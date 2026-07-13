@@ -4,17 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="light" />
-  <title>TEİAŞ – Netztransparenz Frekans Karşılaştırma ve Osilasyon Analizi</title>
+  <title>Frekans Atlası</title>
 
-  <!--
-    Harici kütüphaneler yalnızca görselleştirme ve çıktı üretimi için kullanılır.
-    CSV ayrıştırma, büyük dosyalarda ana arayüzü kilitlememek amacıyla Web Worker
-    içinde akış (stream) tabanlı ve satır satır yapılır.
-  -->
+  <!-- CSV ayrıştırma Web Worker içinde akış tabanlı ve satır satır yapılır. -->
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
 
   <style>
     :root {
@@ -108,7 +101,7 @@
 
     .tabs {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       background: #fff;
       border: 1px solid var(--line);
       border-radius: 13px;
@@ -133,6 +126,45 @@
 
     .tab-button:hover { background: var(--soft-blue); color: var(--navy); }
     .tab-button.active { background: var(--navy); color: #fff; }
+
+    .calendar-nav { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .calendar-nav button {
+      border: 1px solid var(--line); background: #fff; border-radius: 7px;
+      padding: 5px 10px; cursor: pointer; font-size: .9rem; color: var(--navy);
+      min-height: 32px; line-height: 1;
+    }
+    .calendar-nav button:hover { background: var(--soft-blue); }
+    .calendar-nav span { font-weight: 800; font-size: .95rem; color: var(--navy); min-width: 140px; text-align: center; }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      max-width: 320px;
+    }
+    .cal-header {
+      text-align: center; font-size: .72rem; font-weight: 800; color: var(--muted);
+      padding: 4px 0; text-transform: uppercase;
+    }
+    .cal-day {
+      position: relative;
+      text-align: center; padding: 6px 2px; border-radius: 7px;
+      font-size: .82rem; font-weight: 700; cursor: pointer; color: var(--ink);
+      background: #fff; border: 1px solid transparent; min-height: 36px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    }
+    .cal-day:hover { background: var(--soft-blue); }
+    .cal-day.selected { border-color: var(--cyan); background: #edf9fc; }
+    .cal-day.other-month { color: #bccbd6; }
+    .cal-day.empty { cursor: default; background: transparent; border-color: transparent; }
+    .cal-day.empty:hover { background: transparent; }
+    .cal-dots { display: flex; gap: 3px; justify-content: center; min-height: 8px; }
+    .cal-dot {
+      width: 7px; height: 7px; border-radius: 50%; display: inline-block;
+    }
+    .cal-dot.teias { background: var(--red); }
+    .cal-dot.netz { background: var(--blue); }
+
 
     main {
       max-width: 1550px;
@@ -587,7 +619,7 @@
 
     @media print {
       body { background: #fff; }
-      .app-header, .tabs, .no-print, #tab-load, #tab-settings { display: none !important; }
+      .app-header, .tabs, .no-print, #tab-settings { display: none !important; }
       main { max-width: none; margin: 0; padding: 0; }
       .panel { box-shadow: none; break-inside: avoid; }
       .hour-matrix-shell, .hour-matrix { break-inside: avoid; page-break-inside: avoid; }
@@ -600,46 +632,173 @@
   <header class="app-header">
     <div class="header-row">
       <div class="brand">
-        <h1>Frekans Karşılaştırma ve Alanlar Arası Osilasyon Analizi</h1>
-        <p>TEİAŞ günlük frekans verisi • Netztransparenz aylık frekans verisi • 1 saniyelik veri işleme</p>
+        <h1>Frekans Atlası</h1>
+        <p>Türkiye ve ENTSO-e Günlük Şebeke Frekansı Analiz Platformu</p>
       </div>
-      <div class="header-actions">
-        <span class="privacy-chip">🔒 Veriler yalnızca tarayıcı belleğinde işlenir</span>
-        <button class="btn btn-light" id="excelBtn">Excel Çıktısı</button>
-        <button class="btn btn-light" id="pdfBtn">PDF Raporu</button>
-      </div>
+      <div class="header-actions"></div>
     </div>
   </header>
 
   <div class="tabs-shell">
     <nav class="tabs" aria-label="Uygulama sekmeleri">
-      <button class="tab-button active" data-tab="tab-load">1. Frekans Veri Yükleme</button>
-      <button class="tab-button" data-tab="tab-chart">2. Frekans Grafiği</button>
-      <button class="tab-button" data-tab="tab-oscillation">3. Alanlar Arası Osilasyon</button>
-      <button class="tab-button" data-tab="tab-settings">4. Ayarlar</button>
+      <button class="tab-button active" data-tab="tab-chart">Günlük Frekans</button>
+      <button class="tab-button" data-tab="tab-oscillation">Alanlar Arası Osilasyon</button>
+      <button class="tab-button" data-tab="tab-settings">Ayarlar</button>
     </nav>
   </div>
 
   <main>
-    <!-- SEKME 1: VERİ YÜKLEME -->
-    <section id="tab-load" class="tab-panel active">
+    <!-- SEKME 1: GÜNLÜK FREKANS (eski tab-chart, artık aktif başlangıç sekmesi) -->
+
+    <!-- SEKME 1: GÜNLÜK FREKANS -->
+    <section id="tab-chart" class="tab-panel active">
+      <div class="panel no-print">
+        <div class="control-bar">
+          <div class="field">
+            <label>Tarih Seçimi</label>
+            <div id="calendarContainer">
+              <div class="calendar-nav">
+                <button id="calPrevMonth" title="Önceki ay">◀</button>
+                <span id="calMonthYear"></span>
+                <button id="calNextMonth" title="Sonraki ay">▶</button>
+              </div>
+              <div class="calendar-grid" id="calGrid"></div>
+              <input type="hidden" id="dateSelect" value="" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="alignmentSelect">Zaman eşleştirme</label>
+            <select id="alignmentSelect">
+              <option value="utcAuto">UTC – otomatik</option>
+              <option value="sameLocal">Aynı yerel saat</option>
+              <option value="manual">Manuel saat farkı</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="manualOffsetGraph">TR→DE saat farkı</label>
+            <input id="manualOffsetGraph" type="number" min="-12" max="12" step="0.5" value="1" />
+          </div>
+          <div class="field">
+            <label for="showDifference">Grafikte fark</label>
+            <select id="showDifference"><option value="yes">Göster</option><option value="no">Gizle</option></select>
+          </div>
+          <button class="btn btn-primary" id="calculateBtn">Günlük Raporu Hesapla</button>
+          <button class="btn btn-secondary" id="resetZoomBtn">Grafik Sıfırla</button>
+        </div>
+        <div id="alignmentInfo" class="status-banner warn">Tarih seçip Günlük Raporu Hesapla butonuna basın.</div>
+      </div>
+
       <div class="panel">
         <div class="section-title">
           <div>
-            <h2>Frekans Veri Yükleme</h2>
-            <p>Aylık Netztransparenz CSV dosyası ile bir veya daha fazla TEİAŞ günlük CSV dosyasını yükleyin. Dosyalar sunucuya gönderilmez.</p>
+            <h2>24 Saatlik Frekans Karşılaştırması</h2>
+            <p id="frequencyChartDescription"></p>
           </div>
-          <button class="btn btn-danger" id="clearDataBtn">Yüklenen Verileri Temizle</button>
+          <div class="chart-tags">
+            <span class="tag good" id="chartViewTag">24 saat • dakikalık</span>
+            <span class="tag" id="reportDateTag">Tarih seçilmedi</span>
+          </div>
+        </div>
+        <div class="kpi-grid" id="kpiGrid"></div>
+        <div id="frequencyChart" class="chart"></div>
+      </div>
+
+      <div class="panel">
+        <div class="section-title">
+          <div>
+            <h3>Saatlik İstatistik Matrisi</h3>
+            <p>Tek tabloda Metrik ve 00–23 saat kolonları gösterilir. <span class="interaction-note">Saat başlığına tek tıklama saniyelik saat grafiğini, çift tıklama günlük grafiği açar.</span></p>
+          </div>
+        </div>
+        <div id="hourBlocks" class="hour-matrix-shell"></div>
+      </div>
+
+      <div class="panel">
+        <div class="section-title">
+          <div>
+            <h3>15 Dakikalık Ortalama Mutlak Frekans Farkı</h3>
+            <p>Her hücre ilgili çeyrek saatteki eşlenmiş TEİAŞ–Netztransparenz farkının MAE değerini gösterir. <span class="interaction-note">Tek tıklama 900 saniyelik grafiği, çift tıklama günlük grafiği açar.</span></p>
+          </div>
+        </div>
+        <div id="quarterHeatmap" class="quarter-grid"></div>
+      </div>
+    </section>
+
+    <!-- SEKME 2: OSİLASYON -->
+    <section id="tab-oscillation" class="tab-panel">
+      <div class="panel no-print">
+        <div class="section-title">
+          <div>
+            <h2>Alanlar Arası Osilasyon Taraması</h2>
+          </div>
+          <div class="osc-source-selector">
+            <label for="oscSourceSelect">Analiz kaynağı</label>
+            <select id="oscSourceSelect">
+              <option value="tr" selected>TEİAŞ</option>
+              <option value="de">Netztransparenz</option>
+            </select>
+          </div>
+        </div>
+        <div class="oscillation-controls">
+          <div class="field"><label for="bandMin">Alt bant (Hz)</label><input id="bandMin" type="number" min="0.01" max="0.45" step="0.01" value="0.10" /></div>
+          <div class="field"><label for="bandMax">Üst bant (Hz)</label><input id="bandMax" type="number" min="0.02" max="0.49" step="0.01" value="0.20" /></div>
+          <div class="field"><label for="oscThreshold">Genlik eşiği (mHz)</label><input id="oscThreshold" type="number" min="0.1" max="200" step="0.5" value="10" /></div>
+          <div class="field"><label for="windowSec">Pencere (sn)</label><input id="windowSec" type="number" min="30" max="900" step="10" value="120" /></div>
+          <div class="field"><label for="stepSec">Adım (sn)</label><input id="stepSec" type="number" min="1" max="120" step="1" value="10" /></div>
+          <div class="field"><label for="filterTaps">FIR kademe (tek)</label><input id="filterTaps" type="number" min="31" max="401" step="2" value="101" /></div>
+          <div class="field"><label for="minDuration">Min. olay süresi (sn)</label><input id="minDuration" type="number" min="10" max="1800" step="10" value="30" /></div>
+          <button class="btn btn-success" id="oscCalculateBtn">Hesaplama Yap</button>
+        </div>
+        <div id="oscStatus" class="status-banner warn">Önce Günlük Frekans sekmesinde rapor hesaplayın.</div>
+      </div>
+
+      <div class="panel">
+        <div class="section-title">
+          <div>
+            <h3 id="oscChartTitle">Seçilen Kaynağın Bant Geçiren Bileşeni ve Bulgular</h3>
+          </div>
+          <span class="tag" id="oscCountTag">0 bulgu</span>
+        </div>
+        <div id="oscillationChart" class="chart tall"></div>
+      </div>
+
+      <div class="panel">
+        <div class="section-title">
+          <div>
+            <h3>Osilasyon Bulguları</h3>
+            <p>Bir satıra tıklayarak grafiği ilgili zaman aralığına yakınlaştırabilirsiniz.</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>No</th><th>Başlangıç</th><th>Bitiş</th><th>Süre</th><th>Tepe genlik</th><th>RMS</th><th>Baskın frekans</th><th>Pencere</th><th id="eventSourceMeanHead">TEİAŞ ort.</th><th id="eventSourceRangeHead">TEİAŞ min–maks</th><th>Sınıflandırma</th></tr>
+            </thead>
+            <tbody id="eventBody"><tr><td colspan="11" class="empty-state">Henüz osilasyon analizi yapılmadı.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEKME 3: AYARLAR -->
+    <section id="tab-settings" class="tab-panel">
+      <div class="panel">
+        <div class="section-title">
+          <div>
+            <h3>Veri Yükleme</h3>
+          </div>
+          <div class="button-row">
+            <button class="btn btn-danger" id="clearDataBtn">Yüklenen Verileri Temizle</button>
+          </div>
         </div>
 
         <div class="grid-2">
           <div class="card">
             <div class="section-title">
               <div>
-                <h3>Netztransparenz – Aylık CSV</h3>
-                <p><code>DATE;TIME;FREQUENCY_[HZ]</code> formatı otomatik algılanır.</p>
+                <h3>Netztransparenz</h3>
               </div>
-              <span class="tag">Aylık</span>
+              <span class="tag">Aylık CSV</span>
             </div>
             <label class="drop-zone" id="deDrop" for="deFiles">
               <span class="drop-icon">DE</span>
@@ -652,8 +811,7 @@
           <div class="card">
             <div class="section-title">
               <div>
-                <h3>TEİAŞ – Günlük CSV</h3>
-                <p>Başlıksız TEİAŞ formatında saat, saniye, frekans ve tarih alanları otomatik eşleştirilir.</p>
+                <h3>TEİAŞ</h3>
               </div>
               <span class="tag">Çoklu günlük</span>
             </div>
@@ -704,16 +862,15 @@
           </div>
         </div>
         <div class="source-links">
-          <a href="https://www.teias.gov.tr/gunluk-frekans-bilgisi" target="_blank" rel="noopener">TEİAŞ kaynak sayfası</a>
-          <a href="https://www.netztransparenz.de/de-de/Regelenergie/Daten-Regelreserve/Sek%C3%BCndliche-Daten" target="_blank" rel="noopener">Netztransparenz kaynak sayfası</a>
+          <a href="https://www.teias.gov.tr/gunluk-frekans-bilgisi" target="_blank" rel="noopener">TEİAŞ</a>
+          <a href="https://www.netztransparenz.de/de-de/Regelenergie/Daten-Regelreserve/Sek%C3%BCndliche-Daten" target="_blank" rel="noopener">Netztransparenz</a>
         </div>
       </div>
 
       <div class="panel">
         <div class="section-title">
           <div>
-            <h3>Yüklenen Veri Envanteri ve Kalite Kontrolü</h3>
-            <p>Her gün için kayıt sayısı, eksik saniye, yinelenen kayıt ve temel frekans istatistikleri gösterilir.</p>
+            <h3>Veri Envanteri</h3>
           </div>
         </div>
         <div class="table-wrap">
@@ -731,152 +888,9 @@
       </div>
 
       <div class="panel">
-        <div class="section-title"><div><h3>Kaynak Formatı Notları</h3></div></div>
-        <div class="grid-2">
-          <div class="help-box">
-            <strong>Netztransparenz:</strong> Ayraç noktalı virgüldür; frekans ondalığı virgül olabilir. Aylık dosya tarayıcıda akışla okunur ve her gün ayrı <code>Float32Array(86400)</code> olarak saklanır.
-          </div>
-          <div class="help-box">
-            <strong>TEİAŞ:</strong> Sağlanan örneklerde saat 5. alan, saniye numarası 6. alan, frekans 7. alan ve tarih 8. alandadır. Uygulama bu yapıyı otomatik doğrular.
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SEKME 2: FREKANS GRAFİĞİ -->
-    <section id="tab-chart" class="tab-panel">
-      <div class="panel no-print">
-        <div class="control-bar">
-          <div class="field">
-            <label for="dateSelect">TEİAŞ günü</label>
-            <select id="dateSelect"><option value="">Önce veri yükleyin</option></select>
-          </div>
-          <div class="field">
-            <label for="alignmentSelect">Zaman eşleştirme</label>
-            <select id="alignmentSelect">
-              <option value="utcAuto">UTC – otomatik mevsim saati</option>
-              <option value="sameLocal">Aynı yerel saat</option>
-              <option value="manual">Manuel saat farkı</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="manualOffsetGraph">TR → DE saat farkı</label>
-            <input id="manualOffsetGraph" type="number" min="-12" max="12" step="0.5" value="1" />
-          </div>
-          <div class="field">
-            <label for="showDifference">Grafikte fark</label>
-            <select id="showDifference"><option value="yes">Göster</option><option value="no">Gizle</option></select>
-          </div>
-          <button class="btn btn-primary" id="calculateBtn">Günlük Raporu Hesapla</button>
-          <button class="btn btn-secondary" id="resetZoomBtn">Grafik Yakınlaştırmayı Sıfırla</button>
-        </div>
-        <div id="alignmentInfo" class="status-banner warn">Zaman eşleştirme bilgisi veri ve tarih seçildiğinde gösterilecektir.</div>
-      </div>
-
-      <div class="panel">
         <div class="section-title">
           <div>
-            <h2>24 Saatlik Frekans Karşılaştırması</h2>
-            <p id="frequencyChartDescription">Günlük görünümde 86.400 örnek dakikalık ortalamaya indirgenir; saat ve çeyrek saat detaylarında saniyelik örnekler çizilir.</p>
-          </div>
-          <div class="chart-tags">
-            <span class="tag good" id="chartViewTag">24 saat • dakikalık</span>
-            <span class="tag" id="reportDateTag">Tarih seçilmedi</span>
-          </div>
-        </div>
-        <div class="kpi-grid" id="kpiGrid"></div>
-        <div id="frequencyChart" class="chart"></div>
-      </div>
-
-      <div class="panel">
-        <div class="section-title">
-          <div>
-            <h3>Saatlik İstatistik Matrisi</h3>
-            <p>Tek tabloda Metrik ve 00–23 saat kolonları gösterilir. <span class="interaction-note">Saat başlığına tek tıklama saniyelik saat grafiğini, çift tıklama günlük grafiği açar.</span></p>
-          </div>
-        </div>
-        <div id="hourBlocks" class="hour-matrix-shell"></div>
-      </div>
-
-      <div class="panel">
-        <div class="section-title">
-          <div>
-            <h3>15 Dakikalık Ortalama Mutlak Frekans Farkı</h3>
-            <p>Her hücre ilgili çeyrek saatteki eşlenmiş TEİAŞ–Netztransparenz farkının MAE değerini gösterir. <span class="interaction-note">Tek tıklama 900 saniyelik grafiği, çift tıklama günlük grafiği açar.</span></p>
-          </div>
-        </div>
-        <div id="quarterHeatmap" class="quarter-grid"></div>
-      </div>
-    </section>
-
-    <!-- SEKME 3: OSİLASYON -->
-    <section id="tab-oscillation" class="tab-panel">
-      <div class="panel no-print">
-        <div class="section-title">
-          <div>
-            <h2>Alanlar Arası / Inter-Area Osilasyon Taraması</h2>
-            <p id="oscSourceDescription">Seçilen frekans kaynağı üzerinde 0,1–0,2 Hz bant geçiren FIR süzgeci ve kayan pencere analizi uygulanır.</p>
-          </div>
-          <div class="osc-source-selector" title="Osilasyon hesabının uygulanacağı frekans kaynağını seçin. Diğer kaynak grafikte varsayılan olarak pasif kalır ve lejanttan açılabilir.">
-            <label for="oscSourceSelect">Analiz kaynağı</label>
-            <select id="oscSourceSelect">
-              <option value="tr" selected>TEİAŞ</option>
-              <option value="de">Netztransparenz</option>
-            </select>
-          </div>
-        </div>
-        <div class="oscillation-controls">
-          <div class="field"><label for="bandMin">Alt bant (Hz)</label><input id="bandMin" type="number" min="0.01" max="0.45" step="0.01" value="0.10" /></div>
-          <div class="field"><label for="bandMax">Üst bant (Hz)</label><input id="bandMax" type="number" min="0.02" max="0.49" step="0.01" value="0.20" /></div>
-          <div class="field"><label for="oscThreshold">Genlik eşiği (mHz)</label><input id="oscThreshold" type="number" min="0.1" max="200" step="0.5" value="10" /></div>
-          <div class="field"><label for="windowSec">Pencere (sn)</label><input id="windowSec" type="number" min="30" max="900" step="10" value="120" /></div>
-          <div class="field"><label for="stepSec">Adım (sn)</label><input id="stepSec" type="number" min="1" max="120" step="1" value="10" /></div>
-          <div class="field"><label for="filterTaps">FIR kademe (tek)</label><input id="filterTaps" type="number" min="31" max="401" step="2" value="101" /></div>
-          <div class="field"><label for="minDuration">Min. olay süresi (sn)</label><input id="minDuration" type="number" min="10" max="1800" step="10" value="30" /></div>
-          <button class="btn btn-success" id="oscCalculateBtn">Hesaplama Yap</button>
-        </div>
-        <div id="oscStatus" class="status-banner warn">Önce Frekans Grafiği sekmesinde bir günlük rapor hesaplayın.</div>
-        <div class="help-box">
-          <strong>Teknik sınır:</strong> Veriler 1 Hz örnekleme hızındadır; Nyquist frekansı 0,5 Hz’dir. Bu modül 0,1–0,2 Hz için bir tarama ve karar destek aracıdır; 10–100 ms PMU modal analizinin yerine geçmez. Sentetik veri veya mock fallback kullanılmaz.
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="section-title">
-          <div>
-            <h3 id="oscChartTitle">Seçilen Kaynağın Bant Geçiren Frekans Bileşeni ve Eşik Üstü Bulguları</h3>
-            <p id="oscChartDescription">Grafikte yalnızca eşik üstü bulgu aralıkları ±30 saniye genişletilerek çizilir. İkinci eksende TEİAŞ ve Netztransparenz gerçek frekansları bulunur; analiz edilmeyen kaynak varsayılan olarak pasiftir.</p>
-          </div>
-          <span class="tag" id="oscCountTag">0 bulgu</span>
-        </div>
-        <div id="oscillationChart" class="chart tall"></div>
-      </div>
-
-      <div class="panel">
-        <div class="section-title">
-          <div>
-            <h3>Osilasyon Bulguları</h3>
-            <p>Bir satıra tıklayarak grafiği ilgili zaman aralığına yakınlaştırabilirsiniz.</p>
-          </div>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr><th>No</th><th>Başlangıç</th><th>Bitiş</th><th>Süre</th><th>Tepe genlik</th><th>RMS</th><th>Baskın frekans</th><th>Pencere</th><th id="eventSourceMeanHead">TEİAŞ ort.</th><th id="eventSourceRangeHead">TEİAŞ min–maks</th><th>Sınıflandırma</th></tr>
-            </thead>
-            <tbody id="eventBody"><tr><td colspan="11" class="empty-state">Henüz osilasyon analizi yapılmadı.</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- SEKME 4: AYARLAR -->
-    <section id="tab-settings" class="tab-panel">
-      <div class="panel">
-        <div class="section-title">
-          <div>
-            <h2>Yapılandırma</h2>
-            <p>Zaman dilimi, veri kalite sınırları, grafik ölçeği ve varsayılan osilasyon parametreleri tarayıcıda saklanır.</p>
+            <h3>Yapılandırma</h3>
           </div>
           <div class="button-row">
             <button class="btn btn-secondary" id="resetSettingsBtn">Varsayılanlara Dön</button>
@@ -891,7 +905,7 @@
             <div class="field"><label for="teiasUtcOffset">TEİAŞ UTC ofseti</label><input id="teiasUtcOffset" type="number" step="0.5" value="3" /></div>
             <div class="field"><label for="deWinterOffset">Almanya kış UTC ofseti</label><input id="deWinterOffset" type="number" step="0.5" value="1" /></div>
             <div class="field"><label for="deSummerOffset">Almanya yaz UTC ofseti</label><input id="deSummerOffset" type="number" step="0.5" value="2" /></div>
-            <div class="field"><label for="manualOffsetSetting">Manuel TR → DE farkı (saat)</label><input id="manualOffsetSetting" type="number" step="0.5" value="1" /></div>
+            <div class="field"><label for="manualOffsetSetting">Manuel TR→DE farkı (saat)</label><input id="manualOffsetSetting" type="number" step="0.5" value="1" /></div>
           </div>
 
           <div class="card settings-card">
@@ -899,27 +913,22 @@
             <div class="field"><label for="nominalFrequency">Nominal frekans (Hz)</label><input id="nominalFrequency" type="number" step="0.001" value="50" /></div>
             <div class="field"><label for="validMin">Geçerli alt sınır (Hz)</label><input id="validMin" type="number" step="0.001" value="49" /></div>
             <div class="field"><label for="validMax">Geçerli üst sınır (Hz)</label><input id="validMax" type="number" step="0.001" value="51" /></div>
-            <div class="field"><label for="maxGap">Doğrusal doldurma üst sınırı (sn)</label><input id="maxGap" type="number" min="0" max="30" step="1" value="2" /></div>
-            <div class="field"><label for="minPairedRatio">Minimum eşlenmiş veri oranı (%)</label><input id="minPairedRatio" type="number" min="1" max="100" step="1" value="90" /></div>
+            <div class="field"><label for="maxGap">Doğrusal doldurma (sn)</label><input id="maxGap" type="number" min="0" max="30" step="1" value="2" /></div>
+            <div class="field"><label for="minPairedRatio">Min. eşlenmiş veri oranı (%)</label><input id="minPairedRatio" type="number" min="1" max="100" step="1" value="90" /></div>
           </div>
 
           <div class="card settings-card">
-            <h3>Grafik ve Rapor</h3>
+            <h3>Grafik</h3>
             <div class="field"><label for="graphScale">Frekans Y ekseni</label><select id="graphScale"><option value="auto">Otomatik</option><option value="fixed">Sabit</option></select></div>
             <div class="field"><label for="graphMin">Sabit minimum (Hz)</label><input id="graphMin" type="number" step="0.001" value="49.90" /></div>
             <div class="field"><label for="graphMax">Sabit maksimum (Hz)</label><input id="graphMax" type="number" step="0.001" value="50.10" /></div>
             <div class="field"><label for="chartStep">Osilasyon grafik adımı (sn)</label><input id="chartStep" type="number" min="1" max="30" step="1" value="5" /></div>
-            <div class="field"><label for="reportTitle">Rapor başlığı</label><input id="reportTitle" type="text" value="Frekans Karşılaştırma ve Osilasyon Analiz Raporu" /></div>
           </div>
-        </div>
-
-        <div class="help-box">
-          <strong>Otomatik yaz/kış saati:</strong> Avrupa/Berlin için son pazar günü kuralı uygulanır. Haziran 2026’da Almanya UTC+2, Türkiye UTC+3 olduğundan eş zamanlı karşılaştırmada fark 1 saattir. Kış döneminde Almanya UTC+1 olduğundan fark 2 saate çıkar.
         </div>
       </div>
     </section>
 
-    <div class="footer-note">Bu uygulama TEİAŞ'ın veya diğer TSO'ların resmi uygulaması değildir. Frekans verileri ilgili kaynak kurumların kamuya açık yayınlarından elde edilir ve kaynakların zaman damgası, kapsamı ve kalite durumu ile sınırlıdır. Kaynaklar arasındaki farklar ölçüm noktası, örnekleme, filtreleme, zaman damgası ve veri işleme yöntemlerinden kaynaklanabilir. 0,10-0,20 Hz bant analizi alanlar arası osilasyon adayı tespitidir; kesin sınıflandırma için çok noktalı PMU ölçümleri, faz ilişkisi, koherens ve mod şekli analizi gerekir.</div>
+
   </main>
 
   <!--
@@ -1349,7 +1358,6 @@
       graphMin: 49.90,
       graphMax: 50.10,
       chartStepSeconds: 5,
-      reportTitle: 'Frekans Karşılaştırma ve Osilasyon Analiz Raporu',
       bandMin: 0.10,
       bandMax: 0.20,
       thresholdMhz: 10,
@@ -1363,11 +1371,6 @@
     const AUTO_DATA_BASE = './data/';
     const AUTO_SOURCE_TO_STATE = { teias: 'tr', netztransparenz: 'de' };
     const STATE_TO_AUTO_SOURCE = { tr: 'teias', de: 'netztransparenz' };
-    const PDF_FONT_URLS = {
-      regular: 'https://cdn.jsdelivr.net/npm/notosans-fontface@1.3.0/fonts/NotoSans-Regular.ttf',
-      bold: 'https://cdn.jsdelivr.net/npm/notosans-fontface@1.3.0/fonts/NotoSans-Bold.ttf'
-    };
-
     const state = {
       de: new Map(),
       tr: new Map(),
@@ -1379,9 +1382,8 @@
         loadError: null,
         loadedDays: new Set()
       },
-      pdfFontFiles: null,
-      pdfUnicodeReady: false,
       settings: loadSettings(),
+      calendarDate: new Date(),
       current: null,
       events: [],
       filteredOscillation: null,
@@ -1398,14 +1400,6 @@
     const $ = (id) => document.getElementById(id);
     const fmt = (v, digits = 3) => Number.isFinite(v) ? Number(v).toFixed(digits) : '—';
     const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
-
-    // jsPDF'nin yerleşik Helvetica fontu Türkçe glifleri güvenilir biçimde taşımaz.
-    // PDF metinlerinde okunabilir ASCII karşılık kullanılarak bozuk karakterler engellenir.
-    function pdfSafeText(value) {
-      if (state.pdfUnicodeReady) return String(value ?? '');
-      const map = { 'ç':'c','Ç':'C','ğ':'g','Ğ':'G','ı':'i','İ':'I','ö':'o','Ö':'O','ş':'s','Ş':'S','ü':'u','Ü':'U' };
-      return String(value ?? '').replace(/[çÇğĞıİöÖşŞüÜ]/g, ch => map[ch] || ch);
-    }
 
     function singleSeriesStats(series, start, end, nominal = 50) {
       let count = 0, sum = 0, min = Infinity, max = -Infinity, absDev = 0;
@@ -1521,8 +1515,8 @@
       $('oscCalculateBtn').addEventListener('click', calculateOscillation);
       $('oscSourceSelect').addEventListener('change', handleOscillationSourceChange);
       $('resetZoomBtn').addEventListener('click', showDailyFrequencyChart);
-      $('excelBtn').addEventListener('click', exportExcel);
-      $('pdfBtn').addEventListener('click', exportPdf);
+      $('calPrevMonth').addEventListener('click', () => { state.calendarDate.setMonth(state.calendarDate.getMonth() - 1); renderCalendar(); });
+      $('calNextMonth').addEventListener('click', () => { state.calendarDate.setMonth(state.calendarDate.getMonth() + 1); renderCalendar(); });
       $('useAutoDataBtn').addEventListener('click', useAutoDataMode);
       $('useManualDataBtn').addEventListener('click', useManualDataMode);
       $('reloadAutoDataBtn').addEventListener('click', () => loadAutoDataCatalog({ force: true }));
@@ -1531,7 +1525,6 @@
 
       $('alignmentSelect').addEventListener('change', updateAlignmentInfo);
       $('manualOffsetGraph').addEventListener('change', updateAlignmentInfo);
-      $('dateSelect').addEventListener('change', updateAlignmentInfo);
       window.addEventListener('resize', () => {
         state.frequencyChart?.resize();
         state.oscillationChart?.resize();
@@ -1541,52 +1534,9 @@
     function checkLibraries() {
       const missing = [];
       if (!window.echarts) missing.push('ECharts');
-      if (!window.XLSX) missing.push('SheetJS');
-      if (!window.jspdf) missing.push('jsPDF');
       if (missing.length) {
-        setBanner('loadStatus', `İnternet/CDN erişimi nedeniyle şu kütüphaneler yüklenemedi: ${missing.join(', ')}. Veri işleme çalışır; ilgili grafik veya çıktı işlevi sınırlı olabilir.`, 'warn');
+        setBanner('loadStatus', `CDN yüklenemedi: ${missing.join(', ')}.`, 'warn');
       }
-    }
-
-    async function loadPdfUnicodeFont(doc) {
-      try {
-        if (!state.pdfFontFiles) {
-          const [regular, bold] = await Promise.all([
-            fetch(PDF_FONT_URLS.regular).then(r => {
-              if (!r.ok) throw new Error(`NotoSans-Regular HTTP ${r.status}`);
-              return r.arrayBuffer();
-            }),
-            fetch(PDF_FONT_URLS.bold).then(r => {
-              if (!r.ok) throw new Error(`NotoSans-Bold HTTP ${r.status}`);
-              return r.arrayBuffer();
-            })
-          ]);
-          state.pdfFontFiles = {
-            regular: arrayBufferToBase64(regular),
-            bold: arrayBufferToBase64(bold)
-          };
-        }
-        doc.addFileToVFS('NotoSans-Regular.ttf', state.pdfFontFiles.regular);
-        doc.addFont('NotoSans-Regular.ttf', 'NotoSans', 'normal');
-        doc.addFileToVFS('NotoSans-Bold.ttf', state.pdfFontFiles.bold);
-        doc.addFont('NotoSans-Bold.ttf', 'NotoSans', 'bold');
-        state.pdfUnicodeReady = true;
-        return 'NotoSans';
-      } catch (error) {
-        state.pdfUnicodeReady = false;
-        console.warn('PDF Unicode font could not be loaded; falling back to ASCII-safe text.', error);
-        return 'helvetica';
-      }
-    }
-
-    function arrayBufferToBase64(buffer) {
-      const bytes = new Uint8Array(buffer);
-      let binary = '';
-      const chunk = 0x8000;
-      for (let i = 0; i < bytes.length; i += chunk) {
-        binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
-      }
-      return btoa(binary);
     }
 
     // -----------------------------
@@ -1877,15 +1827,65 @@
     }
 
     function updateDateSelect() {
-      const select = $('dateSelect');
-      const previous = select.value;
       const dates = reportDatesForCurrentMode();
-      select.innerHTML = dates.length
-        ? dates.map(d => `<option value="${d}">${displayDate(d)}</option>`).join('')
-        : '<option value="">Önce TEİAŞ verisi yükleyin</option>';
-      if (dates.includes(previous)) select.value = previous;
-      else if (state.dataMode === 'auto' && dates.length) select.value = dates[dates.length - 1];
+      const hidden = $('dateSelect');
+      if (dates.length && !hidden.value) hidden.value = dates[dates.length - 1];
+      renderCalendar();
       updateAlignmentInfo();
+    }
+
+    function renderCalendar() {
+      const grid = $('calGrid');
+      const monthYear = $('calMonthYear');
+      const hidden = $('dateSelect');
+      const date = state.calendarDate;
+      const year = date.getFullYear();
+      const month = date.getMonth();
+
+      const monthNames = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+      monthYear.textContent = `${monthNames[month]} ${year}`;
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const daysInPrev = new Date(year, month, 0).getDate();
+
+      const allTeias = [...state.tr.keys()];
+      if (state.auto.manifest?.sources?.teias?.availableDates) {
+        state.auto.manifest.sources.teias.availableDates.forEach(d => allTeias.push(d));
+      }
+      const teiasDates = new Set(allTeias);
+      const deDates = new Set(state.de.keys());
+      if (state.auto.manifest?.sources?.netztransparenz?.availableDates) {
+        state.auto.manifest.sources.netztransparenz.availableDates.forEach(d => deDates.add(d));
+      }
+
+      const trPrefix = (d) => teiasDates.has(d) ? '<span class="cal-dot teias"></span>' : '';
+      const dePrefix = (d) => deDates.has(d) ? '<span class="cal-dot netz"></span>' : '';
+
+      const headerDays = ['Pt','Sa','Ça','Pe','Cu','Ct','Pz'];
+      let html = headerDays.map(d => `<div class="cal-header">${d}</div>`).join('');
+
+      for (let i = firstDay === 0 ? 6 : firstDay - 1; i > 0; i--) {
+        html += `<div class="cal-day empty"></div>`;
+      }
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const iso = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const selected = hidden.value === iso ? ' selected' : '';
+        const dots = trPrefix(iso) + dePrefix(iso);
+        html += `<div class="cal-day${selected}" data-date="${iso}">${d}<div class="cal-dots">${dots}</div></div>`;
+      }
+
+      grid.innerHTML = html;
+
+      grid.querySelectorAll('.cal-day[data-date]').forEach(day => {
+        day.addEventListener('click', () => {
+          grid.querySelectorAll('.cal-day').forEach(el => el.classList.remove('selected'));
+          day.classList.add('selected');
+          hidden.value = day.dataset.date;
+          updateAlignmentInfo();
+        });
+      });
     }
 
     function clearData() {
@@ -2399,16 +2399,7 @@
 
     function updateOscillationSourceUi() {
       const source = $('oscSourceSelect')?.value || state.settings.oscillationSource || 'tr';
-      const selected = sourceLabel(source);
-      const other = sourceLabel(source === 'tr' ? 'de' : 'tr');
       state.oscillationSource = source;
-      if ($('oscSourceDescription')) {
-        $('oscSourceDescription').textContent = `${selected} frekans sinyali üzerinde 0,1–0,2 Hz bant geçiren FIR süzgeci ve kayan pencere analizi uygulanır.`;
-      }
-      if ($('oscChartTitle')) $('oscChartTitle').textContent = `${selected} Bant Geçiren Frekans Bileşeni ve Eşik Üstü Bulguları`;
-      if ($('oscChartDescription')) {
-        $('oscChartDescription').textContent = `Yalnızca eşik üstü bulgu aralıkları ±30 saniye genişletilerek çizilir. İkinci eksende iki gerçek frekans da bulunur; ${other} serisi varsayılan olarak pasiftir ve lejanttan açılabilir.`;
-      }
       if ($('eventSourceMeanHead')) $('eventSourceMeanHead').textContent = `${sourceShortLabel(source)} ort.`;
       if ($('eventSourceRangeHead')) $('eventSourceRangeHead').textContent = `${sourceShortLabel(source)} min–maks`;
     }
@@ -2640,146 +2631,7 @@
       }));
     }
 
-    // -----------------------------
-    // EXCEL VE PDF ÇIKTILARI
-    // -----------------------------
-    function exportExcel() {
-      if (!state.current) { alert('Önce günlük rapor hesaplayın.'); return; }
-      if (!window.XLSX) { alert('SheetJS kütüphanesi yüklenemedi. İnternet bağlantısını kontrol edin.'); return; }
-
-      const wb = XLSX.utils.book_new();
-      const c = state.current;
-      const summary = [
-        [state.settings.reportTitle],
-        ['Tarih', displayDate(c.date)],
-        ['Eşleştirme', c.alignment.description],
-        ['TEİAŞ Ortalama (Hz)', c.overall.meanA],
-        ['Netztransparenz Ortalama (Hz)', c.overall.meanB],
-        ['Bias (mHz)', c.overall.biasMhz],
-        ['MAE (mHz)', c.overall.maeMhz],
-        ['RMSE (mHz)', c.overall.rmseMhz],
-        ['Korelasyon', c.overall.correlation],
-        ['Ortak saniye', c.overall.pairedCount]
-      ];
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summary), 'Özet');
-
-      const metadataRows = [
-        ['Alan', 'Değer'],
-        ['Veri modu', c.dataMode === 'auto' ? 'GitHub Pages otomatik veri' : 'Manuel CSV'],
-        ['Manifest güncelleme UTC', c.manifestUpdatedAtUtc || ''],
-        ['Durum güncelleme', c.statusUpdatedAtUtc || ''],
-        ['TEİAŞ son aktif gün', state.auto.manifest?.sources?.teias?.latestDate || ''],
-        ['Netztransparenz son içe aktarım günü', state.auto.manifest?.sources?.netztransparenz?.latestDate || ''],
-        ['TEİAŞ yayınlanmamış gün sayısı', state.auto.status?.missingDayCount ?? ''],
-        ['TEİAŞ kaynak', 'https://www.teias.gov.tr/gunluk-frekans-bilgisi'],
-        ['Netztransparenz kaynak', 'https://www.netztransparenz.de/de-de/Regelenergie/Daten-Regelreserve/Sek%C3%BCndliche-Daten']
-      ];
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(metadataRows), 'Kaynak Metadata');
-
-      const minuteRows = [['Saat', 'TEİAŞ Ort. Hz', 'Netztransparenz Ort. Hz', 'Bias mHz', 'MAE mHz', 'Korelasyon']];
-      c.minute.forEach(r => minuteRows.push([minuteToTime(r.minute), r.meanA, r.meanB, r.biasMhz, r.maeMhz, r.correlation]));
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(minuteRows), 'Dakikalık');
-
-      const hourRows = [['Saat', 'TEİAŞ Ort.', 'TEİAŞ Min', 'TEİAŞ Maks', 'DE Ort.', 'DE Min', 'DE Maks', 'Bias mHz', 'MAE mHz', 'RMSE mHz', 'Korelasyon', 'Ortak sn']];
-      c.hourly.forEach((r, h) => hourRows.push([hourRange(h), r.meanA, r.minA, r.maxA, r.meanB, r.minB, r.maxB, r.biasMhz, r.maeMhz, r.rmseMhz, r.correlation, r.pairedCount]));
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(hourRows), 'Saatlik İstatistik');
-
-      const oscSourceName = sourceLabel(state.oscillationSource || 'tr');
-      const eventRows = [['Analiz Kaynağı', 'No', 'Başlangıç', 'Bitiş', 'Süre sn', 'Tepe Genlik mHz', 'RMS mHz', 'Baskın Hz', 'Pencere', `${oscSourceName} Ortalama Hz`, `${oscSourceName} Min Hz`, `${oscSourceName} Maks Hz`, `${oscSourceName} Ort. |Δf| mHz`, 'Sınıflandırma']];
-      state.events.forEach(e => eventRows.push([oscSourceName, e.no, secondToTime(e.start), secondToTime(e.end), e.duration, e.peakAmplitudeMhz, e.peakRmsMhz, e.dominantHz, e.windows, e.sourceMeanHz, e.sourceMinHz, e.sourceMaxHz, e.sourceMeanAbsDevMhz, e.classification]));
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(eventRows), 'Osilasyon Bulguları');
-
-      const qualityRows = [['Kaynak', 'Tarih', 'Kayıt', 'Eksik', 'Geçersiz', 'Yinelenen', 'Ortalama', 'Min', 'Maks']];
-      state.quality.forEach(q => qualityRows.push([q.source === 'de' ? 'Netztransparenz' : 'TEİAŞ', q.date, q.count, q.missing, q.invalid, q.duplicates, q.mean, q.min, q.max]));
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(qualityRows), 'Veri Kalitesi');
-
-      const settingsRows = [['Ayar', 'Değer'], ...Object.entries(state.settings)];
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(settingsRows), 'Ayarlar');
-      XLSX.writeFile(wb, `Frekans_Raporu_${c.date}.xlsx`);
-    }
-
-    async function exportPdf() {
-      if (!state.current) { alert('Önce günlük rapor hesaplayın.'); return; }
-      if (!window.jspdf?.jsPDF) { window.print(); return; }
-
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-      const pdfFont = await loadPdfUnicodeFont(doc);
-      const current = state.current;
-      const title = state.settings.reportTitle;
-
-      doc.setFont(pdfFont, 'bold'); doc.setFontSize(17); doc.setTextColor(13, 47, 79);
-      doc.text(pdfSafeText(title), 14, 14);
-      doc.setFont(pdfFont, 'normal'); doc.setFontSize(9); doc.setTextColor(70, 85, 97);
-      doc.text(pdfSafeText(`${displayDate(current.date)} • ${current.alignment.description}`), 14, 20, { maxWidth: 265 });
-      doc.setFontSize(7.5);
-      doc.text(pdfSafeText(`Veri modu: ${current.dataMode === 'auto' ? 'GitHub Pages otomatik veri' : 'Manuel CSV'} • Manifest: ${current.manifestUpdatedAtUtc || 'yok'}`), 14, 24, { maxWidth: 265 });
-
-      const cards = [
-        ['TEİAŞ Ort.', `${fmt(current.overall.meanA)} Hz`], ['DE Ort.', `${fmt(current.overall.meanB)} Hz`],
-        ['Ort. Sapma', `${fmt(current.overall.meanAbsDevA,1)} / ${fmt(current.overall.meanAbsDevB,1)} mHz`],
-        ['Bias', `${fmt(current.overall.biasMhz,2)} mHz`], ['MAE', `${fmt(current.overall.maeMhz,2)} mHz`],
-        ['Korelasyon', fmt(current.overall.correlation,4)], ['Ortak veri', `${current.overall.pairedCount.toLocaleString('tr-TR')} sn`]
-      ];
-      cards.forEach((card, index) => {
-        const x = 14 + index * 39.5;
-        doc.setFillColor(237, 245, 249); doc.roundedRect(x, 28, 36.5, 15, 2, 2, 'F');
-        doc.setFontSize(7); doc.setTextColor(80, 100, 115); doc.text(pdfSafeText(card[0]), x + 2, 33);
-        doc.setFontSize(10); doc.setTextColor(13, 47, 79); doc.setFont(pdfFont, 'bold'); doc.text(pdfSafeText(card[1]), x + 2, 39);
-      });
-
-      // Kullanıcı detay görünümündeyken de PDF günlük grafiği içermelidir.
-      const previousView = { ...state.chartView };
-      renderFrequencyChart(current, { mode: 'day', start: 0, end: 86400, label: '24 saat • dakikalık' });
-      const frequencyImage = state.frequencyChart?.getDataURL({ type: 'png', pixelRatio: 2, backgroundColor: '#ffffff' });
-      if (frequencyImage) doc.addImage(frequencyImage, 'PNG', 14, 47, 269, 88);
-      if (previousView.mode !== 'day') renderFrequencyChart(current, previousView);
-
-      const hourlyBody = current.hourly.map((row, hour) => [String(hour).padStart(2,'0'), fmt(row.meanA), fmt(row.meanB), fmt(row.biasMhz,2), fmt(row.maeMhz,2), fmt(row.correlation,3)]);
-      doc.autoTable({
-        startY: 139,
-        head: [[pdfSafeText('Saat'), pdfSafeText('TEİAŞ Ort. Hz'), 'DE Ort. Hz', 'Bias mHz', 'MAE mHz', pdfSafeText('Korelasyon')]],
-        body: hourlyBody.map(row => row.map(pdfSafeText)),
-        theme: 'grid',
-        styles: { font: pdfFont, fontSize: 6.4, cellPadding: 1.2 },
-        headStyles: { fillColor: [13, 47, 79] },
-        columnStyles: { 0: { cellWidth: 17 } },
-        margin: { left: 14, right: 14 }
-      });
-
-      if (state.filteredOscillation) {
-        doc.addPage('a4', 'landscape');
-        doc.setFontSize(15); doc.setTextColor(13, 47, 79); doc.setFont(pdfFont, 'bold');
-        const oscSourceName = sourceLabel(state.oscillationSource || 'tr');
-        doc.text(pdfSafeText(`Alanlar Arası Osilasyon Bulguları - ${oscSourceName} Frekansı`), 14, 14);
-        const oscillationImage = state.oscillationChart?.getDataURL({ type: 'png', pixelRatio: 2, backgroundColor: '#ffffff' });
-        if (oscillationImage) doc.addImage(oscillationImage, 'PNG', 14, 20, 269, 105);
-
-        const eventBody = state.events.map(event => [
-          event.no, secondToTime(event.start), secondToTime(event.end), durationText(event.duration),
-          fmt(event.peakAmplitudeMhz,2), fmt(event.peakRmsMhz,2), fmt(event.dominantHz,4),
-          fmt(event.sourceMeanHz,4), `${fmt(event.sourceMinHz,4)}-${fmt(event.sourceMaxHz,4)}`, event.classification
-        ]);
-        doc.autoTable({
-          startY: 130,
-          head: [[pdfSafeText('No'), pdfSafeText('Başlangıç'), pdfSafeText('Bitiş'), pdfSafeText('Süre'), 'Tepe mHz', 'RMS mHz', pdfSafeText('Baskın Hz'), pdfSafeText(`${sourceShortLabel(state.oscillationSource || 'tr')} Ort. Hz`), pdfSafeText(`${sourceShortLabel(state.oscillationSource || 'tr')} Min-Maks`), pdfSafeText('Sınıf')]],
-          body: eventBody.length
-            ? eventBody.map(row => row.map(pdfSafeText))
-            : [[pdfSafeText('Seçilen eşik için osilasyon bulgusu tespit edilmedi.')]],
-          theme: 'grid',
-          styles: { font: pdfFont, fontSize: 6.2, cellPadding: 1.1 },
-          headStyles: { fillColor: [13, 47, 79] },
-          margin: { left: 14, right: 14 }
-        });
-      }
-
-      doc.setProperties({
-        title: pdfSafeText(title),
-        subject: pdfSafeText(`TEİAŞ ve Netztransparenz frekans karşılaştırması ile ${sourceLabel(state.oscillationSource || 'tr')} osilasyon analizi`),
-        creator: pdfSafeText('Tarayıcı tabanlı frekans analiz uygulaması')
-      });
-      doc.save(`Frekans_Raporu_${current.date}.pdf`);
-    }
+    // (Excel ve PDF çıktı özellikleri kaldırıldı)
 
     // -----------------------------
     // AYARLAR
@@ -2809,7 +2661,6 @@
       $('graphMin').value = s.graphMin;
       $('graphMax').value = s.graphMax;
       $('chartStep').value = s.chartStepSeconds;
-      $('reportTitle').value = s.reportTitle;
       $('bandMin').value = s.bandMin;
       $('bandMax').value = s.bandMax;
       $('oscThreshold').value = s.thresholdMhz;
@@ -2839,7 +2690,6 @@
         graphMin: Number($('graphMin').value),
         graphMax: Number($('graphMax').value),
         chartStepSeconds: Number($('chartStep').value),
-        reportTitle: $('reportTitle').value.trim() || DEFAULT_SETTINGS.reportTitle,
         bandMin: Number($('bandMin').value),
         bandMax: Number($('bandMax').value),
         thresholdMhz: Number($('oscThreshold').value),
