@@ -1,0 +1,4618 @@
+{
+  "schemaVersion": 1,
+  "updatedAtUtc": "2026-07-13T01:00:29Z",
+  "storage": {
+    "type": "github-pages",
+    "baseUrl": "./data"
+  },
+  "sources": {
+    "netztransparenz": {
+      "label": "Netztransparenz",
+      "timezone": "Europe/Berlin",
+      "firstDate": "2026-06-01",
+      "latestDate": "2026-06-30",
+      "availableDates": [
+        "2026-06-01",
+        "2026-06-02",
+        "2026-06-03",
+        "2026-06-04",
+        "2026-06-05",
+        "2026-06-06",
+        "2026-06-07",
+        "2026-06-08",
+        "2026-06-09",
+        "2026-06-10",
+        "2026-06-11",
+        "2026-06-12",
+        "2026-06-13",
+        "2026-06-14",
+        "2026-06-15",
+        "2026-06-16",
+        "2026-06-17",
+        "2026-06-18",
+        "2026-06-19",
+        "2026-06-20",
+        "2026-06-21",
+        "2026-06-22",
+        "2026-06-23",
+        "2026-06-24",
+        "2026-06-25",
+        "2026-06-26",
+        "2026-06-27",
+        "2026-06-28",
+        "2026-06-29",
+        "2026-06-30"
+      ],
+      "excludedDates": [],
+      "days": {
+        "2026-06-01": {
+          "date": "2026-06-01",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260601.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260601.minute.json",
+            "hourly": "netztransparenz/2026/06/20260601.hourly.json",
+            "meta": "netztransparenz/2026/06/20260601.meta.json"
+          }
+        },
+        "2026-06-02": {
+          "date": "2026-06-02",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260602.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260602.minute.json",
+            "hourly": "netztransparenz/2026/06/20260602.hourly.json",
+            "meta": "netztransparenz/2026/06/20260602.meta.json"
+          }
+        },
+        "2026-06-03": {
+          "date": "2026-06-03",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260603.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260603.minute.json",
+            "hourly": "netztransparenz/2026/06/20260603.hourly.json",
+            "meta": "netztransparenz/2026/06/20260603.meta.json"
+          }
+        },
+        "2026-06-04": {
+          "date": "2026-06-04",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260604.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260604.minute.json",
+            "hourly": "netztransparenz/2026/06/20260604.hourly.json",
+            "meta": "netztransparenz/2026/06/20260604.meta.json"
+          }
+        },
+        "2026-06-05": {
+          "date": "2026-06-05",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260605.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260605.minute.json",
+            "hourly": "netztransparenz/2026/06/20260605.hourly.json",
+            "meta": "netztransparenz/2026/06/20260605.meta.json"
+          }
+        },
+        "2026-06-06": {
+          "date": "2026-06-06",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260606.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260606.minute.json",
+            "hourly": "netztransparenz/2026/06/20260606.hourly.json",
+            "meta": "netztransparenz/2026/06/20260606.meta.json"
+          }
+        },
+        "2026-06-07": {
+          "date": "2026-06-07",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260607.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260607.minute.json",
+            "hourly": "netztransparenz/2026/06/20260607.hourly.json",
+            "meta": "netztransparenz/2026/06/20260607.meta.json"
+          }
+        },
+        "2026-06-08": {
+          "date": "2026-06-08",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260608.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260608.minute.json",
+            "hourly": "netztransparenz/2026/06/20260608.hourly.json",
+            "meta": "netztransparenz/2026/06/20260608.meta.json"
+          }
+        },
+        "2026-06-09": {
+          "date": "2026-06-09",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260609.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260609.minute.json",
+            "hourly": "netztransparenz/2026/06/20260609.hourly.json",
+            "meta": "netztransparenz/2026/06/20260609.meta.json"
+          }
+        },
+        "2026-06-10": {
+          "date": "2026-06-10",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260610.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260610.minute.json",
+            "hourly": "netztransparenz/2026/06/20260610.hourly.json",
+            "meta": "netztransparenz/2026/06/20260610.meta.json"
+          }
+        },
+        "2026-06-11": {
+          "date": "2026-06-11",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260611.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260611.minute.json",
+            "hourly": "netztransparenz/2026/06/20260611.hourly.json",
+            "meta": "netztransparenz/2026/06/20260611.meta.json"
+          }
+        },
+        "2026-06-12": {
+          "date": "2026-06-12",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260612.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260612.minute.json",
+            "hourly": "netztransparenz/2026/06/20260612.hourly.json",
+            "meta": "netztransparenz/2026/06/20260612.meta.json"
+          }
+        },
+        "2026-06-13": {
+          "date": "2026-06-13",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260613.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260613.minute.json",
+            "hourly": "netztransparenz/2026/06/20260613.hourly.json",
+            "meta": "netztransparenz/2026/06/20260613.meta.json"
+          }
+        },
+        "2026-06-14": {
+          "date": "2026-06-14",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260614.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260614.minute.json",
+            "hourly": "netztransparenz/2026/06/20260614.hourly.json",
+            "meta": "netztransparenz/2026/06/20260614.meta.json"
+          }
+        },
+        "2026-06-15": {
+          "date": "2026-06-15",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260615.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260615.minute.json",
+            "hourly": "netztransparenz/2026/06/20260615.hourly.json",
+            "meta": "netztransparenz/2026/06/20260615.meta.json"
+          }
+        },
+        "2026-06-16": {
+          "date": "2026-06-16",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260616.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260616.minute.json",
+            "hourly": "netztransparenz/2026/06/20260616.hourly.json",
+            "meta": "netztransparenz/2026/06/20260616.meta.json"
+          }
+        },
+        "2026-06-17": {
+          "date": "2026-06-17",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260617.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260617.minute.json",
+            "hourly": "netztransparenz/2026/06/20260617.hourly.json",
+            "meta": "netztransparenz/2026/06/20260617.meta.json"
+          }
+        },
+        "2026-06-18": {
+          "date": "2026-06-18",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260618.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260618.minute.json",
+            "hourly": "netztransparenz/2026/06/20260618.hourly.json",
+            "meta": "netztransparenz/2026/06/20260618.meta.json"
+          }
+        },
+        "2026-06-19": {
+          "date": "2026-06-19",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260619.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260619.minute.json",
+            "hourly": "netztransparenz/2026/06/20260619.hourly.json",
+            "meta": "netztransparenz/2026/06/20260619.meta.json"
+          }
+        },
+        "2026-06-20": {
+          "date": "2026-06-20",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260620.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260620.minute.json",
+            "hourly": "netztransparenz/2026/06/20260620.hourly.json",
+            "meta": "netztransparenz/2026/06/20260620.meta.json"
+          }
+        },
+        "2026-06-21": {
+          "date": "2026-06-21",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260621.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260621.minute.json",
+            "hourly": "netztransparenz/2026/06/20260621.hourly.json",
+            "meta": "netztransparenz/2026/06/20260621.meta.json"
+          }
+        },
+        "2026-06-22": {
+          "date": "2026-06-22",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260622.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260622.minute.json",
+            "hourly": "netztransparenz/2026/06/20260622.hourly.json",
+            "meta": "netztransparenz/2026/06/20260622.meta.json"
+          }
+        },
+        "2026-06-23": {
+          "date": "2026-06-23",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260623.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260623.minute.json",
+            "hourly": "netztransparenz/2026/06/20260623.hourly.json",
+            "meta": "netztransparenz/2026/06/20260623.meta.json"
+          }
+        },
+        "2026-06-24": {
+          "date": "2026-06-24",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260624.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260624.minute.json",
+            "hourly": "netztransparenz/2026/06/20260624.hourly.json",
+            "meta": "netztransparenz/2026/06/20260624.meta.json"
+          }
+        },
+        "2026-06-25": {
+          "date": "2026-06-25",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260625.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260625.minute.json",
+            "hourly": "netztransparenz/2026/06/20260625.hourly.json",
+            "meta": "netztransparenz/2026/06/20260625.meta.json"
+          }
+        },
+        "2026-06-26": {
+          "date": "2026-06-26",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260626.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260626.minute.json",
+            "hourly": "netztransparenz/2026/06/20260626.hourly.json",
+            "meta": "netztransparenz/2026/06/20260626.meta.json"
+          }
+        },
+        "2026-06-27": {
+          "date": "2026-06-27",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260627.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260627.minute.json",
+            "hourly": "netztransparenz/2026/06/20260627.hourly.json",
+            "meta": "netztransparenz/2026/06/20260627.meta.json"
+          }
+        },
+        "2026-06-28": {
+          "date": "2026-06-28",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260628.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260628.minute.json",
+            "hourly": "netztransparenz/2026/06/20260628.hourly.json",
+            "meta": "netztransparenz/2026/06/20260628.meta.json"
+          }
+        },
+        "2026-06-29": {
+          "date": "2026-06-29",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260629.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260629.minute.json",
+            "hourly": "netztransparenz/2026/06/20260629.hourly.json",
+            "meta": "netztransparenz/2026/06/20260629.meta.json"
+          }
+        },
+        "2026-06-30": {
+          "date": "2026-06-30",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/06/20260630.frequency.i16",
+            "minute": "netztransparenz/2026/06/20260630.minute.json",
+            "hourly": "netztransparenz/2026/06/20260630.hourly.json",
+            "meta": "netztransparenz/2026/06/20260630.meta.json"
+          }
+        }
+      },
+      "status": "manual_monthly_import",
+      "files": {
+        "2026-06-01": {
+          "frequency": "netztransparenz/2026/06/20260601.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260601.minute.json",
+          "hourly": "netztransparenz/2026/06/20260601.hourly.json",
+          "meta": "netztransparenz/2026/06/20260601.meta.json"
+        },
+        "2026-06-02": {
+          "frequency": "netztransparenz/2026/06/20260602.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260602.minute.json",
+          "hourly": "netztransparenz/2026/06/20260602.hourly.json",
+          "meta": "netztransparenz/2026/06/20260602.meta.json"
+        },
+        "2026-06-03": {
+          "frequency": "netztransparenz/2026/06/20260603.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260603.minute.json",
+          "hourly": "netztransparenz/2026/06/20260603.hourly.json",
+          "meta": "netztransparenz/2026/06/20260603.meta.json"
+        },
+        "2026-06-04": {
+          "frequency": "netztransparenz/2026/06/20260604.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260604.minute.json",
+          "hourly": "netztransparenz/2026/06/20260604.hourly.json",
+          "meta": "netztransparenz/2026/06/20260604.meta.json"
+        },
+        "2026-06-05": {
+          "frequency": "netztransparenz/2026/06/20260605.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260605.minute.json",
+          "hourly": "netztransparenz/2026/06/20260605.hourly.json",
+          "meta": "netztransparenz/2026/06/20260605.meta.json"
+        },
+        "2026-06-06": {
+          "frequency": "netztransparenz/2026/06/20260606.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260606.minute.json",
+          "hourly": "netztransparenz/2026/06/20260606.hourly.json",
+          "meta": "netztransparenz/2026/06/20260606.meta.json"
+        },
+        "2026-06-07": {
+          "frequency": "netztransparenz/2026/06/20260607.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260607.minute.json",
+          "hourly": "netztransparenz/2026/06/20260607.hourly.json",
+          "meta": "netztransparenz/2026/06/20260607.meta.json"
+        },
+        "2026-06-08": {
+          "frequency": "netztransparenz/2026/06/20260608.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260608.minute.json",
+          "hourly": "netztransparenz/2026/06/20260608.hourly.json",
+          "meta": "netztransparenz/2026/06/20260608.meta.json"
+        },
+        "2026-06-09": {
+          "frequency": "netztransparenz/2026/06/20260609.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260609.minute.json",
+          "hourly": "netztransparenz/2026/06/20260609.hourly.json",
+          "meta": "netztransparenz/2026/06/20260609.meta.json"
+        },
+        "2026-06-10": {
+          "frequency": "netztransparenz/2026/06/20260610.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260610.minute.json",
+          "hourly": "netztransparenz/2026/06/20260610.hourly.json",
+          "meta": "netztransparenz/2026/06/20260610.meta.json"
+        },
+        "2026-06-11": {
+          "frequency": "netztransparenz/2026/06/20260611.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260611.minute.json",
+          "hourly": "netztransparenz/2026/06/20260611.hourly.json",
+          "meta": "netztransparenz/2026/06/20260611.meta.json"
+        },
+        "2026-06-12": {
+          "frequency": "netztransparenz/2026/06/20260612.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260612.minute.json",
+          "hourly": "netztransparenz/2026/06/20260612.hourly.json",
+          "meta": "netztransparenz/2026/06/20260612.meta.json"
+        },
+        "2026-06-13": {
+          "frequency": "netztransparenz/2026/06/20260613.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260613.minute.json",
+          "hourly": "netztransparenz/2026/06/20260613.hourly.json",
+          "meta": "netztransparenz/2026/06/20260613.meta.json"
+        },
+        "2026-06-14": {
+          "frequency": "netztransparenz/2026/06/20260614.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260614.minute.json",
+          "hourly": "netztransparenz/2026/06/20260614.hourly.json",
+          "meta": "netztransparenz/2026/06/20260614.meta.json"
+        },
+        "2026-06-15": {
+          "frequency": "netztransparenz/2026/06/20260615.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260615.minute.json",
+          "hourly": "netztransparenz/2026/06/20260615.hourly.json",
+          "meta": "netztransparenz/2026/06/20260615.meta.json"
+        },
+        "2026-06-16": {
+          "frequency": "netztransparenz/2026/06/20260616.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260616.minute.json",
+          "hourly": "netztransparenz/2026/06/20260616.hourly.json",
+          "meta": "netztransparenz/2026/06/20260616.meta.json"
+        },
+        "2026-06-17": {
+          "frequency": "netztransparenz/2026/06/20260617.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260617.minute.json",
+          "hourly": "netztransparenz/2026/06/20260617.hourly.json",
+          "meta": "netztransparenz/2026/06/20260617.meta.json"
+        },
+        "2026-06-18": {
+          "frequency": "netztransparenz/2026/06/20260618.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260618.minute.json",
+          "hourly": "netztransparenz/2026/06/20260618.hourly.json",
+          "meta": "netztransparenz/2026/06/20260618.meta.json"
+        },
+        "2026-06-19": {
+          "frequency": "netztransparenz/2026/06/20260619.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260619.minute.json",
+          "hourly": "netztransparenz/2026/06/20260619.hourly.json",
+          "meta": "netztransparenz/2026/06/20260619.meta.json"
+        },
+        "2026-06-20": {
+          "frequency": "netztransparenz/2026/06/20260620.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260620.minute.json",
+          "hourly": "netztransparenz/2026/06/20260620.hourly.json",
+          "meta": "netztransparenz/2026/06/20260620.meta.json"
+        },
+        "2026-06-21": {
+          "frequency": "netztransparenz/2026/06/20260621.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260621.minute.json",
+          "hourly": "netztransparenz/2026/06/20260621.hourly.json",
+          "meta": "netztransparenz/2026/06/20260621.meta.json"
+        },
+        "2026-06-22": {
+          "frequency": "netztransparenz/2026/06/20260622.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260622.minute.json",
+          "hourly": "netztransparenz/2026/06/20260622.hourly.json",
+          "meta": "netztransparenz/2026/06/20260622.meta.json"
+        },
+        "2026-06-23": {
+          "frequency": "netztransparenz/2026/06/20260623.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260623.minute.json",
+          "hourly": "netztransparenz/2026/06/20260623.hourly.json",
+          "meta": "netztransparenz/2026/06/20260623.meta.json"
+        },
+        "2026-06-24": {
+          "frequency": "netztransparenz/2026/06/20260624.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260624.minute.json",
+          "hourly": "netztransparenz/2026/06/20260624.hourly.json",
+          "meta": "netztransparenz/2026/06/20260624.meta.json"
+        },
+        "2026-06-25": {
+          "frequency": "netztransparenz/2026/06/20260625.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260625.minute.json",
+          "hourly": "netztransparenz/2026/06/20260625.hourly.json",
+          "meta": "netztransparenz/2026/06/20260625.meta.json"
+        },
+        "2026-06-26": {
+          "frequency": "netztransparenz/2026/06/20260626.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260626.minute.json",
+          "hourly": "netztransparenz/2026/06/20260626.hourly.json",
+          "meta": "netztransparenz/2026/06/20260626.meta.json"
+        },
+        "2026-06-27": {
+          "frequency": "netztransparenz/2026/06/20260627.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260627.minute.json",
+          "hourly": "netztransparenz/2026/06/20260627.hourly.json",
+          "meta": "netztransparenz/2026/06/20260627.meta.json"
+        },
+        "2026-06-28": {
+          "frequency": "netztransparenz/2026/06/20260628.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260628.minute.json",
+          "hourly": "netztransparenz/2026/06/20260628.hourly.json",
+          "meta": "netztransparenz/2026/06/20260628.meta.json"
+        },
+        "2026-06-29": {
+          "frequency": "netztransparenz/2026/06/20260629.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260629.minute.json",
+          "hourly": "netztransparenz/2026/06/20260629.hourly.json",
+          "meta": "netztransparenz/2026/06/20260629.meta.json"
+        },
+        "2026-06-30": {
+          "frequency": "netztransparenz/2026/06/20260630.frequency.i16",
+          "minute": "netztransparenz/2026/06/20260630.minute.json",
+          "hourly": "netztransparenz/2026/06/20260630.hourly.json",
+          "meta": "netztransparenz/2026/06/20260630.meta.json"
+        }
+      }
+    },
+    "teias": {
+      "label": "TEİAŞ",
+      "timezone": "Europe/Istanbul",
+      "firstDate": "2026-01-01",
+      "latestDate": "2026-06-30",
+      "availableDates": [
+        "2026-01-01",
+        "2026-01-02",
+        "2026-01-03",
+        "2026-01-04",
+        "2026-01-05",
+        "2026-01-06",
+        "2026-01-07",
+        "2026-01-08",
+        "2026-01-09",
+        "2026-01-10",
+        "2026-01-11",
+        "2026-01-12",
+        "2026-01-13",
+        "2026-01-14",
+        "2026-01-15",
+        "2026-01-16",
+        "2026-01-17",
+        "2026-01-18",
+        "2026-01-19",
+        "2026-01-20",
+        "2026-01-21",
+        "2026-01-22",
+        "2026-01-23",
+        "2026-01-24",
+        "2026-01-25",
+        "2026-01-26",
+        "2026-01-27",
+        "2026-01-28",
+        "2026-01-29",
+        "2026-01-30",
+        "2026-01-31",
+        "2026-02-01",
+        "2026-02-02",
+        "2026-02-03",
+        "2026-02-04",
+        "2026-02-05",
+        "2026-02-06",
+        "2026-02-07",
+        "2026-02-08",
+        "2026-02-09",
+        "2026-02-10",
+        "2026-02-11",
+        "2026-02-12",
+        "2026-02-13",
+        "2026-02-14",
+        "2026-02-15",
+        "2026-02-16",
+        "2026-02-17",
+        "2026-02-18",
+        "2026-02-19",
+        "2026-02-20",
+        "2026-02-21",
+        "2026-02-22",
+        "2026-02-23",
+        "2026-02-24",
+        "2026-02-25",
+        "2026-02-26",
+        "2026-02-27",
+        "2026-02-28",
+        "2026-03-01",
+        "2026-03-02",
+        "2026-03-03",
+        "2026-03-04",
+        "2026-03-05",
+        "2026-03-06",
+        "2026-03-07",
+        "2026-03-08",
+        "2026-03-09",
+        "2026-03-10",
+        "2026-03-11",
+        "2026-03-12",
+        "2026-03-13",
+        "2026-03-14",
+        "2026-03-15",
+        "2026-03-16",
+        "2026-03-17",
+        "2026-03-18",
+        "2026-03-19",
+        "2026-03-20",
+        "2026-03-21",
+        "2026-03-22",
+        "2026-03-23",
+        "2026-03-24",
+        "2026-03-25",
+        "2026-03-26",
+        "2026-03-27",
+        "2026-03-28",
+        "2026-03-29",
+        "2026-03-30",
+        "2026-03-31",
+        "2026-04-01",
+        "2026-04-02",
+        "2026-04-03",
+        "2026-04-04",
+        "2026-04-05",
+        "2026-04-06",
+        "2026-04-07",
+        "2026-04-08",
+        "2026-04-09",
+        "2026-04-10",
+        "2026-04-11",
+        "2026-04-12",
+        "2026-04-13",
+        "2026-04-14",
+        "2026-04-15",
+        "2026-04-16",
+        "2026-04-17",
+        "2026-04-18",
+        "2026-04-19",
+        "2026-04-20",
+        "2026-04-21",
+        "2026-04-22",
+        "2026-04-23",
+        "2026-04-24",
+        "2026-04-25",
+        "2026-04-26",
+        "2026-04-27",
+        "2026-04-28",
+        "2026-04-29",
+        "2026-04-30",
+        "2026-05-01",
+        "2026-05-02",
+        "2026-05-03",
+        "2026-05-04",
+        "2026-05-05",
+        "2026-05-06",
+        "2026-05-07",
+        "2026-05-11",
+        "2026-05-12",
+        "2026-05-13",
+        "2026-05-14",
+        "2026-05-15",
+        "2026-05-16",
+        "2026-05-17",
+        "2026-05-18",
+        "2026-05-19",
+        "2026-05-20",
+        "2026-05-21",
+        "2026-05-22",
+        "2026-05-23",
+        "2026-05-24",
+        "2026-05-25",
+        "2026-05-26",
+        "2026-05-27",
+        "2026-05-28",
+        "2026-05-29",
+        "2026-05-30",
+        "2026-05-31",
+        "2026-06-01",
+        "2026-06-02",
+        "2026-06-03",
+        "2026-06-04",
+        "2026-06-05",
+        "2026-06-06",
+        "2026-06-07",
+        "2026-06-08",
+        "2026-06-09",
+        "2026-06-10",
+        "2026-06-11",
+        "2026-06-12",
+        "2026-06-13",
+        "2026-06-14",
+        "2026-06-15",
+        "2026-06-16",
+        "2026-06-17",
+        "2026-06-18",
+        "2026-06-19",
+        "2026-06-20",
+        "2026-06-21",
+        "2026-06-22",
+        "2026-06-23",
+        "2026-06-24",
+        "2026-06-25",
+        "2026-06-26",
+        "2026-06-27",
+        "2026-06-28",
+        "2026-06-29",
+        "2026-06-30"
+      ],
+      "excludedDates": [
+        "2026-05-08",
+        "2026-05-09",
+        "2026-05-10"
+      ],
+      "days": {
+        "2026-01-01": {
+          "date": "2026-01-01",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "38927babbdd0a0051ddda61d15a53d320c62c4cce9b06b73eb3adcad801e84b0",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260101.frequency.i16",
+            "minute": "teias/2026/01/20260101.minute.json",
+            "hourly": "teias/2026/01/20260101.hourly.json",
+            "meta": "teias/2026/01/20260101.meta.json"
+          }
+        },
+        "2026-01-02": {
+          "date": "2026-01-02",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "05230da869dc225776877dc4460cdcc613501d7aad33da07d7e6368b641f90bd",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260102.frequency.i16",
+            "minute": "teias/2026/01/20260102.minute.json",
+            "hourly": "teias/2026/01/20260102.hourly.json",
+            "meta": "teias/2026/01/20260102.meta.json"
+          }
+        },
+        "2026-01-03": {
+          "date": "2026-01-03",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "5e00a9fbbe24789e40369ba4866c15adbcd7cad33f012f894c9c5f1fbf346897",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260103.frequency.i16",
+            "minute": "teias/2026/01/20260103.minute.json",
+            "hourly": "teias/2026/01/20260103.hourly.json",
+            "meta": "teias/2026/01/20260103.meta.json"
+          }
+        },
+        "2026-01-04": {
+          "date": "2026-01-04",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "c7780f98844263be7749e0367ce063b6daa481fbcb1b0021793eaab2e4af8433",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260104.frequency.i16",
+            "minute": "teias/2026/01/20260104.minute.json",
+            "hourly": "teias/2026/01/20260104.hourly.json",
+            "meta": "teias/2026/01/20260104.meta.json"
+          }
+        },
+        "2026-01-05": {
+          "date": "2026-01-05",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "267d29afb39135625e8e9004fd1297616c0a5cb68515d18ebb2c245c59ac3bab",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260105.frequency.i16",
+            "minute": "teias/2026/01/20260105.minute.json",
+            "hourly": "teias/2026/01/20260105.hourly.json",
+            "meta": "teias/2026/01/20260105.meta.json"
+          }
+        },
+        "2026-01-06": {
+          "date": "2026-01-06",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "6cd21bf0969ac9b245f1a5303bf69b7a8b8bbac3994ae6cb2222e1e3ba579f8a",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260106.frequency.i16",
+            "minute": "teias/2026/01/20260106.minute.json",
+            "hourly": "teias/2026/01/20260106.hourly.json",
+            "meta": "teias/2026/01/20260106.meta.json"
+          }
+        },
+        "2026-01-07": {
+          "date": "2026-01-07",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "93c2f82ad87036d6b9be502b56ef442f17348034cd25cce2baae18aa4a43bc5a",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260107.frequency.i16",
+            "minute": "teias/2026/01/20260107.minute.json",
+            "hourly": "teias/2026/01/20260107.hourly.json",
+            "meta": "teias/2026/01/20260107.meta.json"
+          }
+        },
+        "2026-01-08": {
+          "date": "2026-01-08",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "c3cc6d6a04a17100035f7f2240ba63980be445ca25eda9776a42787fb9f824b4",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260108.frequency.i16",
+            "minute": "teias/2026/01/20260108.minute.json",
+            "hourly": "teias/2026/01/20260108.hourly.json",
+            "meta": "teias/2026/01/20260108.meta.json"
+          }
+        },
+        "2026-01-09": {
+          "date": "2026-01-09",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "8b1f518a2621399fce409623b9d4d6dc365ff56605bd4ea164a975708a52036a",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260109.frequency.i16",
+            "minute": "teias/2026/01/20260109.minute.json",
+            "hourly": "teias/2026/01/20260109.hourly.json",
+            "meta": "teias/2026/01/20260109.meta.json"
+          }
+        },
+        "2026-01-10": {
+          "date": "2026-01-10",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "f8bef68087cc6e1cb91292a3a3f954ae31b962f91b1a17463693fa49864618dc",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260110.frequency.i16",
+            "minute": "teias/2026/01/20260110.minute.json",
+            "hourly": "teias/2026/01/20260110.hourly.json",
+            "meta": "teias/2026/01/20260110.meta.json"
+          }
+        },
+        "2026-01-11": {
+          "date": "2026-01-11",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "6be822b8d4d3fff5f32ed3894c7b7592d1fbe49b5ee828fe6fd9ab58f278b29d",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260111.frequency.i16",
+            "minute": "teias/2026/01/20260111.minute.json",
+            "hourly": "teias/2026/01/20260111.hourly.json",
+            "meta": "teias/2026/01/20260111.meta.json"
+          }
+        },
+        "2026-01-12": {
+          "date": "2026-01-12",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "a91251778747aec2f58d840b698f458753141a0bc3fad627e24db572376f7785",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260112.frequency.i16",
+            "minute": "teias/2026/01/20260112.minute.json",
+            "hourly": "teias/2026/01/20260112.hourly.json",
+            "meta": "teias/2026/01/20260112.meta.json"
+          }
+        },
+        "2026-01-13": {
+          "date": "2026-01-13",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "e1818ddb7f39582fdb16fc39e9f3e2f3813e4f862dc4f08d2e28b59088eacd03",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260113.frequency.i16",
+            "minute": "teias/2026/01/20260113.minute.json",
+            "hourly": "teias/2026/01/20260113.hourly.json",
+            "meta": "teias/2026/01/20260113.meta.json"
+          }
+        },
+        "2026-01-14": {
+          "date": "2026-01-14",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "bc19bc470b71c536ed58191cc331cebf2915a760cc9f855d98838d78152de371",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260114.frequency.i16",
+            "minute": "teias/2026/01/20260114.minute.json",
+            "hourly": "teias/2026/01/20260114.hourly.json",
+            "meta": "teias/2026/01/20260114.meta.json"
+          }
+        },
+        "2026-01-15": {
+          "date": "2026-01-15",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "45bc7a026c8f8e2da5dd15190ae169aa7500da2889ca4ec0daffbe6777c5f9e5",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260115.frequency.i16",
+            "minute": "teias/2026/01/20260115.minute.json",
+            "hourly": "teias/2026/01/20260115.hourly.json",
+            "meta": "teias/2026/01/20260115.meta.json"
+          }
+        },
+        "2026-01-16": {
+          "date": "2026-01-16",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "74d0735a04435542f46aeba5a7b9d4228e341196cb17af4972638bdff9bb7ec1",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260116.frequency.i16",
+            "minute": "teias/2026/01/20260116.minute.json",
+            "hourly": "teias/2026/01/20260116.hourly.json",
+            "meta": "teias/2026/01/20260116.meta.json"
+          }
+        },
+        "2026-01-17": {
+          "date": "2026-01-17",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "5a4978697a527d525cfcdd2d2827a6622c8a6ab901807e0bb1c5cb850d363694",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260117.frequency.i16",
+            "minute": "teias/2026/01/20260117.minute.json",
+            "hourly": "teias/2026/01/20260117.hourly.json",
+            "meta": "teias/2026/01/20260117.meta.json"
+          }
+        },
+        "2026-01-18": {
+          "date": "2026-01-18",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "c288ed8fb6bbba338fbf8e0ed1067369af6378bcf98f716654454043de56381a",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260118.frequency.i16",
+            "minute": "teias/2026/01/20260118.minute.json",
+            "hourly": "teias/2026/01/20260118.hourly.json",
+            "meta": "teias/2026/01/20260118.meta.json"
+          }
+        },
+        "2026-01-19": {
+          "date": "2026-01-19",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "ef0b3dc1599ed749a1276f355317aa1973164a26b82090b17500fb8f91ef3af9",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260119.frequency.i16",
+            "minute": "teias/2026/01/20260119.minute.json",
+            "hourly": "teias/2026/01/20260119.hourly.json",
+            "meta": "teias/2026/01/20260119.meta.json"
+          }
+        },
+        "2026-01-20": {
+          "date": "2026-01-20",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "32392cc6e1456df0c1e5bc98c7850cb7f1da22287d46c13fb6526d382d1ddb59",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260120.frequency.i16",
+            "minute": "teias/2026/01/20260120.minute.json",
+            "hourly": "teias/2026/01/20260120.hourly.json",
+            "meta": "teias/2026/01/20260120.meta.json"
+          }
+        },
+        "2026-01-21": {
+          "date": "2026-01-21",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "e8bb4b85498147477d831320e7af6c94594525e351e2a7088aa150870ebfa775",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260121.frequency.i16",
+            "minute": "teias/2026/01/20260121.minute.json",
+            "hourly": "teias/2026/01/20260121.hourly.json",
+            "meta": "teias/2026/01/20260121.meta.json"
+          }
+        },
+        "2026-01-22": {
+          "date": "2026-01-22",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "282625763da1274dbaa31809432a02debc3a21deddb8ec5fc50a68cbd8dac177",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260122.frequency.i16",
+            "minute": "teias/2026/01/20260122.minute.json",
+            "hourly": "teias/2026/01/20260122.hourly.json",
+            "meta": "teias/2026/01/20260122.meta.json"
+          }
+        },
+        "2026-01-23": {
+          "date": "2026-01-23",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "c91590d75fdb7d263b6dfe200be98d5dd3e5bc80b0d5efbf87a24cff54e5625e",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260123.frequency.i16",
+            "minute": "teias/2026/01/20260123.minute.json",
+            "hourly": "teias/2026/01/20260123.hourly.json",
+            "meta": "teias/2026/01/20260123.meta.json"
+          }
+        },
+        "2026-01-24": {
+          "date": "2026-01-24",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "f6349fe43877ae956fe9d9f43bafc4ca33b9a70ae5fb75de3df35db7e070d35d",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260124.frequency.i16",
+            "minute": "teias/2026/01/20260124.minute.json",
+            "hourly": "teias/2026/01/20260124.hourly.json",
+            "meta": "teias/2026/01/20260124.meta.json"
+          }
+        },
+        "2026-01-25": {
+          "date": "2026-01-25",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "e683588432e6672ee0432cc01eca377bd6e0fdd7afebb390ef7901d750890dd4",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260125.frequency.i16",
+            "minute": "teias/2026/01/20260125.minute.json",
+            "hourly": "teias/2026/01/20260125.hourly.json",
+            "meta": "teias/2026/01/20260125.meta.json"
+          }
+        },
+        "2026-01-26": {
+          "date": "2026-01-26",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "b00dbb4ff90a6dab07bcb3de306587b648e722f5e35b6c189e6c2f2bb13fcdf4",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260126.frequency.i16",
+            "minute": "teias/2026/01/20260126.minute.json",
+            "hourly": "teias/2026/01/20260126.hourly.json",
+            "meta": "teias/2026/01/20260126.meta.json"
+          }
+        },
+        "2026-01-27": {
+          "date": "2026-01-27",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "9a651830f15d401c5155063b1a833cf89b407ed4c4ca0c166c18536cf7e4f275",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260127.frequency.i16",
+            "minute": "teias/2026/01/20260127.minute.json",
+            "hourly": "teias/2026/01/20260127.hourly.json",
+            "meta": "teias/2026/01/20260127.meta.json"
+          }
+        },
+        "2026-01-28": {
+          "date": "2026-01-28",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "29c6e3b5fc3a38a899fd6da9a753dd30e5b6e88acec7bb8547a5f2fe40ce3324",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260128.frequency.i16",
+            "minute": "teias/2026/01/20260128.minute.json",
+            "hourly": "teias/2026/01/20260128.hourly.json",
+            "meta": "teias/2026/01/20260128.meta.json"
+          }
+        },
+        "2026-01-29": {
+          "date": "2026-01-29",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "663e0969e50f7e3b057b6d76a1ad28b0d842ea50016403a92d5ca2c9f4c0b798",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260129.frequency.i16",
+            "minute": "teias/2026/01/20260129.minute.json",
+            "hourly": "teias/2026/01/20260129.hourly.json",
+            "meta": "teias/2026/01/20260129.meta.json"
+          }
+        },
+        "2026-01-30": {
+          "date": "2026-01-30",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "a582e0fab3b56279e084bf83f6ca380a4b212e510e81718d0157fb3c416ebcca",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260130.frequency.i16",
+            "minute": "teias/2026/01/20260130.minute.json",
+            "hourly": "teias/2026/01/20260130.hourly.json",
+            "meta": "teias/2026/01/20260130.meta.json"
+          }
+        },
+        "2026-01-31": {
+          "date": "2026-01-31",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "a2bf91fccc8cf6c1d85d57aa0ab33e94e99b101d64dd3253bbae8bcab1854db7",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/01/20260131.frequency.i16",
+            "minute": "teias/2026/01/20260131.minute.json",
+            "hourly": "teias/2026/01/20260131.hourly.json",
+            "meta": "teias/2026/01/20260131.meta.json"
+          }
+        },
+        "2026-02-01": {
+          "date": "2026-02-01",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "315b20e5e7c8818e005235fca2bcd060a99a15c2f029f94f22a35d942e189171",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260201.frequency.i16",
+            "minute": "teias/2026/02/20260201.minute.json",
+            "hourly": "teias/2026/02/20260201.hourly.json",
+            "meta": "teias/2026/02/20260201.meta.json"
+          }
+        },
+        "2026-02-02": {
+          "date": "2026-02-02",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "fd98348f13370192fd6a8de73b2e2858a777dc47082bfec202f42fd78decd790",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260202.frequency.i16",
+            "minute": "teias/2026/02/20260202.minute.json",
+            "hourly": "teias/2026/02/20260202.hourly.json",
+            "meta": "teias/2026/02/20260202.meta.json"
+          }
+        },
+        "2026-02-03": {
+          "date": "2026-02-03",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "f03f1957393a3e07ce2d31bbf312257f1b8c2eff64b60fd3dbd201f2f8cfa70b",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260203.frequency.i16",
+            "minute": "teias/2026/02/20260203.minute.json",
+            "hourly": "teias/2026/02/20260203.hourly.json",
+            "meta": "teias/2026/02/20260203.meta.json"
+          }
+        },
+        "2026-02-04": {
+          "date": "2026-02-04",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "9ae0b276ed504e7f4f30642c7adcd4c76d84e6a0a542f458d5e9f100d8ca72f9",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260204.frequency.i16",
+            "minute": "teias/2026/02/20260204.minute.json",
+            "hourly": "teias/2026/02/20260204.hourly.json",
+            "meta": "teias/2026/02/20260204.meta.json"
+          }
+        },
+        "2026-02-05": {
+          "date": "2026-02-05",
+          "timezone": "Europe/Istanbul",
+          "status": "partial",
+          "qualityScore": 96,
+          "sha256": "b5af23abb826039738c5e394ae4cb918cf035bc0319095aaf1284b21148f01f2",
+          "expectedSamples": 86400,
+          "validSamples": 82800,
+          "files": {
+            "frequency": "teias/2026/02/20260205.frequency.i16",
+            "minute": "teias/2026/02/20260205.minute.json",
+            "hourly": "teias/2026/02/20260205.hourly.json",
+            "meta": "teias/2026/02/20260205.meta.json"
+          }
+        },
+        "2026-02-06": {
+          "date": "2026-02-06",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "347e7ad075c2d8b6039675062148436a7a6e4c21d7407c75e7176c77af08648d",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260206.frequency.i16",
+            "minute": "teias/2026/02/20260206.minute.json",
+            "hourly": "teias/2026/02/20260206.hourly.json",
+            "meta": "teias/2026/02/20260206.meta.json"
+          }
+        },
+        "2026-02-07": {
+          "date": "2026-02-07",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "6e56a9a67937bbfca17f3f2c030bc78d5b66f4c35d4bbc2de4aa5cc44b56ae68",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260207.frequency.i16",
+            "minute": "teias/2026/02/20260207.minute.json",
+            "hourly": "teias/2026/02/20260207.hourly.json",
+            "meta": "teias/2026/02/20260207.meta.json"
+          }
+        },
+        "2026-02-08": {
+          "date": "2026-02-08",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "e33389889bd79ebe6f07dee3acbb5fd5d1cbc90921ccc1de3f01872331def059",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260208.frequency.i16",
+            "minute": "teias/2026/02/20260208.minute.json",
+            "hourly": "teias/2026/02/20260208.hourly.json",
+            "meta": "teias/2026/02/20260208.meta.json"
+          }
+        },
+        "2026-02-09": {
+          "date": "2026-02-09",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "237ee45a85521bceffa49ed8b2f584a3f11bfc7b713fdc74afc5d11ef4dd744e",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260209.frequency.i16",
+            "minute": "teias/2026/02/20260209.minute.json",
+            "hourly": "teias/2026/02/20260209.hourly.json",
+            "meta": "teias/2026/02/20260209.meta.json"
+          }
+        },
+        "2026-02-10": {
+          "date": "2026-02-10",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "3d87eec188c6d631d38c61d4e6d03a840385cceea5d1dbd3a2e214df1f6c5fd6",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260210.frequency.i16",
+            "minute": "teias/2026/02/20260210.minute.json",
+            "hourly": "teias/2026/02/20260210.hourly.json",
+            "meta": "teias/2026/02/20260210.meta.json"
+          }
+        },
+        "2026-02-11": {
+          "date": "2026-02-11",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "74d16a2fac0ef86ec62dd37f2f25eee057c2777ec0e0476ae06c17815f715311",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260211.frequency.i16",
+            "minute": "teias/2026/02/20260211.minute.json",
+            "hourly": "teias/2026/02/20260211.hourly.json",
+            "meta": "teias/2026/02/20260211.meta.json"
+          }
+        },
+        "2026-02-12": {
+          "date": "2026-02-12",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "90b951ab40e8b9f43f37dbcec2cf327179ccb50034bf533fe91e0e88895c9c53",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260212.frequency.i16",
+            "minute": "teias/2026/02/20260212.minute.json",
+            "hourly": "teias/2026/02/20260212.hourly.json",
+            "meta": "teias/2026/02/20260212.meta.json"
+          }
+        },
+        "2026-02-13": {
+          "date": "2026-02-13",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "74dd58debd5fe17fae39dad43e6aa321915ae9e49688285ed54c9a759a0195b3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260213.frequency.i16",
+            "minute": "teias/2026/02/20260213.minute.json",
+            "hourly": "teias/2026/02/20260213.hourly.json",
+            "meta": "teias/2026/02/20260213.meta.json"
+          }
+        },
+        "2026-02-14": {
+          "date": "2026-02-14",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "32aadefb141963aaf6dc1bc64a4ef96d9edd14521c16738dfafa9359b5cf4e35",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260214.frequency.i16",
+            "minute": "teias/2026/02/20260214.minute.json",
+            "hourly": "teias/2026/02/20260214.hourly.json",
+            "meta": "teias/2026/02/20260214.meta.json"
+          }
+        },
+        "2026-02-15": {
+          "date": "2026-02-15",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "e199f8b1eef258392069ad6478dc673b42bb5dd80635cdf1439557a13617b5c5",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260215.frequency.i16",
+            "minute": "teias/2026/02/20260215.minute.json",
+            "hourly": "teias/2026/02/20260215.hourly.json",
+            "meta": "teias/2026/02/20260215.meta.json"
+          }
+        },
+        "2026-02-16": {
+          "date": "2026-02-16",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "c362107b62d1aedda7785f03d97d6fa8c6dafa148805be3dea8c22d173db5a72",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260216.frequency.i16",
+            "minute": "teias/2026/02/20260216.minute.json",
+            "hourly": "teias/2026/02/20260216.hourly.json",
+            "meta": "teias/2026/02/20260216.meta.json"
+          }
+        },
+        "2026-02-17": {
+          "date": "2026-02-17",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "e2993595506b13e047d25acc613c0b93bd5cb5edb08dd9805649d6d44e0ea166",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260217.frequency.i16",
+            "minute": "teias/2026/02/20260217.minute.json",
+            "hourly": "teias/2026/02/20260217.hourly.json",
+            "meta": "teias/2026/02/20260217.meta.json"
+          }
+        },
+        "2026-02-18": {
+          "date": "2026-02-18",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "2747f267c7f55a49cd4c39ec90fe39759e7bce083dbeddb133ec091321f3afbe",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260218.frequency.i16",
+            "minute": "teias/2026/02/20260218.minute.json",
+            "hourly": "teias/2026/02/20260218.hourly.json",
+            "meta": "teias/2026/02/20260218.meta.json"
+          }
+        },
+        "2026-02-19": {
+          "date": "2026-02-19",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "835109284a56236eea3e3e6472d34753d15f4dc34b7a524effc62eed11e16969",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260219.frequency.i16",
+            "minute": "teias/2026/02/20260219.minute.json",
+            "hourly": "teias/2026/02/20260219.hourly.json",
+            "meta": "teias/2026/02/20260219.meta.json"
+          }
+        },
+        "2026-02-20": {
+          "date": "2026-02-20",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "ac48338bbfdefefb76878cb9a2656a1abd4f2118485f7d43874db9fef2f8379f",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260220.frequency.i16",
+            "minute": "teias/2026/02/20260220.minute.json",
+            "hourly": "teias/2026/02/20260220.hourly.json",
+            "meta": "teias/2026/02/20260220.meta.json"
+          }
+        },
+        "2026-02-21": {
+          "date": "2026-02-21",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "a29f6c95b71a489ae8416cb93c002994fda45459e5840b85d281e63a2bf108d4",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260221.frequency.i16",
+            "minute": "teias/2026/02/20260221.minute.json",
+            "hourly": "teias/2026/02/20260221.hourly.json",
+            "meta": "teias/2026/02/20260221.meta.json"
+          }
+        },
+        "2026-02-22": {
+          "date": "2026-02-22",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "c69a7df5975e553a16d42627ca3d8823f60555a6e5557b74fb19beecdfc60505",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260222.frequency.i16",
+            "minute": "teias/2026/02/20260222.minute.json",
+            "hourly": "teias/2026/02/20260222.hourly.json",
+            "meta": "teias/2026/02/20260222.meta.json"
+          }
+        },
+        "2026-02-23": {
+          "date": "2026-02-23",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "2aa8536a710b6cf978510e896f7804178caeb17aa9f889e05ada096858b6ca21",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260223.frequency.i16",
+            "minute": "teias/2026/02/20260223.minute.json",
+            "hourly": "teias/2026/02/20260223.hourly.json",
+            "meta": "teias/2026/02/20260223.meta.json"
+          }
+        },
+        "2026-02-24": {
+          "date": "2026-02-24",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "f888f789509efc3c0ec8c80502b00ae1885c70c325a54ddd88775e2b245a21c2",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260224.frequency.i16",
+            "minute": "teias/2026/02/20260224.minute.json",
+            "hourly": "teias/2026/02/20260224.hourly.json",
+            "meta": "teias/2026/02/20260224.meta.json"
+          }
+        },
+        "2026-02-25": {
+          "date": "2026-02-25",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "38c746d6d1b27030e67ebde79840f6b47cc9fc466abb9965b0554155df33ca61",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260225.frequency.i16",
+            "minute": "teias/2026/02/20260225.minute.json",
+            "hourly": "teias/2026/02/20260225.hourly.json",
+            "meta": "teias/2026/02/20260225.meta.json"
+          }
+        },
+        "2026-02-26": {
+          "date": "2026-02-26",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "b827a07f61fef450f3a72620070c72377220f23a1aaa2048c34de19a75b6eb6a",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260226.frequency.i16",
+            "minute": "teias/2026/02/20260226.minute.json",
+            "hourly": "teias/2026/02/20260226.hourly.json",
+            "meta": "teias/2026/02/20260226.meta.json"
+          }
+        },
+        "2026-02-27": {
+          "date": "2026-02-27",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "36ee18008785a94284fd2322ee146ee4851495d1679dbd64c61d96179c9a84ca",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260227.frequency.i16",
+            "minute": "teias/2026/02/20260227.minute.json",
+            "hourly": "teias/2026/02/20260227.hourly.json",
+            "meta": "teias/2026/02/20260227.meta.json"
+          }
+        },
+        "2026-02-28": {
+          "date": "2026-02-28",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "654fdc8d19ed1fd1c2b36cc144f5282fda0b22c73fed5222a123232bdeb3df75",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/02/20260228.frequency.i16",
+            "minute": "teias/2026/02/20260228.minute.json",
+            "hourly": "teias/2026/02/20260228.hourly.json",
+            "meta": "teias/2026/02/20260228.meta.json"
+          }
+        },
+        "2026-03-01": {
+          "date": "2026-03-01",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "6ef513441d5cfd87ad953cfe23abb38b890290e056278854ebd8359856a75fcd",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260301.frequency.i16",
+            "minute": "teias/2026/03/20260301.minute.json",
+            "hourly": "teias/2026/03/20260301.hourly.json",
+            "meta": "teias/2026/03/20260301.meta.json"
+          }
+        },
+        "2026-03-02": {
+          "date": "2026-03-02",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "34a9b984773d2cb05e5d025957e6d4f2811bc225b971fd5ef0f80f52f4f3748f",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260302.frequency.i16",
+            "minute": "teias/2026/03/20260302.minute.json",
+            "hourly": "teias/2026/03/20260302.hourly.json",
+            "meta": "teias/2026/03/20260302.meta.json"
+          }
+        },
+        "2026-03-03": {
+          "date": "2026-03-03",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "89f9039f728b9d23be8718470110bb46c71bf383bf374e7246abb103ed30548f",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260303.frequency.i16",
+            "minute": "teias/2026/03/20260303.minute.json",
+            "hourly": "teias/2026/03/20260303.hourly.json",
+            "meta": "teias/2026/03/20260303.meta.json"
+          }
+        },
+        "2026-03-04": {
+          "date": "2026-03-04",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "6d94a20ca7b1255ddbef0571aace995579ff1bbcdde1ff647c0f9245cfce6d90",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260304.frequency.i16",
+            "minute": "teias/2026/03/20260304.minute.json",
+            "hourly": "teias/2026/03/20260304.hourly.json",
+            "meta": "teias/2026/03/20260304.meta.json"
+          }
+        },
+        "2026-03-05": {
+          "date": "2026-03-05",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "10532a3837a3c5942e6801e476013e67fb323d376f589d933ec859442ec38f4a",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260305.frequency.i16",
+            "minute": "teias/2026/03/20260305.minute.json",
+            "hourly": "teias/2026/03/20260305.hourly.json",
+            "meta": "teias/2026/03/20260305.meta.json"
+          }
+        },
+        "2026-03-06": {
+          "date": "2026-03-06",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "8aea9ca39dc7f323c3927ce875280c789a695d1c20766d2d3642a93a3196ea52",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260306.frequency.i16",
+            "minute": "teias/2026/03/20260306.minute.json",
+            "hourly": "teias/2026/03/20260306.hourly.json",
+            "meta": "teias/2026/03/20260306.meta.json"
+          }
+        },
+        "2026-03-07": {
+          "date": "2026-03-07",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "b724ec421a7a9c2c26859628bef33b83aefcdae8db644c3a09d02de8b896399a",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260307.frequency.i16",
+            "minute": "teias/2026/03/20260307.minute.json",
+            "hourly": "teias/2026/03/20260307.hourly.json",
+            "meta": "teias/2026/03/20260307.meta.json"
+          }
+        },
+        "2026-03-08": {
+          "date": "2026-03-08",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "c592363ecae07206ea4ef769232abead0f18e5af2b631015f76b8eefab2371c6",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260308.frequency.i16",
+            "minute": "teias/2026/03/20260308.minute.json",
+            "hourly": "teias/2026/03/20260308.hourly.json",
+            "meta": "teias/2026/03/20260308.meta.json"
+          }
+        },
+        "2026-03-09": {
+          "date": "2026-03-09",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "e5504d1e751d8d5bda702c2e9fbe07859299d11095b30ede5f9ac84ea1e0ff93",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260309.frequency.i16",
+            "minute": "teias/2026/03/20260309.minute.json",
+            "hourly": "teias/2026/03/20260309.hourly.json",
+            "meta": "teias/2026/03/20260309.meta.json"
+          }
+        },
+        "2026-03-10": {
+          "date": "2026-03-10",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "23336fbf033b4f9cded8f92d0914fb4052223509b1ce8bb2c02adaabcd1e0ee0",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260310.frequency.i16",
+            "minute": "teias/2026/03/20260310.minute.json",
+            "hourly": "teias/2026/03/20260310.hourly.json",
+            "meta": "teias/2026/03/20260310.meta.json"
+          }
+        },
+        "2026-03-11": {
+          "date": "2026-03-11",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "85c416f6704255b44fae331eceebcc05d21de0e84475639020cda2bbd14241dc",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260311.frequency.i16",
+            "minute": "teias/2026/03/20260311.minute.json",
+            "hourly": "teias/2026/03/20260311.hourly.json",
+            "meta": "teias/2026/03/20260311.meta.json"
+          }
+        },
+        "2026-03-12": {
+          "date": "2026-03-12",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "03ded2c656ad3c85bf2f9261a26226feada446c8a1a4fae65ea208757e7e5c76",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260312.frequency.i16",
+            "minute": "teias/2026/03/20260312.minute.json",
+            "hourly": "teias/2026/03/20260312.hourly.json",
+            "meta": "teias/2026/03/20260312.meta.json"
+          }
+        },
+        "2026-03-13": {
+          "date": "2026-03-13",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "e01c581aef7851d8631520102f198724bc37b02dfc85fad5d6160e63226516e2",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260313.frequency.i16",
+            "minute": "teias/2026/03/20260313.minute.json",
+            "hourly": "teias/2026/03/20260313.hourly.json",
+            "meta": "teias/2026/03/20260313.meta.json"
+          }
+        },
+        "2026-03-14": {
+          "date": "2026-03-14",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "3be0067dce8a3c790fc41f9e14b5d20c803896e3733ad5d82b2d9c5e5c12e051",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260314.frequency.i16",
+            "minute": "teias/2026/03/20260314.minute.json",
+            "hourly": "teias/2026/03/20260314.hourly.json",
+            "meta": "teias/2026/03/20260314.meta.json"
+          }
+        },
+        "2026-03-15": {
+          "date": "2026-03-15",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "683dedffdf1ddfbce0284fc4fa64ae1ca4acf5499c00a93656dd36f803631341",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260315.frequency.i16",
+            "minute": "teias/2026/03/20260315.minute.json",
+            "hourly": "teias/2026/03/20260315.hourly.json",
+            "meta": "teias/2026/03/20260315.meta.json"
+          }
+        },
+        "2026-03-16": {
+          "date": "2026-03-16",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "d36916b020728a860ff46dc36b5d32b867fd3ff23c0a8934c9d97f69dc46159c",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260316.frequency.i16",
+            "minute": "teias/2026/03/20260316.minute.json",
+            "hourly": "teias/2026/03/20260316.hourly.json",
+            "meta": "teias/2026/03/20260316.meta.json"
+          }
+        },
+        "2026-03-17": {
+          "date": "2026-03-17",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "07f0fd4b73c0abd62c19084868b0d324c5d85e15d4bc36b5ffe2e4f5ca521902",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260317.frequency.i16",
+            "minute": "teias/2026/03/20260317.minute.json",
+            "hourly": "teias/2026/03/20260317.hourly.json",
+            "meta": "teias/2026/03/20260317.meta.json"
+          }
+        },
+        "2026-03-18": {
+          "date": "2026-03-18",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "4548d1021b365fae23865b89298d4625809c31d45e30be796c36b9e67c1052f9",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260318.frequency.i16",
+            "minute": "teias/2026/03/20260318.minute.json",
+            "hourly": "teias/2026/03/20260318.hourly.json",
+            "meta": "teias/2026/03/20260318.meta.json"
+          }
+        },
+        "2026-03-19": {
+          "date": "2026-03-19",
+          "timezone": "Europe/Istanbul",
+          "status": "critical",
+          "qualityScore": 42,
+          "sha256": "6ccad87fe8e41bdad92eecf6236c45f56e6c58089a50ad145fdda8b84ee8f8ce",
+          "expectedSamples": 86400,
+          "validSamples": 36000,
+          "files": {
+            "frequency": "teias/2026/03/20260319.frequency.i16",
+            "minute": "teias/2026/03/20260319.minute.json",
+            "hourly": "teias/2026/03/20260319.hourly.json",
+            "meta": "teias/2026/03/20260319.meta.json"
+          }
+        },
+        "2026-03-20": {
+          "date": "2026-03-20",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "81773db74abce7b3db995c0249908b7dd25362cafe401b6cd88221bda23629bc",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260320.frequency.i16",
+            "minute": "teias/2026/03/20260320.minute.json",
+            "hourly": "teias/2026/03/20260320.hourly.json",
+            "meta": "teias/2026/03/20260320.meta.json"
+          }
+        },
+        "2026-03-21": {
+          "date": "2026-03-21",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "b594cf145c92593932f4d92bd09f2b8975ca8e690483b93181aacf623d5ddc03",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260321.frequency.i16",
+            "minute": "teias/2026/03/20260321.minute.json",
+            "hourly": "teias/2026/03/20260321.hourly.json",
+            "meta": "teias/2026/03/20260321.meta.json"
+          }
+        },
+        "2026-03-22": {
+          "date": "2026-03-22",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "822c660037e2ca84298c48fd968df9c59f2a5b363f1587e10e9e1345b6d32792",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260322.frequency.i16",
+            "minute": "teias/2026/03/20260322.minute.json",
+            "hourly": "teias/2026/03/20260322.hourly.json",
+            "meta": "teias/2026/03/20260322.meta.json"
+          }
+        },
+        "2026-03-23": {
+          "date": "2026-03-23",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "408f4ef4b5d17381cfde1a887be6f3b79297f29cd1968a985a2d0545f20e1cdd",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260323.frequency.i16",
+            "minute": "teias/2026/03/20260323.minute.json",
+            "hourly": "teias/2026/03/20260323.hourly.json",
+            "meta": "teias/2026/03/20260323.meta.json"
+          }
+        },
+        "2026-03-24": {
+          "date": "2026-03-24",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "733acb33284418442691db1895887491e15a98783de134261831fe508fd4c2b9",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260324.frequency.i16",
+            "minute": "teias/2026/03/20260324.minute.json",
+            "hourly": "teias/2026/03/20260324.hourly.json",
+            "meta": "teias/2026/03/20260324.meta.json"
+          }
+        },
+        "2026-03-25": {
+          "date": "2026-03-25",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "68b273054950991780787ecbdc962639d3612c31bf562839c436bb93a3e24459",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260325.frequency.i16",
+            "minute": "teias/2026/03/20260325.minute.json",
+            "hourly": "teias/2026/03/20260325.hourly.json",
+            "meta": "teias/2026/03/20260325.meta.json"
+          }
+        },
+        "2026-03-26": {
+          "date": "2026-03-26",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "e2603d53c5a88878cb928925da968bb2cd97241880a9cdb5d19fb32f4baec83f",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260326.frequency.i16",
+            "minute": "teias/2026/03/20260326.minute.json",
+            "hourly": "teias/2026/03/20260326.hourly.json",
+            "meta": "teias/2026/03/20260326.meta.json"
+          }
+        },
+        "2026-03-27": {
+          "date": "2026-03-27",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "9af4c8ceb9814e6259e6d2a15b81eb4649eb4f5f50e8a8f40c946285d136be7a",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260327.frequency.i16",
+            "minute": "teias/2026/03/20260327.minute.json",
+            "hourly": "teias/2026/03/20260327.hourly.json",
+            "meta": "teias/2026/03/20260327.meta.json"
+          }
+        },
+        "2026-03-28": {
+          "date": "2026-03-28",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "c2f2a4bdf11800c2d33375897cecd71c06454bf0a1acdaab38b963aa763db096",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260328.frequency.i16",
+            "minute": "teias/2026/03/20260328.minute.json",
+            "hourly": "teias/2026/03/20260328.hourly.json",
+            "meta": "teias/2026/03/20260328.meta.json"
+          }
+        },
+        "2026-03-29": {
+          "date": "2026-03-29",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "c38e9c30c287be2c08e9ccd584df61d0f1e024aac96648c230fdb6fd9fd20692",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260329.frequency.i16",
+            "minute": "teias/2026/03/20260329.minute.json",
+            "hourly": "teias/2026/03/20260329.hourly.json",
+            "meta": "teias/2026/03/20260329.meta.json"
+          }
+        },
+        "2026-03-30": {
+          "date": "2026-03-30",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "60d6b66906cf00c5bfdddb97c51a153f3246a4deb28f4fd5e25dcc9f26064892",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260330.frequency.i16",
+            "minute": "teias/2026/03/20260330.minute.json",
+            "hourly": "teias/2026/03/20260330.hourly.json",
+            "meta": "teias/2026/03/20260330.meta.json"
+          }
+        },
+        "2026-03-31": {
+          "date": "2026-03-31",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "52e15aa4c4eec31eedd498ae953d41f61c09f48c2b236899174adab87f549f57",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/03/20260331.frequency.i16",
+            "minute": "teias/2026/03/20260331.minute.json",
+            "hourly": "teias/2026/03/20260331.hourly.json",
+            "meta": "teias/2026/03/20260331.meta.json"
+          }
+        },
+        "2026-04-01": {
+          "date": "2026-04-01",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "2e6aef21b1146f250ba886b3aa3429d39ace29d9603d1b95f54615a46b36db9f",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/04/20260401.frequency.i16",
+            "minute": "teias/2026/04/20260401.minute.json",
+            "hourly": "teias/2026/04/20260401.hourly.json",
+            "meta": "teias/2026/04/20260401.meta.json"
+          }
+        },
+        "2026-04-02": {
+          "date": "2026-04-02",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "44771aa979283676124cc0dbd2b137b33ce820ffeba358c56a61af5e88d40bbd",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/04/20260402.frequency.i16",
+            "minute": "teias/2026/04/20260402.minute.json",
+            "hourly": "teias/2026/04/20260402.hourly.json",
+            "meta": "teias/2026/04/20260402.meta.json"
+          }
+        },
+        "2026-04-03": {
+          "date": "2026-04-03",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "e302cd11bf8b6b9a8a1a3bd4e66897d18549b9370dab6a5d8a1695cba3796932",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/04/20260403.frequency.i16",
+            "minute": "teias/2026/04/20260403.minute.json",
+            "hourly": "teias/2026/04/20260403.hourly.json",
+            "meta": "teias/2026/04/20260403.meta.json"
+          }
+        },
+        "2026-04-04": {
+          "date": "2026-04-04",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "493d567b457b609535d4e4e489010043ddca3c1728ede7b9a38ceca63e2bace9",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/04/20260404.frequency.i16",
+            "minute": "teias/2026/04/20260404.minute.json",
+            "hourly": "teias/2026/04/20260404.hourly.json",
+            "meta": "teias/2026/04/20260404.meta.json"
+          }
+        },
+        "2026-04-05": {
+          "date": "2026-04-05",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "e9c69c3c1bd5a20ca6b61c979cacd108f878753d0f720e561ff66a7ca07b8679",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/04/20260405.frequency.i16",
+            "minute": "teias/2026/04/20260405.minute.json",
+            "hourly": "teias/2026/04/20260405.hourly.json",
+            "meta": "teias/2026/04/20260405.meta.json"
+          }
+        },
+        "2026-04-06": {
+          "date": "2026-04-06",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "9332769dbb813f9c487a2810b8e6ddf8fee253cb2db4b625dce4c1abda929887",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/04/20260406.frequency.i16",
+            "minute": "teias/2026/04/20260406.minute.json",
+            "hourly": "teias/2026/04/20260406.hourly.json",
+            "meta": "teias/2026/04/20260406.meta.json"
+          }
+        },
+        "2026-04-07": {
+          "date": "2026-04-07",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "6f4f62001ea152e214b5a96250a46b7ca573e79ed72e4e7d550040e62c27d224",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/04/20260407.frequency.i16",
+            "minute": "teias/2026/04/20260407.minute.json",
+            "hourly": "teias/2026/04/20260407.hourly.json",
+            "meta": "teias/2026/04/20260407.meta.json"
+          }
+        },
+        "2026-04-08": {
+          "date": "2026-04-08",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "5a8e2220021cb6de03efd7911a7396f37a15e5b75ffaad6893112a5cea73f2c1",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/04/20260408.frequency.i16",
+            "minute": "teias/2026/04/20260408.minute.json",
+            "hourly": "teias/2026/04/20260408.hourly.json",
+            "meta": "teias/2026/04/20260408.meta.json"
+          }
+        },
+        "2026-04-09": {
+          "date": "2026-04-09",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "0ab1437742ad0bae142185e8519941d9599dfcc7f9cc176ac9256370133a6bf5",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/04/20260409.frequency.i16",
+            "minute": "teias/2026/04/20260409.minute.json",
+            "hourly": "teias/2026/04/20260409.hourly.json",
+            "meta": "teias/2026/04/20260409.meta.json"
+          }
+        },
+        "2026-04-10": {
+          "date": "2026-04-10",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "afa4ee09f5c0753c1fe2fae95aedaef73e1db313f9c44d199564a594d6dca008",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/04/20260410.frequency.i16",
+            "minute": "teias/2026/04/20260410.minute.json",
+            "hourly": "teias/2026/04/20260410.hourly.json",
+            "meta": "teias/2026/04/20260410.meta.json"
+          }
+        },
+        "2026-04-11": {
+          "date": "2026-04-11",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "9cfe5c197b524805b612e8b0c5c5cdb2ba07a70f3ff4eff7261dc1ebe763ecdf",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/04/20260411.frequency.i16",
+            "minute": "teias/2026/04/20260411.minute.json",
+            "hourly": "teias/2026/04/20260411.hourly.json",
+            "meta": "teias/2026/04/20260411.meta.json"
+          }
+        },
+        "2026-04-12": {
+          "date": "2026-04-12",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "9f48c1046af4135fd32b4fbc076256024578bb4c508bf1f4cab796410bdffc54",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/04/20260412.frequency.i16",
+            "minute": "teias/2026/04/20260412.minute.json",
+            "hourly": "teias/2026/04/20260412.hourly.json",
+            "meta": "teias/2026/04/20260412.meta.json"
+          }
+        },
+        "2026-04-13": {
+          "date": "2026-04-13",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "a83b95eac0dd9c4779b50db648a6289e506dbb71e45c3c45e9ed2694cc29d7ca",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/04/20260413.frequency.i16",
+            "minute": "teias/2026/04/20260413.minute.json",
+            "hourly": "teias/2026/04/20260413.hourly.json",
+            "meta": "teias/2026/04/20260413.meta.json"
+          }
+        },
+        "2026-04-14": {
+          "date": "2026-04-14",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "8436535588741f98d19e2e080c18dd701703a9eefe4a260771472357d24b6ede",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/04/20260414.frequency.i16",
+            "minute": "teias/2026/04/20260414.minute.json",
+            "hourly": "teias/2026/04/20260414.hourly.json",
+            "meta": "teias/2026/04/20260414.meta.json"
+          }
+        },
+        "2026-04-15": {
+          "date": "2026-04-15",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "2c4cd4f2bcb83eb36e5633e15423566529bf28246c40a578dd5231cb409a7310",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/04/20260415.frequency.i16",
+            "minute": "teias/2026/04/20260415.minute.json",
+            "hourly": "teias/2026/04/20260415.hourly.json",
+            "meta": "teias/2026/04/20260415.meta.json"
+          }
+        },
+        "2026-04-16": {
+          "date": "2026-04-16",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "31734e8b2fb7edbf2194277d861fe3f95efc63adacbc5c37485fc7f8aa7ef237",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/04/20260416.frequency.i16",
+            "minute": "teias/2026/04/20260416.minute.json",
+            "hourly": "teias/2026/04/20260416.hourly.json",
+            "meta": "teias/2026/04/20260416.meta.json"
+          }
+        },
+        "2026-04-17": {
+          "date": "2026-04-17",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "3d9e2a1ce56090b036d8cb1c736d4ef06f0c1c6a060fb547f372841fec8785cd",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/04/20260417.frequency.i16",
+            "minute": "teias/2026/04/20260417.minute.json",
+            "hourly": "teias/2026/04/20260417.hourly.json",
+            "meta": "teias/2026/04/20260417.meta.json"
+          }
+        },
+        "2026-04-18": {
+          "date": "2026-04-18",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "96b053074bd9e1fb3398c8f1e21f3453f5d0ad9801e41af3d9d33d17ee7269cf",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/04/20260418.frequency.i16",
+            "minute": "teias/2026/04/20260418.minute.json",
+            "hourly": "teias/2026/04/20260418.hourly.json",
+            "meta": "teias/2026/04/20260418.meta.json"
+          }
+        },
+        "2026-04-19": {
+          "date": "2026-04-19",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "2bb211aed785f6bb89a14e54b662443063cf80bc583a867f60663b6353fbd4bb",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/04/20260419.frequency.i16",
+            "minute": "teias/2026/04/20260419.minute.json",
+            "hourly": "teias/2026/04/20260419.hourly.json",
+            "meta": "teias/2026/04/20260419.meta.json"
+          }
+        },
+        "2026-04-20": {
+          "date": "2026-04-20",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "ba93f521da9b320f9abae49c8eb6d220c6c31962e1fcb3a6c7afd06e3a1d8fdb",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/04/20260420.frequency.i16",
+            "minute": "teias/2026/04/20260420.minute.json",
+            "hourly": "teias/2026/04/20260420.hourly.json",
+            "meta": "teias/2026/04/20260420.meta.json"
+          }
+        },
+        "2026-04-21": {
+          "date": "2026-04-21",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "4dc0cd2f9825f8b1f10ee4766210ac8e0e2e7f66cfd3e49874adf1991d1eda33",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/04/20260421.frequency.i16",
+            "minute": "teias/2026/04/20260421.minute.json",
+            "hourly": "teias/2026/04/20260421.hourly.json",
+            "meta": "teias/2026/04/20260421.meta.json"
+          }
+        },
+        "2026-04-22": {
+          "date": "2026-04-22",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "36882b2dcff876d1701781d6a4d1fb8af3f212a3b35b02651e53e7a0e80b48e5",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/04/20260422.frequency.i16",
+            "minute": "teias/2026/04/20260422.minute.json",
+            "hourly": "teias/2026/04/20260422.hourly.json",
+            "meta": "teias/2026/04/20260422.meta.json"
+          }
+        },
+        "2026-04-23": {
+          "date": "2026-04-23",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "8e0d10109c69d85bb5031501e918d39f2e56e205e35f6d26d0c2a8a98d5be7f3",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/04/20260423.frequency.i16",
+            "minute": "teias/2026/04/20260423.minute.json",
+            "hourly": "teias/2026/04/20260423.hourly.json",
+            "meta": "teias/2026/04/20260423.meta.json"
+          }
+        },
+        "2026-04-24": {
+          "date": "2026-04-24",
+          "timezone": "Europe/Istanbul",
+          "status": "critical",
+          "qualityScore": 67,
+          "sha256": "42bcb097970b9d96658ffd832ad406ddc0a58b1a8153d78fe155e3a9436a05af",
+          "expectedSamples": 86400,
+          "validSamples": 83510,
+          "files": {
+            "frequency": "teias/2026/04/20260424.frequency.i16",
+            "minute": "teias/2026/04/20260424.minute.json",
+            "hourly": "teias/2026/04/20260424.hourly.json",
+            "meta": "teias/2026/04/20260424.meta.json"
+          }
+        },
+        "2026-04-25": {
+          "date": "2026-04-25",
+          "timezone": "Europe/Istanbul",
+          "status": "critical",
+          "qualityScore": 64,
+          "sha256": "1745a51c27dfaba96824d2264baec4bafe518db9b862573d63006cc5b5c4dc43",
+          "expectedSamples": 86400,
+          "validSamples": 81376,
+          "files": {
+            "frequency": "teias/2026/04/20260425.frequency.i16",
+            "minute": "teias/2026/04/20260425.minute.json",
+            "hourly": "teias/2026/04/20260425.hourly.json",
+            "meta": "teias/2026/04/20260425.meta.json"
+          }
+        },
+        "2026-04-26": {
+          "date": "2026-04-26",
+          "timezone": "Europe/Istanbul",
+          "status": "critical",
+          "qualityScore": 64,
+          "sha256": "444bb64be0a65c7f0b92a672bf89c1535bd52dfa6a08b306a420af138914ad9c",
+          "expectedSamples": 86400,
+          "validSamples": 81486,
+          "files": {
+            "frequency": "teias/2026/04/20260426.frequency.i16",
+            "minute": "teias/2026/04/20260426.minute.json",
+            "hourly": "teias/2026/04/20260426.hourly.json",
+            "meta": "teias/2026/04/20260426.meta.json"
+          }
+        },
+        "2026-04-27": {
+          "date": "2026-04-27",
+          "timezone": "Europe/Istanbul",
+          "status": "critical",
+          "qualityScore": 65,
+          "sha256": "94ffdb7442460fb1dab1af30e77381e0dfc23f6c1f7aa28f1e1189085d4cd2d2",
+          "expectedSamples": 86400,
+          "validSamples": 81802,
+          "files": {
+            "frequency": "teias/2026/04/20260427.frequency.i16",
+            "minute": "teias/2026/04/20260427.minute.json",
+            "hourly": "teias/2026/04/20260427.hourly.json",
+            "meta": "teias/2026/04/20260427.meta.json"
+          }
+        },
+        "2026-04-28": {
+          "date": "2026-04-28",
+          "timezone": "Europe/Istanbul",
+          "status": "critical",
+          "qualityScore": 64,
+          "sha256": "7bd5ec844a217ff9e245ce8479d75920a466cb687c7e6812e57590f266bd0cbb",
+          "expectedSamples": 86400,
+          "validSamples": 80822,
+          "files": {
+            "frequency": "teias/2026/04/20260428.frequency.i16",
+            "minute": "teias/2026/04/20260428.minute.json",
+            "hourly": "teias/2026/04/20260428.hourly.json",
+            "meta": "teias/2026/04/20260428.meta.json"
+          }
+        },
+        "2026-04-29": {
+          "date": "2026-04-29",
+          "timezone": "Europe/Istanbul",
+          "status": "critical",
+          "qualityScore": 65,
+          "sha256": "f93bea7b28519d2da9e9837e86993a1a5c1a21f406c26ca8f5c233f660d2ce05",
+          "expectedSamples": 86400,
+          "validSamples": 81826,
+          "files": {
+            "frequency": "teias/2026/04/20260429.frequency.i16",
+            "minute": "teias/2026/04/20260429.minute.json",
+            "hourly": "teias/2026/04/20260429.hourly.json",
+            "meta": "teias/2026/04/20260429.meta.json"
+          }
+        },
+        "2026-04-30": {
+          "date": "2026-04-30",
+          "timezone": "Europe/Istanbul",
+          "status": "critical",
+          "qualityScore": 66,
+          "sha256": "90aeb7e5cf300b98d526d440879f1418b18cfcfc636e51d0a8bb6a38e699b777",
+          "expectedSamples": 86400,
+          "validSamples": 82818,
+          "files": {
+            "frequency": "teias/2026/04/20260430.frequency.i16",
+            "minute": "teias/2026/04/20260430.minute.json",
+            "hourly": "teias/2026/04/20260430.hourly.json",
+            "meta": "teias/2026/04/20260430.meta.json"
+          }
+        },
+        "2026-05-01": {
+          "date": "2026-05-01",
+          "timezone": "Europe/Istanbul",
+          "status": "critical",
+          "qualityScore": 66,
+          "sha256": "b6095003587716189fc8b98305382c5db402f60a644877d631f830b93d69f516",
+          "expectedSamples": 86400,
+          "validSamples": 82791,
+          "files": {
+            "frequency": "teias/2026/05/20260501.frequency.i16",
+            "minute": "teias/2026/05/20260501.minute.json",
+            "hourly": "teias/2026/05/20260501.hourly.json",
+            "meta": "teias/2026/05/20260501.meta.json"
+          }
+        },
+        "2026-05-02": {
+          "date": "2026-05-02",
+          "timezone": "Europe/Istanbul",
+          "status": "critical",
+          "qualityScore": 66,
+          "sha256": "911066a68bd718f481d8722199fecac7b66b7a98ab7de48bf6fac344d99b28ff",
+          "expectedSamples": 86400,
+          "validSamples": 82814,
+          "files": {
+            "frequency": "teias/2026/05/20260502.frequency.i16",
+            "minute": "teias/2026/05/20260502.minute.json",
+            "hourly": "teias/2026/05/20260502.hourly.json",
+            "meta": "teias/2026/05/20260502.meta.json"
+          }
+        },
+        "2026-05-03": {
+          "date": "2026-05-03",
+          "timezone": "Europe/Istanbul",
+          "status": "critical",
+          "qualityScore": 66,
+          "sha256": "fbad5e0ef7e65ac12a7533a7c31d1fce26b18e37f30ab6030de180d9e2d2ae9c",
+          "expectedSamples": 86400,
+          "validSamples": 82850,
+          "files": {
+            "frequency": "teias/2026/05/20260503.frequency.i16",
+            "minute": "teias/2026/05/20260503.minute.json",
+            "hourly": "teias/2026/05/20260503.hourly.json",
+            "meta": "teias/2026/05/20260503.meta.json"
+          }
+        },
+        "2026-05-04": {
+          "date": "2026-05-04",
+          "timezone": "Europe/Istanbul",
+          "status": "critical",
+          "qualityScore": 66,
+          "sha256": "9ad4e6b1835fef91836e55c4b981fc3e7cee5fdbe5c06e88e300dcc6cb8f2968",
+          "expectedSamples": 86400,
+          "validSamples": 82898,
+          "files": {
+            "frequency": "teias/2026/05/20260504.frequency.i16",
+            "minute": "teias/2026/05/20260504.minute.json",
+            "hourly": "teias/2026/05/20260504.hourly.json",
+            "meta": "teias/2026/05/20260504.meta.json"
+          }
+        },
+        "2026-05-05": {
+          "date": "2026-05-05",
+          "timezone": "Europe/Istanbul",
+          "status": "critical",
+          "qualityScore": 65,
+          "sha256": "68decf0f8c7a8a10ccd28be1d47229ae86a4e0d85134d7bf56b65cbc21e16a34",
+          "expectedSamples": 86400,
+          "validSamples": 82069,
+          "files": {
+            "frequency": "teias/2026/05/20260505.frequency.i16",
+            "minute": "teias/2026/05/20260505.minute.json",
+            "hourly": "teias/2026/05/20260505.hourly.json",
+            "meta": "teias/2026/05/20260505.meta.json"
+          }
+        },
+        "2026-05-06": {
+          "date": "2026-05-06",
+          "timezone": "Europe/Istanbul",
+          "status": "critical",
+          "qualityScore": 64,
+          "sha256": "a31e7e831358f653349bf5dc1f5ba15ffa1c7b65af9303e51bf91adca491d229",
+          "expectedSamples": 86400,
+          "validSamples": 81376,
+          "files": {
+            "frequency": "teias/2026/05/20260506.frequency.i16",
+            "minute": "teias/2026/05/20260506.minute.json",
+            "hourly": "teias/2026/05/20260506.hourly.json",
+            "meta": "teias/2026/05/20260506.meta.json"
+          }
+        },
+        "2026-05-07": {
+          "date": "2026-05-07",
+          "timezone": "Europe/Istanbul",
+          "status": "critical",
+          "qualityScore": 15,
+          "sha256": "b88c59539cfee5c9b21fbddf4a002eeeccaab19c3dcde7fe0f421c09cd6035ce",
+          "expectedSamples": 86400,
+          "validSamples": 39175,
+          "files": {
+            "frequency": "teias/2026/05/20260507.frequency.i16",
+            "minute": "teias/2026/05/20260507.minute.json",
+            "hourly": "teias/2026/05/20260507.hourly.json",
+            "meta": "teias/2026/05/20260507.meta.json"
+          }
+        },
+        "2026-05-11": {
+          "date": "2026-05-11",
+          "timezone": "Europe/Istanbul",
+          "status": "critical",
+          "qualityScore": 0,
+          "sha256": "de3ee3eb8abeb3fe3813d1acd23383b714553ffd4273f7190932056b0ead5c67",
+          "expectedSamples": 86400,
+          "validSamples": 32,
+          "files": {
+            "frequency": "teias/2026/05/20260511.frequency.i16",
+            "minute": "teias/2026/05/20260511.minute.json",
+            "hourly": "teias/2026/05/20260511.hourly.json",
+            "meta": "teias/2026/05/20260511.meta.json"
+          }
+        },
+        "2026-05-12": {
+          "date": "2026-05-12",
+          "timezone": "Europe/Istanbul",
+          "status": "critical",
+          "qualityScore": 12,
+          "sha256": "9401ddf84976403dcdb47e0620c43599cbddfdd8e6d0a20c93383a01eeff37f2",
+          "expectedSamples": 86400,
+          "validSamples": 36000,
+          "files": {
+            "frequency": "teias/2026/05/20260512.frequency.i16",
+            "minute": "teias/2026/05/20260512.minute.json",
+            "hourly": "teias/2026/05/20260512.hourly.json",
+            "meta": "teias/2026/05/20260512.meta.json"
+          }
+        },
+        "2026-05-13": {
+          "date": "2026-05-13",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "39372d41662afba7ca9cf8642f9c9d18be5b215e17412fd08ac4f739f8a8340f",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/05/20260513.frequency.i16",
+            "minute": "teias/2026/05/20260513.minute.json",
+            "hourly": "teias/2026/05/20260513.hourly.json",
+            "meta": "teias/2026/05/20260513.meta.json"
+          }
+        },
+        "2026-05-14": {
+          "date": "2026-05-14",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "94454e474136d84f26db8ad1f371ccf2e1fd857779a0e39dede9b941e4b4142a",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/05/20260514.frequency.i16",
+            "minute": "teias/2026/05/20260514.minute.json",
+            "hourly": "teias/2026/05/20260514.hourly.json",
+            "meta": "teias/2026/05/20260514.meta.json"
+          }
+        },
+        "2026-05-15": {
+          "date": "2026-05-15",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "d4f7ceee447595d0d928442fd813be1626cdaad946db697c5e557f3210ef2bcc",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/05/20260515.frequency.i16",
+            "minute": "teias/2026/05/20260515.minute.json",
+            "hourly": "teias/2026/05/20260515.hourly.json",
+            "meta": "teias/2026/05/20260515.meta.json"
+          }
+        },
+        "2026-05-16": {
+          "date": "2026-05-16",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "a8572d7e3c0aef4a2cdac8718338ac18685f6b5dd138340c3f06776faab02529",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/05/20260516.frequency.i16",
+            "minute": "teias/2026/05/20260516.minute.json",
+            "hourly": "teias/2026/05/20260516.hourly.json",
+            "meta": "teias/2026/05/20260516.meta.json"
+          }
+        },
+        "2026-05-17": {
+          "date": "2026-05-17",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "6c438d9e960201aeb0b2d9f5e2d7f163e0ea9ff5ed3e2b9f4289a489ab35d3b5",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/05/20260517.frequency.i16",
+            "minute": "teias/2026/05/20260517.minute.json",
+            "hourly": "teias/2026/05/20260517.hourly.json",
+            "meta": "teias/2026/05/20260517.meta.json"
+          }
+        },
+        "2026-05-18": {
+          "date": "2026-05-18",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "715b65998601364033a45b67e628b12a31d10d574efdffd17a1ce15b13aabdb6",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/05/20260518.frequency.i16",
+            "minute": "teias/2026/05/20260518.minute.json",
+            "hourly": "teias/2026/05/20260518.hourly.json",
+            "meta": "teias/2026/05/20260518.meta.json"
+          }
+        },
+        "2026-05-19": {
+          "date": "2026-05-19",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "c79c8216db1118e045cd6c16a7bb48b4f2f37fbcdeab51370b982fc6c42962c0",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/05/20260519.frequency.i16",
+            "minute": "teias/2026/05/20260519.minute.json",
+            "hourly": "teias/2026/05/20260519.hourly.json",
+            "meta": "teias/2026/05/20260519.meta.json"
+          }
+        },
+        "2026-05-20": {
+          "date": "2026-05-20",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "021b59e95bc042f362896e8aff7e09f8c37ec8a9b26207348207470be2a2afc1",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/05/20260520.frequency.i16",
+            "minute": "teias/2026/05/20260520.minute.json",
+            "hourly": "teias/2026/05/20260520.hourly.json",
+            "meta": "teias/2026/05/20260520.meta.json"
+          }
+        },
+        "2026-05-21": {
+          "date": "2026-05-21",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "9ca1e5f47900261880b22e305d0499bbc11582b82ba5fd899e82fa0cfde41be4",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/05/20260521.frequency.i16",
+            "minute": "teias/2026/05/20260521.minute.json",
+            "hourly": "teias/2026/05/20260521.hourly.json",
+            "meta": "teias/2026/05/20260521.meta.json"
+          }
+        },
+        "2026-05-22": {
+          "date": "2026-05-22",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "5351a3d78b60f23bc38653dfc55cf912db36e928ff7314e978f186799b0a0e82",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/05/20260522.frequency.i16",
+            "minute": "teias/2026/05/20260522.minute.json",
+            "hourly": "teias/2026/05/20260522.hourly.json",
+            "meta": "teias/2026/05/20260522.meta.json"
+          }
+        },
+        "2026-05-23": {
+          "date": "2026-05-23",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "3af9d71051b450b5f7fc5835c02b469b0bed14b9ab472ef9cdae39ee890babda",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/05/20260523.frequency.i16",
+            "minute": "teias/2026/05/20260523.minute.json",
+            "hourly": "teias/2026/05/20260523.hourly.json",
+            "meta": "teias/2026/05/20260523.meta.json"
+          }
+        },
+        "2026-05-24": {
+          "date": "2026-05-24",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "3859cebe1fbe4f21026dd26458e0c9814da2d40438603010cb32b14225f63fe2",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/05/20260524.frequency.i16",
+            "minute": "teias/2026/05/20260524.minute.json",
+            "hourly": "teias/2026/05/20260524.hourly.json",
+            "meta": "teias/2026/05/20260524.meta.json"
+          }
+        },
+        "2026-05-25": {
+          "date": "2026-05-25",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "1446cbc0acf874e5947e0a40d34581ac9d80ed910abc0b1649e47d61fd43c48e",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/05/20260525.frequency.i16",
+            "minute": "teias/2026/05/20260525.minute.json",
+            "hourly": "teias/2026/05/20260525.hourly.json",
+            "meta": "teias/2026/05/20260525.meta.json"
+          }
+        },
+        "2026-05-26": {
+          "date": "2026-05-26",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "b94f7cd36dd6d0162374c74acf4f2fc4563f7070e89d2e1756dbd211f37f21f1",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/05/20260526.frequency.i16",
+            "minute": "teias/2026/05/20260526.minute.json",
+            "hourly": "teias/2026/05/20260526.hourly.json",
+            "meta": "teias/2026/05/20260526.meta.json"
+          }
+        },
+        "2026-05-27": {
+          "date": "2026-05-27",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "3f48baf8ddad9349553ffc8acda3690f33a5a0e43c3b1d48d882565996de9985",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/05/20260527.frequency.i16",
+            "minute": "teias/2026/05/20260527.minute.json",
+            "hourly": "teias/2026/05/20260527.hourly.json",
+            "meta": "teias/2026/05/20260527.meta.json"
+          }
+        },
+        "2026-05-28": {
+          "date": "2026-05-28",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "5248fff3bf6727a8945244659a34bd95e2438021e344185eaa71c7de3c622722",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/05/20260528.frequency.i16",
+            "minute": "teias/2026/05/20260528.minute.json",
+            "hourly": "teias/2026/05/20260528.hourly.json",
+            "meta": "teias/2026/05/20260528.meta.json"
+          }
+        },
+        "2026-05-29": {
+          "date": "2026-05-29",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "3e7951011109b5f178a09b1549f02f754f9dbe5598483a4655a0548d5c504ae0",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/05/20260529.frequency.i16",
+            "minute": "teias/2026/05/20260529.minute.json",
+            "hourly": "teias/2026/05/20260529.hourly.json",
+            "meta": "teias/2026/05/20260529.meta.json"
+          }
+        },
+        "2026-05-30": {
+          "date": "2026-05-30",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "49064c95c274ea4948f3d08e7bb62f2dfbdb0f98fc93bb735ac226e5bedcb3cc",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/05/20260530.frequency.i16",
+            "minute": "teias/2026/05/20260530.minute.json",
+            "hourly": "teias/2026/05/20260530.hourly.json",
+            "meta": "teias/2026/05/20260530.meta.json"
+          }
+        },
+        "2026-05-31": {
+          "date": "2026-05-31",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "e0bffc7c34624229d56b82efbf2a1f6052b2a06a8f22621fc9686c1eba6fe93e",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/05/20260531.frequency.i16",
+            "minute": "teias/2026/05/20260531.minute.json",
+            "hourly": "teias/2026/05/20260531.hourly.json",
+            "meta": "teias/2026/05/20260531.meta.json"
+          }
+        },
+        "2026-06-01": {
+          "date": "2026-06-01",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "f02881d5e73a3209de0d6f587d89a6dd3cfbcc43513007a67a38fb9cc17aa530",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260601.frequency.i16",
+            "minute": "teias/2026/06/20260601.minute.json",
+            "hourly": "teias/2026/06/20260601.hourly.json",
+            "meta": "teias/2026/06/20260601.meta.json"
+          }
+        },
+        "2026-06-02": {
+          "date": "2026-06-02",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "8836b3073e8de29b87c3b2827d66631687069aa2922a6baa734c636a9e5ff7ce",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260602.frequency.i16",
+            "minute": "teias/2026/06/20260602.minute.json",
+            "hourly": "teias/2026/06/20260602.hourly.json",
+            "meta": "teias/2026/06/20260602.meta.json"
+          }
+        },
+        "2026-06-03": {
+          "date": "2026-06-03",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "b6d2ba9a0ba79c1b3a8c7abcab3e8039f91e1003bc892a8b5865931fcdd5ad52",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260603.frequency.i16",
+            "minute": "teias/2026/06/20260603.minute.json",
+            "hourly": "teias/2026/06/20260603.hourly.json",
+            "meta": "teias/2026/06/20260603.meta.json"
+          }
+        },
+        "2026-06-04": {
+          "date": "2026-06-04",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "ef36bf68f65280c5c363e2e3ac4cc8e5ed454eb667f300c5187b1216d20ce14f",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260604.frequency.i16",
+            "minute": "teias/2026/06/20260604.minute.json",
+            "hourly": "teias/2026/06/20260604.hourly.json",
+            "meta": "teias/2026/06/20260604.meta.json"
+          }
+        },
+        "2026-06-05": {
+          "date": "2026-06-05",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "20cfc06f0a57e6b274389d4246551c75b515ce23952f2f2719dd40e59fdc43b7",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260605.frequency.i16",
+            "minute": "teias/2026/06/20260605.minute.json",
+            "hourly": "teias/2026/06/20260605.hourly.json",
+            "meta": "teias/2026/06/20260605.meta.json"
+          }
+        },
+        "2026-06-06": {
+          "date": "2026-06-06",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "b688debb6d05ceb23fab7c2f85170620bb5e645292affbfe019f3c1dd15847bb",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260606.frequency.i16",
+            "minute": "teias/2026/06/20260606.minute.json",
+            "hourly": "teias/2026/06/20260606.hourly.json",
+            "meta": "teias/2026/06/20260606.meta.json"
+          }
+        },
+        "2026-06-07": {
+          "date": "2026-06-07",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "9107d193fb9d25a29840619b038ff93206ab7a4d677d38e3f60e4d56aa7c256d",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260607.frequency.i16",
+            "minute": "teias/2026/06/20260607.minute.json",
+            "hourly": "teias/2026/06/20260607.hourly.json",
+            "meta": "teias/2026/06/20260607.meta.json"
+          }
+        },
+        "2026-06-08": {
+          "date": "2026-06-08",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "2cbdc8408c8e8c5f8c5590b0a609e2b19c1c319cd772fe5f5fdfe3e2930b2f50",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260608.frequency.i16",
+            "minute": "teias/2026/06/20260608.minute.json",
+            "hourly": "teias/2026/06/20260608.hourly.json",
+            "meta": "teias/2026/06/20260608.meta.json"
+          }
+        },
+        "2026-06-09": {
+          "date": "2026-06-09",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "289c5672dc10e3f2848eda1c118d48e829d558cfd937f0f1eeea5564ad68a9d1",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260609.frequency.i16",
+            "minute": "teias/2026/06/20260609.minute.json",
+            "hourly": "teias/2026/06/20260609.hourly.json",
+            "meta": "teias/2026/06/20260609.meta.json"
+          }
+        },
+        "2026-06-10": {
+          "date": "2026-06-10",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "69fd4d5bd1091c6c8120cbc8fd7a684ceb3efd19792c202c8959be55591e0d6f",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260610.frequency.i16",
+            "minute": "teias/2026/06/20260610.minute.json",
+            "hourly": "teias/2026/06/20260610.hourly.json",
+            "meta": "teias/2026/06/20260610.meta.json"
+          }
+        },
+        "2026-06-11": {
+          "date": "2026-06-11",
+          "timezone": "Europe/Istanbul",
+          "status": "partial",
+          "qualityScore": 100,
+          "sha256": "3b30db07cfb90a2dd41444be1d839115c3cee49fe00cbee7820bdfd4e2400e0e",
+          "expectedSamples": 86400,
+          "validSamples": 86399,
+          "files": {
+            "frequency": "teias/2026/06/20260611.frequency.i16",
+            "minute": "teias/2026/06/20260611.minute.json",
+            "hourly": "teias/2026/06/20260611.hourly.json",
+            "meta": "teias/2026/06/20260611.meta.json"
+          }
+        },
+        "2026-06-12": {
+          "date": "2026-06-12",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "d91164fcaa064d46bb0bf8b1c4f72426e0e568d7e9e7c3be3d0f18054e1222bc",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260612.frequency.i16",
+            "minute": "teias/2026/06/20260612.minute.json",
+            "hourly": "teias/2026/06/20260612.hourly.json",
+            "meta": "teias/2026/06/20260612.meta.json"
+          }
+        },
+        "2026-06-13": {
+          "date": "2026-06-13",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "d81c13eb79b417c4b11de7738fb6ac6e7d4fe3b414b80dc0d338a803aebe1867",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260613.frequency.i16",
+            "minute": "teias/2026/06/20260613.minute.json",
+            "hourly": "teias/2026/06/20260613.hourly.json",
+            "meta": "teias/2026/06/20260613.meta.json"
+          }
+        },
+        "2026-06-14": {
+          "date": "2026-06-14",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "91ec68e8399f76b59e64a4bbf923e6a882c249d50472e68f8fafa5e8adb9ce7b",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260614.frequency.i16",
+            "minute": "teias/2026/06/20260614.minute.json",
+            "hourly": "teias/2026/06/20260614.hourly.json",
+            "meta": "teias/2026/06/20260614.meta.json"
+          }
+        },
+        "2026-06-15": {
+          "date": "2026-06-15",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "6a1b3fddef5052e09700c255f843b2a60621c6b53f8cb6268c99f321527c877a",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260615.frequency.i16",
+            "minute": "teias/2026/06/20260615.minute.json",
+            "hourly": "teias/2026/06/20260615.hourly.json",
+            "meta": "teias/2026/06/20260615.meta.json"
+          }
+        },
+        "2026-06-16": {
+          "date": "2026-06-16",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "046b083ae06248edc288a769f42937bc4292551e764fdbee48428aa9f84620b4",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260616.frequency.i16",
+            "minute": "teias/2026/06/20260616.minute.json",
+            "hourly": "teias/2026/06/20260616.hourly.json",
+            "meta": "teias/2026/06/20260616.meta.json"
+          }
+        },
+        "2026-06-17": {
+          "date": "2026-06-17",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "911fdf25de33df234a6cfcd1b60c628b48baf2ec2f110fab373d43cbfb556d7a",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260617.frequency.i16",
+            "minute": "teias/2026/06/20260617.minute.json",
+            "hourly": "teias/2026/06/20260617.hourly.json",
+            "meta": "teias/2026/06/20260617.meta.json"
+          }
+        },
+        "2026-06-18": {
+          "date": "2026-06-18",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "21609ddc366f5c2bc91aec1eaed58fcbc098e3306c7d5f90e6e019141c5d4c34",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260618.frequency.i16",
+            "minute": "teias/2026/06/20260618.minute.json",
+            "hourly": "teias/2026/06/20260618.hourly.json",
+            "meta": "teias/2026/06/20260618.meta.json"
+          }
+        },
+        "2026-06-19": {
+          "date": "2026-06-19",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "2258a867a326f1979ffb14373851ddd82308439caa2997f44a6b72522f413c69",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260619.frequency.i16",
+            "minute": "teias/2026/06/20260619.minute.json",
+            "hourly": "teias/2026/06/20260619.hourly.json",
+            "meta": "teias/2026/06/20260619.meta.json"
+          }
+        },
+        "2026-06-20": {
+          "date": "2026-06-20",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "5b160c757d95112f8990c143f55d6154dd50b906fc74861a52c903919bb2b377",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260620.frequency.i16",
+            "minute": "teias/2026/06/20260620.minute.json",
+            "hourly": "teias/2026/06/20260620.hourly.json",
+            "meta": "teias/2026/06/20260620.meta.json"
+          }
+        },
+        "2026-06-21": {
+          "date": "2026-06-21",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "a88353b6fe8f271a9445fe115e4fb6b14543ee8bf25ae6150a10aae7aba1f649",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260621.frequency.i16",
+            "minute": "teias/2026/06/20260621.minute.json",
+            "hourly": "teias/2026/06/20260621.hourly.json",
+            "meta": "teias/2026/06/20260621.meta.json"
+          }
+        },
+        "2026-06-22": {
+          "date": "2026-06-22",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "cdd5a3b0048208eafeee335f406dc88476b6770c5bc02a458da609eaf6f82932",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260622.frequency.i16",
+            "minute": "teias/2026/06/20260622.minute.json",
+            "hourly": "teias/2026/06/20260622.hourly.json",
+            "meta": "teias/2026/06/20260622.meta.json"
+          }
+        },
+        "2026-06-23": {
+          "date": "2026-06-23",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "1e3adea887c24f98674ad3d7c23e29a357c169c887681ed50d033c8a09f27b3d",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260623.frequency.i16",
+            "minute": "teias/2026/06/20260623.minute.json",
+            "hourly": "teias/2026/06/20260623.hourly.json",
+            "meta": "teias/2026/06/20260623.meta.json"
+          }
+        },
+        "2026-06-24": {
+          "date": "2026-06-24",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "a50af88df6049e45af255f4ec4a3aabaad883705f60bc4d63f045fe488dbfb71",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260624.frequency.i16",
+            "minute": "teias/2026/06/20260624.minute.json",
+            "hourly": "teias/2026/06/20260624.hourly.json",
+            "meta": "teias/2026/06/20260624.meta.json"
+          }
+        },
+        "2026-06-25": {
+          "date": "2026-06-25",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "cb8638ca211625ac423d13703c3b133bd7b289bb4f9879c2015773b3b0f31dee",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260625.frequency.i16",
+            "minute": "teias/2026/06/20260625.minute.json",
+            "hourly": "teias/2026/06/20260625.hourly.json",
+            "meta": "teias/2026/06/20260625.meta.json"
+          }
+        },
+        "2026-06-26": {
+          "date": "2026-06-26",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "d5a35373fd6e1e5b0d9f13094d82b0f991f602c15ed6f0b938c15b830550158d",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260626.frequency.i16",
+            "minute": "teias/2026/06/20260626.minute.json",
+            "hourly": "teias/2026/06/20260626.hourly.json",
+            "meta": "teias/2026/06/20260626.meta.json"
+          }
+        },
+        "2026-06-27": {
+          "date": "2026-06-27",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "c488919f4713b43508abe1fec93c285875a222c618bb1a91b8418713bbaa9ff1",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260627.frequency.i16",
+            "minute": "teias/2026/06/20260627.minute.json",
+            "hourly": "teias/2026/06/20260627.hourly.json",
+            "meta": "teias/2026/06/20260627.meta.json"
+          }
+        },
+        "2026-06-28": {
+          "date": "2026-06-28",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "5541a79cb0f1afad5e5d536474ba9ce36dae3a1e6291204c0a53875b26fc67a4",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260628.frequency.i16",
+            "minute": "teias/2026/06/20260628.minute.json",
+            "hourly": "teias/2026/06/20260628.hourly.json",
+            "meta": "teias/2026/06/20260628.meta.json"
+          }
+        },
+        "2026-06-29": {
+          "date": "2026-06-29",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "75e358d15a68469efbcbb7cf4d41decdf3217ca8061e5b7ebe0e00abf4244330",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260629.frequency.i16",
+            "minute": "teias/2026/06/20260629.minute.json",
+            "hourly": "teias/2026/06/20260629.hourly.json",
+            "meta": "teias/2026/06/20260629.meta.json"
+          }
+        },
+        "2026-06-30": {
+          "date": "2026-06-30",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "4c58717363efde0a4ad9c59b15752cb778e49228497694fde0f0269d985238df",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/06/20260630.frequency.i16",
+            "minute": "teias/2026/06/20260630.minute.json",
+            "hourly": "teias/2026/06/20260630.hourly.json",
+            "meta": "teias/2026/06/20260630.meta.json"
+          }
+        }
+      },
+      "status": "active",
+      "files": {
+        "2026-01-01": {
+          "frequency": "teias/2026/01/20260101.frequency.i16",
+          "minute": "teias/2026/01/20260101.minute.json",
+          "hourly": "teias/2026/01/20260101.hourly.json",
+          "meta": "teias/2026/01/20260101.meta.json"
+        },
+        "2026-01-02": {
+          "frequency": "teias/2026/01/20260102.frequency.i16",
+          "minute": "teias/2026/01/20260102.minute.json",
+          "hourly": "teias/2026/01/20260102.hourly.json",
+          "meta": "teias/2026/01/20260102.meta.json"
+        },
+        "2026-01-03": {
+          "frequency": "teias/2026/01/20260103.frequency.i16",
+          "minute": "teias/2026/01/20260103.minute.json",
+          "hourly": "teias/2026/01/20260103.hourly.json",
+          "meta": "teias/2026/01/20260103.meta.json"
+        },
+        "2026-01-04": {
+          "frequency": "teias/2026/01/20260104.frequency.i16",
+          "minute": "teias/2026/01/20260104.minute.json",
+          "hourly": "teias/2026/01/20260104.hourly.json",
+          "meta": "teias/2026/01/20260104.meta.json"
+        },
+        "2026-01-05": {
+          "frequency": "teias/2026/01/20260105.frequency.i16",
+          "minute": "teias/2026/01/20260105.minute.json",
+          "hourly": "teias/2026/01/20260105.hourly.json",
+          "meta": "teias/2026/01/20260105.meta.json"
+        },
+        "2026-01-06": {
+          "frequency": "teias/2026/01/20260106.frequency.i16",
+          "minute": "teias/2026/01/20260106.minute.json",
+          "hourly": "teias/2026/01/20260106.hourly.json",
+          "meta": "teias/2026/01/20260106.meta.json"
+        },
+        "2026-01-07": {
+          "frequency": "teias/2026/01/20260107.frequency.i16",
+          "minute": "teias/2026/01/20260107.minute.json",
+          "hourly": "teias/2026/01/20260107.hourly.json",
+          "meta": "teias/2026/01/20260107.meta.json"
+        },
+        "2026-01-08": {
+          "frequency": "teias/2026/01/20260108.frequency.i16",
+          "minute": "teias/2026/01/20260108.minute.json",
+          "hourly": "teias/2026/01/20260108.hourly.json",
+          "meta": "teias/2026/01/20260108.meta.json"
+        },
+        "2026-01-09": {
+          "frequency": "teias/2026/01/20260109.frequency.i16",
+          "minute": "teias/2026/01/20260109.minute.json",
+          "hourly": "teias/2026/01/20260109.hourly.json",
+          "meta": "teias/2026/01/20260109.meta.json"
+        },
+        "2026-01-10": {
+          "frequency": "teias/2026/01/20260110.frequency.i16",
+          "minute": "teias/2026/01/20260110.minute.json",
+          "hourly": "teias/2026/01/20260110.hourly.json",
+          "meta": "teias/2026/01/20260110.meta.json"
+        },
+        "2026-01-11": {
+          "frequency": "teias/2026/01/20260111.frequency.i16",
+          "minute": "teias/2026/01/20260111.minute.json",
+          "hourly": "teias/2026/01/20260111.hourly.json",
+          "meta": "teias/2026/01/20260111.meta.json"
+        },
+        "2026-01-12": {
+          "frequency": "teias/2026/01/20260112.frequency.i16",
+          "minute": "teias/2026/01/20260112.minute.json",
+          "hourly": "teias/2026/01/20260112.hourly.json",
+          "meta": "teias/2026/01/20260112.meta.json"
+        },
+        "2026-01-13": {
+          "frequency": "teias/2026/01/20260113.frequency.i16",
+          "minute": "teias/2026/01/20260113.minute.json",
+          "hourly": "teias/2026/01/20260113.hourly.json",
+          "meta": "teias/2026/01/20260113.meta.json"
+        },
+        "2026-01-14": {
+          "frequency": "teias/2026/01/20260114.frequency.i16",
+          "minute": "teias/2026/01/20260114.minute.json",
+          "hourly": "teias/2026/01/20260114.hourly.json",
+          "meta": "teias/2026/01/20260114.meta.json"
+        },
+        "2026-01-15": {
+          "frequency": "teias/2026/01/20260115.frequency.i16",
+          "minute": "teias/2026/01/20260115.minute.json",
+          "hourly": "teias/2026/01/20260115.hourly.json",
+          "meta": "teias/2026/01/20260115.meta.json"
+        },
+        "2026-01-16": {
+          "frequency": "teias/2026/01/20260116.frequency.i16",
+          "minute": "teias/2026/01/20260116.minute.json",
+          "hourly": "teias/2026/01/20260116.hourly.json",
+          "meta": "teias/2026/01/20260116.meta.json"
+        },
+        "2026-01-17": {
+          "frequency": "teias/2026/01/20260117.frequency.i16",
+          "minute": "teias/2026/01/20260117.minute.json",
+          "hourly": "teias/2026/01/20260117.hourly.json",
+          "meta": "teias/2026/01/20260117.meta.json"
+        },
+        "2026-01-18": {
+          "frequency": "teias/2026/01/20260118.frequency.i16",
+          "minute": "teias/2026/01/20260118.minute.json",
+          "hourly": "teias/2026/01/20260118.hourly.json",
+          "meta": "teias/2026/01/20260118.meta.json"
+        },
+        "2026-01-19": {
+          "frequency": "teias/2026/01/20260119.frequency.i16",
+          "minute": "teias/2026/01/20260119.minute.json",
+          "hourly": "teias/2026/01/20260119.hourly.json",
+          "meta": "teias/2026/01/20260119.meta.json"
+        },
+        "2026-01-20": {
+          "frequency": "teias/2026/01/20260120.frequency.i16",
+          "minute": "teias/2026/01/20260120.minute.json",
+          "hourly": "teias/2026/01/20260120.hourly.json",
+          "meta": "teias/2026/01/20260120.meta.json"
+        },
+        "2026-01-21": {
+          "frequency": "teias/2026/01/20260121.frequency.i16",
+          "minute": "teias/2026/01/20260121.minute.json",
+          "hourly": "teias/2026/01/20260121.hourly.json",
+          "meta": "teias/2026/01/20260121.meta.json"
+        },
+        "2026-01-22": {
+          "frequency": "teias/2026/01/20260122.frequency.i16",
+          "minute": "teias/2026/01/20260122.minute.json",
+          "hourly": "teias/2026/01/20260122.hourly.json",
+          "meta": "teias/2026/01/20260122.meta.json"
+        },
+        "2026-01-23": {
+          "frequency": "teias/2026/01/20260123.frequency.i16",
+          "minute": "teias/2026/01/20260123.minute.json",
+          "hourly": "teias/2026/01/20260123.hourly.json",
+          "meta": "teias/2026/01/20260123.meta.json"
+        },
+        "2026-01-24": {
+          "frequency": "teias/2026/01/20260124.frequency.i16",
+          "minute": "teias/2026/01/20260124.minute.json",
+          "hourly": "teias/2026/01/20260124.hourly.json",
+          "meta": "teias/2026/01/20260124.meta.json"
+        },
+        "2026-01-25": {
+          "frequency": "teias/2026/01/20260125.frequency.i16",
+          "minute": "teias/2026/01/20260125.minute.json",
+          "hourly": "teias/2026/01/20260125.hourly.json",
+          "meta": "teias/2026/01/20260125.meta.json"
+        },
+        "2026-01-26": {
+          "frequency": "teias/2026/01/20260126.frequency.i16",
+          "minute": "teias/2026/01/20260126.minute.json",
+          "hourly": "teias/2026/01/20260126.hourly.json",
+          "meta": "teias/2026/01/20260126.meta.json"
+        },
+        "2026-01-27": {
+          "frequency": "teias/2026/01/20260127.frequency.i16",
+          "minute": "teias/2026/01/20260127.minute.json",
+          "hourly": "teias/2026/01/20260127.hourly.json",
+          "meta": "teias/2026/01/20260127.meta.json"
+        },
+        "2026-01-28": {
+          "frequency": "teias/2026/01/20260128.frequency.i16",
+          "minute": "teias/2026/01/20260128.minute.json",
+          "hourly": "teias/2026/01/20260128.hourly.json",
+          "meta": "teias/2026/01/20260128.meta.json"
+        },
+        "2026-01-29": {
+          "frequency": "teias/2026/01/20260129.frequency.i16",
+          "minute": "teias/2026/01/20260129.minute.json",
+          "hourly": "teias/2026/01/20260129.hourly.json",
+          "meta": "teias/2026/01/20260129.meta.json"
+        },
+        "2026-01-30": {
+          "frequency": "teias/2026/01/20260130.frequency.i16",
+          "minute": "teias/2026/01/20260130.minute.json",
+          "hourly": "teias/2026/01/20260130.hourly.json",
+          "meta": "teias/2026/01/20260130.meta.json"
+        },
+        "2026-01-31": {
+          "frequency": "teias/2026/01/20260131.frequency.i16",
+          "minute": "teias/2026/01/20260131.minute.json",
+          "hourly": "teias/2026/01/20260131.hourly.json",
+          "meta": "teias/2026/01/20260131.meta.json"
+        },
+        "2026-02-01": {
+          "frequency": "teias/2026/02/20260201.frequency.i16",
+          "minute": "teias/2026/02/20260201.minute.json",
+          "hourly": "teias/2026/02/20260201.hourly.json",
+          "meta": "teias/2026/02/20260201.meta.json"
+        },
+        "2026-02-02": {
+          "frequency": "teias/2026/02/20260202.frequency.i16",
+          "minute": "teias/2026/02/20260202.minute.json",
+          "hourly": "teias/2026/02/20260202.hourly.json",
+          "meta": "teias/2026/02/20260202.meta.json"
+        },
+        "2026-02-03": {
+          "frequency": "teias/2026/02/20260203.frequency.i16",
+          "minute": "teias/2026/02/20260203.minute.json",
+          "hourly": "teias/2026/02/20260203.hourly.json",
+          "meta": "teias/2026/02/20260203.meta.json"
+        },
+        "2026-02-04": {
+          "frequency": "teias/2026/02/20260204.frequency.i16",
+          "minute": "teias/2026/02/20260204.minute.json",
+          "hourly": "teias/2026/02/20260204.hourly.json",
+          "meta": "teias/2026/02/20260204.meta.json"
+        },
+        "2026-02-05": {
+          "frequency": "teias/2026/02/20260205.frequency.i16",
+          "minute": "teias/2026/02/20260205.minute.json",
+          "hourly": "teias/2026/02/20260205.hourly.json",
+          "meta": "teias/2026/02/20260205.meta.json"
+        },
+        "2026-02-06": {
+          "frequency": "teias/2026/02/20260206.frequency.i16",
+          "minute": "teias/2026/02/20260206.minute.json",
+          "hourly": "teias/2026/02/20260206.hourly.json",
+          "meta": "teias/2026/02/20260206.meta.json"
+        },
+        "2026-02-07": {
+          "frequency": "teias/2026/02/20260207.frequency.i16",
+          "minute": "teias/2026/02/20260207.minute.json",
+          "hourly": "teias/2026/02/20260207.hourly.json",
+          "meta": "teias/2026/02/20260207.meta.json"
+        },
+        "2026-02-08": {
+          "frequency": "teias/2026/02/20260208.frequency.i16",
+          "minute": "teias/2026/02/20260208.minute.json",
+          "hourly": "teias/2026/02/20260208.hourly.json",
+          "meta": "teias/2026/02/20260208.meta.json"
+        },
+        "2026-02-09": {
+          "frequency": "teias/2026/02/20260209.frequency.i16",
+          "minute": "teias/2026/02/20260209.minute.json",
+          "hourly": "teias/2026/02/20260209.hourly.json",
+          "meta": "teias/2026/02/20260209.meta.json"
+        },
+        "2026-02-10": {
+          "frequency": "teias/2026/02/20260210.frequency.i16",
+          "minute": "teias/2026/02/20260210.minute.json",
+          "hourly": "teias/2026/02/20260210.hourly.json",
+          "meta": "teias/2026/02/20260210.meta.json"
+        },
+        "2026-02-11": {
+          "frequency": "teias/2026/02/20260211.frequency.i16",
+          "minute": "teias/2026/02/20260211.minute.json",
+          "hourly": "teias/2026/02/20260211.hourly.json",
+          "meta": "teias/2026/02/20260211.meta.json"
+        },
+        "2026-02-12": {
+          "frequency": "teias/2026/02/20260212.frequency.i16",
+          "minute": "teias/2026/02/20260212.minute.json",
+          "hourly": "teias/2026/02/20260212.hourly.json",
+          "meta": "teias/2026/02/20260212.meta.json"
+        },
+        "2026-02-13": {
+          "frequency": "teias/2026/02/20260213.frequency.i16",
+          "minute": "teias/2026/02/20260213.minute.json",
+          "hourly": "teias/2026/02/20260213.hourly.json",
+          "meta": "teias/2026/02/20260213.meta.json"
+        },
+        "2026-02-14": {
+          "frequency": "teias/2026/02/20260214.frequency.i16",
+          "minute": "teias/2026/02/20260214.minute.json",
+          "hourly": "teias/2026/02/20260214.hourly.json",
+          "meta": "teias/2026/02/20260214.meta.json"
+        },
+        "2026-02-15": {
+          "frequency": "teias/2026/02/20260215.frequency.i16",
+          "minute": "teias/2026/02/20260215.minute.json",
+          "hourly": "teias/2026/02/20260215.hourly.json",
+          "meta": "teias/2026/02/20260215.meta.json"
+        },
+        "2026-02-16": {
+          "frequency": "teias/2026/02/20260216.frequency.i16",
+          "minute": "teias/2026/02/20260216.minute.json",
+          "hourly": "teias/2026/02/20260216.hourly.json",
+          "meta": "teias/2026/02/20260216.meta.json"
+        },
+        "2026-02-17": {
+          "frequency": "teias/2026/02/20260217.frequency.i16",
+          "minute": "teias/2026/02/20260217.minute.json",
+          "hourly": "teias/2026/02/20260217.hourly.json",
+          "meta": "teias/2026/02/20260217.meta.json"
+        },
+        "2026-02-18": {
+          "frequency": "teias/2026/02/20260218.frequency.i16",
+          "minute": "teias/2026/02/20260218.minute.json",
+          "hourly": "teias/2026/02/20260218.hourly.json",
+          "meta": "teias/2026/02/20260218.meta.json"
+        },
+        "2026-02-19": {
+          "frequency": "teias/2026/02/20260219.frequency.i16",
+          "minute": "teias/2026/02/20260219.minute.json",
+          "hourly": "teias/2026/02/20260219.hourly.json",
+          "meta": "teias/2026/02/20260219.meta.json"
+        },
+        "2026-02-20": {
+          "frequency": "teias/2026/02/20260220.frequency.i16",
+          "minute": "teias/2026/02/20260220.minute.json",
+          "hourly": "teias/2026/02/20260220.hourly.json",
+          "meta": "teias/2026/02/20260220.meta.json"
+        },
+        "2026-02-21": {
+          "frequency": "teias/2026/02/20260221.frequency.i16",
+          "minute": "teias/2026/02/20260221.minute.json",
+          "hourly": "teias/2026/02/20260221.hourly.json",
+          "meta": "teias/2026/02/20260221.meta.json"
+        },
+        "2026-02-22": {
+          "frequency": "teias/2026/02/20260222.frequency.i16",
+          "minute": "teias/2026/02/20260222.minute.json",
+          "hourly": "teias/2026/02/20260222.hourly.json",
+          "meta": "teias/2026/02/20260222.meta.json"
+        },
+        "2026-02-23": {
+          "frequency": "teias/2026/02/20260223.frequency.i16",
+          "minute": "teias/2026/02/20260223.minute.json",
+          "hourly": "teias/2026/02/20260223.hourly.json",
+          "meta": "teias/2026/02/20260223.meta.json"
+        },
+        "2026-02-24": {
+          "frequency": "teias/2026/02/20260224.frequency.i16",
+          "minute": "teias/2026/02/20260224.minute.json",
+          "hourly": "teias/2026/02/20260224.hourly.json",
+          "meta": "teias/2026/02/20260224.meta.json"
+        },
+        "2026-02-25": {
+          "frequency": "teias/2026/02/20260225.frequency.i16",
+          "minute": "teias/2026/02/20260225.minute.json",
+          "hourly": "teias/2026/02/20260225.hourly.json",
+          "meta": "teias/2026/02/20260225.meta.json"
+        },
+        "2026-02-26": {
+          "frequency": "teias/2026/02/20260226.frequency.i16",
+          "minute": "teias/2026/02/20260226.minute.json",
+          "hourly": "teias/2026/02/20260226.hourly.json",
+          "meta": "teias/2026/02/20260226.meta.json"
+        },
+        "2026-02-27": {
+          "frequency": "teias/2026/02/20260227.frequency.i16",
+          "minute": "teias/2026/02/20260227.minute.json",
+          "hourly": "teias/2026/02/20260227.hourly.json",
+          "meta": "teias/2026/02/20260227.meta.json"
+        },
+        "2026-02-28": {
+          "frequency": "teias/2026/02/20260228.frequency.i16",
+          "minute": "teias/2026/02/20260228.minute.json",
+          "hourly": "teias/2026/02/20260228.hourly.json",
+          "meta": "teias/2026/02/20260228.meta.json"
+        },
+        "2026-03-01": {
+          "frequency": "teias/2026/03/20260301.frequency.i16",
+          "minute": "teias/2026/03/20260301.minute.json",
+          "hourly": "teias/2026/03/20260301.hourly.json",
+          "meta": "teias/2026/03/20260301.meta.json"
+        },
+        "2026-03-02": {
+          "frequency": "teias/2026/03/20260302.frequency.i16",
+          "minute": "teias/2026/03/20260302.minute.json",
+          "hourly": "teias/2026/03/20260302.hourly.json",
+          "meta": "teias/2026/03/20260302.meta.json"
+        },
+        "2026-03-03": {
+          "frequency": "teias/2026/03/20260303.frequency.i16",
+          "minute": "teias/2026/03/20260303.minute.json",
+          "hourly": "teias/2026/03/20260303.hourly.json",
+          "meta": "teias/2026/03/20260303.meta.json"
+        },
+        "2026-03-04": {
+          "frequency": "teias/2026/03/20260304.frequency.i16",
+          "minute": "teias/2026/03/20260304.minute.json",
+          "hourly": "teias/2026/03/20260304.hourly.json",
+          "meta": "teias/2026/03/20260304.meta.json"
+        },
+        "2026-03-05": {
+          "frequency": "teias/2026/03/20260305.frequency.i16",
+          "minute": "teias/2026/03/20260305.minute.json",
+          "hourly": "teias/2026/03/20260305.hourly.json",
+          "meta": "teias/2026/03/20260305.meta.json"
+        },
+        "2026-03-06": {
+          "frequency": "teias/2026/03/20260306.frequency.i16",
+          "minute": "teias/2026/03/20260306.minute.json",
+          "hourly": "teias/2026/03/20260306.hourly.json",
+          "meta": "teias/2026/03/20260306.meta.json"
+        },
+        "2026-03-07": {
+          "frequency": "teias/2026/03/20260307.frequency.i16",
+          "minute": "teias/2026/03/20260307.minute.json",
+          "hourly": "teias/2026/03/20260307.hourly.json",
+          "meta": "teias/2026/03/20260307.meta.json"
+        },
+        "2026-03-08": {
+          "frequency": "teias/2026/03/20260308.frequency.i16",
+          "minute": "teias/2026/03/20260308.minute.json",
+          "hourly": "teias/2026/03/20260308.hourly.json",
+          "meta": "teias/2026/03/20260308.meta.json"
+        },
+        "2026-03-09": {
+          "frequency": "teias/2026/03/20260309.frequency.i16",
+          "minute": "teias/2026/03/20260309.minute.json",
+          "hourly": "teias/2026/03/20260309.hourly.json",
+          "meta": "teias/2026/03/20260309.meta.json"
+        },
+        "2026-03-10": {
+          "frequency": "teias/2026/03/20260310.frequency.i16",
+          "minute": "teias/2026/03/20260310.minute.json",
+          "hourly": "teias/2026/03/20260310.hourly.json",
+          "meta": "teias/2026/03/20260310.meta.json"
+        },
+        "2026-03-11": {
+          "frequency": "teias/2026/03/20260311.frequency.i16",
+          "minute": "teias/2026/03/20260311.minute.json",
+          "hourly": "teias/2026/03/20260311.hourly.json",
+          "meta": "teias/2026/03/20260311.meta.json"
+        },
+        "2026-03-12": {
+          "frequency": "teias/2026/03/20260312.frequency.i16",
+          "minute": "teias/2026/03/20260312.minute.json",
+          "hourly": "teias/2026/03/20260312.hourly.json",
+          "meta": "teias/2026/03/20260312.meta.json"
+        },
+        "2026-03-13": {
+          "frequency": "teias/2026/03/20260313.frequency.i16",
+          "minute": "teias/2026/03/20260313.minute.json",
+          "hourly": "teias/2026/03/20260313.hourly.json",
+          "meta": "teias/2026/03/20260313.meta.json"
+        },
+        "2026-03-14": {
+          "frequency": "teias/2026/03/20260314.frequency.i16",
+          "minute": "teias/2026/03/20260314.minute.json",
+          "hourly": "teias/2026/03/20260314.hourly.json",
+          "meta": "teias/2026/03/20260314.meta.json"
+        },
+        "2026-03-15": {
+          "frequency": "teias/2026/03/20260315.frequency.i16",
+          "minute": "teias/2026/03/20260315.minute.json",
+          "hourly": "teias/2026/03/20260315.hourly.json",
+          "meta": "teias/2026/03/20260315.meta.json"
+        },
+        "2026-03-16": {
+          "frequency": "teias/2026/03/20260316.frequency.i16",
+          "minute": "teias/2026/03/20260316.minute.json",
+          "hourly": "teias/2026/03/20260316.hourly.json",
+          "meta": "teias/2026/03/20260316.meta.json"
+        },
+        "2026-03-17": {
+          "frequency": "teias/2026/03/20260317.frequency.i16",
+          "minute": "teias/2026/03/20260317.minute.json",
+          "hourly": "teias/2026/03/20260317.hourly.json",
+          "meta": "teias/2026/03/20260317.meta.json"
+        },
+        "2026-03-18": {
+          "frequency": "teias/2026/03/20260318.frequency.i16",
+          "minute": "teias/2026/03/20260318.minute.json",
+          "hourly": "teias/2026/03/20260318.hourly.json",
+          "meta": "teias/2026/03/20260318.meta.json"
+        },
+        "2026-03-19": {
+          "frequency": "teias/2026/03/20260319.frequency.i16",
+          "minute": "teias/2026/03/20260319.minute.json",
+          "hourly": "teias/2026/03/20260319.hourly.json",
+          "meta": "teias/2026/03/20260319.meta.json"
+        },
+        "2026-03-20": {
+          "frequency": "teias/2026/03/20260320.frequency.i16",
+          "minute": "teias/2026/03/20260320.minute.json",
+          "hourly": "teias/2026/03/20260320.hourly.json",
+          "meta": "teias/2026/03/20260320.meta.json"
+        },
+        "2026-03-21": {
+          "frequency": "teias/2026/03/20260321.frequency.i16",
+          "minute": "teias/2026/03/20260321.minute.json",
+          "hourly": "teias/2026/03/20260321.hourly.json",
+          "meta": "teias/2026/03/20260321.meta.json"
+        },
+        "2026-03-22": {
+          "frequency": "teias/2026/03/20260322.frequency.i16",
+          "minute": "teias/2026/03/20260322.minute.json",
+          "hourly": "teias/2026/03/20260322.hourly.json",
+          "meta": "teias/2026/03/20260322.meta.json"
+        },
+        "2026-03-23": {
+          "frequency": "teias/2026/03/20260323.frequency.i16",
+          "minute": "teias/2026/03/20260323.minute.json",
+          "hourly": "teias/2026/03/20260323.hourly.json",
+          "meta": "teias/2026/03/20260323.meta.json"
+        },
+        "2026-03-24": {
+          "frequency": "teias/2026/03/20260324.frequency.i16",
+          "minute": "teias/2026/03/20260324.minute.json",
+          "hourly": "teias/2026/03/20260324.hourly.json",
+          "meta": "teias/2026/03/20260324.meta.json"
+        },
+        "2026-03-25": {
+          "frequency": "teias/2026/03/20260325.frequency.i16",
+          "minute": "teias/2026/03/20260325.minute.json",
+          "hourly": "teias/2026/03/20260325.hourly.json",
+          "meta": "teias/2026/03/20260325.meta.json"
+        },
+        "2026-03-26": {
+          "frequency": "teias/2026/03/20260326.frequency.i16",
+          "minute": "teias/2026/03/20260326.minute.json",
+          "hourly": "teias/2026/03/20260326.hourly.json",
+          "meta": "teias/2026/03/20260326.meta.json"
+        },
+        "2026-03-27": {
+          "frequency": "teias/2026/03/20260327.frequency.i16",
+          "minute": "teias/2026/03/20260327.minute.json",
+          "hourly": "teias/2026/03/20260327.hourly.json",
+          "meta": "teias/2026/03/20260327.meta.json"
+        },
+        "2026-03-28": {
+          "frequency": "teias/2026/03/20260328.frequency.i16",
+          "minute": "teias/2026/03/20260328.minute.json",
+          "hourly": "teias/2026/03/20260328.hourly.json",
+          "meta": "teias/2026/03/20260328.meta.json"
+        },
+        "2026-03-29": {
+          "frequency": "teias/2026/03/20260329.frequency.i16",
+          "minute": "teias/2026/03/20260329.minute.json",
+          "hourly": "teias/2026/03/20260329.hourly.json",
+          "meta": "teias/2026/03/20260329.meta.json"
+        },
+        "2026-03-30": {
+          "frequency": "teias/2026/03/20260330.frequency.i16",
+          "minute": "teias/2026/03/20260330.minute.json",
+          "hourly": "teias/2026/03/20260330.hourly.json",
+          "meta": "teias/2026/03/20260330.meta.json"
+        },
+        "2026-03-31": {
+          "frequency": "teias/2026/03/20260331.frequency.i16",
+          "minute": "teias/2026/03/20260331.minute.json",
+          "hourly": "teias/2026/03/20260331.hourly.json",
+          "meta": "teias/2026/03/20260331.meta.json"
+        },
+        "2026-04-01": {
+          "frequency": "teias/2026/04/20260401.frequency.i16",
+          "minute": "teias/2026/04/20260401.minute.json",
+          "hourly": "teias/2026/04/20260401.hourly.json",
+          "meta": "teias/2026/04/20260401.meta.json"
+        },
+        "2026-04-02": {
+          "frequency": "teias/2026/04/20260402.frequency.i16",
+          "minute": "teias/2026/04/20260402.minute.json",
+          "hourly": "teias/2026/04/20260402.hourly.json",
+          "meta": "teias/2026/04/20260402.meta.json"
+        },
+        "2026-04-03": {
+          "frequency": "teias/2026/04/20260403.frequency.i16",
+          "minute": "teias/2026/04/20260403.minute.json",
+          "hourly": "teias/2026/04/20260403.hourly.json",
+          "meta": "teias/2026/04/20260403.meta.json"
+        },
+        "2026-04-04": {
+          "frequency": "teias/2026/04/20260404.frequency.i16",
+          "minute": "teias/2026/04/20260404.minute.json",
+          "hourly": "teias/2026/04/20260404.hourly.json",
+          "meta": "teias/2026/04/20260404.meta.json"
+        },
+        "2026-04-05": {
+          "frequency": "teias/2026/04/20260405.frequency.i16",
+          "minute": "teias/2026/04/20260405.minute.json",
+          "hourly": "teias/2026/04/20260405.hourly.json",
+          "meta": "teias/2026/04/20260405.meta.json"
+        },
+        "2026-04-06": {
+          "frequency": "teias/2026/04/20260406.frequency.i16",
+          "minute": "teias/2026/04/20260406.minute.json",
+          "hourly": "teias/2026/04/20260406.hourly.json",
+          "meta": "teias/2026/04/20260406.meta.json"
+        },
+        "2026-04-07": {
+          "frequency": "teias/2026/04/20260407.frequency.i16",
+          "minute": "teias/2026/04/20260407.minute.json",
+          "hourly": "teias/2026/04/20260407.hourly.json",
+          "meta": "teias/2026/04/20260407.meta.json"
+        },
+        "2026-04-08": {
+          "frequency": "teias/2026/04/20260408.frequency.i16",
+          "minute": "teias/2026/04/20260408.minute.json",
+          "hourly": "teias/2026/04/20260408.hourly.json",
+          "meta": "teias/2026/04/20260408.meta.json"
+        },
+        "2026-04-09": {
+          "frequency": "teias/2026/04/20260409.frequency.i16",
+          "minute": "teias/2026/04/20260409.minute.json",
+          "hourly": "teias/2026/04/20260409.hourly.json",
+          "meta": "teias/2026/04/20260409.meta.json"
+        },
+        "2026-04-10": {
+          "frequency": "teias/2026/04/20260410.frequency.i16",
+          "minute": "teias/2026/04/20260410.minute.json",
+          "hourly": "teias/2026/04/20260410.hourly.json",
+          "meta": "teias/2026/04/20260410.meta.json"
+        },
+        "2026-04-11": {
+          "frequency": "teias/2026/04/20260411.frequency.i16",
+          "minute": "teias/2026/04/20260411.minute.json",
+          "hourly": "teias/2026/04/20260411.hourly.json",
+          "meta": "teias/2026/04/20260411.meta.json"
+        },
+        "2026-04-12": {
+          "frequency": "teias/2026/04/20260412.frequency.i16",
+          "minute": "teias/2026/04/20260412.minute.json",
+          "hourly": "teias/2026/04/20260412.hourly.json",
+          "meta": "teias/2026/04/20260412.meta.json"
+        },
+        "2026-04-13": {
+          "frequency": "teias/2026/04/20260413.frequency.i16",
+          "minute": "teias/2026/04/20260413.minute.json",
+          "hourly": "teias/2026/04/20260413.hourly.json",
+          "meta": "teias/2026/04/20260413.meta.json"
+        },
+        "2026-04-14": {
+          "frequency": "teias/2026/04/20260414.frequency.i16",
+          "minute": "teias/2026/04/20260414.minute.json",
+          "hourly": "teias/2026/04/20260414.hourly.json",
+          "meta": "teias/2026/04/20260414.meta.json"
+        },
+        "2026-04-15": {
+          "frequency": "teias/2026/04/20260415.frequency.i16",
+          "minute": "teias/2026/04/20260415.minute.json",
+          "hourly": "teias/2026/04/20260415.hourly.json",
+          "meta": "teias/2026/04/20260415.meta.json"
+        },
+        "2026-04-16": {
+          "frequency": "teias/2026/04/20260416.frequency.i16",
+          "minute": "teias/2026/04/20260416.minute.json",
+          "hourly": "teias/2026/04/20260416.hourly.json",
+          "meta": "teias/2026/04/20260416.meta.json"
+        },
+        "2026-04-17": {
+          "frequency": "teias/2026/04/20260417.frequency.i16",
+          "minute": "teias/2026/04/20260417.minute.json",
+          "hourly": "teias/2026/04/20260417.hourly.json",
+          "meta": "teias/2026/04/20260417.meta.json"
+        },
+        "2026-04-18": {
+          "frequency": "teias/2026/04/20260418.frequency.i16",
+          "minute": "teias/2026/04/20260418.minute.json",
+          "hourly": "teias/2026/04/20260418.hourly.json",
+          "meta": "teias/2026/04/20260418.meta.json"
+        },
+        "2026-04-19": {
+          "frequency": "teias/2026/04/20260419.frequency.i16",
+          "minute": "teias/2026/04/20260419.minute.json",
+          "hourly": "teias/2026/04/20260419.hourly.json",
+          "meta": "teias/2026/04/20260419.meta.json"
+        },
+        "2026-04-20": {
+          "frequency": "teias/2026/04/20260420.frequency.i16",
+          "minute": "teias/2026/04/20260420.minute.json",
+          "hourly": "teias/2026/04/20260420.hourly.json",
+          "meta": "teias/2026/04/20260420.meta.json"
+        },
+        "2026-04-21": {
+          "frequency": "teias/2026/04/20260421.frequency.i16",
+          "minute": "teias/2026/04/20260421.minute.json",
+          "hourly": "teias/2026/04/20260421.hourly.json",
+          "meta": "teias/2026/04/20260421.meta.json"
+        },
+        "2026-04-22": {
+          "frequency": "teias/2026/04/20260422.frequency.i16",
+          "minute": "teias/2026/04/20260422.minute.json",
+          "hourly": "teias/2026/04/20260422.hourly.json",
+          "meta": "teias/2026/04/20260422.meta.json"
+        },
+        "2026-04-23": {
+          "frequency": "teias/2026/04/20260423.frequency.i16",
+          "minute": "teias/2026/04/20260423.minute.json",
+          "hourly": "teias/2026/04/20260423.hourly.json",
+          "meta": "teias/2026/04/20260423.meta.json"
+        },
+        "2026-04-24": {
+          "frequency": "teias/2026/04/20260424.frequency.i16",
+          "minute": "teias/2026/04/20260424.minute.json",
+          "hourly": "teias/2026/04/20260424.hourly.json",
+          "meta": "teias/2026/04/20260424.meta.json"
+        },
+        "2026-04-25": {
+          "frequency": "teias/2026/04/20260425.frequency.i16",
+          "minute": "teias/2026/04/20260425.minute.json",
+          "hourly": "teias/2026/04/20260425.hourly.json",
+          "meta": "teias/2026/04/20260425.meta.json"
+        },
+        "2026-04-26": {
+          "frequency": "teias/2026/04/20260426.frequency.i16",
+          "minute": "teias/2026/04/20260426.minute.json",
+          "hourly": "teias/2026/04/20260426.hourly.json",
+          "meta": "teias/2026/04/20260426.meta.json"
+        },
+        "2026-04-27": {
+          "frequency": "teias/2026/04/20260427.frequency.i16",
+          "minute": "teias/2026/04/20260427.minute.json",
+          "hourly": "teias/2026/04/20260427.hourly.json",
+          "meta": "teias/2026/04/20260427.meta.json"
+        },
+        "2026-04-28": {
+          "frequency": "teias/2026/04/20260428.frequency.i16",
+          "minute": "teias/2026/04/20260428.minute.json",
+          "hourly": "teias/2026/04/20260428.hourly.json",
+          "meta": "teias/2026/04/20260428.meta.json"
+        },
+        "2026-04-29": {
+          "frequency": "teias/2026/04/20260429.frequency.i16",
+          "minute": "teias/2026/04/20260429.minute.json",
+          "hourly": "teias/2026/04/20260429.hourly.json",
+          "meta": "teias/2026/04/20260429.meta.json"
+        },
+        "2026-04-30": {
+          "frequency": "teias/2026/04/20260430.frequency.i16",
+          "minute": "teias/2026/04/20260430.minute.json",
+          "hourly": "teias/2026/04/20260430.hourly.json",
+          "meta": "teias/2026/04/20260430.meta.json"
+        },
+        "2026-05-01": {
+          "frequency": "teias/2026/05/20260501.frequency.i16",
+          "minute": "teias/2026/05/20260501.minute.json",
+          "hourly": "teias/2026/05/20260501.hourly.json",
+          "meta": "teias/2026/05/20260501.meta.json"
+        },
+        "2026-05-02": {
+          "frequency": "teias/2026/05/20260502.frequency.i16",
+          "minute": "teias/2026/05/20260502.minute.json",
+          "hourly": "teias/2026/05/20260502.hourly.json",
+          "meta": "teias/2026/05/20260502.meta.json"
+        },
+        "2026-05-03": {
+          "frequency": "teias/2026/05/20260503.frequency.i16",
+          "minute": "teias/2026/05/20260503.minute.json",
+          "hourly": "teias/2026/05/20260503.hourly.json",
+          "meta": "teias/2026/05/20260503.meta.json"
+        },
+        "2026-05-04": {
+          "frequency": "teias/2026/05/20260504.frequency.i16",
+          "minute": "teias/2026/05/20260504.minute.json",
+          "hourly": "teias/2026/05/20260504.hourly.json",
+          "meta": "teias/2026/05/20260504.meta.json"
+        },
+        "2026-05-05": {
+          "frequency": "teias/2026/05/20260505.frequency.i16",
+          "minute": "teias/2026/05/20260505.minute.json",
+          "hourly": "teias/2026/05/20260505.hourly.json",
+          "meta": "teias/2026/05/20260505.meta.json"
+        },
+        "2026-05-06": {
+          "frequency": "teias/2026/05/20260506.frequency.i16",
+          "minute": "teias/2026/05/20260506.minute.json",
+          "hourly": "teias/2026/05/20260506.hourly.json",
+          "meta": "teias/2026/05/20260506.meta.json"
+        },
+        "2026-05-07": {
+          "frequency": "teias/2026/05/20260507.frequency.i16",
+          "minute": "teias/2026/05/20260507.minute.json",
+          "hourly": "teias/2026/05/20260507.hourly.json",
+          "meta": "teias/2026/05/20260507.meta.json"
+        },
+        "2026-05-11": {
+          "frequency": "teias/2026/05/20260511.frequency.i16",
+          "minute": "teias/2026/05/20260511.minute.json",
+          "hourly": "teias/2026/05/20260511.hourly.json",
+          "meta": "teias/2026/05/20260511.meta.json"
+        },
+        "2026-05-12": {
+          "frequency": "teias/2026/05/20260512.frequency.i16",
+          "minute": "teias/2026/05/20260512.minute.json",
+          "hourly": "teias/2026/05/20260512.hourly.json",
+          "meta": "teias/2026/05/20260512.meta.json"
+        },
+        "2026-05-13": {
+          "frequency": "teias/2026/05/20260513.frequency.i16",
+          "minute": "teias/2026/05/20260513.minute.json",
+          "hourly": "teias/2026/05/20260513.hourly.json",
+          "meta": "teias/2026/05/20260513.meta.json"
+        },
+        "2026-05-14": {
+          "frequency": "teias/2026/05/20260514.frequency.i16",
+          "minute": "teias/2026/05/20260514.minute.json",
+          "hourly": "teias/2026/05/20260514.hourly.json",
+          "meta": "teias/2026/05/20260514.meta.json"
+        },
+        "2026-05-15": {
+          "frequency": "teias/2026/05/20260515.frequency.i16",
+          "minute": "teias/2026/05/20260515.minute.json",
+          "hourly": "teias/2026/05/20260515.hourly.json",
+          "meta": "teias/2026/05/20260515.meta.json"
+        },
+        "2026-05-16": {
+          "frequency": "teias/2026/05/20260516.frequency.i16",
+          "minute": "teias/2026/05/20260516.minute.json",
+          "hourly": "teias/2026/05/20260516.hourly.json",
+          "meta": "teias/2026/05/20260516.meta.json"
+        },
+        "2026-05-17": {
+          "frequency": "teias/2026/05/20260517.frequency.i16",
+          "minute": "teias/2026/05/20260517.minute.json",
+          "hourly": "teias/2026/05/20260517.hourly.json",
+          "meta": "teias/2026/05/20260517.meta.json"
+        },
+        "2026-05-18": {
+          "frequency": "teias/2026/05/20260518.frequency.i16",
+          "minute": "teias/2026/05/20260518.minute.json",
+          "hourly": "teias/2026/05/20260518.hourly.json",
+          "meta": "teias/2026/05/20260518.meta.json"
+        },
+        "2026-05-19": {
+          "frequency": "teias/2026/05/20260519.frequency.i16",
+          "minute": "teias/2026/05/20260519.minute.json",
+          "hourly": "teias/2026/05/20260519.hourly.json",
+          "meta": "teias/2026/05/20260519.meta.json"
+        },
+        "2026-05-20": {
+          "frequency": "teias/2026/05/20260520.frequency.i16",
+          "minute": "teias/2026/05/20260520.minute.json",
+          "hourly": "teias/2026/05/20260520.hourly.json",
+          "meta": "teias/2026/05/20260520.meta.json"
+        },
+        "2026-05-21": {
+          "frequency": "teias/2026/05/20260521.frequency.i16",
+          "minute": "teias/2026/05/20260521.minute.json",
+          "hourly": "teias/2026/05/20260521.hourly.json",
+          "meta": "teias/2026/05/20260521.meta.json"
+        },
+        "2026-05-22": {
+          "frequency": "teias/2026/05/20260522.frequency.i16",
+          "minute": "teias/2026/05/20260522.minute.json",
+          "hourly": "teias/2026/05/20260522.hourly.json",
+          "meta": "teias/2026/05/20260522.meta.json"
+        },
+        "2026-05-23": {
+          "frequency": "teias/2026/05/20260523.frequency.i16",
+          "minute": "teias/2026/05/20260523.minute.json",
+          "hourly": "teias/2026/05/20260523.hourly.json",
+          "meta": "teias/2026/05/20260523.meta.json"
+        },
+        "2026-05-24": {
+          "frequency": "teias/2026/05/20260524.frequency.i16",
+          "minute": "teias/2026/05/20260524.minute.json",
+          "hourly": "teias/2026/05/20260524.hourly.json",
+          "meta": "teias/2026/05/20260524.meta.json"
+        },
+        "2026-05-25": {
+          "frequency": "teias/2026/05/20260525.frequency.i16",
+          "minute": "teias/2026/05/20260525.minute.json",
+          "hourly": "teias/2026/05/20260525.hourly.json",
+          "meta": "teias/2026/05/20260525.meta.json"
+        },
+        "2026-05-26": {
+          "frequency": "teias/2026/05/20260526.frequency.i16",
+          "minute": "teias/2026/05/20260526.minute.json",
+          "hourly": "teias/2026/05/20260526.hourly.json",
+          "meta": "teias/2026/05/20260526.meta.json"
+        },
+        "2026-05-27": {
+          "frequency": "teias/2026/05/20260527.frequency.i16",
+          "minute": "teias/2026/05/20260527.minute.json",
+          "hourly": "teias/2026/05/20260527.hourly.json",
+          "meta": "teias/2026/05/20260527.meta.json"
+        },
+        "2026-05-28": {
+          "frequency": "teias/2026/05/20260528.frequency.i16",
+          "minute": "teias/2026/05/20260528.minute.json",
+          "hourly": "teias/2026/05/20260528.hourly.json",
+          "meta": "teias/2026/05/20260528.meta.json"
+        },
+        "2026-05-29": {
+          "frequency": "teias/2026/05/20260529.frequency.i16",
+          "minute": "teias/2026/05/20260529.minute.json",
+          "hourly": "teias/2026/05/20260529.hourly.json",
+          "meta": "teias/2026/05/20260529.meta.json"
+        },
+        "2026-05-30": {
+          "frequency": "teias/2026/05/20260530.frequency.i16",
+          "minute": "teias/2026/05/20260530.minute.json",
+          "hourly": "teias/2026/05/20260530.hourly.json",
+          "meta": "teias/2026/05/20260530.meta.json"
+        },
+        "2026-05-31": {
+          "frequency": "teias/2026/05/20260531.frequency.i16",
+          "minute": "teias/2026/05/20260531.minute.json",
+          "hourly": "teias/2026/05/20260531.hourly.json",
+          "meta": "teias/2026/05/20260531.meta.json"
+        },
+        "2026-06-01": {
+          "frequency": "teias/2026/06/20260601.frequency.i16",
+          "minute": "teias/2026/06/20260601.minute.json",
+          "hourly": "teias/2026/06/20260601.hourly.json",
+          "meta": "teias/2026/06/20260601.meta.json"
+        },
+        "2026-06-02": {
+          "frequency": "teias/2026/06/20260602.frequency.i16",
+          "minute": "teias/2026/06/20260602.minute.json",
+          "hourly": "teias/2026/06/20260602.hourly.json",
+          "meta": "teias/2026/06/20260602.meta.json"
+        },
+        "2026-06-03": {
+          "frequency": "teias/2026/06/20260603.frequency.i16",
+          "minute": "teias/2026/06/20260603.minute.json",
+          "hourly": "teias/2026/06/20260603.hourly.json",
+          "meta": "teias/2026/06/20260603.meta.json"
+        },
+        "2026-06-04": {
+          "frequency": "teias/2026/06/20260604.frequency.i16",
+          "minute": "teias/2026/06/20260604.minute.json",
+          "hourly": "teias/2026/06/20260604.hourly.json",
+          "meta": "teias/2026/06/20260604.meta.json"
+        },
+        "2026-06-05": {
+          "frequency": "teias/2026/06/20260605.frequency.i16",
+          "minute": "teias/2026/06/20260605.minute.json",
+          "hourly": "teias/2026/06/20260605.hourly.json",
+          "meta": "teias/2026/06/20260605.meta.json"
+        },
+        "2026-06-06": {
+          "frequency": "teias/2026/06/20260606.frequency.i16",
+          "minute": "teias/2026/06/20260606.minute.json",
+          "hourly": "teias/2026/06/20260606.hourly.json",
+          "meta": "teias/2026/06/20260606.meta.json"
+        },
+        "2026-06-07": {
+          "frequency": "teias/2026/06/20260607.frequency.i16",
+          "minute": "teias/2026/06/20260607.minute.json",
+          "hourly": "teias/2026/06/20260607.hourly.json",
+          "meta": "teias/2026/06/20260607.meta.json"
+        },
+        "2026-06-08": {
+          "frequency": "teias/2026/06/20260608.frequency.i16",
+          "minute": "teias/2026/06/20260608.minute.json",
+          "hourly": "teias/2026/06/20260608.hourly.json",
+          "meta": "teias/2026/06/20260608.meta.json"
+        },
+        "2026-06-09": {
+          "frequency": "teias/2026/06/20260609.frequency.i16",
+          "minute": "teias/2026/06/20260609.minute.json",
+          "hourly": "teias/2026/06/20260609.hourly.json",
+          "meta": "teias/2026/06/20260609.meta.json"
+        },
+        "2026-06-10": {
+          "frequency": "teias/2026/06/20260610.frequency.i16",
+          "minute": "teias/2026/06/20260610.minute.json",
+          "hourly": "teias/2026/06/20260610.hourly.json",
+          "meta": "teias/2026/06/20260610.meta.json"
+        },
+        "2026-06-11": {
+          "frequency": "teias/2026/06/20260611.frequency.i16",
+          "minute": "teias/2026/06/20260611.minute.json",
+          "hourly": "teias/2026/06/20260611.hourly.json",
+          "meta": "teias/2026/06/20260611.meta.json"
+        },
+        "2026-06-12": {
+          "frequency": "teias/2026/06/20260612.frequency.i16",
+          "minute": "teias/2026/06/20260612.minute.json",
+          "hourly": "teias/2026/06/20260612.hourly.json",
+          "meta": "teias/2026/06/20260612.meta.json"
+        },
+        "2026-06-13": {
+          "frequency": "teias/2026/06/20260613.frequency.i16",
+          "minute": "teias/2026/06/20260613.minute.json",
+          "hourly": "teias/2026/06/20260613.hourly.json",
+          "meta": "teias/2026/06/20260613.meta.json"
+        },
+        "2026-06-14": {
+          "frequency": "teias/2026/06/20260614.frequency.i16",
+          "minute": "teias/2026/06/20260614.minute.json",
+          "hourly": "teias/2026/06/20260614.hourly.json",
+          "meta": "teias/2026/06/20260614.meta.json"
+        },
+        "2026-06-15": {
+          "frequency": "teias/2026/06/20260615.frequency.i16",
+          "minute": "teias/2026/06/20260615.minute.json",
+          "hourly": "teias/2026/06/20260615.hourly.json",
+          "meta": "teias/2026/06/20260615.meta.json"
+        },
+        "2026-06-16": {
+          "frequency": "teias/2026/06/20260616.frequency.i16",
+          "minute": "teias/2026/06/20260616.minute.json",
+          "hourly": "teias/2026/06/20260616.hourly.json",
+          "meta": "teias/2026/06/20260616.meta.json"
+        },
+        "2026-06-17": {
+          "frequency": "teias/2026/06/20260617.frequency.i16",
+          "minute": "teias/2026/06/20260617.minute.json",
+          "hourly": "teias/2026/06/20260617.hourly.json",
+          "meta": "teias/2026/06/20260617.meta.json"
+        },
+        "2026-06-18": {
+          "frequency": "teias/2026/06/20260618.frequency.i16",
+          "minute": "teias/2026/06/20260618.minute.json",
+          "hourly": "teias/2026/06/20260618.hourly.json",
+          "meta": "teias/2026/06/20260618.meta.json"
+        },
+        "2026-06-19": {
+          "frequency": "teias/2026/06/20260619.frequency.i16",
+          "minute": "teias/2026/06/20260619.minute.json",
+          "hourly": "teias/2026/06/20260619.hourly.json",
+          "meta": "teias/2026/06/20260619.meta.json"
+        },
+        "2026-06-20": {
+          "frequency": "teias/2026/06/20260620.frequency.i16",
+          "minute": "teias/2026/06/20260620.minute.json",
+          "hourly": "teias/2026/06/20260620.hourly.json",
+          "meta": "teias/2026/06/20260620.meta.json"
+        },
+        "2026-06-21": {
+          "frequency": "teias/2026/06/20260621.frequency.i16",
+          "minute": "teias/2026/06/20260621.minute.json",
+          "hourly": "teias/2026/06/20260621.hourly.json",
+          "meta": "teias/2026/06/20260621.meta.json"
+        },
+        "2026-06-22": {
+          "frequency": "teias/2026/06/20260622.frequency.i16",
+          "minute": "teias/2026/06/20260622.minute.json",
+          "hourly": "teias/2026/06/20260622.hourly.json",
+          "meta": "teias/2026/06/20260622.meta.json"
+        },
+        "2026-06-23": {
+          "frequency": "teias/2026/06/20260623.frequency.i16",
+          "minute": "teias/2026/06/20260623.minute.json",
+          "hourly": "teias/2026/06/20260623.hourly.json",
+          "meta": "teias/2026/06/20260623.meta.json"
+        },
+        "2026-06-24": {
+          "frequency": "teias/2026/06/20260624.frequency.i16",
+          "minute": "teias/2026/06/20260624.minute.json",
+          "hourly": "teias/2026/06/20260624.hourly.json",
+          "meta": "teias/2026/06/20260624.meta.json"
+        },
+        "2026-06-25": {
+          "frequency": "teias/2026/06/20260625.frequency.i16",
+          "minute": "teias/2026/06/20260625.minute.json",
+          "hourly": "teias/2026/06/20260625.hourly.json",
+          "meta": "teias/2026/06/20260625.meta.json"
+        },
+        "2026-06-26": {
+          "frequency": "teias/2026/06/20260626.frequency.i16",
+          "minute": "teias/2026/06/20260626.minute.json",
+          "hourly": "teias/2026/06/20260626.hourly.json",
+          "meta": "teias/2026/06/20260626.meta.json"
+        },
+        "2026-06-27": {
+          "frequency": "teias/2026/06/20260627.frequency.i16",
+          "minute": "teias/2026/06/20260627.minute.json",
+          "hourly": "teias/2026/06/20260627.hourly.json",
+          "meta": "teias/2026/06/20260627.meta.json"
+        },
+        "2026-06-28": {
+          "frequency": "teias/2026/06/20260628.frequency.i16",
+          "minute": "teias/2026/06/20260628.minute.json",
+          "hourly": "teias/2026/06/20260628.hourly.json",
+          "meta": "teias/2026/06/20260628.meta.json"
+        },
+        "2026-06-29": {
+          "frequency": "teias/2026/06/20260629.frequency.i16",
+          "minute": "teias/2026/06/20260629.minute.json",
+          "hourly": "teias/2026/06/20260629.hourly.json",
+          "meta": "teias/2026/06/20260629.meta.json"
+        },
+        "2026-06-30": {
+          "frequency": "teias/2026/06/20260630.frequency.i16",
+          "minute": "teias/2026/06/20260630.minute.json",
+          "hourly": "teias/2026/06/20260630.hourly.json",
+          "meta": "teias/2026/06/20260630.meta.json"
+        }
+      }
+    }
+  }
+}

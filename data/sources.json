@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "updatedAtUtc": "2026-07-13T00:42:20Z",
+  "sources": {
+    "teias": {
+      "label": "TEİAŞ Günlük Frekans Bilgisi",
+      "sourcePageUrl": "https://www.teias.gov.tr/gunluk-frekans-bilgisi",
+      "discoveryMethod": "TEİAŞ web sayfasının kullandığı resmi gallery API yanıtındaki media slug değerleri webim.teias.gov.tr dosya indirme uç noktasına bağlanır.",
+      "automation": "daily_lookback_14_days",
+      "timezone": "Europe/Istanbul"
+    },
+    "netztransparenz": {
+      "label": "Netztransparenz Sekündliche Daten",
+      "sourcePageUrl": "https://www.netztransparenz.de/de-de/Regelenergie/Daten-Regelreserve/Sek%C3%BCndliche-Daten",
+      "discoveryMethod": "2026 için güvenilir statik otomatik indirme bağlantısı doğrulanmadı; manuel aylık CSV import yolu kullanılır.",
+      "automation": "manual_monthly_import",
+      "timezone": "Europe/Berlin"
+    }
+  }
+}

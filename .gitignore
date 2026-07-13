@@ -1,0 +1,13 @@
+incoming/
+cache/
+raw/
+downloads/
+dist/
+*.tmp
+*.part
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+node_modules/

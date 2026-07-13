@@ -233,53 +233,6 @@
 
     .button-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 
-    .auto-data-grid {
-      display: grid;
-      grid-template-columns: minmax(240px, 1.25fr) repeat(2, minmax(170px, .75fr));
-      gap: 12px;
-      align-items: stretch;
-    }
-
-    .auto-data-card {
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 13px;
-      background: #fbfdff;
-      min-height: 102px;
-    }
-
-    .auto-data-card .label {
-      color: var(--muted);
-      font-size: .72rem;
-      font-weight: 850;
-      text-transform: uppercase;
-      letter-spacing: .03em;
-    }
-
-    .auto-data-card .value {
-      margin-top: 7px;
-      color: var(--navy);
-      font-size: 1.04rem;
-      font-weight: 850;
-    }
-
-    .auto-data-card .sub {
-      margin-top: 5px;
-      color: var(--muted);
-      font-size: .78rem;
-    }
-
-    .source-links {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 9px;
-      font-size: .8rem;
-    }
-
-    .source-links a { color: var(--blue); font-weight: 800; text-decoration: none; }
-    .source-links a:hover { text-decoration: underline; }
-
     .progress-wrap { margin-top: 12px; display: none; }
     .progress-wrap.visible { display: block; }
     .progress-track { height: 9px; background: #e5edf2; border-radius: 99px; overflow: hidden; }
@@ -572,7 +525,6 @@
     @media (max-width: 820px) {
       .tabs { grid-template-columns: 1fr 1fr; position: static; }
       .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
-      .auto-data-grid { grid-template-columns: 1fr; }
       .hour-blocks { grid-template-columns: 1fr; }
       .hour-matrix th, .hour-matrix td { font-size: .43rem; padding: 4px 1px; }
       .hour-matrix th:first-child, .hour-matrix td:first-child { width: 13.5%; padding-left: 3px; }
@@ -671,42 +623,6 @@
           <div class="progress-text" id="parseProgressText">Dosya hazırlanıyor…</div>
         </div>
         <div id="loadStatus" class="status-banner">Henüz veri yüklenmedi.</div>
-      </div>
-
-      <div class="panel">
-        <div class="section-title">
-          <div>
-            <h3>GitHub Pages Otomatik Veri</h3>
-            <p id="autoDataSummary">Statik veri kataloğu denetleniyor.</p>
-          </div>
-          <div class="button-row">
-            <span class="tag" id="autoModeBadge">Kontrol</span>
-            <button class="btn btn-primary" id="useAutoDataBtn" type="button" disabled>Otomatik Veri</button>
-            <button class="btn btn-secondary" id="useManualDataBtn" type="button">Manuel CSV</button>
-            <button class="btn btn-secondary" id="reloadAutoDataBtn" type="button">Yenile</button>
-          </div>
-        </div>
-        <div class="auto-data-grid">
-          <div class="auto-data-card">
-            <div class="label">TEİAŞ</div>
-            <div class="value" id="autoTeiasValue">-</div>
-            <div class="sub" id="autoTeiasMeta">Manifest bekleniyor.</div>
-          </div>
-          <div class="auto-data-card">
-            <div class="label">Netztransparenz</div>
-            <div class="value" id="autoDeValue">-</div>
-            <div class="sub" id="autoDeMeta">Manifest bekleniyor.</div>
-          </div>
-          <div class="auto-data-card">
-            <div class="label">Durum</div>
-            <div class="value" id="autoStatusValue">-</div>
-            <div class="sub" id="autoStatusMeta">-</div>
-          </div>
-        </div>
-        <div class="source-links">
-          <a href="https://www.teias.gov.tr/gunluk-frekans-bilgisi" target="_blank" rel="noopener">TEİAŞ kaynak sayfası</a>
-          <a href="https://www.netztransparenz.de/de-de/Regelenergie/Daten-Regelreserve/Sek%C3%BCndliche-Daten" target="_blank" rel="noopener">Netztransparenz kaynak sayfası</a>
-        </div>
       </div>
 
       <div class="panel">
@@ -919,7 +835,7 @@
       </div>
     </section>
 
-    <div class="footer-note">Bu uygulama TEİAŞ'ın veya diğer TSO'ların resmi uygulaması değildir. Frekans verileri ilgili kaynak kurumların kamuya açık yayınlarından elde edilir ve kaynakların zaman damgası, kapsamı ve kalite durumu ile sınırlıdır. Kaynaklar arasındaki farklar ölçüm noktası, örnekleme, filtreleme, zaman damgası ve veri işleme yöntemlerinden kaynaklanabilir. 0,10-0,20 Hz bant analizi alanlar arası osilasyon adayı tespitidir; kesin sınıflandırma için çok noktalı PMU ölçümleri, faz ilişkisi, koherens ve mod şekli analizi gerekir.</div>
+    <div class="footer-note">Frekans verileri kaynak kurumların zaman damgaları ve veri kalitesiyle sınırlıdır. Osilasyon bulguları operatör/uzman değerlendirmesi gerektirir.</div>
   </main>
 
   <!--
@@ -1360,27 +1276,10 @@
       oscillationSource: 'tr'
     };
 
-    const AUTO_DATA_BASE = './data/';
-    const AUTO_SOURCE_TO_STATE = { teias: 'tr', netztransparenz: 'de' };
-    const STATE_TO_AUTO_SOURCE = { tr: 'teias', de: 'netztransparenz' };
-    const PDF_FONT_URLS = {
-      regular: 'https://cdn.jsdelivr.net/npm/notosans-fontface@1.3.0/fonts/NotoSans-Regular.ttf',
-      bold: 'https://cdn.jsdelivr.net/npm/notosans-fontface@1.3.0/fonts/NotoSans-Bold.ttf'
-    };
-
     const state = {
       de: new Map(),
       tr: new Map(),
       quality: [],
-      dataMode: 'manual',
-      auto: {
-        manifest: null,
-        status: null,
-        loadError: null,
-        loadedDays: new Set()
-      },
-      pdfFontFiles: null,
-      pdfUnicodeReady: false,
       settings: loadSettings(),
       current: null,
       events: [],
@@ -1402,7 +1301,6 @@
     // jsPDF'nin yerleşik Helvetica fontu Türkçe glifleri güvenilir biçimde taşımaz.
     // PDF metinlerinde okunabilir ASCII karşılık kullanılarak bozuk karakterler engellenir.
     function pdfSafeText(value) {
-      if (state.pdfUnicodeReady) return String(value ?? '');
       const map = { 'ç':'c','Ç':'C','ğ':'g','Ğ':'G','ı':'i','İ':'I','ö':'o','Ö':'O','ş':'s','Ş':'S','ü':'u','Ü':'U' };
       return String(value ?? '').replace(/[çÇğĞıİöÖşŞüÜ]/g, ch => map[ch] || ch);
     }
@@ -1461,7 +1359,6 @@
       renderQuarterHeatmap(null);
       renderHourBlocks(null);
       checkLibraries();
-      loadAutoDataCatalog();
     }
 
     function initTabs() {
@@ -1523,9 +1420,6 @@
       $('resetZoomBtn').addEventListener('click', showDailyFrequencyChart);
       $('excelBtn').addEventListener('click', exportExcel);
       $('pdfBtn').addEventListener('click', exportPdf);
-      $('useAutoDataBtn').addEventListener('click', useAutoDataMode);
-      $('useManualDataBtn').addEventListener('click', useManualDataMode);
-      $('reloadAutoDataBtn').addEventListener('click', () => loadAutoDataCatalog({ force: true }));
       $('saveSettingsBtn').addEventListener('click', saveSettingsFromForm);
       $('resetSettingsBtn').addEventListener('click', resetSettings);
 
@@ -1548,253 +1442,6 @@
       }
     }
 
-    async function loadPdfUnicodeFont(doc) {
-      try {
-        if (!state.pdfFontFiles) {
-          const [regular, bold] = await Promise.all([
-            fetch(PDF_FONT_URLS.regular).then(r => {
-              if (!r.ok) throw new Error(`NotoSans-Regular HTTP ${r.status}`);
-              return r.arrayBuffer();
-            }),
-            fetch(PDF_FONT_URLS.bold).then(r => {
-              if (!r.ok) throw new Error(`NotoSans-Bold HTTP ${r.status}`);
-              return r.arrayBuffer();
-            })
-          ]);
-          state.pdfFontFiles = {
-            regular: arrayBufferToBase64(regular),
-            bold: arrayBufferToBase64(bold)
-          };
-        }
-        doc.addFileToVFS('NotoSans-Regular.ttf', state.pdfFontFiles.regular);
-        doc.addFont('NotoSans-Regular.ttf', 'NotoSans', 'normal');
-        doc.addFileToVFS('NotoSans-Bold.ttf', state.pdfFontFiles.bold);
-        doc.addFont('NotoSans-Bold.ttf', 'NotoSans', 'bold');
-        state.pdfUnicodeReady = true;
-        return 'NotoSans';
-      } catch (error) {
-        state.pdfUnicodeReady = false;
-        console.warn('PDF Unicode font could not be loaded; falling back to ASCII-safe text.', error);
-        return 'helvetica';
-      }
-    }
-
-    function arrayBufferToBase64(buffer) {
-      const bytes = new Uint8Array(buffer);
-      let binary = '';
-      const chunk = 0x8000;
-      for (let i = 0; i < bytes.length; i += chunk) {
-        binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
-      }
-      return btoa(binary);
-    }
-
-    // -----------------------------
-    // GITHUB PAGES STATİK VERİ MODU
-    // -----------------------------
-    function autoDataUrl(relativePath) {
-      return `${AUTO_DATA_BASE}${String(relativePath || '').replace(/^\.?\/?data\//, '').replace(/^\/+/, '')}`;
-    }
-
-    async function fetchJson(relativePath) {
-      const response = await fetch(autoDataUrl(relativePath), { cache: 'no-store' });
-      if (!response.ok) throw new Error(`${relativePath} HTTP ${response.status}`);
-      return response.json();
-    }
-
-    async function loadAutoDataCatalog({ force = false } = {}) {
-      if (state.auto.manifest && !force) return;
-      updateAutoDataPanel('loading');
-      try {
-        const manifest = await fetchJson('manifest.json');
-        let status = null;
-        try { status = await fetchJson('status.json'); } catch { status = null; }
-        state.auto.manifest = manifest;
-        state.auto.status = status;
-        state.auto.loadError = null;
-        const hasTeias = Boolean(manifest?.sources?.teias?.availableDates?.length);
-        if (hasTeias && !hasManualDataLoaded()) state.dataMode = 'auto';
-        updateAutoDataPanel();
-        updateDateSelect();
-        if (hasTeias) {
-          const latest = manifest.sources.teias.latestDate;
-          setBanner('loadStatus', `Otomatik veri kataloğu hazır. Son aktif TEİAŞ günü: ${displayDate(latest)}.`, 'success');
-        }
-      } catch (error) {
-        state.auto.manifest = null;
-        state.auto.status = null;
-        state.auto.loadError = error?.message || String(error);
-        if (state.dataMode === 'auto') state.dataMode = 'manual';
-        updateAutoDataPanel('error');
-        updateDateSelect();
-      }
-    }
-
-    function updateAutoDataPanel(mode = '') {
-      const manifest = state.auto.manifest;
-      const status = state.auto.status;
-      const teias = manifest?.sources?.teias;
-      const de = manifest?.sources?.netztransparenz;
-      const hasAuto = Boolean(teias?.availableDates?.length);
-
-      if (mode === 'loading') {
-        $('autoModeBadge').className = 'tag warn';
-        $('autoModeBadge').textContent = 'Kontrol';
-        $('autoDataSummary').textContent = 'Statik veri kataloğu denetleniyor.';
-      } else if (mode === 'error' || state.auto.loadError) {
-        $('autoModeBadge').className = 'tag bad';
-        $('autoModeBadge').textContent = 'Yok';
-        $('autoDataSummary').textContent = `Otomatik katalog okunamadı: ${state.auto.loadError}`;
-      } else if (hasAuto) {
-        $('autoModeBadge').className = state.dataMode === 'auto' ? 'tag good' : 'tag warn';
-        $('autoModeBadge').textContent = state.dataMode === 'auto' ? 'Otomatik' : 'Manuel';
-        $('autoDataSummary').textContent = `Manifest ${formatUtc(manifest.updatedAtUtc)} tarihinde üretildi.`;
-      } else {
-        $('autoModeBadge').className = 'tag warn';
-        $('autoModeBadge').textContent = 'Bekliyor';
-        $('autoDataSummary').textContent = 'Statik katalogda aktif TEİAŞ günü bulunamadı.';
-      }
-
-      $('useAutoDataBtn').disabled = !hasAuto;
-      $('autoTeiasValue').textContent = teias?.availableDates?.length ? `${teias.availableDates.length} aktif gün` : '-';
-      $('autoTeiasMeta').textContent = teias?.availableDates?.length
-        ? `${displayDate(teias.firstDate)} - ${displayDate(teias.latestDate)}; dışlanan ${teias.excludedDates?.length || 0} gün`
-        : 'Aktif TEİAŞ günü yok.';
-      $('autoDeValue').textContent = de?.availableDates?.length ? `${de.availableDates.length} gün` : '-';
-      $('autoDeMeta').textContent = de?.availableDates?.length
-        ? `${displayDate(de.firstDate)} - ${displayDate(de.latestDate)}; manuel aylık import`
-        : 'Netztransparenz otomatik kaynak doğrulanmadı.';
-      $('autoStatusValue').textContent = status?.lastSuccessfulTeiasDataDate
-        ? displayDate(status.lastSuccessfulTeiasDataDate)
-        : (teias?.latestDate ? displayDate(teias.latestDate) : '-');
-      $('autoStatusMeta').textContent = status
-        ? `${status.missingDayCount || 0} yayınlanmamış gün; son kontrol ${formatUtc(status.lastSuccessfulTeiasCheckUtc)}`
-        : 'Durum dosyası yok.';
-    }
-
-    function useAutoDataMode() {
-      if (!state.auto.manifest?.sources?.teias?.availableDates?.length) {
-        alert('Otomatik veri manifesti bulunamadı.');
-        return;
-      }
-      state.dataMode = 'auto';
-      updateAutoDataPanel();
-      updateDateSelect();
-      setBanner('loadStatus', 'Otomatik veri modu seçildi.', 'success');
-    }
-
-    function useManualDataMode() {
-      state.dataMode = 'manual';
-      updateAutoDataPanel();
-      updateDateSelect();
-      setBanner('loadStatus', 'Manuel CSV modu seçildi.', 'warn');
-    }
-
-    function isAutoLoaded(source, date) {
-      return state.auto.loadedDays.has(`${source}:${date}`);
-    }
-
-    function hasManualDataLoaded() {
-      const hasTr = [...state.tr.keys()].some(date => !isAutoLoaded('teias', date));
-      const hasDe = [...state.de.keys()].some(date => !isAutoLoaded('netztransparenz', date));
-      return hasTr || hasDe;
-    }
-
-    function markManualDay(sourceKey, date) {
-      const autoSource = STATE_TO_AUTO_SOURCE[sourceKey];
-      if (autoSource) state.auto.loadedDays.delete(`${autoSource}:${date}`);
-    }
-
-    function reportDatesForCurrentMode() {
-      if (state.dataMode === 'auto') {
-        return [...(state.auto.manifest?.sources?.teias?.availableDates || [])].sort();
-      }
-      return [...state.tr.keys()].filter(date => !isAutoLoaded('teias', date)).sort();
-    }
-
-    async function ensureAutoDataForReport(date) {
-      if (state.dataMode !== 'auto') return true;
-      const alignment = getAlignment(date);
-      const deltaSeconds = Math.round(alignment.deltaHours * 3600);
-      const deDates = new Set([
-        shiftSecondLabel(0, -deltaSeconds, date).date,
-        shiftSecondLabel(86399, -deltaSeconds, date).date
-      ]);
-
-      state.busy = true;
-      setBanner('loadStatus', `${displayDate(date)} otomatik verisi yükleniyor.`, 'warn');
-      try {
-        const trLoaded = await loadAutoDay('teias', date);
-        let deLoaded = false;
-        for (const deDate of deDates) {
-          deLoaded = (await loadAutoDay('netztransparenz', deDate)) || deLoaded;
-        }
-        updateInventory();
-        if (!trLoaded) throw new Error(`${displayDate(date)} için TEİAŞ otomatik verisi yok.`);
-        if (!deLoaded) {
-          setBanner('loadStatus', `${displayDate(date)} TEİAŞ verisi yüklendi; eşleşen Netztransparenz günü bulunamadı.`, 'warn');
-        }
-        return true;
-      } finally {
-        state.busy = false;
-      }
-    }
-
-    async function loadAutoDay(source, date) {
-      const sourceInfo = state.auto.manifest?.sources?.[source];
-      const day = sourceInfo?.days?.[date];
-      const files = day?.files || sourceInfo?.files?.[date];
-      const targetKey = AUTO_SOURCE_TO_STATE[source];
-      if (!targetKey || !files?.frequency) return false;
-      const target = targetKey === 'de' ? state.de : state.tr;
-      if (target.has(date) && isAutoLoaded(source, date)) return true;
-
-      const [binaryResponse, meta] = await Promise.all([
-        fetch(autoDataUrl(files.frequency), { cache: 'no-store' }),
-        fetchJson(files.meta)
-      ]);
-      if (!binaryResponse.ok) throw new Error(`${files.frequency} HTTP ${binaryResponse.status}`);
-      const series = decodeFrequencyBinary(await binaryResponse.arrayBuffer(), meta);
-      target.set(date, series);
-      state.auto.loadedDays.add(`${source}:${date}`);
-      state.quality = state.quality.filter(q => !(q.source === targetKey && q.date === date));
-      state.quality.push(qualityFromMeta(meta, targetKey));
-      return true;
-    }
-
-    function decodeFrequencyBinary(buffer, meta) {
-      const encoding = meta?.encoding || {};
-      const base = Number(encoding.baseHz ?? 50);
-      const scale = Number(encoding.scale ?? 10000);
-      const missing = Number(encoding.missingValue ?? -32768);
-      const view = new DataView(buffer);
-      const output = new Float32Array(86400);
-      output.fill(NaN);
-      const samples = Math.min(86400, Math.floor(buffer.byteLength / 2));
-      for (let i = 0; i < samples; i++) {
-        const raw = view.getInt16(i * 2, true);
-        output[i] = raw === missing ? NaN : base + raw / scale;
-      }
-      return output;
-    }
-
-    function qualityFromMeta(meta, sourceKey) {
-      return {
-        source: sourceKey,
-        date: meta.localDate,
-        count: Number(meta.validSamples || 0),
-        missing: Number(meta.missingSamples || 0),
-        invalid: Number(meta.invalidRows || 0) + Number(meta.invalidFrequencySamples || 0),
-        duplicates: Number(meta.duplicateSamples || 0),
-        mean: Number(meta.averageHz),
-        min: Number(meta.minimumHz),
-        max: Number(meta.maximumHz),
-        status: meta.status,
-        qualityScore: meta.qualityScore,
-        origin: 'auto'
-      };
-    }
-
     // -----------------------------
     // DOSYA AYRIŞTIRMA VE ENVANTER
     // -----------------------------
@@ -1806,8 +1453,6 @@
       if (!files.length) return;
 
       state.busy = true;
-      state.dataMode = 'manual';
-      updateAutoDataPanel();
       $('parseProgress').classList.add('visible');
       $('parseProgressBar').style.width = '0%';
       $('parseProgressText').textContent = 'Dosya okunuyor…';
@@ -1835,9 +1480,8 @@
         const target = msg.source === 'de' ? state.de : state.tr;
         for (const day of msg.days) {
           target.set(day.date, new Float32Array(day.buffer));
-          markManualDay(msg.source, day.date);
           state.quality = state.quality.filter(q => !(q.source === msg.source && q.date === day.date));
-          state.quality.push({ source: msg.source, date: day.date, origin: 'manual', ...day.quality });
+          state.quality.push({ source: msg.source, date: day.date, ...day.quality });
         }
         state.busy = false;
         $('parseProgressBar').style.width = '100%';
@@ -1860,7 +1504,7 @@
       body.innerHTML = rows.map(q => {
         const sourceName = q.source === 'de' ? 'Netztransparenz' : 'TEİAŞ';
         const complete = q.count === 86400 && q.invalid === 0;
-        const tag = q.status ? statusTag(q.status, q.qualityScore) : complete ? '<span class="tag good">Tam</span>' : q.count >= 85000 ? '<span class="tag warn">Kısmi</span>' : '<span class="tag bad">Eksik</span>';
+        const tag = complete ? '<span class="tag good">Tam</span>' : q.count >= 85000 ? '<span class="tag warn">Kısmi</span>' : '<span class="tag bad">Eksik</span>';
         return `<tr>
           <td>${sourceName}</td><td>${displayDate(q.date)}</td><td>${q.count.toLocaleString('tr-TR')}</td>
           <td>${q.missing.toLocaleString('tr-TR')}</td><td>${q.invalid.toLocaleString('tr-TR')}</td><td>${q.duplicates.toLocaleString('tr-TR')}</td>
@@ -1869,22 +1513,14 @@
       }).join('');
     }
 
-    function statusTag(status, score) {
-      if (status === 'complete') return `<span class="tag good">Tam ${score ?? ''}</span>`;
-      if (status === 'partial') return `<span class="tag warn">Kısmi ${score ?? ''}</span>`;
-      if (status === 'critical') return `<span class="tag bad">Kritik ${score ?? ''}</span>`;
-      return '<span class="tag bad">Geçersiz</span>';
-    }
-
     function updateDateSelect() {
       const select = $('dateSelect');
       const previous = select.value;
-      const dates = reportDatesForCurrentMode();
+      const dates = [...state.tr.keys()].sort();
       select.innerHTML = dates.length
         ? dates.map(d => `<option value="${d}">${displayDate(d)}</option>`).join('')
         : '<option value="">Önce TEİAŞ verisi yükleyin</option>';
       if (dates.includes(previous)) select.value = previous;
-      else if (state.dataMode === 'auto' && dates.length) select.value = dates[dates.length - 1];
       updateAlignmentInfo();
     }
 
@@ -1893,14 +1529,11 @@
       state.de.clear();
       state.tr.clear();
       state.quality = [];
-      state.auto.loadedDays.clear();
-      state.dataMode = state.auto.manifest?.sources?.teias?.availableDates?.length ? 'auto' : 'manual';
       state.current = null;
       state.events = [];
       state.filteredOscillation = null;
       state.chartView = { mode: 'day', start: 0, end: 86400, label: '24 saat • dakikalık' };
       updateInventory();
-      updateAutoDataPanel();
       updateDateSelect();
       renderEmptyCharts();
       renderKpis(null);
@@ -1974,22 +1607,9 @@
     // -----------------------------
     // GÜNLÜK KARŞILAŞTIRMA
     // -----------------------------
-    async function calculateDailyReport() {
+    function calculateDailyReport() {
       const date = $('dateSelect').value;
-      if (!date) {
-        alert('Lütfen TEİAŞ verisi bulunan bir gün seçin.');
-        return;
-      }
-      if (state.dataMode === 'auto') {
-        try {
-          await ensureAutoDataForReport(date);
-        } catch (error) {
-          setBanner('loadStatus', `Otomatik veri yüklenemedi: ${error?.message || error}`, 'error');
-          alert(`Otomatik veri yüklenemedi: ${error?.message || error}`);
-          return;
-        }
-      }
-      if (!state.tr.has(date)) {
+      if (!date || !state.tr.has(date)) {
         alert('Lütfen TEİAŞ verisi bulunan bir gün seçin.');
         return;
       }
@@ -2018,20 +1638,7 @@
       for (let h = 0; h < 24; h++) hourly.push(pairedStats(tr, de, h * 3600, (h + 1) * 3600, state.settings.nominalFrequency));
       const quarters = aggregateQuarters(tr, de);
 
-      state.current = {
-        date,
-        alignment,
-        deltaSeconds,
-        tr,
-        de,
-        overall,
-        minute,
-        hourly,
-        quarters,
-        dataMode: state.dataMode,
-        manifestUpdatedAtUtc: state.auto.manifest?.updatedAtUtc || null,
-        statusUpdatedAtUtc: state.auto.status?.updatedAtUtc || null
-      };
+      state.current = { date, alignment, deltaSeconds, tr, de, overall, minute, hourly, quarters };
       state.events = [];
       state.filteredOscillation = null;
       state.chartView = { mode: 'day', start: 0, end: 86400, label: '24 saat • dakikalık' };
@@ -2663,19 +2270,6 @@
       ];
       XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summary), 'Özet');
 
-      const metadataRows = [
-        ['Alan', 'Değer'],
-        ['Veri modu', c.dataMode === 'auto' ? 'GitHub Pages otomatik veri' : 'Manuel CSV'],
-        ['Manifest güncelleme UTC', c.manifestUpdatedAtUtc || ''],
-        ['Durum güncelleme', c.statusUpdatedAtUtc || ''],
-        ['TEİAŞ son aktif gün', state.auto.manifest?.sources?.teias?.latestDate || ''],
-        ['Netztransparenz son içe aktarım günü', state.auto.manifest?.sources?.netztransparenz?.latestDate || ''],
-        ['TEİAŞ yayınlanmamış gün sayısı', state.auto.status?.missingDayCount ?? ''],
-        ['TEİAŞ kaynak', 'https://www.teias.gov.tr/gunluk-frekans-bilgisi'],
-        ['Netztransparenz kaynak', 'https://www.netztransparenz.de/de-de/Regelenergie/Daten-Regelreserve/Sek%C3%BCndliche-Daten']
-      ];
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(metadataRows), 'Kaynak Metadata');
-
       const minuteRows = [['Saat', 'TEİAŞ Ort. Hz', 'Netztransparenz Ort. Hz', 'Bias mHz', 'MAE mHz', 'Korelasyon']];
       c.minute.forEach(r => minuteRows.push([minuteToTime(r.minute), r.meanA, r.meanB, r.biasMhz, r.maeMhz, r.correlation]));
       XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(minuteRows), 'Dakikalık');
@@ -2704,44 +2298,41 @@
 
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-      const pdfFont = await loadPdfUnicodeFont(doc);
       const current = state.current;
       const title = state.settings.reportTitle;
 
-      doc.setFont(pdfFont, 'bold'); doc.setFontSize(17); doc.setTextColor(13, 47, 79);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(17); doc.setTextColor(13, 47, 79);
       doc.text(pdfSafeText(title), 14, 14);
-      doc.setFont(pdfFont, 'normal'); doc.setFontSize(9); doc.setTextColor(70, 85, 97);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(70, 85, 97);
       doc.text(pdfSafeText(`${displayDate(current.date)} • ${current.alignment.description}`), 14, 20, { maxWidth: 265 });
-      doc.setFontSize(7.5);
-      doc.text(pdfSafeText(`Veri modu: ${current.dataMode === 'auto' ? 'GitHub Pages otomatik veri' : 'Manuel CSV'} • Manifest: ${current.manifestUpdatedAtUtc || 'yok'}`), 14, 24, { maxWidth: 265 });
 
       const cards = [
-        ['TEİAŞ Ort.', `${fmt(current.overall.meanA)} Hz`], ['DE Ort.', `${fmt(current.overall.meanB)} Hz`],
+        ['TEIAS Ort.', `${fmt(current.overall.meanA)} Hz`], ['DE Ort.', `${fmt(current.overall.meanB)} Hz`],
         ['Ort. Sapma', `${fmt(current.overall.meanAbsDevA,1)} / ${fmt(current.overall.meanAbsDevB,1)} mHz`],
         ['Bias', `${fmt(current.overall.biasMhz,2)} mHz`], ['MAE', `${fmt(current.overall.maeMhz,2)} mHz`],
         ['Korelasyon', fmt(current.overall.correlation,4)], ['Ortak veri', `${current.overall.pairedCount.toLocaleString('tr-TR')} sn`]
       ];
       cards.forEach((card, index) => {
         const x = 14 + index * 39.5;
-        doc.setFillColor(237, 245, 249); doc.roundedRect(x, 28, 36.5, 15, 2, 2, 'F');
-        doc.setFontSize(7); doc.setTextColor(80, 100, 115); doc.text(pdfSafeText(card[0]), x + 2, 33);
-        doc.setFontSize(10); doc.setTextColor(13, 47, 79); doc.setFont(pdfFont, 'bold'); doc.text(pdfSafeText(card[1]), x + 2, 39);
+        doc.setFillColor(237, 245, 249); doc.roundedRect(x, 25, 36.5, 15, 2, 2, 'F');
+        doc.setFontSize(7); doc.setTextColor(80, 100, 115); doc.text(pdfSafeText(card[0]), x + 2, 30);
+        doc.setFontSize(10); doc.setTextColor(13, 47, 79); doc.setFont('helvetica', 'bold'); doc.text(pdfSafeText(card[1]), x + 2, 36);
       });
 
       // Kullanıcı detay görünümündeyken de PDF günlük grafiği içermelidir.
       const previousView = { ...state.chartView };
       renderFrequencyChart(current, { mode: 'day', start: 0, end: 86400, label: '24 saat • dakikalık' });
       const frequencyImage = state.frequencyChart?.getDataURL({ type: 'png', pixelRatio: 2, backgroundColor: '#ffffff' });
-      if (frequencyImage) doc.addImage(frequencyImage, 'PNG', 14, 47, 269, 88);
+      if (frequencyImage) doc.addImage(frequencyImage, 'PNG', 14, 44, 269, 91);
       if (previousView.mode !== 'day') renderFrequencyChart(current, previousView);
 
       const hourlyBody = current.hourly.map((row, hour) => [String(hour).padStart(2,'0'), fmt(row.meanA), fmt(row.meanB), fmt(row.biasMhz,2), fmt(row.maeMhz,2), fmt(row.correlation,3)]);
       doc.autoTable({
         startY: 139,
-        head: [[pdfSafeText('Saat'), pdfSafeText('TEİAŞ Ort. Hz'), 'DE Ort. Hz', 'Bias mHz', 'MAE mHz', pdfSafeText('Korelasyon')]],
+        head: [[pdfSafeText('Saat'), pdfSafeText('TEIAS Ort. Hz'), 'DE Ort. Hz', 'Bias mHz', 'MAE mHz', pdfSafeText('Korelasyon')]],
         body: hourlyBody.map(row => row.map(pdfSafeText)),
         theme: 'grid',
-        styles: { font: pdfFont, fontSize: 6.4, cellPadding: 1.2 },
+        styles: { font: 'helvetica', fontSize: 6.4, cellPadding: 1.2 },
         headStyles: { fillColor: [13, 47, 79] },
         columnStyles: { 0: { cellWidth: 17 } },
         margin: { left: 14, right: 14 }
@@ -2749,9 +2340,9 @@
 
       if (state.filteredOscillation) {
         doc.addPage('a4', 'landscape');
-        doc.setFontSize(15); doc.setTextColor(13, 47, 79); doc.setFont(pdfFont, 'bold');
+        doc.setFontSize(15); doc.setTextColor(13, 47, 79); doc.setFont('helvetica', 'bold');
         const oscSourceName = sourceLabel(state.oscillationSource || 'tr');
-        doc.text(pdfSafeText(`Alanlar Arası Osilasyon Bulguları - ${oscSourceName} Frekansı`), 14, 14);
+        doc.text(pdfSafeText(`Alanlar Arasi Osilasyon Bulgulari - ${oscSourceName} Frekansi`), 14, 14);
         const oscillationImage = state.oscillationChart?.getDataURL({ type: 'png', pixelRatio: 2, backgroundColor: '#ffffff' });
         if (oscillationImage) doc.addImage(oscillationImage, 'PNG', 14, 20, 269, 105);
 
@@ -2762,12 +2353,12 @@
         ]);
         doc.autoTable({
           startY: 130,
-          head: [[pdfSafeText('No'), pdfSafeText('Başlangıç'), pdfSafeText('Bitiş'), pdfSafeText('Süre'), 'Tepe mHz', 'RMS mHz', pdfSafeText('Baskın Hz'), pdfSafeText(`${sourceShortLabel(state.oscillationSource || 'tr')} Ort. Hz`), pdfSafeText(`${sourceShortLabel(state.oscillationSource || 'tr')} Min-Maks`), pdfSafeText('Sınıf')]],
+          head: [[pdfSafeText('No'), pdfSafeText('Baslangic'), pdfSafeText('Bitis'), pdfSafeText('Sure'), 'Tepe mHz', 'RMS mHz', pdfSafeText('Baskin Hz'), pdfSafeText(`${sourceShortLabel(state.oscillationSource || 'tr')} Ort. Hz`), pdfSafeText(`${sourceShortLabel(state.oscillationSource || 'tr')} Min-Maks`), pdfSafeText('Sinif')]],
           body: eventBody.length
             ? eventBody.map(row => row.map(pdfSafeText))
-            : [[pdfSafeText('Seçilen eşik için osilasyon bulgusu tespit edilmedi.')]],
+            : [[pdfSafeText('Secilen esik icin osilasyon bulgusu tespit edilmedi.')]],
           theme: 'grid',
-          styles: { font: pdfFont, fontSize: 6.2, cellPadding: 1.1 },
+          styles: { font: 'helvetica', fontSize: 6.2, cellPadding: 1.1 },
           headStyles: { fillColor: [13, 47, 79] },
           margin: { left: 14, right: 14 }
         });
@@ -2775,8 +2366,8 @@
 
       doc.setProperties({
         title: pdfSafeText(title),
-        subject: pdfSafeText(`TEİAŞ ve Netztransparenz frekans karşılaştırması ile ${sourceLabel(state.oscillationSource || 'tr')} osilasyon analizi`),
-        creator: pdfSafeText('Tarayıcı tabanlı frekans analiz uygulaması')
+        subject: pdfSafeText(`TEIAS ve Netztransparenz frekans karsilastirmasi ile ${sourceLabel(state.oscillationSource || 'tr')} osilasyon analizi`),
+        creator: pdfSafeText('Tarayici tabanli frekans analiz uygulamasi')
       });
       doc.save(`Frekans_Raporu_${current.date}.pdf`);
     }
@@ -2874,13 +2465,6 @@
       if (!iso) return '—';
       const [y, m, d] = iso.split('-');
       return `${d}.${m}.${y}`;
-    }
-
-    function formatUtc(value) {
-      if (!value) return '—';
-      const parsed = new Date(value);
-      if (Number.isNaN(parsed.getTime())) return String(value);
-      return parsed.toISOString().replace('T', ' ').replace(/\.\d{3}Z$/, ' UTC');
     }
 
     function secondToTime(second) {

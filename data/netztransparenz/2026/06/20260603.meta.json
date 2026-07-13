@@ -1,0 +1,31 @@
+{
+  "source": "netztransparenz",
+  "sourceLabel": "Netztransparenz",
+  "localDate": "2026-06-03",
+  "timezone": "Europe/Berlin",
+  "startUtc": "2026-06-02T22:00:00Z",
+  "sampleIntervalSeconds": 1,
+  "expectedSamples": 86400,
+  "validSamples": 86400,
+  "missingSamples": 0,
+  "duplicateSamples": 0,
+  "invalidRows": 0,
+  "invalidFrequencySamples": 0,
+  "encoding": {
+    "type": "int16-le",
+    "baseHz": 50.0,
+    "scale": 10000,
+    "missingValue": -32768
+  },
+  "minimumHz": 49.891,
+  "maximumHz": 50.077,
+  "averageHz": 49.996740949074066,
+  "sha256": "bbddbd1c65f63043105e0f9714cbb1def008c642cd9524ae0af74aabd7a93af3",
+  "sourceUrl": "docs\\Netztransparenz_frekans_aylık\\Frequenz_20260601_20260630.csv\\Frequenz_20260601_20260630.csv",
+  "downloadedAtUtc": "2026-07-13T00:30:31Z",
+  "httpStatus": 0,
+  "sourceSize": 72576024,
+  "parsedRows": 86400,
+  "qualityScore": 100,
+  "status": "complete"
+}
