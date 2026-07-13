@@ -143,6 +143,18 @@
       padding: 10px; margin-top: 4px; width: 290px;
     }
     .cal-dropdown.hidden { display: none; }
+    .filter-dropdown {
+      position: absolute; z-index: 50; right:0;
+      background: #fff; border: 1px solid var(--line); border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(13,47,79,.15);
+      padding: 12px; margin-top: 4px; width: 260px;
+    }
+    .filter-dropdown.hidden { display: none; }
+    .filter-row { margin-bottom: 10px; }
+    .filter-row:last-child { margin-bottom: 0; }
+    .filter-row label { display:block; color: var(--muted); font-weight:700; font-size:.78rem; margin-bottom:4px; }
+    .filter-row input,
+    .filter-row select { width:100%; min-height:36px; border:1px solid #cbd9e3; border-radius:8px; padding:6px 10px; background:#fff; color:var(--ink); font-size:.88rem; }
     .calendar-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
     .calendar-nav button {
       border: 1px solid var(--line); background: #fff; border-radius: 7px;
@@ -669,10 +681,14 @@
         <div class="control-bar">
           <div class="field" style="position:relative">
             <label data-i18n="dateSelectLabel">Tarih Seçimi</label>
-            <button type="button" class="cal-toggle-btn" id="calToggle">
-              <span id="calToggleText" data-i18n="calToggleText">Tarih seçin</span>
-              <span>▾</span>
-            </button>
+            <div style="display:flex;gap:4px;align-items:stretch">
+              <button class="btn btn-secondary" id="prevDayBtn" type="button" title="◀" style="min-height:39px;min-width:36px;padding:4px 8px">◀</button>
+              <button type="button" class="cal-toggle-btn" id="calToggle" style="flex:1;min-width:0">
+                <span id="calToggleText" data-i18n="calToggleText">Tarih seçin</span>
+                <span>▾</span>
+              </button>
+              <button class="btn btn-secondary" id="nextDayBtn" type="button" title="▶" style="min-height:39px;min-width:36px;padding:4px 8px">▶</button>
+            </div>
             <div class="cal-dropdown hidden" id="calDropdown">
               <div class="calendar-nav">
                 <button id="calPrevMonth" type="button">◀</button>
@@ -691,18 +707,23 @@
               <option value="manual" data-i18n="manualOffset">Manuel saat farkı</option>
             </select>
           </div>
-          <div class="field">
-            <label for="manualOffsetGraph" data-i18n="manualOffsetGraphLabel">TR→DE saat farkı</label>
-            <input id="manualOffsetGraph" type="number" min="-12" max="12" step="0.5" value="1" />
-          </div>
-          <div class="field">
-            <label for="showDifference" data-i18n="diffLabel">Grafikte fark</label>
-            <select id="showDifference"><option value="yes" data-i18n="diffShow">Göster</option><option value="no" data-i18n="diffHide">Gizle</option></select>
+          <div class="field" style="position:relative">
+            <button class="btn btn-secondary" id="filterToggleBtn" type="button" style="min-height:39px;font-size:1.1rem">⚙</button>
+            <div class="filter-dropdown hidden" id="filterDropdown">
+              <div class="filter-row">
+                <label for="manualOffsetGraph" data-i18n="manualOffsetGraphLabel">TR→DE saat farkı</label>
+                <input id="manualOffsetGraph" type="number" min="-12" max="12" step="0.5" value="1" />
+              </div>
+              <div class="filter-row">
+                <label for="showDifference" data-i18n="diffLabel">Grafikte fark</label>
+                <select id="showDifference"><option value="yes" data-i18n="diffShow">Göster</option><option value="no" data-i18n="diffHide">Gizle</option></select>
+              </div>
+            </div>
           </div>
           <button class="btn btn-primary" id="calculateBtn" data-i18n="calculateBtn">Günlük Raporu Hesapla</button>
           <button class="btn btn-secondary" id="resetZoomBtn" data-i18n="resetZoomBtn">Grafik Sıfırla</button>
         </div>
-        <div id="alignmentInfo" class="status-banner warn" data-i18n="alignmentInfoDefault">Tarih seçip Günlük Raporu Hesapla butonuna basın.</div>
+        <div id="alignmentInfo" class="status-banner warn">Tarih seçip Günlük Raporu Hesapla butonuna basın.</div>
       </div>
 
       <div class="panel">
@@ -734,7 +755,7 @@
         <div class="section-title">
           <div>
             <h3 data-i18n="sectionQuarterHeatmap">15 Dakikalık Ortalama Mutlak Frekans Farkı</h3>
-            <p data-i18n="quarterHeatmapDesc">Her hücre ilgili çeyrek saatteki eşlenmiş TEİAŞ–Netztransparenz farkının MAE değerini gösterir. <span class="interaction-note" data-i18n="singleDoubleHintQuarter">Tek tıklama 900 saniyelik grafiği, çift tıklama günlük grafiği açar.</span></p>
+            <p data-i18n="quarterHeatmapDesc">Her hücre ilgili çeyrek saatteki eşlenmiş Türkiye–Almanya farkının MAE değerini gösterir. <span class="interaction-note" data-i18n="singleDoubleHintQuarter">Tek tıklama 900 saniyelik grafiği, çift tıklama günlük grafiği açar.</span></p>
           </div>
         </div>
         <div id="quarterHeatmap" class="quarter-grid"></div>
@@ -751,8 +772,8 @@
           <div class="osc-source-selector">
             <label for="oscSourceSelect" data-i18n="oscSourceLabel">Analiz kaynağı</label>
             <select id="oscSourceSelect">
-              <option value="tr" selected data-i18n="teias">TEİAŞ</option>
-              <option value="de" data-i18n="netz">Netztransparenz</option>
+              <option value="tr" selected data-i18n="teias">Türkiye</option>
+              <option value="de" data-i18n="netz">Almanya</option>
             </select>
           </div>
         </div>
@@ -789,7 +810,7 @@
         <div class="table-wrap">
           <table>
             <thead>
-              <tr><th data-i18n="oscThNo">No</th><th data-i18n="oscThStart">Başlangıç</th><th data-i18n="oscThEnd">Bitiş</th><th data-i18n="oscThDuration">Süre</th><th data-i18n="oscThPeak">Tepe genlik</th><th data-i18n="oscThRms">RMS</th><th data-i18n="oscThDominant">Baskın frekans</th><th data-i18n="oscThWindow">Pencere</th><th id="eventSourceMeanHead" data-i18n="oscThSourceMean">TEİAŞ ort.</th><th id="eventSourceRangeHead" data-i18n="oscThSourceRange">TEİAŞ min–maks</th><th data-i18n="oscThClass">Sınıflandırma</th></tr>
+              <tr><th data-i18n="oscThNo">No</th><th data-i18n="oscThStart">Başlangıç</th><th data-i18n="oscThEnd">Bitiş</th><th data-i18n="oscThDuration">Süre</th><th data-i18n="oscThPeak">Tepe genlik</th><th data-i18n="oscThRms">RMS</th><th data-i18n="oscThDominant">Baskın frekans</th><th data-i18n="oscThWindow">Pencere</th><th id="eventSourceMeanHead" data-i18n="oscThSourceMean">Türkiye ort.</th><th id="eventSourceRangeHead" data-i18n="oscThSourceRange">Türkiye min–maks</th><th data-i18n="oscThClass">Sınıflandırma</th></tr>
             </thead>
             <tbody id="eventBody"><tr><td colspan="11" class="empty-state" data-i18n="oscNoAnalysis">Henüz osilasyon analizi yapılmadı.</td></tr></tbody>
           </table>
@@ -813,7 +834,7 @@
           <div class="card">
             <div class="section-title">
               <div>
-                <h3>Netztransparenz</h3>
+                <h3 data-i18n="sourceDe">Almanya</h3>
               </div>
               <span class="tag" data-i18n="monthlyCsv">Aylık CSV</span>
             </div>
@@ -828,7 +849,7 @@
           <div class="card">
             <div class="section-title">
               <div>
-                <h3>TEİAŞ</h3>
+                <h3 data-i18n="sourceTr">Türkiye</h3>
               </div>
               <span class="tag" data-i18n="multiDaily">Çoklu günlük</span>
             </div>
@@ -863,12 +884,12 @@
         </div>
         <div class="auto-data-grid">
           <div class="auto-data-card">
-            <div class="label" data-i18n="teias">TEİAŞ</div>
+            <div class="label" data-i18n="teias">Türkiye</div>
             <div class="value" id="autoTeiasValue">-</div>
             <div class="sub" id="autoTeiasMeta" data-i18n="autoTeiasMetaDefault">Manifest bekleniyor.</div>
           </div>
           <div class="auto-data-card">
-            <div class="label" data-i18n="netz">Netztransparenz</div>
+            <div class="label" data-i18n="netz">Almanya</div>
             <div class="value" id="autoDeValue">-</div>
             <div class="sub" id="autoDeMeta" data-i18n="autoDeMetaDefault">Manifest bekleniyor.</div>
           </div>
@@ -879,8 +900,8 @@
           </div>
         </div>
         <div class="source-links">
-          <a href="https://www.teias.gov.tr/gunluk-frekans-bilgisi" target="_blank" rel="noopener">TEİAŞ</a>
-          <a href="https://www.netztransparenz.de/de-de/Regelenergie/Daten-Regelreserve/Sek%C3%BCndliche-Daten" target="_blank" rel="noopener">Netztransparenz</a>
+          <a href="https://www.teias.gov.tr/gunluk-frekans-bilgisi" target="_blank" rel="noopener" data-i18n="sourceTeiasLink">Türkiye</a>
+          <a href="https://www.netztransparenz.de/de-de/Regelenergie/Daten-Regelreserve/Sek%C3%BCndliche-Daten" target="_blank" rel="noopener" data-i18n="sourceNetzLink">Almanya</a>
         </div>
       </div>
 
@@ -919,7 +940,7 @@
           <div class="card settings-card">
             <h3 data-i18n="settingsAlignmentTitle">Zaman Eşleştirme</h3>
             <div class="field"><label for="setAlignment" data-i18n="defaultMethodLabel">Varsayılan yöntem</label><select id="setAlignment"><option value="utcAuto" data-i18n="utcAuto">UTC – otomatik</option><option value="sameLocal" data-i18n="sameLocal">Aynı yerel saat</option><option value="manual" data-i18n="manualOption">Manuel</option></select></div>
-            <div class="field"><label for="teiasUtcOffset" data-i18n="teiasUtcOffsetLabel">TEİAŞ UTC ofseti</label><input id="teiasUtcOffset" type="number" step="0.5" value="3" /></div>
+            <div class="field"><label for="teiasUtcOffset" data-i18n="teiasUtcOffsetLabel">Türkiye UTC ofseti</label><input id="teiasUtcOffset" type="number" step="0.5" value="3" /></div>
             <div class="field"><label for="deWinterOffset" data-i18n="deWinterOffsetLabel">Almanya kış UTC ofseti</label><input id="deWinterOffset" type="number" step="0.5" value="1" /></div>
             <div class="field"><label for="deSummerOffset" data-i18n="deSummerOffsetLabel">Almanya yaz UTC ofseti</label><input id="deSummerOffset" type="number" step="0.5" value="2" /></div>
             <div class="field"><label for="manualOffsetSetting" data-i18n="manualOffsetSettingLabel">Manuel TR→DE farkı (saat)</label><input id="manualOffsetSetting" type="number" step="0.5" value="1" /></div>
@@ -940,6 +961,8 @@
             <div class="field"><label for="graphMin" data-i18n="graphMinLabel">Sabit minimum (Hz)</label><input id="graphMin" type="number" step="0.001" value="49.90" /></div>
             <div class="field"><label for="graphMax" data-i18n="graphMaxLabel">Sabit maksimum (Hz)</label><input id="graphMax" type="number" step="0.001" value="50.10" /></div>
             <div class="field"><label for="chartStep" data-i18n="chartStepLabel">Osilasyon grafik adımı (sn)</label><input id="chartStep" type="number" min="1" max="30" step="1" value="5" /></div>
+            <div class="field"><label for="diffAxisMin" data-i18n="diffAxisMinLabel">Fark alt limit (mHz)</label><input id="diffAxisMin" type="number" min="-200" max="0" step="1" value="-20" /></div>
+            <div class="field"><label for="diffAxisMax" data-i18n="diffAxisMaxLabel">Fark üst limit (mHz)</label><input id="diffAxisMax" type="number" min="0" max="200" step="1" value="20" /></div>
           </div>
         </div>
       </div>
@@ -1383,7 +1406,9 @@
       filterTaps: 101,
       minDuration: 30,
       oscillationSource: 'tr',
-      locale: 'tr'
+      locale: 'tr',
+      diffAxisMin: -20,
+      diffAxisMax: 20
     };
 
     const AUTO_DATA_BASE = './data/';
@@ -1549,12 +1574,41 @@
       $('resetSettingsBtn').addEventListener('click', resetSettings);
       $('langToggle').addEventListener('click', () => setLanguage(lang === 'tr' ? 'en' : 'tr'));
 
+      $('prevDayBtn').addEventListener('click', () => navigateDay(-1));
+      $('nextDayBtn').addEventListener('click', () => navigateDay(1));
+      $('filterToggleBtn').addEventListener('click', (e) => { e.stopPropagation(); $('filterDropdown').classList.toggle('hidden'); });
+      document.addEventListener('click', (e) => { if (!$('filterDropdown').classList.contains('hidden') && !$('filterToggleBtn').contains(e.target) && !$('filterDropdown').contains(e.target)) $('filterDropdown').classList.add('hidden'); });
+      $('showDifference').addEventListener('change', () => { if (state.current) renderFrequencyChart(state.current); });
+      $('manualOffsetGraph').addEventListener('change', () => { if ($('dateSelect').value) calculateDailyReport(); });
+
       $('alignmentSelect').addEventListener('change', updateAlignmentInfo);
       $('manualOffsetGraph').addEventListener('change', updateAlignmentInfo);
       window.addEventListener('resize', () => {
         state.frequencyChart?.resize();
         state.oscillationChart?.resize();
       });
+    }
+
+    function navigateDay(dir) {
+      const current = $('dateSelect').value;
+      if (!current) {
+        const dates = reportDatesForCurrentMode();
+        if (dates.length) { selectDate(dates[dates.length - 1]); }
+        return;
+      }
+      const d = new Date(current + 'T00:00:00');
+      d.setDate(d.getDate() + dir);
+      const iso = d.toISOString().slice(0, 10);
+      const available = reportDatesForCurrentMode();
+      if (available.includes(iso)) selectDate(iso);
+    }
+
+    function selectDate(iso) {
+      $('dateSelect').value = iso;
+      $('calToggleText').textContent = displayDate(iso);
+      $('calGrid').querySelectorAll('.cal-day').forEach(el => el.classList.toggle('selected', el.dataset.date === iso));
+      updateAlignmentInfo();
+      calculateDailyReport();
     }
 
     function checkLibraries() {
@@ -1595,6 +1649,7 @@
         if (hasTeias) {
           const latest = manifest.sources.teias.latestDate;
           setBanner('loadStatus', t('autoDataReady', { date: displayDate(latest) }), 'success');
+          if (!$('dateSelect').value) selectDate(latest);
         }
       } catch (error) {
         state.auto.manifest = null;
@@ -1855,9 +1910,15 @@
     function updateDateSelect() {
       const dates = reportDatesForCurrentMode();
       const hidden = $('dateSelect');
-      if (dates.length && !hidden.value) hidden.value = dates[dates.length - 1];
-      renderCalendar();
-      updateAlignmentInfo();
+      if (dates.length && !hidden.value) {
+        hidden.value = dates[dates.length - 1];
+        renderCalendar();
+        updateAlignmentInfo();
+        calculateDailyReport();
+      } else {
+        renderCalendar();
+        updateAlignmentInfo();
+      }
     }
 
     function renderCalendar() {
@@ -1915,12 +1976,8 @@
 
       grid.querySelectorAll('.cal-day[data-date]').forEach(day => {
         day.addEventListener('click', () => {
-          grid.querySelectorAll('.cal-day').forEach(el => el.classList.remove('selected'));
-          day.classList.add('selected');
-          hidden.value = day.dataset.date;
-          toggleText.textContent = displayDate(hidden.value);
           $('calDropdown').classList.add('hidden');
-          updateAlignmentInfo();
+          selectDate(day.dataset.date);
         });
       });
     }
@@ -2291,11 +2348,16 @@
             formatter: value => secondToTime(Math.round(value)).slice(0, 8),
             hideOverlap: true,
             interval: labelInterval
+          },
+          splitLine: {
+            show: true,
+            interval: detailMode ? 900 : 3600,
+            lineStyle: { color: '#e5edf2' }
           }
         },
         yAxis: [
           { type: 'value', name: t('yAxisFreq'), scale: true, min: fixed ? state.settings.graphMin : null, max: fixed ? state.settings.graphMax : null, axisLabel: { formatter: v => v.toFixed(3) }, splitLine: { lineStyle: { color: '#e5edf2' } } },
-          { type: 'value', name: t('yAxisDiff'), show: showDiff, axisLabel: { formatter: v => v.toFixed(0) } }
+          { type: 'value', name: t('yAxisDiff'), show: showDiff, axisLabel: { formatter: v => v.toFixed(0) }, min: state.settings.diffAxisMin, max: state.settings.diffAxisMax }
         ],
         dataZoom: [{ type: 'inside', filterMode: 'none' }, { type: 'slider', filterMode: 'none', height: 22, bottom: 18, start: 0, end: 100 }],
         series: [
@@ -2699,6 +2761,8 @@
       $('graphMin').value = s.graphMin;
       $('graphMax').value = s.graphMax;
       $('chartStep').value = s.chartStepSeconds;
+      $('diffAxisMin').value = s.diffAxisMin;
+      $('diffAxisMax').value = s.diffAxisMax;
       $('bandMin').value = s.bandMin;
       $('bandMax').value = s.bandMax;
       $('oscThreshold').value = s.thresholdMhz;
@@ -2728,6 +2792,8 @@
         graphMin: Number($('graphMin').value),
         graphMax: Number($('graphMax').value),
         chartStepSeconds: Number($('chartStep').value),
+        diffAxisMin: Number($('diffAxisMin').value),
+        diffAxisMax: Number($('diffAxisMax').value),
         bandMin: Number($('bandMin').value),
         bandMax: Number($('bandMax').value),
         thresholdMhz: Number($('oscThreshold').value),
@@ -2805,13 +2871,13 @@
         diffLabel: 'Grafikte fark',
         diffShow: 'Göster',
         diffHide: 'Gizle',
-        calculateBtn: 'Günlük Raporu Hesapla',
+        calculateBtn: 'Yenile',
         resetZoomBtn: 'Grafik Sıfırla',
         utcAuto: 'UTC – otomatik',
         sameLocal: 'Aynı yerel saat',
         manualOffset: 'Manuel saat farkı',
         manualOption: 'Manuel',
-        alignmentInfoDefault: 'Tarih seçip Günlük Raporu Hesapla butonuna basın.',
+        alignmentInfoDefault: 'Grafiği görüntülemek için bir tarih seçin.',
         section24h: '24 Saatlik Frekans Karşılaştırması',
         chartViewTag: '24 saat • dakikalık',
         reportDateTag: 'Tarih seçilmedi',
@@ -2819,12 +2885,12 @@
         hourlyMatrixDesc: 'Tek tabloda Metrik ve 00–23 saat kolonları gösterilir.',
         singleDoubleHint: 'Saat başlığına tek tıklama saniyelik saat grafiğini, çift tıklama günlük grafiği açar.',
         sectionQuarterHeatmap: '15 Dakikalık Ortalama Mutlak Frekans Farkı',
-        quarterHeatmapDesc: 'Her hücre ilgili çeyrek saatteki eşlenmiş TEİAŞ–Netztransparenz farkının MAE değerini gösterir.',
+        quarterHeatmapDesc: 'Her hücre ilgili çeyrek saatteki eşlenmiş Türkiye–Almanya farkının MAE değerini gösterir.',
         singleDoubleHintQuarter: 'Tek tıklama 900 saniyelik grafiği, çift tıklama günlük grafiği açar.',
         sectionOscillation: 'Alanlar Arası Osilasyon Taraması',
         oscSourceLabel: 'Analiz kaynağı',
-        teias: 'TEİAŞ',
-        netz: 'Netztransparenz',
+        teias: 'Türkiye',
+        netz: 'Almanya',
         bandMinLabel: 'Alt bant (Hz)',
         bandMaxLabel: 'Üst bant (Hz)',
         oscThresholdLabel: 'Genlik eşiği (mHz)',
@@ -2846,8 +2912,8 @@
         oscThRms: 'RMS',
         oscThDominant: 'Baskın frekans',
         oscThWindow: 'Pencere',
-        oscThSourceMean: 'TEİAŞ ort.',
-        oscThSourceRange: 'TEİAŞ min–maks',
+        oscThSourceMean: 'Türkiye ort.',
+        oscThSourceRange: 'Türkiye min–maks',
         oscThClass: 'Sınıflandırma',
         oscNoAnalysis: 'Henüz osilasyon analizi yapılmadı.',
         sectionDataLoad: 'Veri Yükleme',
@@ -2886,7 +2952,7 @@
         saveSettingsBtn: 'Ayarları Kaydet',
         settingsAlignmentTitle: 'Zaman Eşleştirme',
         defaultMethodLabel: 'Varsayılan yöntem',
-        teiasUtcOffsetLabel: 'TEİAŞ UTC ofseti',
+        teiasUtcOffsetLabel: 'Türkiye UTC ofseti',
         deWinterOffsetLabel: 'Almanya kış UTC ofseti',
         deSummerOffsetLabel: 'Almanya yaz UTC ofseti',
         manualOffsetSettingLabel: 'Manuel TR→DE farkı (saat)',
@@ -2903,14 +2969,16 @@
         graphMinLabel: 'Sabit minimum (Hz)',
         graphMaxLabel: 'Sabit maksimum (Hz)',
         chartStepLabel: 'Osilasyon grafik adımı (sn)',
+        diffAxisMinLabel: 'Fark alt limit (mHz)',
+        diffAxisMaxLabel: 'Fark üst limit (mHz)',
         // Calendar
         months: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'],
         dayHeaders: ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'],
         // KPI
-        kpiTeiasMean: 'TEİAŞ Ortalama',
-        kpiDeMean: 'DE Ortalama',
-        kpiTeiasAbsDev: 'TEİAŞ Ort. |Δf|',
-        kpiDeAbsDev: 'DE Ort. |Δf|',
+        kpiTeiasMean: 'Türkiye Ortalama',
+        kpiDeMean: 'Almanya Ortalama',
+        kpiTeiasAbsDev: 'Türkiye Ort. |Δf|',
+        kpiDeAbsDev: 'Almanya Ort. |Δf|',
         kpiBias: 'Bias',
         kpiMae: 'MAE',
         kpiCorrelation: 'Korelasyon',
@@ -2928,41 +2996,41 @@
         tagNone: 'Yok',
         tagCheck: 'Kontrol',
         // Source labels
-        sourceTr: 'TEİAŞ',
-        sourceDe: 'Netztransparenz',
-        sourceTrShort: 'TEİAŞ',
+        sourceTr: 'Türkiye',
+        sourceDe: 'Almanya',
+        sourceTrShort: 'TR',
         sourceDeShort: 'DE',
         // Matrix metric labels
-        metricMeanTr: 'TEİAŞ Ort.',
-        metricMinTr: 'TEİAŞ Min',
-        metricMaxTr: 'TEİAŞ Maks',
-        metricMeanDe: 'DE Ort.',
-        metricMinDe: 'DE Min',
-        metricMaxDe: 'DE Maks',
+        metricMeanTr: 'Türkiye Ort.',
+        metricMinTr: 'Türkiye Min',
+        metricMaxTr: 'Türkiye Maks',
+        metricMeanDe: 'Almanya Ort.',
+        metricMinDe: 'Almanya Min',
+        metricMaxDe: 'Almanya Maks',
         metricBias: 'Bias',
         metricMae: 'MAE',
         metricRmse: 'RMSE',
         metricCorr: 'Korel.',
         // Oscillation chart labels
         oscFilteredName: '{source} eşik üstü {f1}–{f2} Hz bileşeni',
-        oscTrReal: 'TEİAŞ gerçek frekansı',
-        oscDeReal: 'Netztransparenz gerçek frekansı',
+        oscTrReal: 'Türkiye gerçek frekansı',
+        oscDeReal: 'Almanya gerçek frekansı',
         oscLegendHint: 'Varsayılan pasif, göstermek için tıklayın',
         // Chart descriptions
         chartDescDay: 'Günlük görünümde 86.400 örnek dakikalık ortalamaya indirgenir; istatistikler saniyelik ortak kayıtlardan hesaplanır.',
         chartDescDetail: '{label} görünümünde saniyelik çözünürlük kullanılır ve {count} veri noktası çizilir.',
         // Alignment descriptions
         alignDescSameLocal: 'Aynı yerel saat karşılaştırması seçildi.',
-        alignDescManual: 'Manuel eşleştirme seçildi; Almanya yerel saati = TEİAŞ yerel saati − {delta} saat.',
-        alignDescUtcAuto: 'UTC otomatik eşleştirme seçildi; TEİAŞ UTC{teias}, Almanya UTC{de}, fark {delta} saat.',
+        alignDescManual: 'Manuel eşleştirme seçildi; Almanya yerel saati = Türkiye yerel saati − {delta} saat.',
+        alignDescUtcAuto: 'UTC otomatik eşleştirme seçildi; Türkiye UTC{teias}, Almanya UTC{de}, fark {delta} saat.',
         alignDescDefault: 'Zaman eşleştirme bilgisi veri ve tarih seçildiğinde gösterilecektir.',
-        alignInfo: '{desc} TEİAŞ {trDate} 00:00:00 kaydı, Netztransparenz {deDate} {deTime} kaydıyla eşleştirilir.',
+        alignInfo: '{desc} Türkiye {trDate} 00:00:00 kaydı, Almanya {deDate} {deTime} kaydıyla eşleştirilir.',
         // Various messages
-        noDateSelected: 'Lütfen TEİAŞ verisi bulunan bir gün seçin.',
+        noDateSelected: 'Lütfen Türkiye verisi bulunan bir gün seçin.',
         autoDataLoading: '{date} otomatik verisi yükleniyor.',
-        autoDataNoDe: '{date} TEİAŞ verisi yüklendi; eşleşen Netztransparenz günü bulunamadı.',
-        autoDataNoTr: '{date} için TEİAŞ otomatik verisi yok.',
-        autoDataReady: 'Otomatik veri kataloğu hazır. Son aktif TEİAŞ günü: {date}.',
+        autoDataNoDe: '{date} Türkiye verisi yüklendi; eşleşen Almanya günü bulunamadı.',
+        autoDataNoTr: '{date} için Türkiye otomatik verisi yok.',
+        autoDataReady: 'Otomatik veri kataloğu hazır. Son aktif gün: {date}.',
         autoDataSelected: 'Otomatik veri modu seçildi.',
         manualDataSelected: 'Manuel CSV modu seçildi.',
         dataCleared: 'Yüklenen veriler temizlendi.',
@@ -2976,7 +3044,7 @@
         parsingProgress: '{file}: %{pct} • {rows} satır işlendi',
         parsingError: 'Dosya ayrıştırma hatası: {msg}',
         parsingDone: '{days} günlük veri başarıyla belleğe alındı.',
-        parsingSourceLoaded: '{source} verisi yüklendi. Toplam {deCount} Almanya günü ve {trCount} TEİAŞ günü mevcut.',
+        parsingSourceLoaded: '{source} verisi yüklendi. Toplam {deCount} Almanya günü ve {trCount} Türkiye günü mevcut.',
         parseReading: 'Dosya okunuyor…',
         parseBusy: 'Başka bir dosya işleniyor. Lütfen işlemin tamamlanmasını bekleyin.',
         // Report messages
@@ -2989,13 +3057,13 @@
         autoDataCatalog: 'Statik veri kataloğu denetleniyor.',
         autoDataCatalogError: 'Otomatik katalog okunamadı: {error}',
         autoDataManifestDate: 'Manifest {date} tarihinde üretildi.',
-        autoDataNoTeias: 'Statik katalogda aktif TEİAŞ günü bulunamadı.',
+        autoDataNoTeias: 'Statik katalogda aktif Türkiye günü bulunamadı.',
         autoTeiasDays: '{count} aktif gün',
         autoTeiasMeta: '{range}; dışlanan {excluded} gün',
         autoDeDays: '{count} gün',
         autoDeMeta: '{range}; manuel aylık import',
-        autoNoDeMeta: 'Netztransparenz otomatik kaynak doğrulanmadı.',
-        autoNoTeiasDays: 'Aktif TEİAŞ günü yok.',
+        autoNoDeMeta: 'Almanya otomatik kaynak doğrulanmadı.',
+        autoNoTeiasDays: 'Aktif Türkiye günü yok.',
         autoStatusDays: '{count} yayınlanmamış gün; son kontrol {date}',
         autoNoStatus: 'Durum dosyası yok.',
         // Event empty
@@ -3018,14 +3086,14 @@
         yAxisDiff: 'Fark (mHz)',
         yAxisBand: 'Bant bileşeni (mHz)',
         yAxisReal: 'Gerçek frekanslar (Hz)',
-        xAxisOsc: 'TEİAŞ yerel zaman ekseni',
+        xAxisOsc: 'Türkiye yerel zaman ekseni',
         // Chart series
-        seriesTr: 'TEİAŞ',
-        seriesDe: 'Netztransparenz',
+        seriesTr: 'Türkiye',
+        seriesDe: 'Almanya',
         seriesDiff: 'Fark',
         // Tooltip
-        tooltipTr: 'TEİAŞ',
-        tooltipDe: 'Netztransparenz',
+        tooltipTr: 'Türkiye',
+        tooltipDe: 'Almanya',
         tooltipDiff: 'Fark',
         tooltipDiffUnit: ' mHz',
         tooltipFreqUnit: ' Hz',
@@ -3048,8 +3116,8 @@
         // Count tags
         findingsCount: '{count} bulgu',
         // Data source links
-        sourceTeiasLink: 'TEİAŞ',
-        sourceNetzLink: 'Netztransparenz',
+        sourceTeiasLink: 'Türkiye',
+        sourceNetzLink: 'Almanya',
         // Seconds to time
         timeSecondTo: '{time}',
         displayDate: '{time}',
@@ -3071,13 +3139,13 @@
         diffLabel: 'Show difference',
         diffShow: 'Show',
         diffHide: 'Hide',
-        calculateBtn: 'Calculate Daily Report',
+        calculateBtn: 'Refresh',
         resetZoomBtn: 'Reset Zoom',
         utcAuto: 'UTC – automatic',
         sameLocal: 'Same local time',
         manualOffset: 'Manual offset',
         manualOption: 'Manual',
-        alignmentInfoDefault: 'Select a date and click "Calculate Daily Report".',
+        alignmentInfoDefault: 'Select a date to view the chart.',
         section24h: '24-Hour Frequency Comparison',
         chartViewTag: '24h • minutely',
         reportDateTag: 'No date selected',
@@ -3085,12 +3153,12 @@
         hourlyMatrixDesc: 'Metrics and 00–23 hour columns in one table.',
         singleDoubleHint: 'Single-click opens second-resolution chart, double-click opens daily chart.',
         sectionQuarterHeatmap: '15-Minute Mean Absolute Frequency Difference',
-        quarterHeatmapDesc: 'Each cell shows MAE of aligned TEİAŞ–Netztransparenz difference for that quarter.',
+        quarterHeatmapDesc: 'Each cell shows MAE of aligned TURKIYE–Germany difference for that quarter.',
         singleDoubleHintQuarter: 'Single-click opens 900s chart, double-click opens daily chart.',
         sectionOscillation: 'Inter-Area Oscillation Scan',
         oscSourceLabel: 'Analysis source',
-        teias: 'TEİAŞ',
-        netz: 'Netztransparenz',
+        teias: 'TURKIYE',
+        netz: 'Germany',
         bandMinLabel: 'Lower band (Hz)',
         bandMaxLabel: 'Upper band (Hz)',
         oscThresholdLabel: 'Amplitude threshold (mHz)',
@@ -3112,8 +3180,8 @@
         oscThRms: 'RMS',
         oscThDominant: 'Dominant freq.',
         oscThWindow: 'Window',
-        oscThSourceMean: 'TEİAŞ mean',
-        oscThSourceRange: 'TEİAŞ min–max',
+        oscThSourceMean: 'TURKIYE mean',
+        oscThSourceRange: 'TURKIYE min–max',
         oscThClass: 'Classification',
         oscNoAnalysis: 'No oscillation analysis performed yet.',
         sectionDataLoad: 'Data Loading',
@@ -3152,7 +3220,7 @@
         saveSettingsBtn: 'Save Settings',
         settingsAlignmentTitle: 'Time Alignment',
         defaultMethodLabel: 'Default method',
-        teiasUtcOffsetLabel: 'TEİAŞ UTC offset',
+        teiasUtcOffsetLabel: 'TURKIYE UTC offset',
         deWinterOffsetLabel: 'Germany winter UTC offset',
         deSummerOffsetLabel: 'Germany summer UTC offset',
         manualOffsetSettingLabel: 'Manual TR→DE offset (hours)',
@@ -3169,14 +3237,16 @@
         graphMinLabel: 'Fixed minimum (Hz)',
         graphMaxLabel: 'Fixed maximum (Hz)',
         chartStepLabel: 'Oscillation chart step (sec)',
+        diffAxisMinLabel: 'Diff lower limit (mHz)',
+        diffAxisMaxLabel: 'Diff upper limit (mHz)',
         // Calendar
         months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         dayHeaders: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
         // KPI
-        kpiTeiasMean: 'TEİAŞ Mean',
-        kpiDeMean: 'DE Mean',
-        kpiTeiasAbsDev: 'TEİAŞ Mean |Δf|',
-        kpiDeAbsDev: 'DE Mean |Δf|',
+        kpiTeiasMean: 'TURKIYE Mean',
+        kpiDeMean: 'Germany Mean',
+        kpiTeiasAbsDev: 'TURKIYE Mean |Δf|',
+        kpiDeAbsDev: 'Germany Mean |Δf|',
         kpiBias: 'Bias',
         kpiMae: 'MAE',
         kpiCorrelation: 'Correlation',
@@ -3194,14 +3264,14 @@
         tagNone: 'N/A',
         tagCheck: 'Check',
         // Source labels
-        sourceTr: 'TEİAŞ',
-        sourceDe: 'Netztransparenz',
-        sourceTrShort: 'TEİAŞ',
+        sourceTr: 'TURKIYE',
+        sourceDe: 'Germany',
+        sourceTrShort: 'TR',
         sourceDeShort: 'DE',
         // Matrix metric labels
-        metricMeanTr: 'TEİAŞ Mean',
-        metricMinTr: 'TEİAŞ Min',
-        metricMaxTr: 'TEİAŞ Max',
+        metricMeanTr: 'TURKIYE Mean',
+        metricMinTr: 'TURKIYE Min',
+        metricMaxTr: 'TURKIYE Max',
         metricMeanDe: 'DE Mean',
         metricMinDe: 'DE Min',
         metricMaxDe: 'DE Max',
@@ -3211,24 +3281,24 @@
         metricCorr: 'Corr.',
         // Oscillation chart labels
         oscFilteredName: '{source} bandpass {f1}–{f2} Hz component',
-        oscTrReal: 'TEİAŞ actual frequency',
-        oscDeReal: 'Netztransparenz actual frequency',
+        oscTrReal: 'TURKIYE actual frequency',
+        oscDeReal: 'Germany actual frequency',
         oscLegendHint: 'Disabled by default, click to show',
         // Chart descriptions
         chartDescDay: 'Daily view downsamples 86,400 samples to minute averages; statistics computed from second-paired records.',
         chartDescDetail: '{label} view uses second-resolution with {count} data points plotted.',
         // Alignment descriptions
         alignDescSameLocal: 'Same local time comparison selected.',
-        alignDescManual: 'Manual alignment selected; Germany local time = TEİAŞ local time − {delta} hours.',
-        alignDescUtcAuto: 'UTC auto alignment selected; TEİAŞ UTC{teias}, Germany UTC{de}, delta {delta} hours.',
+        alignDescManual: 'Manual alignment selected; Germany local time = TURKIYE local time − {delta} hours.',
+        alignDescUtcAuto: 'UTC auto alignment selected; TURKIYE UTC{teias}, Germany UTC{de}, delta {delta} hours.',
         alignDescDefault: 'Alignment info will be shown when data and date are selected.',
-        alignInfo: '{desc} TEİAŞ {trDate} 00:00:00 record aligns with Netztransparenz {deDate} {deTime} record.',
+        alignInfo: '{desc} TURKIYE {trDate} 00:00:00 record aligns with Germany {deDate} {deTime} record.',
         // Various messages
-        noDateSelected: 'Please select a date with TEİAŞ data.',
+        noDateSelected: 'Please select a date with TURKIYE data.',
         autoDataLoading: 'Loading auto data for {date}.',
-        autoDataNoDe: '{date} TEİAŞ data loaded; matching Netztransparenz day not found.',
-        autoDataNoTr: 'No TEİAŞ auto data for {date}.',
-        autoDataReady: 'Auto data catalog ready. Latest TEİAŞ day: {date}.',
+        autoDataNoDe: '{date} TURKIYE data loaded; matching Germany day not found.',
+        autoDataNoTr: 'No TURKIYE auto data for {date}.',
+        autoDataReady: 'Auto data catalog ready. Latest TURKIYE day: {date}.',
         autoDataSelected: 'Auto data mode selected.',
         manualDataSelected: 'Manual CSV mode selected.',
         dataCleared: 'Loaded data cleared.',
@@ -3242,7 +3312,7 @@
         parsingProgress: '{file}: %{pct} • {rows} rows processed',
         parsingError: 'File parse error: {msg}',
         parsingDone: '{days} day(s) successfully loaded into memory.',
-        parsingSourceLoaded: '{source} data loaded. Total {deCount} DE days and {trCount} TEİAŞ days available.',
+        parsingSourceLoaded: '{source} data loaded. Total {deCount} Germany days and {trCount} TURKIYE days available.',
         parseReading: 'Reading file…',
         parseBusy: 'Another file is being processed. Please wait for completion.',
         // Report messages
@@ -3255,13 +3325,13 @@
         autoDataCatalog: 'Checking static data catalog.',
         autoDataCatalogError: 'Auto catalog could not be read: {error}',
         autoDataManifestDate: 'Manifest generated at {date}.',
-        autoDataNoTeias: 'Static catalog has no active TEİAŞ days.',
+        autoDataNoTeias: 'Static catalog has no active TURKIYE days.',
         autoTeiasDays: '{count} active days',
         autoTeiasMeta: '{range}; {excluded} excluded days',
         autoDeDays: '{count} days',
         autoDeMeta: '{range}; manual monthly import',
-        autoNoDeMeta: 'Netztransparenz auto source not verified.',
-        autoNoTeiasDays: 'No active TEİAŞ days.',
+        autoNoDeMeta: 'Germany auto source not verified.',
+        autoNoTeiasDays: 'No active TURKIYE days.',
         autoStatusDays: '{count} unpublished days; last check {date}',
         autoNoStatus: 'No status file.',
         // Event empty
@@ -3284,14 +3354,14 @@
         yAxisDiff: 'Difference (mHz)',
         yAxisBand: 'Band component (mHz)',
         yAxisReal: 'Actual frequencies (Hz)',
-        xAxisOsc: 'TEİAŞ local time axis',
+        xAxisOsc: 'TURKIYE local time axis',
         // Chart series
-        seriesTr: 'TEİAŞ',
-        seriesDe: 'Netztransparenz',
+        seriesTr: 'TURKIYE',
+        seriesDe: 'Germany',
         seriesDiff: 'Difference',
         // Tooltip
-        tooltipTr: 'TEİAŞ',
-        tooltipDe: 'Netztransparenz',
+        tooltipTr: 'TURKIYE',
+        tooltipDe: 'Germany',
         tooltipDiff: 'Difference',
         tooltipDiffUnit: ' mHz',
         tooltipFreqUnit: ' Hz',
@@ -3314,8 +3384,8 @@
         // Count tags
         findingsCount: '{count} findings',
         // Data source links
-        sourceTeiasLink: 'TEİAŞ',
-        sourceNetzLink: 'Netztransparenz',
+        sourceTeiasLink: 'TURKIYE',
+        sourceNetzLink: 'Germany',
         // Second prefixes for toLocaleString
         localeNumeric: 'en-US'
       }
