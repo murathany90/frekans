@@ -127,41 +127,52 @@
     .tab-button:hover { background: var(--soft-blue); color: var(--navy); }
     .tab-button.active { background: var(--navy); color: #fff; }
 
-    .calendar-nav { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .cal-toggle-btn {
+      width: 100%; min-height: 39px;
+      border: 1px solid #cbd9e3; border-radius: 8px;
+      background: #fff; color: var(--ink);
+      padding: 8px 10px; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between; gap: 6px;
+      font-size: .88rem; font-weight: 600;
+    }
+    .cal-toggle-btn:hover { border-color: var(--cyan); }
+    .cal-dropdown {
+      position: absolute; z-index: 50;
+      background: #fff; border: 1px solid var(--line); border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(13,47,79,.15);
+      padding: 10px; margin-top: 4px; width: 290px;
+    }
+    .cal-dropdown.hidden { display: none; }
+    .calendar-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
     .calendar-nav button {
       border: 1px solid var(--line); background: #fff; border-radius: 7px;
-      padding: 5px 10px; cursor: pointer; font-size: .9rem; color: var(--navy);
-      min-height: 32px; line-height: 1;
+      padding: 4px 8px; cursor: pointer; font-size: .85rem; color: var(--navy);
+      line-height: 1;
     }
     .calendar-nav button:hover { background: var(--soft-blue); }
-    .calendar-nav span { font-weight: 800; font-size: .95rem; color: var(--navy); min-width: 140px; text-align: center; }
-
+    .calendar-nav span { font-weight: 800; font-size: .9rem; color: var(--navy); }
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 2px;
-      max-width: 320px;
+      gap: 1px;
     }
     .cal-header {
-      text-align: center; font-size: .72rem; font-weight: 800; color: var(--muted);
-      padding: 4px 0; text-transform: uppercase;
+      text-align: center; font-size: .7rem; font-weight: 800; color: var(--muted);
+      padding: 3px 0;
     }
     .cal-day {
       position: relative;
-      text-align: center; padding: 6px 2px; border-radius: 7px;
-      font-size: .82rem; font-weight: 700; cursor: pointer; color: var(--ink);
-      background: #fff; border: 1px solid transparent; min-height: 36px;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+      text-align: center; padding: 5px 1px; border-radius: 6px;
+      font-size: .78rem; font-weight: 700; cursor: pointer; color: var(--ink);
+      background: #fff; min-height: 30px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
     }
     .cal-day:hover { background: var(--soft-blue); }
-    .cal-day.selected { border-color: var(--cyan); background: #edf9fc; }
-    .cal-day.other-month { color: #bccbd6; }
-    .cal-day.empty { cursor: default; background: transparent; border-color: transparent; }
+    .cal-day.selected { background: #edf9fc; outline: 2px solid var(--cyan); outline-offset: -1px; }
+    .cal-day.empty { cursor: default; background: transparent; }
     .cal-day.empty:hover { background: transparent; }
-    .cal-dots { display: flex; gap: 3px; justify-content: center; min-height: 8px; }
-    .cal-dot {
-      width: 7px; height: 7px; border-radius: 50%; display: inline-block;
-    }
+    .cal-dots { display: flex; gap: 2px; justify-content: center; min-height: 6px; }
+    .cal-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
     .cal-dot.teias { background: var(--red); }
     .cal-dot.netz { background: var(--blue); }
 
@@ -654,17 +665,21 @@
     <section id="tab-chart" class="tab-panel active">
       <div class="panel no-print">
         <div class="control-bar">
-          <div class="field">
+          <div class="field" style="position:relative">
             <label>Tarih Seçimi</label>
-            <div id="calendarContainer">
+            <button type="button" class="cal-toggle-btn" id="calToggle">
+              <span id="calToggleText">Tarih seçin</span>
+              <span>▾</span>
+            </button>
+            <div class="cal-dropdown hidden" id="calDropdown">
               <div class="calendar-nav">
-                <button id="calPrevMonth" title="Önceki ay">◀</button>
+                <button id="calPrevMonth" type="button">◀</button>
                 <span id="calMonthYear"></span>
-                <button id="calNextMonth" title="Sonraki ay">▶</button>
+                <button id="calNextMonth" type="button">▶</button>
               </div>
               <div class="calendar-grid" id="calGrid"></div>
-              <input type="hidden" id="dateSelect" value="" />
             </div>
+            <input type="hidden" id="dateSelect" value="" />
           </div>
           <div class="field">
             <label for="alignmentSelect">Zaman eşleştirme</label>
@@ -1515,8 +1530,10 @@
       $('oscCalculateBtn').addEventListener('click', calculateOscillation);
       $('oscSourceSelect').addEventListener('change', handleOscillationSourceChange);
       $('resetZoomBtn').addEventListener('click', showDailyFrequencyChart);
-      $('calPrevMonth').addEventListener('click', () => { state.calendarDate.setMonth(state.calendarDate.getMonth() - 1); renderCalendar(); });
-      $('calNextMonth').addEventListener('click', () => { state.calendarDate.setMonth(state.calendarDate.getMonth() + 1); renderCalendar(); });
+      $('calToggle').addEventListener('click', (e) => { e.stopPropagation(); $('calDropdown').classList.toggle('hidden'); });
+      $('calPrevMonth').addEventListener('click', (e) => { e.stopPropagation(); state.calendarDate.setMonth(state.calendarDate.getMonth() - 1); renderCalendar(); });
+      $('calNextMonth').addEventListener('click', (e) => { e.stopPropagation(); state.calendarDate.setMonth(state.calendarDate.getMonth() + 1); renderCalendar(); });
+      document.addEventListener('click', (e) => { if (!$('calDropdown').classList.contains('hidden') && !$('calToggle').contains(e.target) && !$('calDropdown').contains(e.target)) $('calDropdown').classList.add('hidden'); });
       $('useAutoDataBtn').addEventListener('click', useAutoDataMode);
       $('useManualDataBtn').addEventListener('click', useManualDataMode);
       $('reloadAutoDataBtn').addEventListener('click', () => loadAutoDataCatalog({ force: true }));
@@ -1847,8 +1864,6 @@
 
       const firstDay = new Date(year, month, 1).getDay();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
-      const daysInPrev = new Date(year, month, 0).getDate();
-
       const allTeias = [...state.tr.keys()];
       if (state.auto.manifest?.sources?.teias?.availableDates) {
         state.auto.manifest.sources.teias.availableDates.forEach(d => allTeias.push(d));
@@ -1878,11 +1893,16 @@
 
       grid.innerHTML = html;
 
+      const toggleText = $('calToggleText');
+      toggleText.textContent = hidden.value ? displayDate(hidden.value) : 'Tarih seçin';
+
       grid.querySelectorAll('.cal-day[data-date]').forEach(day => {
         day.addEventListener('click', () => {
           grid.querySelectorAll('.cal-day').forEach(el => el.classList.remove('selected'));
           day.classList.add('selected');
           hidden.value = day.dataset.date;
+          toggleText.textContent = displayDate(hidden.value);
+          $('calDropdown').classList.add('hidden');
           updateAlignmentInfo();
         });
       });
