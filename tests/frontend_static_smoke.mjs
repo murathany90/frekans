@@ -13,7 +13,8 @@ const requiredIds = [
   "oscSourceSelect",
   "calGrid",
   "calMonthYear",
-  "calculateBtn"
+  "calculateBtn",
+  "langToggle"
 ];
 
 for (const id of requiredIds) {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-current-lang="tr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -643,18 +643,20 @@
   <header class="app-header">
     <div class="header-row">
       <div class="brand">
-        <h1>Frekans Atlası</h1>
-        <p>Türkiye ve ENTSO-e Günlük Şebeke Frekansı Analiz Platformu</p>
+        <h1 data-i18n="appTitle">Frekans Atlası</h1>
+        <p data-i18n="appSubtitle">Türkiye ve ENTSO-e Günlük Şebeke Frekansı Analiz Platformu</p>
       </div>
-      <div class="header-actions"></div>
+      <div class="header-actions">
+        <button class="btn btn-light" id="langToggle" type="button" data-i18n="langToggle">TR</button>
+      </div>
     </div>
   </header>
 
   <div class="tabs-shell">
     <nav class="tabs" aria-label="Uygulama sekmeleri">
-      <button class="tab-button active" data-tab="tab-chart">Günlük Frekans</button>
-      <button class="tab-button" data-tab="tab-oscillation">Alanlar Arası Osilasyon</button>
-      <button class="tab-button" data-tab="tab-settings">Ayarlar</button>
+      <button class="tab-button active" data-tab="tab-chart" data-i18n="tabChart">Günlük Frekans</button>
+      <button class="tab-button" data-tab="tab-oscillation" data-i18n="tabOscillation">Alanlar Arası Osilasyon</button>
+      <button class="tab-button" data-tab="tab-settings" data-i18n="tabSettings">Ayarlar</button>
     </nav>
   </div>
 
@@ -666,9 +668,9 @@
       <div class="panel no-print">
         <div class="control-bar">
           <div class="field" style="position:relative">
-            <label>Tarih Seçimi</label>
+            <label data-i18n="dateSelectLabel">Tarih Seçimi</label>
             <button type="button" class="cal-toggle-btn" id="calToggle">
-              <span id="calToggleText">Tarih seçin</span>
+              <span id="calToggleText" data-i18n="calToggleText">Tarih seçin</span>
               <span>▾</span>
             </button>
             <div class="cal-dropdown hidden" id="calDropdown">
@@ -682,36 +684,36 @@
             <input type="hidden" id="dateSelect" value="" />
           </div>
           <div class="field">
-            <label for="alignmentSelect">Zaman eşleştirme</label>
+            <label for="alignmentSelect" data-i18n="alignmentLabel">Zaman eşleştirme</label>
             <select id="alignmentSelect">
-              <option value="utcAuto">UTC – otomatik</option>
-              <option value="sameLocal">Aynı yerel saat</option>
-              <option value="manual">Manuel saat farkı</option>
+              <option value="utcAuto" data-i18n="utcAuto">UTC – otomatik</option>
+              <option value="sameLocal" data-i18n="sameLocal">Aynı yerel saat</option>
+              <option value="manual" data-i18n="manualOffset">Manuel saat farkı</option>
             </select>
           </div>
           <div class="field">
-            <label for="manualOffsetGraph">TR→DE saat farkı</label>
+            <label for="manualOffsetGraph" data-i18n="manualOffsetGraphLabel">TR→DE saat farkı</label>
             <input id="manualOffsetGraph" type="number" min="-12" max="12" step="0.5" value="1" />
           </div>
           <div class="field">
-            <label for="showDifference">Grafikte fark</label>
-            <select id="showDifference"><option value="yes">Göster</option><option value="no">Gizle</option></select>
+            <label for="showDifference" data-i18n="diffLabel">Grafikte fark</label>
+            <select id="showDifference"><option value="yes" data-i18n="diffShow">Göster</option><option value="no" data-i18n="diffHide">Gizle</option></select>
           </div>
-          <button class="btn btn-primary" id="calculateBtn">Günlük Raporu Hesapla</button>
-          <button class="btn btn-secondary" id="resetZoomBtn">Grafik Sıfırla</button>
+          <button class="btn btn-primary" id="calculateBtn" data-i18n="calculateBtn">Günlük Raporu Hesapla</button>
+          <button class="btn btn-secondary" id="resetZoomBtn" data-i18n="resetZoomBtn">Grafik Sıfırla</button>
         </div>
-        <div id="alignmentInfo" class="status-banner warn">Tarih seçip Günlük Raporu Hesapla butonuna basın.</div>
+        <div id="alignmentInfo" class="status-banner warn" data-i18n="alignmentInfoDefault">Tarih seçip Günlük Raporu Hesapla butonuna basın.</div>
       </div>
 
       <div class="panel">
         <div class="section-title">
           <div>
-            <h2>24 Saatlik Frekans Karşılaştırması</h2>
+            <h2 data-i18n="section24h">24 Saatlik Frekans Karşılaştırması</h2>
             <p id="frequencyChartDescription"></p>
           </div>
           <div class="chart-tags">
-            <span class="tag good" id="chartViewTag">24 saat • dakikalık</span>
-            <span class="tag" id="reportDateTag">Tarih seçilmedi</span>
+            <span class="tag good" id="chartViewTag" data-i18n="chartViewTag">24 saat • dakikalık</span>
+            <span class="tag" id="reportDateTag" data-i18n="reportDateTag">Tarih seçilmedi</span>
           </div>
         </div>
         <div class="kpi-grid" id="kpiGrid"></div>
@@ -721,8 +723,8 @@
       <div class="panel">
         <div class="section-title">
           <div>
-            <h3>Saatlik İstatistik Matrisi</h3>
-            <p>Tek tabloda Metrik ve 00–23 saat kolonları gösterilir. <span class="interaction-note">Saat başlığına tek tıklama saniyelik saat grafiğini, çift tıklama günlük grafiği açar.</span></p>
+            <h3 data-i18n="sectionHourlyMatrix">Saatlik İstatistik Matrisi</h3>
+            <p data-i18n="hourlyMatrixDesc">Tek tabloda Metrik ve 00–23 saat kolonları gösterilir. <span class="interaction-note" data-i18n="singleDoubleHint">Saat başlığına tek tıklama saniyelik saat grafiğini, çift tıklama günlük grafiği açar.</span></p>
           </div>
         </div>
         <div id="hourBlocks" class="hour-matrix-shell"></div>
@@ -731,8 +733,8 @@
       <div class="panel">
         <div class="section-title">
           <div>
-            <h3>15 Dakikalık Ortalama Mutlak Frekans Farkı</h3>
-            <p>Her hücre ilgili çeyrek saatteki eşlenmiş TEİAŞ–Netztransparenz farkının MAE değerini gösterir. <span class="interaction-note">Tek tıklama 900 saniyelik grafiği, çift tıklama günlük grafiği açar.</span></p>
+            <h3 data-i18n="sectionQuarterHeatmap">15 Dakikalık Ortalama Mutlak Frekans Farkı</h3>
+            <p data-i18n="quarterHeatmapDesc">Her hücre ilgili çeyrek saatteki eşlenmiş TEİAŞ–Netztransparenz farkının MAE değerini gösterir. <span class="interaction-note" data-i18n="singleDoubleHintQuarter">Tek tıklama 900 saniyelik grafiği, çift tıklama günlük grafiği açar.</span></p>
           </div>
         </div>
         <div id="quarterHeatmap" class="quarter-grid"></div>
@@ -744,35 +746,35 @@
       <div class="panel no-print">
         <div class="section-title">
           <div>
-            <h2>Alanlar Arası Osilasyon Taraması</h2>
+            <h2 data-i18n="sectionOscillation">Alanlar Arası Osilasyon Taraması</h2>
           </div>
           <div class="osc-source-selector">
-            <label for="oscSourceSelect">Analiz kaynağı</label>
+            <label for="oscSourceSelect" data-i18n="oscSourceLabel">Analiz kaynağı</label>
             <select id="oscSourceSelect">
-              <option value="tr" selected>TEİAŞ</option>
-              <option value="de">Netztransparenz</option>
+              <option value="tr" selected data-i18n="teias">TEİAŞ</option>
+              <option value="de" data-i18n="netz">Netztransparenz</option>
             </select>
           </div>
         </div>
         <div class="oscillation-controls">
-          <div class="field"><label for="bandMin">Alt bant (Hz)</label><input id="bandMin" type="number" min="0.01" max="0.45" step="0.01" value="0.10" /></div>
-          <div class="field"><label for="bandMax">Üst bant (Hz)</label><input id="bandMax" type="number" min="0.02" max="0.49" step="0.01" value="0.20" /></div>
-          <div class="field"><label for="oscThreshold">Genlik eşiği (mHz)</label><input id="oscThreshold" type="number" min="0.1" max="200" step="0.5" value="10" /></div>
-          <div class="field"><label for="windowSec">Pencere (sn)</label><input id="windowSec" type="number" min="30" max="900" step="10" value="120" /></div>
-          <div class="field"><label for="stepSec">Adım (sn)</label><input id="stepSec" type="number" min="1" max="120" step="1" value="10" /></div>
-          <div class="field"><label for="filterTaps">FIR kademe (tek)</label><input id="filterTaps" type="number" min="31" max="401" step="2" value="101" /></div>
-          <div class="field"><label for="minDuration">Min. olay süresi (sn)</label><input id="minDuration" type="number" min="10" max="1800" step="10" value="30" /></div>
-          <button class="btn btn-success" id="oscCalculateBtn">Hesaplama Yap</button>
+          <div class="field"><label for="bandMin" data-i18n="bandMinLabel">Alt bant (Hz)</label><input id="bandMin" type="number" min="0.01" max="0.45" step="0.01" value="0.10" /></div>
+          <div class="field"><label for="bandMax" data-i18n="bandMaxLabel">Üst bant (Hz)</label><input id="bandMax" type="number" min="0.02" max="0.49" step="0.01" value="0.20" /></div>
+          <div class="field"><label for="oscThreshold" data-i18n="oscThresholdLabel">Genlik eşiği (mHz)</label><input id="oscThreshold" type="number" min="0.1" max="200" step="0.5" value="10" /></div>
+          <div class="field"><label for="windowSec" data-i18n="windowSecLabel">Pencere (sn)</label><input id="windowSec" type="number" min="30" max="900" step="10" value="120" /></div>
+          <div class="field"><label for="stepSec" data-i18n="stepSecLabel">Adım (sn)</label><input id="stepSec" type="number" min="1" max="120" step="1" value="10" /></div>
+          <div class="field"><label for="filterTaps" data-i18n="filterTapsLabel">FIR kademe (tek)</label><input id="filterTaps" type="number" min="31" max="401" step="2" value="101" /></div>
+          <div class="field"><label for="minDuration" data-i18n="minDurationLabel">Min. olay süresi (sn)</label><input id="minDuration" type="number" min="10" max="1800" step="10" value="30" /></div>
+          <button class="btn btn-success" id="oscCalculateBtn" data-i18n="oscCalculateBtn">Hesaplama Yap</button>
         </div>
-        <div id="oscStatus" class="status-banner warn">Önce Günlük Frekans sekmesinde rapor hesaplayın.</div>
+        <div id="oscStatus" class="status-banner warn" data-i18n="oscStatusDefault">Önce Günlük Frekans sekmesinde rapor hesaplayın.</div>
       </div>
 
       <div class="panel">
         <div class="section-title">
           <div>
-            <h3 id="oscChartTitle">Seçilen Kaynağın Bant Geçiren Bileşeni ve Bulgular</h3>
+            <h3 id="oscChartTitle" data-i18n="oscChartTitle">Seçilen Kaynağın Bant Geçiren Bileşeni ve Bulgular</h3>
           </div>
-          <span class="tag" id="oscCountTag">0 bulgu</span>
+          <span class="tag" id="oscCountTag" data-i18n="oscCountTag">0 bulgu</span>
         </div>
         <div id="oscillationChart" class="chart tall"></div>
       </div>
@@ -780,16 +782,16 @@
       <div class="panel">
         <div class="section-title">
           <div>
-            <h3>Osilasyon Bulguları</h3>
-            <p>Bir satıra tıklayarak grafiği ilgili zaman aralığına yakınlaştırabilirsiniz.</p>
+            <h3 data-i18n="sectionOscResults">Osilasyon Bulguları</h3>
+            <p data-i18n="oscResultsDesc">Bir satıra tıklayarak grafiği ilgili zaman aralığına yakınlaştırabilirsiniz.</p>
           </div>
         </div>
         <div class="table-wrap">
           <table>
             <thead>
-              <tr><th>No</th><th>Başlangıç</th><th>Bitiş</th><th>Süre</th><th>Tepe genlik</th><th>RMS</th><th>Baskın frekans</th><th>Pencere</th><th id="eventSourceMeanHead">TEİAŞ ort.</th><th id="eventSourceRangeHead">TEİAŞ min–maks</th><th>Sınıflandırma</th></tr>
+              <tr><th data-i18n="oscThNo">No</th><th data-i18n="oscThStart">Başlangıç</th><th data-i18n="oscThEnd">Bitiş</th><th data-i18n="oscThDuration">Süre</th><th data-i18n="oscThPeak">Tepe genlik</th><th data-i18n="oscThRms">RMS</th><th data-i18n="oscThDominant">Baskın frekans</th><th data-i18n="oscThWindow">Pencere</th><th id="eventSourceMeanHead" data-i18n="oscThSourceMean">TEİAŞ ort.</th><th id="eventSourceRangeHead" data-i18n="oscThSourceRange">TEİAŞ min–maks</th><th data-i18n="oscThClass">Sınıflandırma</th></tr>
             </thead>
-            <tbody id="eventBody"><tr><td colspan="11" class="empty-state">Henüz osilasyon analizi yapılmadı.</td></tr></tbody>
+            <tbody id="eventBody"><tr><td colspan="11" class="empty-state" data-i18n="oscNoAnalysis">Henüz osilasyon analizi yapılmadı.</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -800,10 +802,10 @@
       <div class="panel">
         <div class="section-title">
           <div>
-            <h3>Veri Yükleme</h3>
+            <h3 data-i18n="sectionDataLoad">Veri Yükleme</h3>
           </div>
           <div class="button-row">
-            <button class="btn btn-danger" id="clearDataBtn">Yüklenen Verileri Temizle</button>
+            <button class="btn btn-danger" id="clearDataBtn" data-i18n="clearDataBtn">Yüklenen Verileri Temizle</button>
           </div>
         </div>
 
@@ -813,12 +815,12 @@
               <div>
                 <h3>Netztransparenz</h3>
               </div>
-              <span class="tag">Aylık CSV</span>
+              <span class="tag" data-i18n="monthlyCsv">Aylık CSV</span>
             </div>
             <label class="drop-zone" id="deDrop" for="deFiles">
               <span class="drop-icon">DE</span>
-              <strong>CSV dosyasını seçin veya sürükleyin</strong>
-              <small>Örnek: Frequenz_20260601_20260630.csv</small>
+              <strong data-i18n="netzDropTitle">CSV dosyasını seçin veya sürükleyin</strong>
+              <small data-i18n="netzDropExample">Örnek: Frequenz_20260601_20260630.csv</small>
             </label>
             <input class="hidden-input" id="deFiles" type="file" accept=".csv,text/csv" />
           </div>
@@ -828,12 +830,12 @@
               <div>
                 <h3>TEİAŞ</h3>
               </div>
-              <span class="tag">Çoklu günlük</span>
+              <span class="tag" data-i18n="multiDaily">Çoklu günlük</span>
             </div>
             <label class="drop-zone" id="trDrop" for="trFiles">
               <span class="drop-icon">TR</span>
-              <strong>Bir veya birden fazla günlük CSV seçin</strong>
-              <small>Örnek: 20260603.csv, 20260604.csv…</small>
+              <strong data-i18n="teiasDropTitle">Bir veya birden fazla günlük CSV seçin</strong>
+              <small data-i18n="teiasDropExample">Örnek: 20260603.csv, 20260604.csv…</small>
             </label>
             <input class="hidden-input" id="trFiles" type="file" accept=".csv,text/csv" multiple />
           </div>
@@ -841,37 +843,37 @@
 
         <div class="progress-wrap" id="parseProgress">
           <div class="progress-track"><div class="progress-bar" id="parseProgressBar"></div></div>
-          <div class="progress-text" id="parseProgressText">Dosya hazırlanıyor…</div>
+          <div class="progress-text" id="parseProgressText" data-i18n="progressText">Dosya hazırlanıyor…</div>
         </div>
-        <div id="loadStatus" class="status-banner">Henüz veri yüklenmedi.</div>
+        <div id="loadStatus" class="status-banner" data-i18n="loadStatusDefault">Henüz veri yüklenmedi.</div>
       </div>
 
       <div class="panel">
         <div class="section-title">
           <div>
-            <h3>GitHub Pages Otomatik Veri</h3>
-            <p id="autoDataSummary">Statik veri kataloğu denetleniyor.</p>
+            <h3 data-i18n="sectionAutoData">GitHub Pages Otomatik Veri</h3>
+            <p id="autoDataSummary" data-i18n="autoDataSummary">Statik veri kataloğu denetleniyor.</p>
           </div>
           <div class="button-row">
-            <span class="tag" id="autoModeBadge">Kontrol</span>
-            <button class="btn btn-primary" id="useAutoDataBtn" type="button" disabled>Otomatik Veri</button>
-            <button class="btn btn-secondary" id="useManualDataBtn" type="button">Manuel CSV</button>
-            <button class="btn btn-secondary" id="reloadAutoDataBtn" type="button">Yenile</button>
+            <span class="tag" id="autoModeBadge" data-i18n="autoModeBadge">Kontrol</span>
+            <button class="btn btn-primary" id="useAutoDataBtn" type="button" disabled data-i18n="useAutoDataBtn">Otomatik Veri</button>
+            <button class="btn btn-secondary" id="useManualDataBtn" type="button" data-i18n="useManualDataBtn">Manuel CSV</button>
+            <button class="btn btn-secondary" id="reloadAutoDataBtn" type="button" data-i18n="reloadAutoDataBtn">Yenile</button>
           </div>
         </div>
         <div class="auto-data-grid">
           <div class="auto-data-card">
-            <div class="label">TEİAŞ</div>
+            <div class="label" data-i18n="teias">TEİAŞ</div>
             <div class="value" id="autoTeiasValue">-</div>
-            <div class="sub" id="autoTeiasMeta">Manifest bekleniyor.</div>
+            <div class="sub" id="autoTeiasMeta" data-i18n="autoTeiasMetaDefault">Manifest bekleniyor.</div>
           </div>
           <div class="auto-data-card">
-            <div class="label">Netztransparenz</div>
+            <div class="label" data-i18n="netz">Netztransparenz</div>
             <div class="value" id="autoDeValue">-</div>
-            <div class="sub" id="autoDeMeta">Manifest bekleniyor.</div>
+            <div class="sub" id="autoDeMeta" data-i18n="autoDeMetaDefault">Manifest bekleniyor.</div>
           </div>
           <div class="auto-data-card">
-            <div class="label">Durum</div>
+            <div class="label" data-i18n="statusLabel">Durum</div>
             <div class="value" id="autoStatusValue">-</div>
             <div class="sub" id="autoStatusMeta">-</div>
           </div>
@@ -885,18 +887,18 @@
       <div class="panel">
         <div class="section-title">
           <div>
-            <h3>Veri Envanteri</h3>
+            <h3 data-i18n="sectionInventory">Veri Envanteri</h3>
           </div>
         </div>
         <div class="table-wrap">
           <table class="inventory-table">
             <thead>
               <tr>
-                <th>Kaynak</th><th>Tarih</th><th>Kayıt</th><th>Eksik sn</th><th>Geçersiz</th><th>Yinelenen</th><th>Ort. Hz</th><th>Min Hz</th><th>Maks. Hz</th><th>Durum</th>
+                <th data-i18n="invThSource">Kaynak</th><th data-i18n="invThDate">Tarih</th><th data-i18n="invThRecord">Kayıt</th><th data-i18n="invThMissing">Eksik sn</th><th data-i18n="invThInvalid">Geçersiz</th><th data-i18n="invThDuplicate">Yinelenen</th><th data-i18n="invThMean">Ort. Hz</th><th data-i18n="invThMin">Min Hz</th><th data-i18n="invThMax">Maks. Hz</th><th data-i18n="invThStatus">Durum</th>
               </tr>
             </thead>
             <tbody id="inventoryBody">
-              <tr><td colspan="10" class="empty-state">Veri envanteri yükleme sonrasında oluşacaktır.</td></tr>
+              <tr><td colspan="10" class="empty-state" data-i18n="invEmptyState">Veri envanteri yükleme sonrasında oluşacaktır.</td></tr>
             </tbody>
           </table>
         </div>
@@ -905,39 +907,39 @@
       <div class="panel">
         <div class="section-title">
           <div>
-            <h3>Yapılandırma</h3>
+            <h3 data-i18n="sectionSettings">Yapılandırma</h3>
           </div>
           <div class="button-row">
-            <button class="btn btn-secondary" id="resetSettingsBtn">Varsayılanlara Dön</button>
-            <button class="btn btn-primary" id="saveSettingsBtn">Ayarları Kaydet</button>
+            <button class="btn btn-secondary" id="resetSettingsBtn" data-i18n="resetSettingsBtn">Varsayılanlara Dön</button>
+            <button class="btn btn-primary" id="saveSettingsBtn" data-i18n="saveSettingsBtn">Ayarları Kaydet</button>
           </div>
         </div>
 
         <div class="settings-grid">
           <div class="card settings-card">
-            <h3>Zaman Eşleştirme</h3>
-            <div class="field"><label for="setAlignment">Varsayılan yöntem</label><select id="setAlignment"><option value="utcAuto">UTC – otomatik</option><option value="sameLocal">Aynı yerel saat</option><option value="manual">Manuel</option></select></div>
-            <div class="field"><label for="teiasUtcOffset">TEİAŞ UTC ofseti</label><input id="teiasUtcOffset" type="number" step="0.5" value="3" /></div>
-            <div class="field"><label for="deWinterOffset">Almanya kış UTC ofseti</label><input id="deWinterOffset" type="number" step="0.5" value="1" /></div>
-            <div class="field"><label for="deSummerOffset">Almanya yaz UTC ofseti</label><input id="deSummerOffset" type="number" step="0.5" value="2" /></div>
-            <div class="field"><label for="manualOffsetSetting">Manuel TR→DE farkı (saat)</label><input id="manualOffsetSetting" type="number" step="0.5" value="1" /></div>
+            <h3 data-i18n="settingsAlignmentTitle">Zaman Eşleştirme</h3>
+            <div class="field"><label for="setAlignment" data-i18n="defaultMethodLabel">Varsayılan yöntem</label><select id="setAlignment"><option value="utcAuto" data-i18n="utcAuto">UTC – otomatik</option><option value="sameLocal" data-i18n="sameLocal">Aynı yerel saat</option><option value="manual" data-i18n="manualOption">Manuel</option></select></div>
+            <div class="field"><label for="teiasUtcOffset" data-i18n="teiasUtcOffsetLabel">TEİAŞ UTC ofseti</label><input id="teiasUtcOffset" type="number" step="0.5" value="3" /></div>
+            <div class="field"><label for="deWinterOffset" data-i18n="deWinterOffsetLabel">Almanya kış UTC ofseti</label><input id="deWinterOffset" type="number" step="0.5" value="1" /></div>
+            <div class="field"><label for="deSummerOffset" data-i18n="deSummerOffsetLabel">Almanya yaz UTC ofseti</label><input id="deSummerOffset" type="number" step="0.5" value="2" /></div>
+            <div class="field"><label for="manualOffsetSetting" data-i18n="manualOffsetSettingLabel">Manuel TR→DE farkı (saat)</label><input id="manualOffsetSetting" type="number" step="0.5" value="1" /></div>
           </div>
 
           <div class="card settings-card">
-            <h3>Veri Kalitesi</h3>
-            <div class="field"><label for="nominalFrequency">Nominal frekans (Hz)</label><input id="nominalFrequency" type="number" step="0.001" value="50" /></div>
-            <div class="field"><label for="validMin">Geçerli alt sınır (Hz)</label><input id="validMin" type="number" step="0.001" value="49" /></div>
-            <div class="field"><label for="validMax">Geçerli üst sınır (Hz)</label><input id="validMax" type="number" step="0.001" value="51" /></div>
-            <div class="field"><label for="maxGap">Doğrusal doldurma (sn)</label><input id="maxGap" type="number" min="0" max="30" step="1" value="2" /></div>
-            <div class="field"><label for="minPairedRatio">Min. eşlenmiş veri oranı (%)</label><input id="minPairedRatio" type="number" min="1" max="100" step="1" value="90" /></div>
+            <h3 data-i18n="settingsQualityTitle">Veri Kalitesi</h3>
+            <div class="field"><label for="nominalFrequency" data-i18n="nominalFreqLabel">Nominal frekans (Hz)</label><input id="nominalFrequency" type="number" step="0.001" value="50" /></div>
+            <div class="field"><label for="validMin" data-i18n="validMinLabel">Geçerli alt sınır (Hz)</label><input id="validMin" type="number" step="0.001" value="49" /></div>
+            <div class="field"><label for="validMax" data-i18n="validMaxLabel">Geçerli üst sınır (Hz)</label><input id="validMax" type="number" step="0.001" value="51" /></div>
+            <div class="field"><label for="maxGap" data-i18n="maxGapLabel">Doğrusal doldurma (sn)</label><input id="maxGap" type="number" min="0" max="30" step="1" value="2" /></div>
+            <div class="field"><label for="minPairedRatio" data-i18n="minPairedRatioLabel">Min. eşlenmiş veri oranı (%)</label><input id="minPairedRatio" type="number" min="1" max="100" step="1" value="90" /></div>
           </div>
 
           <div class="card settings-card">
-            <h3>Grafik</h3>
-            <div class="field"><label for="graphScale">Frekans Y ekseni</label><select id="graphScale"><option value="auto">Otomatik</option><option value="fixed">Sabit</option></select></div>
-            <div class="field"><label for="graphMin">Sabit minimum (Hz)</label><input id="graphMin" type="number" step="0.001" value="49.90" /></div>
-            <div class="field"><label for="graphMax">Sabit maksimum (Hz)</label><input id="graphMax" type="number" step="0.001" value="50.10" /></div>
-            <div class="field"><label for="chartStep">Osilasyon grafik adımı (sn)</label><input id="chartStep" type="number" min="1" max="30" step="1" value="5" /></div>
+            <h3 data-i18n="settingsGraphTitle">Grafik</h3>
+            <div class="field"><label for="graphScale" data-i18n="graphScaleLabel">Frekans Y ekseni</label><select id="graphScale"><option value="auto" data-i18n="graphScaleAuto">Otomatik</option><option value="fixed" data-i18n="graphScaleFixed">Sabit</option></select></div>
+            <div class="field"><label for="graphMin" data-i18n="graphMinLabel">Sabit minimum (Hz)</label><input id="graphMin" type="number" step="0.001" value="49.90" /></div>
+            <div class="field"><label for="graphMax" data-i18n="graphMaxLabel">Sabit maksimum (Hz)</label><input id="graphMax" type="number" step="0.001" value="50.10" /></div>
+            <div class="field"><label for="chartStep" data-i18n="chartStepLabel">Osilasyon grafik adımı (sn)</label><input id="chartStep" type="number" min="1" max="30" step="1" value="5" /></div>
           </div>
         </div>
       </div>
@@ -1380,7 +1382,8 @@
       stepSec: 10,
       filterTaps: 101,
       minDuration: 30,
-      oscillationSource: 'tr'
+      oscillationSource: 'tr',
+      locale: 'tr'
     };
 
     const AUTO_DATA_BASE = './data/';
@@ -1463,6 +1466,11 @@
       initDropZones();
       initButtons();
       applySettingsToForm();
+      // Dil başlatma
+      lang = state.settings.locale === 'en' ? 'en' : 'tr';
+      document.documentElement.setAttribute('data-current-lang', lang);
+      $('langToggle').textContent = t('langToggle');
+      applyTranslations();
       updateInventory();
       updateDateSelect();
       renderEmptyCharts();
@@ -1539,6 +1547,7 @@
       $('reloadAutoDataBtn').addEventListener('click', () => loadAutoDataCatalog({ force: true }));
       $('saveSettingsBtn').addEventListener('click', saveSettingsFromForm);
       $('resetSettingsBtn').addEventListener('click', resetSettings);
+      $('langToggle').addEventListener('click', () => setLanguage(lang === 'tr' ? 'en' : 'tr'));
 
       $('alignmentSelect').addEventListener('change', updateAlignmentInfo);
       $('manualOffsetGraph').addEventListener('change', updateAlignmentInfo);
@@ -1552,7 +1561,7 @@
       const missing = [];
       if (!window.echarts) missing.push('ECharts');
       if (missing.length) {
-        setBanner('loadStatus', `CDN yüklenemedi: ${missing.join(', ')}.`, 'warn');
+        setBanner('loadStatus', t('cdError', { libs: missing.join(', ') }), 'warn');
       }
     }
 
@@ -1585,7 +1594,7 @@
         updateDateSelect();
         if (hasTeias) {
           const latest = manifest.sources.teias.latestDate;
-          setBanner('loadStatus', `Otomatik veri kataloğu hazır. Son aktif TEİAŞ günü: ${displayDate(latest)}.`, 'success');
+          setBanner('loadStatus', t('autoDataReady', { date: displayDate(latest) }), 'success');
         }
       } catch (error) {
         state.auto.manifest = null;
@@ -1606,55 +1615,55 @@
 
       if (mode === 'loading') {
         $('autoModeBadge').className = 'tag warn';
-        $('autoModeBadge').textContent = 'Kontrol';
-        $('autoDataSummary').textContent = 'Statik veri kataloğu denetleniyor.';
+        $('autoModeBadge').textContent = t('tagCheck');
+        $('autoDataSummary').textContent = t('autoDataCatalog');
       } else if (mode === 'error' || state.auto.loadError) {
         $('autoModeBadge').className = 'tag bad';
-        $('autoModeBadge').textContent = 'Yok';
-        $('autoDataSummary').textContent = `Otomatik katalog okunamadı: ${state.auto.loadError}`;
+        $('autoModeBadge').textContent = t('tagNone');
+        $('autoDataSummary').textContent = t('autoDataCatalogError', { error: state.auto.loadError });
       } else if (hasAuto) {
         $('autoModeBadge').className = state.dataMode === 'auto' ? 'tag good' : 'tag warn';
-        $('autoModeBadge').textContent = state.dataMode === 'auto' ? 'Otomatik' : 'Manuel';
-        $('autoDataSummary').textContent = `Manifest ${formatUtc(manifest.updatedAtUtc)} tarihinde üretildi.`;
+        $('autoModeBadge').textContent = state.dataMode === 'auto' ? t('tagAuto') : t('tagManual');
+        $('autoDataSummary').textContent = t('autoDataManifestDate', { date: formatUtc(manifest.updatedAtUtc) });
       } else {
         $('autoModeBadge').className = 'tag warn';
-        $('autoModeBadge').textContent = 'Bekliyor';
-        $('autoDataSummary').textContent = 'Statik katalogda aktif TEİAŞ günü bulunamadı.';
+        $('autoModeBadge').textContent = t('tagWaiting');
+        $('autoDataSummary').textContent = t('autoDataNoTeias');
       }
 
       $('useAutoDataBtn').disabled = !hasAuto;
-      $('autoTeiasValue').textContent = teias?.availableDates?.length ? `${teias.availableDates.length} aktif gün` : '-';
+      $('autoTeiasValue').textContent = teias?.availableDates?.length ? t('autoTeiasDays', { count: teias.availableDates.length }) : '-';
       $('autoTeiasMeta').textContent = teias?.availableDates?.length
-        ? `${displayDate(teias.firstDate)} - ${displayDate(teias.latestDate)}; dışlanan ${teias.excludedDates?.length || 0} gün`
-        : 'Aktif TEİAŞ günü yok.';
-      $('autoDeValue').textContent = de?.availableDates?.length ? `${de.availableDates.length} gün` : '-';
+        ? t('autoTeiasMeta', { range: `${displayDate(teias.firstDate)} - ${displayDate(teias.latestDate)}`, excluded: teias.excludedDates?.length || 0 })
+        : t('autoNoTeiasDays');
+      $('autoDeValue').textContent = de?.availableDates?.length ? t('autoDeDays', { count: de.availableDates.length }) : '-';
       $('autoDeMeta').textContent = de?.availableDates?.length
-        ? `${displayDate(de.firstDate)} - ${displayDate(de.latestDate)}; manuel aylık import`
-        : 'Netztransparenz otomatik kaynak doğrulanmadı.';
+        ? t('autoDeMeta', { range: `${displayDate(de.firstDate)} - ${displayDate(de.latestDate)}` })
+        : t('autoNoDeMeta');
       $('autoStatusValue').textContent = status?.lastSuccessfulTeiasDataDate
         ? displayDate(status.lastSuccessfulTeiasDataDate)
         : (teias?.latestDate ? displayDate(teias.latestDate) : '-');
       $('autoStatusMeta').textContent = status
-        ? `${status.missingDayCount || 0} yayınlanmamış gün; son kontrol ${formatUtc(status.lastSuccessfulTeiasCheckUtc)}`
-        : 'Durum dosyası yok.';
+        ? t('autoStatusDays', { count: status.missingDayCount || 0, date: formatUtc(status.lastSuccessfulTeiasCheckUtc) })
+        : t('autoNoStatus');
     }
 
     function useAutoDataMode() {
       if (!state.auto.manifest?.sources?.teias?.availableDates?.length) {
-        alert('Otomatik veri manifesti bulunamadı.');
+        alert(t('autoManifestMissing'));
         return;
       }
       state.dataMode = 'auto';
       updateAutoDataPanel();
       updateDateSelect();
-      setBanner('loadStatus', 'Otomatik veri modu seçildi.', 'success');
+      setBanner('loadStatus', t('autoDataSelected'), 'success');
     }
 
     function useManualDataMode() {
       state.dataMode = 'manual';
       updateAutoDataPanel();
       updateDateSelect();
-      setBanner('loadStatus', 'Manuel CSV modu seçildi.', 'warn');
+      setBanner('loadStatus', t('manualDataSelected'), 'warn');
     }
 
     function isAutoLoaded(source, date) {
@@ -1689,7 +1698,7 @@
       ]);
 
       state.busy = true;
-      setBanner('loadStatus', `${displayDate(date)} otomatik verisi yükleniyor.`, 'warn');
+      setBanner('loadStatus', t('autoDataLoading', { date: displayDate(date) }), 'warn');
       try {
         const trLoaded = await loadAutoDay('teias', date);
         let deLoaded = false;
@@ -1697,9 +1706,9 @@
           deLoaded = (await loadAutoDay('netztransparenz', deDate)) || deLoaded;
         }
         updateInventory();
-        if (!trLoaded) throw new Error(`${displayDate(date)} için TEİAŞ otomatik verisi yok.`);
+        if (!trLoaded) throw new Error(t('autoDataNoTr', { date: displayDate(date) }));
         if (!deLoaded) {
-          setBanner('loadStatus', `${displayDate(date)} TEİAŞ verisi yüklendi; eşleşen Netztransparenz günü bulunamadı.`, 'warn');
+          setBanner('loadStatus', t('autoDataNoDe', { date: displayDate(date) }), 'warn');
         }
         return true;
       } finally {
@@ -1767,7 +1776,7 @@
     // -----------------------------
     function parseFiles(source, files) {
       if (state.busy) {
-        setBanner('loadStatus', 'Başka bir dosya işleniyor. Lütfen işlemin tamamlanmasını bekleyin.', 'warn');
+        setBanner('loadStatus', t('parseBusy'), 'warn');
         return;
       }
       if (!files.length) return;
@@ -1777,8 +1786,8 @@
       updateAutoDataPanel();
       $('parseProgress').classList.add('visible');
       $('parseProgressBar').style.width = '0%';
-      $('parseProgressText').textContent = 'Dosya okunuyor…';
-      setBanner('loadStatus', `${files.length} dosya ayrıştırılıyor. Büyük dosyalarda işlem birkaç dakika sürebilir.`, 'warn');
+      $('parseProgressText').textContent = t('parseReading');
+      setBanner('loadStatus', t('parsingFiles', { count: files.length }), 'warn');
       state.parserWorker.postMessage({ cmd: 'parse', source, files });
     }
 
@@ -1787,14 +1796,14 @@
       if (msg.type === 'progress') {
         const pct = Math.round((msg.fraction || 0) * 100);
         $('parseProgressBar').style.width = `${pct}%`;
-        $('parseProgressText').textContent = `${msg.fileName}: %${pct} • ${Number(msg.rows || 0).toLocaleString('tr-TR')} satır işlendi`;
+        $('parseProgressText').textContent = t('parsingProgress', { file: msg.fileName, pct, rows: Number(msg.rows || 0).toLocaleString(t('localeNumeric')) });
         return;
       }
 
       if (msg.type === 'error') {
         state.busy = false;
         $('parseProgress').classList.remove('visible');
-        setBanner('loadStatus', `Dosya ayrıştırma hatası: ${msg.message}`, 'error');
+        setBanner('loadStatus', t('parsingError', { msg: msg.message }), 'error');
         return;
       }
 
@@ -1808,9 +1817,9 @@
         }
         state.busy = false;
         $('parseProgressBar').style.width = '100%';
-        $('parseProgressText').textContent = `${msg.days.length} günlük veri başarıyla belleğe alındı.`;
+        $('parseProgressText').textContent = t('parsingDone', { days: msg.days.length });
         setTimeout(() => $('parseProgress').classList.remove('visible'), 1200);
-        setBanner('loadStatus', `${msg.source === 'de' ? 'Netztransparenz' : 'TEİAŞ'} verisi yüklendi. Toplam ${state.de.size} Almanya günü ve ${state.tr.size} TEİAŞ günü mevcut.`, 'success');
+        setBanner('loadStatus', t('parsingSourceLoaded', { source: msg.source === 'de' ? t('sourceDe') : t('sourceTr'), deCount: state.de.size, trCount: state.tr.size }), 'success');
         updateInventory();
         updateDateSelect();
       }
@@ -1820,27 +1829,27 @@
       const body = $('inventoryBody');
       const rows = [...state.quality].sort((a, b) => a.date.localeCompare(b.date) || a.source.localeCompare(b.source));
       if (!rows.length) {
-        body.innerHTML = '<tr><td colspan="10" class="empty-state">Veri envanteri yükleme sonrasında oluşacaktır.</td></tr>';
+        body.innerHTML = `<tr><td colspan="10" class="empty-state" data-i18n="invEmptyState">${t('invEmptyState')}</td></tr>`;
         return;
       }
 
       body.innerHTML = rows.map(q => {
-        const sourceName = q.source === 'de' ? 'Netztransparenz' : 'TEİAŞ';
+        const sourceName = q.source === 'de' ? t('sourceDe') : t('sourceTr');
         const complete = q.count === 86400 && q.invalid === 0;
-        const tag = q.status ? statusTag(q.status, q.qualityScore) : complete ? '<span class="tag good">Tam</span>' : q.count >= 85000 ? '<span class="tag warn">Kısmi</span>' : '<span class="tag bad">Eksik</span>';
+        const tag = q.status ? statusTag(q.status, q.qualityScore) : complete ? `<span class="tag good">${t('tagComplete')}</span>` : q.count >= 85000 ? `<span class="tag warn">${t('tagPartial')}</span>` : `<span class="tag bad">${t('tagMissing')}</span>`;
         return `<tr>
-          <td>${sourceName}</td><td>${displayDate(q.date)}</td><td>${q.count.toLocaleString('tr-TR')}</td>
-          <td>${q.missing.toLocaleString('tr-TR')}</td><td>${q.invalid.toLocaleString('tr-TR')}</td><td>${q.duplicates.toLocaleString('tr-TR')}</td>
+          <td>${sourceName}</td><td>${displayDate(q.date)}</td><td>${q.count.toLocaleString(t('localeNumeric'))}</td>
+          <td>${q.missing.toLocaleString(t('localeNumeric'))}</td><td>${q.invalid.toLocaleString(t('localeNumeric'))}</td><td>${q.duplicates.toLocaleString(t('localeNumeric'))}</td>
           <td>${fmt(q.mean)}</td><td>${fmt(q.min)}</td><td>${fmt(q.max)}</td><td>${tag}</td>
         </tr>`;
       }).join('');
     }
 
     function statusTag(status, score) {
-      if (status === 'complete') return `<span class="tag good">Tam ${score ?? ''}</span>`;
-      if (status === 'partial') return `<span class="tag warn">Kısmi ${score ?? ''}</span>`;
-      if (status === 'critical') return `<span class="tag bad">Kritik ${score ?? ''}</span>`;
-      return '<span class="tag bad">Geçersiz</span>';
+      if (status === 'complete') return `<span class="tag good">${t('tagComplete')} ${score ?? ''}</span>`;
+      if (status === 'partial') return `<span class="tag warn">${t('tagPartial')} ${score ?? ''}</span>`;
+      if (status === 'critical') return `<span class="tag bad">${t('tagCritical')} ${score ?? ''}</span>`;
+      return `<span class="tag bad">${t('tagInvalid')}</span>`;
     }
 
     function updateDateSelect() {
@@ -1859,8 +1868,13 @@
       const year = date.getFullYear();
       const month = date.getMonth();
 
-      const monthNames = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
-      monthYear.textContent = `${monthNames[month]} ${year}`;
+      const monthNames = t('months');
+      if (!monthNames?.length || monthNames.length < 12) {
+        const fallback = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+        monthYear.textContent = `${fallback[month]} ${year}`;
+      } else {
+        monthYear.textContent = `${monthNames[month]} ${year}`;
+      }
 
       const firstDay = new Date(year, month, 1).getDay();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -1877,7 +1891,10 @@
       const trPrefix = (d) => teiasDates.has(d) ? '<span class="cal-dot teias"></span>' : '';
       const dePrefix = (d) => deDates.has(d) ? '<span class="cal-dot netz"></span>' : '';
 
-      const headerDays = ['Pt','Sa','Ça','Pe','Cu','Ct','Pz'];
+      let headerDays = t('dayHeaders');
+      if (!headerDays?.length || headerDays.length < 7) {
+        headerDays = ['Pt','Sa','Ça','Pe','Cu','Ct','Pz'];
+      }
       let html = headerDays.map(d => `<div class="cal-header">${d}</div>`).join('');
 
       for (let i = firstDay === 0 ? 6 : firstDay - 1; i > 0; i--) {
@@ -1894,7 +1911,7 @@
       grid.innerHTML = html;
 
       const toggleText = $('calToggleText');
-      toggleText.textContent = hidden.value ? displayDate(hidden.value) : 'Tarih seçin';
+      toggleText.textContent = hidden.value ? displayDate(hidden.value) : t('calToggleText');
 
       grid.querySelectorAll('.cal-day[data-date]').forEach(day => {
         day.addEventListener('click', () => {
@@ -1909,7 +1926,7 @@
     }
 
     function clearData() {
-      if (!confirm('Tarayıcı belleğindeki tüm yüklenmiş frekans verileri temizlensin mi?')) return;
+      if (!confirm(t('confirmClear'))) return;
       state.de.clear();
       state.tr.clear();
       state.quality = [];
@@ -1918,7 +1935,7 @@
       state.current = null;
       state.events = [];
       state.filteredOscillation = null;
-      state.chartView = { mode: 'day', start: 0, end: 86400, label: '24 saat • dakikalık' };
+      state.chartView = { mode: 'day', start: 0, end: 86400, label: t('chartViewTag') };
       updateInventory();
       updateAutoDataPanel();
       updateDateSelect();
@@ -1926,8 +1943,8 @@
       renderKpis(null);
       renderQuarterHeatmap(null);
       renderHourBlocks(null);
-      $('eventBody').innerHTML = '<tr><td colspan="11" class="empty-state">Henüz osilasyon analizi yapılmadı.</td></tr>';
-      setBanner('loadStatus', 'Yüklenen veriler temizlendi.', 'success');
+      $('eventBody').innerHTML = `<tr><td colspan="11" class="empty-state">${t('oscNoAnalysis')}</td></tr>`;
+      setBanner('loadStatus', t('dataCleared'), 'success');
     }
 
     // -----------------------------
@@ -1936,28 +1953,28 @@
     function updateAlignmentInfo() {
       const date = $('dateSelect').value;
       if (!date) {
-        setBanner('alignmentInfo', 'Zaman eşleştirme bilgisi veri ve tarih seçildiğinde gösterilecektir.', 'warn');
+        setBanner('alignmentInfo', t('alignDescDefault'), 'warn');
         return;
       }
       const { mode, deltaHours, description } = getAlignment(date);
       $('manualOffsetGraph').disabled = mode !== 'manual';
       const example = shiftSecondLabel(0, -Math.round(deltaHours * 3600), date);
-      setBanner('alignmentInfo', `${description} TEİAŞ ${displayDate(date)} 00:00:00 kaydı, Netztransparenz ${displayDate(example.date)} ${secondToTime(example.second)} kaydıyla eşleştirilir.`, 'warn');
+      setBanner('alignmentInfo', t('alignInfo', { desc: description, trDate: displayDate(date), deDate: displayDate(example.date), deTime: secondToTime(example.second) }), 'warn');
     }
 
     function getAlignment(date) {
       const mode = $('alignmentSelect')?.value || state.settings.alignmentMode;
-      if (mode === 'sameLocal') return { mode, deltaHours: 0, description: 'Aynı yerel saat karşılaştırması seçildi.' };
+      if (mode === 'sameLocal') return { mode, deltaHours: 0, description: t('alignDescSameLocal') };
       if (mode === 'manual') {
         const deltaHours = Number($('manualOffsetGraph').value || state.settings.manualOffsetHours);
-        return { mode, deltaHours, description: `Manuel eşleştirme seçildi; Almanya yerel saati = TEİAŞ yerel saati − ${deltaHours} saat.` };
+        return { mode, deltaHours, description: t('alignDescManual', { delta: deltaHours }) };
       }
       const deOffset = germanyUtcOffset(date);
       const deltaHours = Number(state.settings.teiasUtcOffset) - deOffset;
       return {
         mode,
         deltaHours,
-        description: `UTC otomatik eşleştirme seçildi; TEİAŞ UTC${signed(state.settings.teiasUtcOffset)}, Almanya UTC${signed(deOffset)}, fark ${deltaHours} saat.`
+        description: t('alignDescUtcAuto', { teias: signed(state.settings.teiasUtcOffset), de: signed(deOffset), delta: deltaHours })
       };
     }
 
@@ -1997,20 +2014,20 @@
     async function calculateDailyReport() {
       const date = $('dateSelect').value;
       if (!date) {
-        alert('Lütfen TEİAŞ verisi bulunan bir gün seçin.');
+        alert(t('noDateSelected'));
         return;
       }
       if (state.dataMode === 'auto') {
         try {
           await ensureAutoDataForReport(date);
         } catch (error) {
-          setBanner('loadStatus', `Otomatik veri yüklenemedi: ${error?.message || error}`, 'error');
-          alert(`Otomatik veri yüklenemedi: ${error?.message || error}`);
+          setBanner('loadStatus', t('autoDataError', { error: error?.message || error }), 'error');
+          alert(t('autoDataError', { error: error?.message || error }));
           return;
         }
       }
       if (!state.tr.has(date)) {
-        alert('Lütfen TEİAŞ verisi bulunan bir gün seçin.');
+        alert(t('noDateSelected'));
         return;
       }
 
@@ -2054,7 +2071,7 @@
       };
       state.events = [];
       state.filteredOscillation = null;
-      state.chartView = { mode: 'day', start: 0, end: 86400, label: '24 saat • dakikalık' };
+      state.chartView = { mode: 'day', start: 0, end: 86400, label: t('chartViewTag') };
 
       renderKpis(state.current);
       renderFrequencyChart(state.current);
@@ -2064,11 +2081,11 @@
       $('reportDateTag').textContent = displayDate(date);
 
       const qualityMessage = pairedRatio >= state.settings.minPairedRatio
-        ? `Günlük rapor hesaplandı. Eşlenmiş veri oranı %${pairedRatio.toFixed(2)}.`
-        : `Günlük rapor hesaplandı; eşlenmiş veri oranı yalnızca %${pairedRatio.toFixed(2)}. Sonuçları veri kalitesi uyarısıyla değerlendirin.`;
+        ? t('reportReady', { ratio: pairedRatio.toFixed(2) })
+        : t('reportLowQuality', { ratio: pairedRatio.toFixed(2) });
       setBanner('alignmentInfo', `${qualityMessage} ${alignment.description}`, pairedRatio >= state.settings.minPairedRatio ? 'success' : 'warn');
       updateOscillationSourceUi();
-      setBanner('oscStatus', `${sourceLabel($('oscSourceSelect').value)} günlük frekans verisi analize hazır. Parametreleri kontrol ederek “Hesaplama Yap” düğmesine basın.`, 'success');
+      setBanner('oscStatus', t('reportOscReady', { source: sourceLabel($('oscSourceSelect').value) }), 'success');
     }
 
     function sanitizeAndInterpolate(input, settings) {
@@ -2176,7 +2193,7 @@
     function renderFrequencyEmpty() {
       if (!state.frequencyChart) return;
       state.frequencyChart.setOption({
-        title: { text: 'Veri yüklendikten sonra günlük grafik burada gösterilecektir', left: 'center', top: 'middle', textStyle: { color: '#71808e', fontSize: 14, fontWeight: 500 } },
+        title: { text: t('chartEmpty'), left: 'center', top: 'middle', textStyle: { color: '#71808e', fontSize: 14, fontWeight: 500 } },
         xAxis: { show: false }, yAxis: { show: false }, series: []
       }, true);
     }
@@ -2185,29 +2202,31 @@
       updateOscillationSourceUi();
       if (!state.oscillationChart) return;
       state.oscillationChart.setOption({
-        title: { text: 'Osilasyon analizi sonucu burada gösterilecektir', left: 'center', top: 'middle', textStyle: { color: '#71808e', fontSize: 14, fontWeight: 500 } },
+        title: { text: t('oscChartEmpty'), left: 'center', top: 'middle', textStyle: { color: '#71808e', fontSize: 14, fontWeight: 500 } },
         xAxis: { show: false }, yAxis: { show: false }, series: []
       }, true);
-      $('oscCountTag').textContent = '0 bulgu';
-      $('eventBody').innerHTML = '<tr><td colspan="11" class="empty-state">Henüz osilasyon analizi yapılmadı.</td></tr>';
+      $('oscCountTag').textContent = t('oscCountTag');
+      $('eventBody').innerHTML = `<tr><td colspan="11" class="empty-state">${t('oscNoAnalysis')}</td></tr>`;
     }
 
     function renderKpis(current) {
       const grid = $('kpiGrid');
+      const kpiLabels = [t('kpiTeiasMean'), t('kpiDeMean'), t('kpiTeiasAbsDev'), t('kpiDeAbsDev'), t('kpiBias'), t('kpiMae'), t('kpiCorrelation'), t('kpiPairedData')];
       if (!current) {
-        grid.innerHTML = Array.from({ length: 8 }, (_, i) => `<div class="kpi"><div class="label">${['TEİAŞ Ortalama','DE Ortalama','TEİAŞ Ort. |Δf|','DE Ort. |Δf|','Bias','MAE','Korelasyon','Ortak Veri'][i]}</div><div class="value">—</div><div class="sub">Rapor bekleniyor</div></div>`).join('');
+        grid.innerHTML = Array.from({ length: 8 }, (_, i) => `<div class="kpi"><div class="label">${kpiLabels[i]}</div><div class="value">—</div><div class="sub">${t('kpiReportPending')}</div></div>`).join('');
         return;
       }
       const s = current.overall;
+      const mx = lang === 'en' ? 'Max' : 'Maks';
       const cards = [
-        ['TEİAŞ Ortalama', `${fmt(s.meanA)} Hz`, `Min ${fmt(s.minA)} • Maks ${fmt(s.maxA)}`],
-        ['DE Ortalama', `${fmt(s.meanB)} Hz`, `Min ${fmt(s.minB)} • Maks ${fmt(s.maxB)}`],
-        ['TEİAŞ Ort. |Δf|', `${fmt(s.meanAbsDevA, 1)} mHz`, `Maks ${fmt(s.maxAbsDevA, 1)} mHz`],
-        ['DE Ort. |Δf|', `${fmt(s.meanAbsDevB, 1)} mHz`, `Maks ${fmt(s.maxAbsDevB, 1)} mHz`],
-        ['Bias', `${fmt(s.biasMhz, 2)} mHz`, 'TEİAŞ − Netztransparenz'],
-        ['MAE', `${fmt(s.maeMhz, 2)} mHz`, `RMSE ${fmt(s.rmseMhz, 2)} mHz`],
-        ['Korelasyon', fmt(s.correlation, 4), 'Saniyelik ortak kayıtlar'],
-        ['Ortak Veri', `%${fmt(s.pairedCount / 864, 2)}`, `${s.pairedCount.toLocaleString('tr-TR')} saniye`]
+        [t('kpiTeiasMean'), `${fmt(s.meanA)} Hz`, `Min ${fmt(s.minA)} • ${mx} ${fmt(s.maxA)}`],
+        [t('kpiDeMean'), `${fmt(s.meanB)} Hz`, `Min ${fmt(s.minB)} • ${mx} ${fmt(s.maxB)}`],
+        [t('kpiTeiasAbsDev'), `${fmt(s.meanAbsDevA, 1)} mHz`, `${mx} ${fmt(s.maxAbsDevA, 1)} mHz`],
+        [t('kpiDeAbsDev'), `${fmt(s.meanAbsDevB, 1)} mHz`, `${mx} ${fmt(s.maxAbsDevB, 1)} mHz`],
+        [t('kpiBias'), `${fmt(s.biasMhz, 2)} mHz`, `${t('sourceTr')} − ${t('sourceDe')}`],
+        [t('kpiMae'), `${fmt(s.maeMhz, 2)} mHz`, `RMSE ${fmt(s.rmseMhz, 2)} mHz`],
+        [t('kpiCorrelation'), fmt(s.correlation, 4), `${t('kpiPairedData')}`],
+        [t('kpiPairedData'), `%${fmt(s.pairedCount / 864, 2)}`, `${s.pairedCount.toLocaleString(t('localeNumeric'))} ${t('kpiPairedData')}`]
       ];
       grid.innerHTML = cards.map(c => `<div class="kpi"><div class="label">${c[0]}</div><div class="value">${c[1]}</div><div class="sub">${c[2]}</div></div>`).join('');
     }
@@ -2257,13 +2276,14 @@
             const second = Math.round(params?.[0]?.value?.[0] ?? 0);
             const lines = params.map(p => {
               const value = p.value?.[1];
-              const unit = p.seriesName === 'Fark' ? ' mHz' : ' Hz';
-              return `${p.marker}${p.seriesName}: ${Number.isFinite(value) ? Number(value).toFixed(p.seriesName === 'Fark' ? 2 : 4) + unit : '—'}`;
+              const isDiff = p.seriesName === t('seriesDiff');
+              const unit = isDiff ? t('tooltipDiffUnit') : t('tooltipFreqUnit');
+              return `${p.marker}${p.seriesName}: ${Number.isFinite(value) ? Number(value).toFixed(isDiff ? 2 : 4) + unit : '—'}`;
             }).join('<br>');
             return `<strong>${secondToTime(second)}</strong><br>${lines}`;
           }
         },
-        legend: { top: 8, data: showDiff ? ['TEİAŞ', 'Netztransparenz', 'Fark'] : ['TEİAŞ', 'Netztransparenz'] },
+        legend: { top: 8, data: showDiff ? [t('seriesTr'), t('seriesDe'), t('seriesDiff')] : [t('seriesTr'), t('seriesDe')] },
         grid: { left: 62, right: showDiff ? 68 : 28, top: 54, bottom: 72 },
         xAxis: {
           type: 'value', min: axisMin, max: axisMax, boundaryGap: false,
@@ -2274,14 +2294,14 @@
           }
         },
         yAxis: [
-          { type: 'value', name: 'Frekans (Hz)', scale: true, min: fixed ? state.settings.graphMin : null, max: fixed ? state.settings.graphMax : null, axisLabel: { formatter: v => v.toFixed(3) }, splitLine: { lineStyle: { color: '#e5edf2' } } },
-          { type: 'value', name: 'Fark (mHz)', show: showDiff, axisLabel: { formatter: v => v.toFixed(0) } }
+          { type: 'value', name: t('yAxisFreq'), scale: true, min: fixed ? state.settings.graphMin : null, max: fixed ? state.settings.graphMax : null, axisLabel: { formatter: v => v.toFixed(3) }, splitLine: { lineStyle: { color: '#e5edf2' } } },
+          { type: 'value', name: t('yAxisDiff'), show: showDiff, axisLabel: { formatter: v => v.toFixed(0) } }
         ],
         dataZoom: [{ type: 'inside', filterMode: 'none' }, { type: 'slider', filterMode: 'none', height: 22, bottom: 18, start: 0, end: 100 }],
         series: [
-          { name: 'TEİAŞ', type: 'line', data: tr, symbol: 'none', connectNulls: false, sampling: detailMode ? undefined : 'lttb', progressive: 6000, lineStyle: { width: detailMode ? 1.2 : 1.5 } },
-          { name: 'Netztransparenz', type: 'line', data: de, symbol: 'none', connectNulls: false, sampling: detailMode ? undefined : 'lttb', progressive: 6000, lineStyle: { width: detailMode ? 1.2 : 1.5 } },
-          ...(showDiff ? [{ name: 'Fark', type: 'line', yAxisIndex: 1, data: diff, symbol: 'none', connectNulls: false, sampling: detailMode ? undefined : 'lttb', lineStyle: { width: 1, type: 'dashed' } }] : [])
+          { name: t('seriesTr'), type: 'line', data: tr, symbol: 'none', connectNulls: false, sampling: detailMode ? undefined : 'lttb', progressive: 6000, lineStyle: { width: detailMode ? 1.2 : 1.5 } },
+          { name: t('seriesDe'), type: 'line', data: de, symbol: 'none', connectNulls: false, sampling: detailMode ? undefined : 'lttb', progressive: 6000, lineStyle: { width: detailMode ? 1.2 : 1.5 } },
+          ...(showDiff ? [{ name: t('seriesDiff'), type: 'line', yAxisIndex: 1, data: diff, symbol: 'none', connectNulls: false, sampling: detailMode ? undefined : 'lttb', lineStyle: { width: 1, type: 'dashed' } }] : [])
         ]
       }, true);
 
@@ -2291,17 +2311,17 @@
     function updateChartViewTag(view) {
       const tag = $('chartViewTag');
       const description = $('frequencyChartDescription');
-      if (tag) tag.textContent = view?.label || '24 saat • dakikalık';
+      if (tag) tag.textContent = view?.label || t('chartViewTag');
       if (description) {
         description.textContent = view?.mode === 'day'
-          ? 'Günlük görünümde 86.400 örnek dakikalık ortalamaya indirgenir; istatistikler saniyelik ortak kayıtlardan hesaplanır.'
-          : `${view.label} görünümünde saniyelik çözünürlük kullanılır ve ${Number(view.end - view.start).toLocaleString('tr-TR')} veri noktası çizilir.`;
+          ? t('chartDescDay')
+          : t('chartDescDetail', { label: view.label, count: Number(view.end - view.start).toLocaleString(t('localeNumeric')) });
       }
     }
 
     function showDailyFrequencyChart() {
       if (!state.current) return;
-      renderFrequencyChart(state.current, { mode: 'day', start: 0, end: 86400, label: '24 saat • dakikalık' });
+      renderFrequencyChart(state.current, { mode: 'day', start: 0, end: 86400, label: t('chartViewTag') });
     }
 
     function showFrequencyInterval(start, end, mode, label) {
@@ -2320,7 +2340,7 @@
       root.innerHTML = current.quarters.map(row => {
         const quarter = row.quarter;
         const color = heatColor(row.maeMhz, 0, max, false);
-        return `<div class="quarter-hour" tabindex="0" data-quarter="${quarter}" style="background:${color}" title="${quarterLabel(quarter)} • MAE ${fmt(row.maeMhz, 2)} mHz • Bias ${fmt(row.biasMhz, 2)} mHz • Tek tık: saniyelik grafik • Çift tık: günlük grafik">${quarterLabel(quarter)}<br>${fmt(row.maeMhz, 1)}</div>`;
+        return `<div class="quarter-hour" tabindex="0" data-quarter="${quarter}" style="background:${color}" title="${t('quarterTooltip', { label: quarterLabel(quarter), mae: fmt(row.maeMhz, 2), bias: fmt(row.biasMhz, 2) })}">${quarterLabel(quarter)}<br>${fmt(row.maeMhz, 1)}</div>`;
       }).join('');
 
       root.querySelectorAll('[data-quarter]').forEach(card => {
@@ -2329,7 +2349,7 @@
         const end = start + 900;
         bindSingleDoubleClick(
           card,
-          () => showFrequencyInterval(start, end, 'quarter', `${quarterLabel(quarter)}–${secondToTime(end % 86400).slice(0,5)} • 900 saniye`),
+          () => showFrequencyInterval(start, end, 'quarter', `${quarterLabel(quarter)}–${secondToTime(end % 86400).slice(0,5)} • 900 ${lang === 'en' ? 'sec' : 'saniye'}`),
           showDailyFrequencyChart
         );
       });
@@ -2338,40 +2358,40 @@
     function renderHourBlocks(current) {
       const root = $('hourBlocks');
       if (!current) {
-        root.innerHTML = '<div class="empty-state">Saatlik istatistikler günlük rapor hesaplandıktan sonra gösterilecektir.</div>';
+        root.innerHTML = `<div class="empty-state">${t('hourBlockEmpty')}</div>`;
         return;
       }
 
       const metrics = [
-        ['TEİAŞ Ort.', 'meanA', 'freq', 'İlgili saatteki geçerli TEİAŞ saniyelik frekans örneklerinin aritmetik ortalaması (Hz).'],
-        ['TEİAŞ Min', 'minA', 'freq', 'İlgili saatte TEİAŞ frekansında görülen en düşük değer (Hz).'],
-        ['TEİAŞ Maks', 'maxA', 'freq', 'İlgili saatte TEİAŞ frekansında görülen en yüksek değer (Hz).'],
-        ['DE Ort.', 'meanB', 'freq', 'Zaman ofsetiyle eşleştirilmiş Netztransparenz frekans örneklerinin saatlik ortalaması (Hz).'],
-        ['DE Min', 'minB', 'freq', 'İlgili saatte eşleştirilmiş Netztransparenz frekansının minimum değeri (Hz).'],
-        ['DE Maks', 'maxB', 'freq', 'İlgili saatte eşleştirilmiş Netztransparenz frekansının maksimum değeri (Hz).'],
-        ['Bias', 'biasMhz', 'bias', 'TEİAŞ − Netztransparenz farkının işaretli saatlik ortalaması (mHz). Negatif değer TEİAŞ ortalamasının daha düşük olduğunu gösterir.'],
-        ['MAE', 'maeMhz', 'mae', 'İki kaynağın saniyelik eşlenmiş değerleri arasındaki mutlak farkların saatlik ortalaması (mHz).'],
-        ['RMSE', 'rmseMhz', 'mae', 'Büyük farkları daha güçlü ağırlıklandıran saatlik kök ortalama kare hata (mHz).'],
-        ['Korel.', 'correlation', 'corr', 'Saat içindeki eşlenmiş saniyelik TEİAŞ ve Netztransparenz serilerinin Pearson korelasyonu.']
+        [t('metricMeanTr'), 'meanA', 'freq', ''],
+        [t('metricMinTr'), 'minA', 'freq', ''],
+        [t('metricMaxTr'), 'maxA', 'freq', ''],
+        [t('metricMeanDe'), 'meanB', 'freq', ''],
+        [t('metricMinDe'), 'minB', 'freq', ''],
+        [t('metricMaxDe'), 'maxB', 'freq', ''],
+        [t('metricBias'), 'biasMhz', 'bias', ''],
+        [t('metricMae'), 'maeMhz', 'mae', ''],
+        [t('metricRmse'), 'rmseMhz', 'mae', ''],
+        [t('metricCorr'), 'correlation', 'corr', '']
       ];
 
-      const head = `<tr><th>Metrik</th>${Array.from({ length: 24 }, (_, hour) => `<th class="hour-header" tabindex="0" data-hour="${hour}" title="${String(hour).padStart(2,'0')}:00–${String((hour + 1) % 24).padStart(2,'0')}:00 • Tek tık: 3.600 saniyelik grafik • Çift tık: günlük grafik">${String(hour).padStart(2, '0')}</th>`).join('')}</tr>`;
-      const rows = metrics.map(([label, key, type, explanation]) => {
+      const head = `<tr><th>${t('hourBlockMetric')}</th>${Array.from({ length: 24 }, (_, hour) => `<th class="hour-header" tabindex="0" data-hour="${hour}" title="${t('hourBlockTooltip', { hour: String(hour).padStart(2,'0'), nextHour: String((hour + 1) % 24).padStart(2,'0') })}">${String(hour).padStart(2, '0')}</th>`).join('')}</tr>`;
+      const rows = metrics.map(([label, key, type]) => {
         const cells = current.hourly.map(row => {
           const value = row[key];
           const background = metricColor(value, type);
           const digits = key === 'correlation' ? 3 : key.includes('Mhz') ? 2 : 3;
           return `<td style="background:${background}" title="${label}: ${fmt(value, digits)}">${fmt(value, digits)}</td>`;
         }).join('');
-        return `<tr><td class="metric-name" tabindex="0" data-tooltip="${explanation}" title="${explanation}">${label}</td>${cells}</tr>`;
+        return `<tr><td class="metric-name" tabindex="0">${label}</td>${cells}</tr>`;
       }).join('');
 
-      root.innerHTML = `<table class="hour-matrix" aria-label="24 saatlik frekans istatistik matrisi"><thead>${head}</thead><tbody>${rows}</tbody></table>`;
+      root.innerHTML = `<table class="hour-matrix" aria-label="${t('hourBlockLabel')}"><thead>${head}</thead><tbody>${rows}</tbody></table>`;
       root.querySelectorAll('[data-hour]').forEach(header => {
         const hour = Number(header.dataset.hour);
         bindSingleDoubleClick(
           header,
-          () => showFrequencyInterval(hour * 3600, (hour + 1) * 3600, 'hour', `${String(hour).padStart(2,'0')}:00–${String((hour + 1) % 24).padStart(2,'0')}:00 • 3.600 saniye`),
+          () => showFrequencyInterval(hour * 3600, (hour + 1) * 3600, 'hour', `${String(hour).padStart(2,'0')}:00–${String((hour + 1) % 24).padStart(2,'0')}:00 • 3.600 ${lang === 'en' ? 'sec' : 'saniye'}`),
           showDailyFrequencyChart
         );
       });
@@ -2406,11 +2426,11 @@
     // OSİLASYON ANALİZİ
     // -----------------------------
     function sourceLabel(source) {
-      return source === 'de' ? 'Netztransparenz' : 'TEİAŞ';
+      return source === 'de' ? t('sourceDe') : t('sourceTr');
     }
 
     function sourceShortLabel(source) {
-      return source === 'de' ? 'DE' : 'TEİAŞ';
+      return source === 'de' ? t('sourceDeShort') : t('sourceTrShort');
     }
 
     function sourceSeries(source, current = state.current) {
@@ -2420,8 +2440,8 @@
     function updateOscillationSourceUi() {
       const source = $('oscSourceSelect')?.value || state.settings.oscillationSource || 'tr';
       state.oscillationSource = source;
-      if ($('eventSourceMeanHead')) $('eventSourceMeanHead').textContent = `${sourceShortLabel(source)} ort.`;
-      if ($('eventSourceRangeHead')) $('eventSourceRangeHead').textContent = `${sourceShortLabel(source)} min–maks`;
+      if ($('eventSourceMeanHead')) $('eventSourceMeanHead').textContent = t('eventSourceMeanHead', { source: sourceShortLabel(source) });
+      if ($('eventSourceRangeHead')) $('eventSourceRangeHead').textContent = t('eventSourceRangeHead', { source: sourceShortLabel(source) });
     }
 
     function handleOscillationSourceChange() {
@@ -2433,13 +2453,13 @@
       updateOscillationSourceUi();
       renderOscillationEmpty();
       if (state.current) {
-        setBanner('oscStatus', `${sourceLabel(source)} analiz kaynağı seçildi. Yeni kaynak için “Hesaplama Yap” düğmesine basın.`, 'success');
+        setBanner('oscStatus', t('oscSourceChanged', { source: sourceLabel(source) }), 'success');
       }
     }
 
     function calculateOscillation() {
       if (!state.current) {
-        setBanner('oscStatus', 'Önce Frekans Grafiği sekmesinde günlük raporu hesaplayın.', 'error');
+        setBanner('oscStatus', t('calculateFirst'), 'error');
         return;
       }
 
@@ -2457,12 +2477,10 @@
       };
 
       if (!(settings.bandMin > 0 && settings.bandMax > settings.bandMin && settings.bandMax < 0.5)) {
-        setBanner('oscStatus', 'Bant sınırları 0 < alt < üst < 0,5 Hz koşulunu sağlamalıdır.', 'error');
+        setBanner('oscStatus', t('oscBandError'), 'error');
         return;
       }
 
-      // Analiz kullanıcı tarafından seçilen TEİAŞ veya zaman eşlenmiş Netztransparenz serisine uygulanır.
-      // Nominal 50 Hz çıkarılarak sayısal hassasiyet artırılır; FIR süzgeci DC bileşeni bastırır.
       const selectedSeries = sourceSeries(source);
       const signal = new Float32Array(86400);
       signal.fill(NaN);
@@ -2475,14 +2493,14 @@
         }
       }
       if (valid < 3600) {
-        setBanner('oscStatus', `${sourceName} için analiz yapmaya yetecek geçerli frekans verisi bulunamadı.`, 'error');
+        setBanner('oscStatus', t('oscNoData', { source: sourceName }), 'error');
         return;
       }
 
       state.pendingOscillationSource = source;
       state.oscillationSource = source;
       updateOscillationSourceUi();
-      setBanner('oscStatus', `${sourceName} frekansı osilasyon analizi Web Worker üzerinde başlatıldı…`, 'warn');
+      setBanner('oscStatus', t('oscStarted', { source: sourceName }), 'warn');
       $('oscCalculateBtn').disabled = true;
       $('oscSourceSelect').disabled = true;
       state.oscWorker.postMessage({ cmd: 'analyze', diffBuffer: signal.buffer, settings }, [signal.buffer]);
@@ -2491,14 +2509,14 @@
     function handleOscWorkerMessage(event) {
       const msg = event.data || {};
       if (msg.type === 'progress') {
-        setBanner('oscStatus', `%${msg.percent} • ${msg.stage}`, 'warn');
+        setBanner('oscStatus', t('oscCalculating', { percent: msg.percent, stage: msg.stage }), 'warn');
         return;
       }
       if (msg.type === 'error') {
         $('oscCalculateBtn').disabled = false;
         $('oscSourceSelect').disabled = false;
         state.pendingOscillationSource = null;
-        setBanner('oscStatus', `Osilasyon analizi hatası: ${msg.message}`, 'error');
+        setBanner('oscStatus', t('oscError', { msg: msg.message }), 'error');
         return;
       }
       if (msg.type === 'done') {
@@ -2512,8 +2530,8 @@
         updateOscillationSourceUi();
         renderOscillationChart(msg.meta);
         renderEventTable();
-        $('oscCountTag').textContent = `${state.events.length} bulgu`;
-        setBanner('oscStatus', `${sourceLabel(source)} frekansı analizi tamamlandı. ${state.events.length} eşik üstü bulgu aralığı tespit edildi.`, state.events.length ? 'warn' : 'success');
+        $('oscCountTag').textContent = t('findingsCount', { count: state.events.length });
+        setBanner('oscStatus', t('oscDone', { source: sourceLabel(source), count: state.events.length }), state.events.length ? 'warn' : 'success');
       }
     }
 
@@ -2531,7 +2549,7 @@
           sourceMinHz: stats.min,
           sourceMaxHz: stats.max,
           sourceMeanAbsDevMhz: stats.meanAbsDevMhz,
-          classification: event.peakAmplitudeMhz >= Number($('oscThreshold').value) * 2 ? 'Yüksek genlikli bulgu' : 'Eşik üstü bulgu'
+          classification: event.peakAmplitudeMhz >= Number($('oscThreshold').value) * 2 ? t('classHigh') : t('classThreshold')
         };
       });
     }
@@ -2541,13 +2559,13 @@
       const threshold = Number(meta.threshold);
       const source = state.oscillationSource || 'tr';
       const sourceName = sourceLabel(source);
-      const filteredName = `${sourceName} eşik üstü ${Number(meta.f1).toFixed(2)}–${Number(meta.f2).toFixed(2)} Hz bileşeni`;
-      const trName = 'TEİAŞ gerçek frekansı';
-      const deName = 'Netztransparenz gerçek frekansı';
+      const filteredName = t('oscFilteredName', { source: sourceName, f1: Number(meta.f1).toFixed(2), f2: Number(meta.f2).toFixed(2) });
+      const trName = t('oscTrReal');
+      const deName = t('oscDeReal');
 
       if (!state.events.length) {
         state.oscillationChart.setOption({
-          title: { text: `Seçilen eşik için ${sourceName} frekansında osilasyon bulgusu tespit edilmedi`, left: 'center', top: 'middle', textStyle: { color: '#71808e', fontSize: 14, fontWeight: 500 } },
+          title: { text: t('oscNoFindings', { source: sourceName }), left: 'center', top: 'middle', textStyle: { color: '#71808e', fontSize: 14, fontWeight: 500 } },
           xAxis: { show: false }, yAxis: [{ show: false }, { show: false }], series: []
         }, true);
         return;
@@ -2607,13 +2625,13 @@
           top: 8,
           data: [filteredName, trName, deName],
           selected: { [filteredName]: true, [trName]: source === 'tr', [deName]: source === 'de' },
-          tooltip: { show: true, formatter: name => name === unselectedFrequencyName ? `${name} • Varsayılan pasif, göstermek için tıklayın` : name }
+          tooltip: { show: true, formatter: name => name === unselectedFrequencyName ? `${name} • ${t('oscLegendHint')}` : name }
         },
         grid: { left: 68, right: 76, top: 58, bottom: 72 },
-        xAxis: { type: 'value', min: minX, max: maxX, name: 'TEİAŞ yerel zaman ekseni', axisLabel: { formatter: value => secondToTime(Math.round(value)).slice(0, 8), hideOverlap: true } },
+        xAxis: { type: 'value', min: minX, max: maxX, name: t('xAxisOsc'), axisLabel: { formatter: value => secondToTime(Math.round(value)).slice(0, 8), hideOverlap: true } },
         yAxis: [
-          { type: 'value', name: 'Bant bileşeni (mHz)', scale: true, splitLine: { lineStyle: { color: '#e5edf2' } } },
-          { type: 'value', name: 'Gerçek frekanslar (Hz)', scale: true, axisLabel: { formatter: value => value.toFixed(3) }, splitLine: { show: false } }
+          { type: 'value', name: t('yAxisBand'), scale: true, splitLine: { lineStyle: { color: '#e5edf2' } } },
+          { type: 'value', name: t('yAxisReal'), scale: true, axisLabel: { formatter: value => value.toFixed(3) }, splitLine: { show: false } }
         ],
         dataZoom: [{ type: 'inside', filterMode: 'none' }, { type: 'slider', filterMode: 'none', height: 22, bottom: 18 }],
         series: [
@@ -2634,13 +2652,13 @@
       const source = state.oscillationSource || 'tr';
       updateOscillationSourceUi();
       if (!state.events.length) {
-        body.innerHTML = `<tr><td colspan="11" class="empty-state">Seçilen bant ve eşik için ${sourceLabel(source)} frekansında bulgu tespit edilmedi.</td></tr>`;
+        body.innerHTML = `<tr><td colspan="11" class="empty-state">${t('eventEmpty', { source: sourceLabel(source) })}</td></tr>`;
         return;
       }
-      body.innerHTML = state.events.map(event => `<tr class="event-row ${event.classification.startsWith('Yüksek') ? 'critical' : ''}" data-start="${event.start}" data-end="${event.end}">
-        <td>${event.no}</td><td>${secondToTime(event.start)}</td><td>${secondToTime(event.end)}</td><td>${durationText(event.duration)}</td>
+      body.innerHTML = state.events.map(event => `<tr class="event-row ${event.classification === t('classHigh') ? 'critical' : ''}" data-start="${event.start}" data-end="${event.end}">
+        <td>${event.no}</td><td>${secondToTime(event.start)}</td><td>${secondToTime(event.end)}</td><td>${t('durationMinSec', { m: Math.floor(event.duration / 60), s: event.duration % 60 })}</td>
         <td>${fmt(event.peakAmplitudeMhz, 2)} mHz</td><td>${fmt(event.peakRmsMhz, 2)} mHz</td><td>${fmt(event.dominantHz, 4)} Hz</td>
-        <td>${event.windows}</td><td>${fmt(event.sourceMeanHz, 4)} Hz</td><td>${fmt(event.sourceMinHz, 4)}–${fmt(event.sourceMaxHz, 4)} Hz</td><td><span class="tag ${event.classification.startsWith('Yüksek') ? 'bad' : 'warn'}">${event.classification}</span></td>
+        <td>${event.windows}</td><td>${fmt(event.sourceMeanHz, 4)} Hz</td><td>${fmt(event.sourceMinHz, 4)}–${fmt(event.sourceMaxHz, 4)} Hz</td><td><span class="tag ${event.classification === t('classHigh') ? 'bad' : 'warn'}">${event.classification}</span></td>
       </tr>`).join('');
 
       body.querySelectorAll('.event-row').forEach(row => row.addEventListener('click', () => {
@@ -2720,8 +2738,8 @@
       };
       localStorage.setItem('frequencyAppSettings', JSON.stringify(state.settings));
       applySettingsToForm();
-      setBanner('loadStatus', 'Ayarlar kaydedildi.', 'success');
-      alert('Ayarlar tarayıcıda kaydedildi.');
+      setBanner('loadStatus', t('settingsSaved'), 'success');
+      alert(t('settingsSavedAlert'));
     }
 
     function resetSettings() {
@@ -2768,6 +2786,587 @@
     function quarterLabel(q) { const m = q * 15; return `${String(Math.floor(m / 60)).padStart(2,'0')}:${String(m % 60).padStart(2,'0')}`; }
     function durationText(sec) { const m = Math.floor(sec / 60), s = sec % 60; return m ? `${m} dk ${s} sn` : `${s} sn`; }
     function signed(n) { return Number(n) >= 0 ? `+${n}` : String(n); }
+
+    // -----------------------------
+    // İ18N — DİL DESTEĞİ
+    // -----------------------------
+    const i18n = {
+      tr: {
+        langToggle: 'TR',
+        appTitle: 'Frekans Atlası',
+        appSubtitle: 'Türkiye ve ENTSO-e Günlük Şebeke Frekansı Analiz Platformu',
+        tabChart: 'Günlük Frekans',
+        tabOscillation: 'Alanlar Arası Osilasyon',
+        tabSettings: 'Ayarlar',
+        dateSelectLabel: 'Tarih Seçimi',
+        calToggleText: 'Tarih seçin',
+        alignmentLabel: 'Zaman eşleştirme',
+        manualOffsetGraphLabel: 'TR→DE saat farkı',
+        diffLabel: 'Grafikte fark',
+        diffShow: 'Göster',
+        diffHide: 'Gizle',
+        calculateBtn: 'Günlük Raporu Hesapla',
+        resetZoomBtn: 'Grafik Sıfırla',
+        utcAuto: 'UTC – otomatik',
+        sameLocal: 'Aynı yerel saat',
+        manualOffset: 'Manuel saat farkı',
+        manualOption: 'Manuel',
+        alignmentInfoDefault: 'Tarih seçip Günlük Raporu Hesapla butonuna basın.',
+        section24h: '24 Saatlik Frekans Karşılaştırması',
+        chartViewTag: '24 saat • dakikalık',
+        reportDateTag: 'Tarih seçilmedi',
+        sectionHourlyMatrix: 'Saatlik İstatistik Matrisi',
+        hourlyMatrixDesc: 'Tek tabloda Metrik ve 00–23 saat kolonları gösterilir.',
+        singleDoubleHint: 'Saat başlığına tek tıklama saniyelik saat grafiğini, çift tıklama günlük grafiği açar.',
+        sectionQuarterHeatmap: '15 Dakikalık Ortalama Mutlak Frekans Farkı',
+        quarterHeatmapDesc: 'Her hücre ilgili çeyrek saatteki eşlenmiş TEİAŞ–Netztransparenz farkının MAE değerini gösterir.',
+        singleDoubleHintQuarter: 'Tek tıklama 900 saniyelik grafiği, çift tıklama günlük grafiği açar.',
+        sectionOscillation: 'Alanlar Arası Osilasyon Taraması',
+        oscSourceLabel: 'Analiz kaynağı',
+        teias: 'TEİAŞ',
+        netz: 'Netztransparenz',
+        bandMinLabel: 'Alt bant (Hz)',
+        bandMaxLabel: 'Üst bant (Hz)',
+        oscThresholdLabel: 'Genlik eşiği (mHz)',
+        windowSecLabel: 'Pencere (sn)',
+        stepSecLabel: 'Adım (sn)',
+        filterTapsLabel: 'FIR kademe (tek)',
+        minDurationLabel: 'Min. olay süresi (sn)',
+        oscCalculateBtn: 'Hesaplama Yap',
+        oscStatusDefault: 'Önce Günlük Frekans sekmesinde rapor hesaplayın.',
+        oscChartTitle: 'Seçilen Kaynağın Bant Geçiren Bileşeni ve Bulgular',
+        oscCountTag: '0 bulgu',
+        sectionOscResults: 'Osilasyon Bulguları',
+        oscResultsDesc: 'Bir satıra tıklayarak grafiği ilgili zaman aralığına yakınlaştırabilirsiniz.',
+        oscThNo: 'No',
+        oscThStart: 'Başlangıç',
+        oscThEnd: 'Bitiş',
+        oscThDuration: 'Süre',
+        oscThPeak: 'Tepe genlik',
+        oscThRms: 'RMS',
+        oscThDominant: 'Baskın frekans',
+        oscThWindow: 'Pencere',
+        oscThSourceMean: 'TEİAŞ ort.',
+        oscThSourceRange: 'TEİAŞ min–maks',
+        oscThClass: 'Sınıflandırma',
+        oscNoAnalysis: 'Henüz osilasyon analizi yapılmadı.',
+        sectionDataLoad: 'Veri Yükleme',
+        clearDataBtn: 'Yüklenen Verileri Temizle',
+        monthlyCsv: 'Aylık CSV',
+        netzDropTitle: 'CSV dosyasını seçin veya sürükleyin',
+        netzDropExample: 'Örnek: Frequenz_20260601_20260630.csv',
+        multiDaily: 'Çoklu günlük',
+        teiasDropTitle: 'Bir veya birden fazla günlük CSV seçin',
+        teiasDropExample: 'Örnek: 20260603.csv, 20260604.csv…',
+        progressText: 'Dosya hazırlanıyor…',
+        loadStatusDefault: 'Henüz veri yüklenmedi.',
+        sectionAutoData: 'GitHub Pages Otomatik Veri',
+        autoDataSummary: 'Statik veri kataloğu denetleniyor.',
+        autoModeBadge: 'Kontrol',
+        useAutoDataBtn: 'Otomatik Veri',
+        useManualDataBtn: 'Manuel CSV',
+        reloadAutoDataBtn: 'Yenile',
+        statusLabel: 'Durum',
+        autoTeiasMetaDefault: 'Manifest bekleniyor.',
+        autoDeMetaDefault: 'Manifest bekleniyor.',
+        sectionInventory: 'Veri Envanteri',
+        invThSource: 'Kaynak',
+        invThDate: 'Tarih',
+        invThRecord: 'Kayıt',
+        invThMissing: 'Eksik sn',
+        invThInvalid: 'Geçersiz',
+        invThDuplicate: 'Yinelenen',
+        invThMean: 'Ort. Hz',
+        invThMin: 'Min Hz',
+        invThMax: 'Maks. Hz',
+        invThStatus: 'Durum',
+        invEmptyState: 'Veri envanteri yükleme sonrasında oluşacaktır.',
+        sectionSettings: 'Yapılandırma',
+        resetSettingsBtn: 'Varsayılanlara Dön',
+        saveSettingsBtn: 'Ayarları Kaydet',
+        settingsAlignmentTitle: 'Zaman Eşleştirme',
+        defaultMethodLabel: 'Varsayılan yöntem',
+        teiasUtcOffsetLabel: 'TEİAŞ UTC ofseti',
+        deWinterOffsetLabel: 'Almanya kış UTC ofseti',
+        deSummerOffsetLabel: 'Almanya yaz UTC ofseti',
+        manualOffsetSettingLabel: 'Manuel TR→DE farkı (saat)',
+        settingsQualityTitle: 'Veri Kalitesi',
+        nominalFreqLabel: 'Nominal frekans (Hz)',
+        validMinLabel: 'Geçerli alt sınır (Hz)',
+        validMaxLabel: 'Geçerli üst sınır (Hz)',
+        maxGapLabel: 'Doğrusal doldurma (sn)',
+        minPairedRatioLabel: 'Min. eşlenmiş veri oranı (%)',
+        settingsGraphTitle: 'Grafik',
+        graphScaleLabel: 'Frekans Y ekseni',
+        graphScaleAuto: 'Otomatik',
+        graphScaleFixed: 'Sabit',
+        graphMinLabel: 'Sabit minimum (Hz)',
+        graphMaxLabel: 'Sabit maksimum (Hz)',
+        chartStepLabel: 'Osilasyon grafik adımı (sn)',
+        // Calendar
+        months: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'],
+        dayHeaders: ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'],
+        // KPI
+        kpiTeiasMean: 'TEİAŞ Ortalama',
+        kpiDeMean: 'DE Ortalama',
+        kpiTeiasAbsDev: 'TEİAŞ Ort. |Δf|',
+        kpiDeAbsDev: 'DE Ort. |Δf|',
+        kpiBias: 'Bias',
+        kpiMae: 'MAE',
+        kpiCorrelation: 'Korelasyon',
+        kpiPairedData: 'Ortak Veri',
+        kpiReportPending: 'Rapor bekleniyor',
+        // Status tags
+        tagComplete: 'Tam',
+        tagPartial: 'Kısmi',
+        tagMissing: 'Eksik',
+        tagCritical: 'Kritik',
+        tagInvalid: 'Geçersiz',
+        tagAuto: 'Otomatik',
+        tagManual: 'Manuel',
+        tagWaiting: 'Bekliyor',
+        tagNone: 'Yok',
+        tagCheck: 'Kontrol',
+        // Source labels
+        sourceTr: 'TEİAŞ',
+        sourceDe: 'Netztransparenz',
+        sourceTrShort: 'TEİAŞ',
+        sourceDeShort: 'DE',
+        // Matrix metric labels
+        metricMeanTr: 'TEİAŞ Ort.',
+        metricMinTr: 'TEİAŞ Min',
+        metricMaxTr: 'TEİAŞ Maks',
+        metricMeanDe: 'DE Ort.',
+        metricMinDe: 'DE Min',
+        metricMaxDe: 'DE Maks',
+        metricBias: 'Bias',
+        metricMae: 'MAE',
+        metricRmse: 'RMSE',
+        metricCorr: 'Korel.',
+        // Oscillation chart labels
+        oscFilteredName: '{source} eşik üstü {f1}–{f2} Hz bileşeni',
+        oscTrReal: 'TEİAŞ gerçek frekansı',
+        oscDeReal: 'Netztransparenz gerçek frekansı',
+        oscLegendHint: 'Varsayılan pasif, göstermek için tıklayın',
+        // Chart descriptions
+        chartDescDay: 'Günlük görünümde 86.400 örnek dakikalık ortalamaya indirgenir; istatistikler saniyelik ortak kayıtlardan hesaplanır.',
+        chartDescDetail: '{label} görünümünde saniyelik çözünürlük kullanılır ve {count} veri noktası çizilir.',
+        // Alignment descriptions
+        alignDescSameLocal: 'Aynı yerel saat karşılaştırması seçildi.',
+        alignDescManual: 'Manuel eşleştirme seçildi; Almanya yerel saati = TEİAŞ yerel saati − {delta} saat.',
+        alignDescUtcAuto: 'UTC otomatik eşleştirme seçildi; TEİAŞ UTC{teias}, Almanya UTC{de}, fark {delta} saat.',
+        alignDescDefault: 'Zaman eşleştirme bilgisi veri ve tarih seçildiğinde gösterilecektir.',
+        alignInfo: '{desc} TEİAŞ {trDate} 00:00:00 kaydı, Netztransparenz {deDate} {deTime} kaydıyla eşleştirilir.',
+        // Various messages
+        noDateSelected: 'Lütfen TEİAŞ verisi bulunan bir gün seçin.',
+        autoDataLoading: '{date} otomatik verisi yükleniyor.',
+        autoDataNoDe: '{date} TEİAŞ verisi yüklendi; eşleşen Netztransparenz günü bulunamadı.',
+        autoDataNoTr: '{date} için TEİAŞ otomatik verisi yok.',
+        autoDataReady: 'Otomatik veri kataloğu hazır. Son aktif TEİAŞ günü: {date}.',
+        autoDataSelected: 'Otomatik veri modu seçildi.',
+        manualDataSelected: 'Manuel CSV modu seçildi.',
+        dataCleared: 'Yüklenen veriler temizlendi.',
+        settingsSaved: 'Ayarlar kaydedildi.',
+        settingsSavedAlert: 'Ayarlar tarayıcıda kaydedildi.',
+        confirmClear: 'Tarayıcı belleğindeki tüm yüklenmiş frekans verileri temizlensin mi?',
+        calculateFirst: 'Önce Frekans Grafiği sekmesinde günlük raporu hesaplayın.',
+        cdError: 'CDN yüklenemedi: {libs}.',
+        // Progress messages
+        parsingFiles: '{count} dosya ayrıştırılıyor. Büyük dosyalarda işlem birkaç dakika sürebilir.',
+        parsingProgress: '{file}: %{pct} • {rows} satır işlendi',
+        parsingError: 'Dosya ayrıştırma hatası: {msg}',
+        parsingDone: '{days} günlük veri başarıyla belleğe alındı.',
+        parsingSourceLoaded: '{source} verisi yüklendi. Toplam {deCount} Almanya günü ve {trCount} TEİAŞ günü mevcut.',
+        parseReading: 'Dosya okunuyor…',
+        parseBusy: 'Başka bir dosya işleniyor. Lütfen işlemin tamamlanmasını bekleyin.',
+        // Report messages
+        reportReady: 'Günlük rapor hesaplandı. Eşlenmiş veri oranı %{ratio}.',
+        reportLowQuality: 'Günlük rapor hesaplandı; eşlenmiş veri oranı yalnızca %{ratio}. Sonuçları veri kalitesi uyarısıyla değerlendirin.',
+        reportOscReady: '{source} günlük frekans verisi analize hazır. Parametreleri kontrol ederek "Hesaplama Yap" düğmesine basın.',
+        // Auto data messages
+        autoManifestMissing: 'Otomatik veri manifesti bulunamadı.',
+        autoDataError: 'Otomatik veri yüklenemedi: {error}',
+        autoDataCatalog: 'Statik veri kataloğu denetleniyor.',
+        autoDataCatalogError: 'Otomatik katalog okunamadı: {error}',
+        autoDataManifestDate: 'Manifest {date} tarihinde üretildi.',
+        autoDataNoTeias: 'Statik katalogda aktif TEİAŞ günü bulunamadı.',
+        autoTeiasDays: '{count} aktif gün',
+        autoTeiasMeta: '{range}; dışlanan {excluded} gün',
+        autoDeDays: '{count} gün',
+        autoDeMeta: '{range}; manuel aylık import',
+        autoNoDeMeta: 'Netztransparenz otomatik kaynak doğrulanmadı.',
+        autoNoTeiasDays: 'Aktif TEİAŞ günü yok.',
+        autoStatusDays: '{count} yayınlanmamış gün; son kontrol {date}',
+        autoNoStatus: 'Durum dosyası yok.',
+        // Event empty
+        eventEmpty: 'Seçilen bant ve eşik için {source} frekansında bulgu tespit edilmedi.',
+        // Oscillation messages
+        oscBandError: 'Bant sınırları 0 < alt < üst < 0,5 Hz koşulunu sağlamalıdır.',
+        oscNoData: '{source} için analiz yapmaya yetecek geçerli frekans verisi bulunamadı.',
+        oscStarted: '{source} frekansı osilasyon analizi Web Worker üzerinde başlatıldı…',
+        oscSourceChanged: '{source} analiz kaynağı seçildi. Yeni kaynak için "Hesaplama Yap" düğmesine basın.',
+        oscCalculating: '%{percent} • {stage}',
+        oscError: 'Osilasyon analizi hatası: {msg}',
+        oscDone: '{source} frekansı analizi tamamlandı. {count} eşik üstü bulgu aralığı tespit edildi.',
+        oscEventEmpty: 'Seçilen bant ve eşik için {source} frekansında bulgu tespit edilmedi.',
+        oscNoFindings: 'Seçilen eşik için {source} frekansında osilasyon bulgusu tespit edilmedi',
+        // Classification
+        classHigh: 'Yüksek genlikli bulgu',
+        classThreshold: 'Eşik üstü bulgu',
+        // Axis labels
+        yAxisFreq: 'Frekans (Hz)',
+        yAxisDiff: 'Fark (mHz)',
+        yAxisBand: 'Bant bileşeni (mHz)',
+        yAxisReal: 'Gerçek frekanslar (Hz)',
+        xAxisOsc: 'TEİAŞ yerel zaman ekseni',
+        // Chart series
+        seriesTr: 'TEİAŞ',
+        seriesDe: 'Netztransparenz',
+        seriesDiff: 'Fark',
+        // Tooltip
+        tooltipTr: 'TEİAŞ',
+        tooltipDe: 'Netztransparenz',
+        tooltipDiff: 'Fark',
+        tooltipDiffUnit: ' mHz',
+        tooltipFreqUnit: ' Hz',
+        // Empty chart
+        chartEmpty: 'Veri yüklendikten sonra günlük grafik burada gösterilecektir',
+        oscChartEmpty: 'Osilasyon analizi sonucu burada gösterilecektir',
+        // Hour blocks
+        hourBlockLabel: '24 saatlik frekans istatistik matrisi',
+        hourBlockEmpty: 'Saatlik istatistikler günlük rapor hesaplandıktan sonra gösterilecektir.',
+        hourBlockMetric: 'Metrik',
+        hourBlockTooltip: '{hour}:00–{nextHour}:00 • Tek tık: 3.600 saniyelik grafik • Çift tık: günlük grafik',
+        // Quarter heatmap
+        quarterTooltip: '{label} • MAE {mae} mHz • Bias {bias} mHz • Tek tık: saniyelik grafik • Çift tık: günlük grafik',
+        // Duration
+        durationMinSec: '{m} dk {s} sn',
+        durationSec: '{s} sn',
+        // Event source mean/range header
+        eventSourceMeanHead: '{source} ort.',
+        eventSourceRangeHead: '{source} min–maks',
+        // Count tags
+        findingsCount: '{count} bulgu',
+        // Data source links
+        sourceTeiasLink: 'TEİAŞ',
+        sourceNetzLink: 'Netztransparenz',
+        // Seconds to time
+        timeSecondTo: '{time}',
+        displayDate: '{time}',
+        // Second prefixes for toLocaleString
+        localeNumeric: 'tr-TR'
+      },
+
+      en: {
+        langToggle: 'EN',
+        appTitle: 'Frequency Atlas',
+        appSubtitle: 'Daily Grid Frequency Analysis Platform for Turkey & ENTSO-e',
+        tabChart: 'Daily Frequency',
+        tabOscillation: 'Inter-Area Oscillation',
+        tabSettings: 'Settings',
+        dateSelectLabel: 'Date Selection',
+        calToggleText: 'Select date',
+        alignmentLabel: 'Time Alignment',
+        manualOffsetGraphLabel: 'TR→DE hour offset',
+        diffLabel: 'Show difference',
+        diffShow: 'Show',
+        diffHide: 'Hide',
+        calculateBtn: 'Calculate Daily Report',
+        resetZoomBtn: 'Reset Zoom',
+        utcAuto: 'UTC – automatic',
+        sameLocal: 'Same local time',
+        manualOffset: 'Manual offset',
+        manualOption: 'Manual',
+        alignmentInfoDefault: 'Select a date and click "Calculate Daily Report".',
+        section24h: '24-Hour Frequency Comparison',
+        chartViewTag: '24h • minutely',
+        reportDateTag: 'No date selected',
+        sectionHourlyMatrix: 'Hourly Statistics Matrix',
+        hourlyMatrixDesc: 'Metrics and 00–23 hour columns in one table.',
+        singleDoubleHint: 'Single-click opens second-resolution chart, double-click opens daily chart.',
+        sectionQuarterHeatmap: '15-Minute Mean Absolute Frequency Difference',
+        quarterHeatmapDesc: 'Each cell shows MAE of aligned TEİAŞ–Netztransparenz difference for that quarter.',
+        singleDoubleHintQuarter: 'Single-click opens 900s chart, double-click opens daily chart.',
+        sectionOscillation: 'Inter-Area Oscillation Scan',
+        oscSourceLabel: 'Analysis source',
+        teias: 'TEİAŞ',
+        netz: 'Netztransparenz',
+        bandMinLabel: 'Lower band (Hz)',
+        bandMaxLabel: 'Upper band (Hz)',
+        oscThresholdLabel: 'Amplitude threshold (mHz)',
+        windowSecLabel: 'Window (sec)',
+        stepSecLabel: 'Step (sec)',
+        filterTapsLabel: 'FIR taps (odd)',
+        minDurationLabel: 'Min. event duration (sec)',
+        oscCalculateBtn: 'Run Analysis',
+        oscStatusDefault: 'First calculate a daily report in the Daily Frequency tab.',
+        oscChartTitle: 'Bandpass Component and Findings of Selected Source',
+        oscCountTag: '0 findings',
+        sectionOscResults: 'Oscillation Findings',
+        oscResultsDesc: 'Click a row to zoom the chart to that time interval.',
+        oscThNo: 'No',
+        oscThStart: 'Start',
+        oscThEnd: 'End',
+        oscThDuration: 'Duration',
+        oscThPeak: 'Peak amplitude',
+        oscThRms: 'RMS',
+        oscThDominant: 'Dominant freq.',
+        oscThWindow: 'Window',
+        oscThSourceMean: 'TEİAŞ mean',
+        oscThSourceRange: 'TEİAŞ min–max',
+        oscThClass: 'Classification',
+        oscNoAnalysis: 'No oscillation analysis performed yet.',
+        sectionDataLoad: 'Data Loading',
+        clearDataBtn: 'Clear Loaded Data',
+        monthlyCsv: 'Monthly CSV',
+        netzDropTitle: 'Select or drag CSV file',
+        netzDropExample: 'Example: Frequenz_20260601_20260630.csv',
+        multiDaily: 'Multi daily',
+        teiasDropTitle: 'Select one or more daily CSV files',
+        teiasDropExample: 'Example: 20260603.csv, 20260604.csv…',
+        progressText: 'Preparing file…',
+        loadStatusDefault: 'No data loaded yet.',
+        sectionAutoData: 'GitHub Pages Auto Data',
+        autoDataSummary: 'Checking static data catalog.',
+        autoModeBadge: 'Check',
+        useAutoDataBtn: 'Auto Data',
+        useManualDataBtn: 'Manual CSV',
+        reloadAutoDataBtn: 'Reload',
+        statusLabel: 'Status',
+        autoTeiasMetaDefault: 'Waiting for manifest.',
+        autoDeMetaDefault: 'Waiting for manifest.',
+        sectionInventory: 'Data Inventory',
+        invThSource: 'Source',
+        invThDate: 'Date',
+        invThRecord: 'Records',
+        invThMissing: 'Missing sec',
+        invThInvalid: 'Invalid',
+        invThDuplicate: 'Duplicates',
+        invThMean: 'Mean Hz',
+        invThMin: 'Min Hz',
+        invThMax: 'Max Hz',
+        invThStatus: 'Status',
+        invEmptyState: 'Data inventory will be created after loading.',
+        sectionSettings: 'Configuration',
+        resetSettingsBtn: 'Reset to Defaults',
+        saveSettingsBtn: 'Save Settings',
+        settingsAlignmentTitle: 'Time Alignment',
+        defaultMethodLabel: 'Default method',
+        teiasUtcOffsetLabel: 'TEİAŞ UTC offset',
+        deWinterOffsetLabel: 'Germany winter UTC offset',
+        deSummerOffsetLabel: 'Germany summer UTC offset',
+        manualOffsetSettingLabel: 'Manual TR→DE offset (hours)',
+        settingsQualityTitle: 'Data Quality',
+        nominalFreqLabel: 'Nominal frequency (Hz)',
+        validMinLabel: 'Valid lower limit (Hz)',
+        validMaxLabel: 'Valid upper limit (Hz)',
+        maxGapLabel: 'Linear interpolation (sec)',
+        minPairedRatioLabel: 'Min. paired data ratio (%)',
+        settingsGraphTitle: 'Chart',
+        graphScaleLabel: 'Frequency Y axis',
+        graphScaleAuto: 'Auto',
+        graphScaleFixed: 'Fixed',
+        graphMinLabel: 'Fixed minimum (Hz)',
+        graphMaxLabel: 'Fixed maximum (Hz)',
+        chartStepLabel: 'Oscillation chart step (sec)',
+        // Calendar
+        months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        dayHeaders: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+        // KPI
+        kpiTeiasMean: 'TEİAŞ Mean',
+        kpiDeMean: 'DE Mean',
+        kpiTeiasAbsDev: 'TEİAŞ Mean |Δf|',
+        kpiDeAbsDev: 'DE Mean |Δf|',
+        kpiBias: 'Bias',
+        kpiMae: 'MAE',
+        kpiCorrelation: 'Correlation',
+        kpiPairedData: 'Paired Data',
+        kpiReportPending: 'Report pending',
+        // Status tags
+        tagComplete: 'Complete',
+        tagPartial: 'Partial',
+        tagMissing: 'Missing',
+        tagCritical: 'Critical',
+        tagInvalid: 'Invalid',
+        tagAuto: 'Auto',
+        tagManual: 'Manual',
+        tagWaiting: 'Waiting',
+        tagNone: 'N/A',
+        tagCheck: 'Check',
+        // Source labels
+        sourceTr: 'TEİAŞ',
+        sourceDe: 'Netztransparenz',
+        sourceTrShort: 'TEİAŞ',
+        sourceDeShort: 'DE',
+        // Matrix metric labels
+        metricMeanTr: 'TEİAŞ Mean',
+        metricMinTr: 'TEİAŞ Min',
+        metricMaxTr: 'TEİAŞ Max',
+        metricMeanDe: 'DE Mean',
+        metricMinDe: 'DE Min',
+        metricMaxDe: 'DE Max',
+        metricBias: 'Bias',
+        metricMae: 'MAE',
+        metricRmse: 'RMSE',
+        metricCorr: 'Corr.',
+        // Oscillation chart labels
+        oscFilteredName: '{source} bandpass {f1}–{f2} Hz component',
+        oscTrReal: 'TEİAŞ actual frequency',
+        oscDeReal: 'Netztransparenz actual frequency',
+        oscLegendHint: 'Disabled by default, click to show',
+        // Chart descriptions
+        chartDescDay: 'Daily view downsamples 86,400 samples to minute averages; statistics computed from second-paired records.',
+        chartDescDetail: '{label} view uses second-resolution with {count} data points plotted.',
+        // Alignment descriptions
+        alignDescSameLocal: 'Same local time comparison selected.',
+        alignDescManual: 'Manual alignment selected; Germany local time = TEİAŞ local time − {delta} hours.',
+        alignDescUtcAuto: 'UTC auto alignment selected; TEİAŞ UTC{teias}, Germany UTC{de}, delta {delta} hours.',
+        alignDescDefault: 'Alignment info will be shown when data and date are selected.',
+        alignInfo: '{desc} TEİAŞ {trDate} 00:00:00 record aligns with Netztransparenz {deDate} {deTime} record.',
+        // Various messages
+        noDateSelected: 'Please select a date with TEİAŞ data.',
+        autoDataLoading: 'Loading auto data for {date}.',
+        autoDataNoDe: '{date} TEİAŞ data loaded; matching Netztransparenz day not found.',
+        autoDataNoTr: 'No TEİAŞ auto data for {date}.',
+        autoDataReady: 'Auto data catalog ready. Latest TEİAŞ day: {date}.',
+        autoDataSelected: 'Auto data mode selected.',
+        manualDataSelected: 'Manual CSV mode selected.',
+        dataCleared: 'Loaded data cleared.',
+        settingsSaved: 'Settings saved.',
+        settingsSavedAlert: 'Settings saved in browser.',
+        confirmClear: 'Clear all loaded frequency data from browser memory?',
+        calculateFirst: 'First calculate a daily report in the Frequency Chart tab.',
+        cdError: 'CDN load failed: {libs}.',
+        // Progress messages
+        parsingFiles: 'Parsing {count} file(s). Large files may take a few minutes.',
+        parsingProgress: '{file}: %{pct} • {rows} rows processed',
+        parsingError: 'File parse error: {msg}',
+        parsingDone: '{days} day(s) successfully loaded into memory.',
+        parsingSourceLoaded: '{source} data loaded. Total {deCount} DE days and {trCount} TEİAŞ days available.',
+        parseReading: 'Reading file…',
+        parseBusy: 'Another file is being processed. Please wait for completion.',
+        // Report messages
+        reportReady: 'Daily report calculated. Paired data ratio: %{ratio}.',
+        reportLowQuality: 'Daily report calculated; paired data ratio is only %{ratio}. Evaluate results with caution.',
+        reportOscReady: '{source} daily frequency data ready for analysis. Check parameters and click "Run Analysis".',
+        // Auto data messages
+        autoManifestMissing: 'Auto data manifest not found.',
+        autoDataError: 'Auto data could not be loaded: {error}',
+        autoDataCatalog: 'Checking static data catalog.',
+        autoDataCatalogError: 'Auto catalog could not be read: {error}',
+        autoDataManifestDate: 'Manifest generated at {date}.',
+        autoDataNoTeias: 'Static catalog has no active TEİAŞ days.',
+        autoTeiasDays: '{count} active days',
+        autoTeiasMeta: '{range}; {excluded} excluded days',
+        autoDeDays: '{count} days',
+        autoDeMeta: '{range}; manual monthly import',
+        autoNoDeMeta: 'Netztransparenz auto source not verified.',
+        autoNoTeiasDays: 'No active TEİAŞ days.',
+        autoStatusDays: '{count} unpublished days; last check {date}',
+        autoNoStatus: 'No status file.',
+        // Event empty
+        eventEmpty: 'No findings detected in {source} frequency for the selected band and threshold.',
+        // Oscillation messages
+        oscBandError: 'Band limits must satisfy 0 < lower < upper < 0.5 Hz.',
+        oscNoData: 'Insufficient valid frequency data for {source} analysis.',
+        oscStarted: '{source} oscillation analysis started on Web Worker…',
+        oscSourceChanged: '{source} selected as analysis source. Click "Run Analysis" for the new source.',
+        oscCalculating: '%{percent} • {stage}',
+        oscError: 'Oscillation analysis error: {msg}',
+        oscDone: '{source} analysis complete. {count} above-threshold events detected.',
+        oscEventEmpty: 'No findings detected in {source} frequency for the selected band and threshold.',
+        oscNoFindings: 'No oscillation findings detected in {source} frequency for the selected threshold',
+        // Classification
+        classHigh: 'High amplitude event',
+        classThreshold: 'Above-threshold event',
+        // Axis labels
+        yAxisFreq: 'Frequency (Hz)',
+        yAxisDiff: 'Difference (mHz)',
+        yAxisBand: 'Band component (mHz)',
+        yAxisReal: 'Actual frequencies (Hz)',
+        xAxisOsc: 'TEİAŞ local time axis',
+        // Chart series
+        seriesTr: 'TEİAŞ',
+        seriesDe: 'Netztransparenz',
+        seriesDiff: 'Difference',
+        // Tooltip
+        tooltipTr: 'TEİAŞ',
+        tooltipDe: 'Netztransparenz',
+        tooltipDiff: 'Difference',
+        tooltipDiffUnit: ' mHz',
+        tooltipFreqUnit: ' Hz',
+        // Empty chart
+        chartEmpty: 'Daily chart will be displayed here after data is loaded',
+        oscChartEmpty: 'Oscillation analysis result will be shown here',
+        // Hour blocks
+        hourBlockLabel: '24-hour frequency statistics matrix',
+        hourBlockEmpty: 'Hourly statistics will appear after calculating the daily report.',
+        hourBlockMetric: 'Metric',
+        hourBlockTooltip: '{hour}:00–{nextHour}:00 • Single-click: 3,600s chart • Double-click: daily chart',
+        // Quarter heatmap
+        quarterTooltip: '{label} • MAE {mae} mHz • Bias {bias} mHz • Single-click: second chart • Double-click: daily chart',
+        // Duration
+        durationMinSec: '{m}m {s}s',
+        durationSec: '{s}s',
+        // Event source mean/range header
+        eventSourceMeanHead: '{source} mean',
+        eventSourceRangeHead: '{source} min–max',
+        // Count tags
+        findingsCount: '{count} findings',
+        // Data source links
+        sourceTeiasLink: 'TEİAŞ',
+        sourceNetzLink: 'Netztransparenz',
+        // Second prefixes for toLocaleString
+        localeNumeric: 'en-US'
+      }
+    };
+
+    let lang = 'tr';
+
+    function t(key, vars) {
+      let val = i18n[lang]?.[key] ?? i18n.tr[key];
+      if (val === undefined) return key;
+      if (vars) {
+        Object.entries(vars).forEach(([k, v]) => {
+          val = String(val).replace(new RegExp(`\\{${k}\\}`, 'g'), v);
+        });
+      }
+      return val;
+    }
+
+    function applyTranslations() {
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        el.textContent = t(key);
+      });
+    }
+
+    function setLanguage(newLang) {
+      if (newLang !== 'tr' && newLang !== 'en') return;
+      lang = newLang;
+      state.settings.locale = newLang;
+      localStorage.setItem('frequencyAppSettings', JSON.stringify(state.settings));
+      document.documentElement.setAttribute('data-current-lang', newLang);
+      // Update toggle button text
+      $('langToggle').textContent = t('langToggle');
+      // Apply static HTML translations
+      applyTranslations();
+      // Re-render dynamic UI
+      renderCalendar();
+      if (state.current) {
+        renderKpis(state.current);
+        renderFrequencyChart(state.current);
+        renderQuarterHeatmap(state.current);
+        renderHourBlocks(state.current);
+        renderEventTable();
+        updateOscillationSourceUi();
+        updateAlignmentInfo();
+      }
+      updateAutoDataPanel();
+      updateInventory();
+      updateChartViewTag(state.chartView);
+    }
+
   </script>
 </body>
 </html>
