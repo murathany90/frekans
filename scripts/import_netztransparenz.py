@@ -4,9 +4,10 @@ import argparse
 import csv
 import io
 import json
-from datetime import datetime
+from datetime import UTC, datetime, time, timedelta
 from pathlib import Path
 import sys
+from zoneinfo import ZoneInfo
 
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -15,6 +16,7 @@ from scripts.normalize_frequency import (
     NETZTRANSPARENZ_TIMEZONE,
     build_manifest,
     build_day_package,
+    expected_seconds_for_local_day,
     normalize_date,
     parse_frequency,
     sha256_bytes,
@@ -36,6 +38,41 @@ def detect_columns(header: list[str]) -> tuple[int, int, int] | None:
     if min(date_index, time_index, freq_index) >= 0:
         return date_index, time_index, freq_index
     return None
+
+
+def local_second_to_day_index(
+    local_date: str,
+    second: int,
+    timezone_name: str,
+    used_indexes: dict[int, float],
+) -> tuple[int | None, bool]:
+    if second < 0 or second >= 86400:
+        return None, False
+    local_day = datetime.strptime(local_date, "%Y-%m-%d").date()
+    expected = expected_seconds_for_local_day(local_day, timezone_name)
+    if expected == 86400:
+        return second, second in used_indexes
+
+    timezone = ZoneInfo(timezone_name)
+    start_utc = datetime.combine(local_day, time.min, tzinfo=timezone).astimezone(UTC)
+    naive_local = datetime.combine(local_day, time.min) + timedelta(seconds=second)
+
+    candidates: list[int] = []
+    for fold in (0, 1):
+        aware_local = naive_local.replace(tzinfo=timezone, fold=fold)
+        back_to_local = aware_local.astimezone(UTC).astimezone(timezone).replace(tzinfo=None)
+        if back_to_local != naive_local:
+            continue
+        index = int((aware_local.astimezone(UTC) - start_utc).total_seconds())
+        if 0 <= index < expected and index not in candidates:
+            candidates.append(index)
+
+    if not candidates:
+        return None, False
+    for index in candidates:
+        if index not in used_indexes:
+            return index, False
+    return candidates[0], True
 
 
 def parse_netztransparenz_csv(
@@ -79,9 +116,18 @@ def parse_netztransparenz_csv(
             invalid_frequency[local_date] = invalid_frequency.get(local_date, 0) + 1
             continue
         day = by_day.setdefault(local_date, {})
-        if second in day:
+        index, duplicate = local_second_to_day_index(
+            local_date,
+            second,
+            NETZTRANSPARENZ_TIMEZONE,
+            day,
+        )
+        if index is None:
+            invalid_rows[local_date] = invalid_rows.get(local_date, 0) + 1
+            continue
+        if duplicate:
             duplicates[local_date] = duplicates.get(local_date, 0) + 1
-        day[second] = frequency
+        day[index] = frequency
 
     packages = {}
     digest = sha256_bytes(data)
@@ -118,7 +164,7 @@ def main() -> int:
     args = parser.parse_args()
 
     input_path = Path(args.input)
-    packages = parse_netztransparenz_csv(input_path.read_bytes(), source_url=str(input_path))
+    packages = parse_netztransparenz_csv(input_path.read_bytes(), source_url=f"manual-import:{input_path.name}")
     root = Path(args.output_root)
     for package in packages.values():
         month = package.local_date[5:7]

@@ -1,0 +1,31 @@
+{
+  "source": "netztransparenz",
+  "sourceLabel": "Netztransparenz",
+  "localDate": "2026-04-28",
+  "timezone": "Europe/Berlin",
+  "startUtc": "2026-04-27T22:00:00Z",
+  "sampleIntervalSeconds": 1,
+  "expectedSamples": 86400,
+  "validSamples": 86400,
+  "missingSamples": 0,
+  "duplicateSamples": 0,
+  "invalidRows": 0,
+  "invalidFrequencySamples": 0,
+  "encoding": {
+    "type": "int16-le",
+    "baseHz": 50.0,
+    "scale": 10000,
+    "missingValue": -32768
+  },
+  "minimumHz": 49.867,
+  "maximumHz": 50.099,
+  "averageHz": 49.99455494212963,
+  "sha256": "88245c6359ef1e45cf59a4f1991c09f05ece0d93f9ed2ab61325849d12c4ff95",
+  "sourceUrl": "manual-import:Frequenz_20260401_20260430.csv",
+  "downloadedAtUtc": "2026-07-13T01:29:53Z",
+  "httpStatus": 0,
+  "sourceSize": 72576024,
+  "parsedRows": 86400,
+  "qualityScore": 100,
+  "status": "complete"
+}

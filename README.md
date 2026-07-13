@@ -20,6 +20,8 @@ Netztransparenz için 2026 yılına ait güvenilir otomatik statik arşiv bağla
 python scripts/import_netztransparenz.py --input "incoming\netztransparenz\2026\Frequenz_20260601_20260630.csv"
 ```
 
+Mevcut optimize veri kapsamı Ocak-Nisan 2026 ve Haziran 2026 aylarını içerir. Mayıs 2026 dosyası yerel kaynak klasöründe bulunmadığı için sentetik veri üretilmeden boş bırakılmıştır.
+
 ## Yerel Çalıştırma
 
 ```powershell
