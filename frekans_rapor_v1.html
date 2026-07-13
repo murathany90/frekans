@@ -413,6 +413,53 @@
 
     .chart.tall { height: 510px; }
 
+    .chart-wrapper {
+      position: relative;
+    }
+    .chart-wrapper:fullscreen {
+      width: 100vw;
+      height: 100vh;
+      background: #fff;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .chart-wrapper:fullscreen .chart {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 0;
+    }
+    .chart-toolbar {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 4px;
+      opacity: 0;
+      transition: opacity .18s;
+      z-index: 10;
+    }
+    .chart-wrapper:hover .chart-toolbar,
+    .chart-wrapper:fullscreen .chart-toolbar {
+      opacity: 1;
+    }
+    .chart-toolbar button {
+      background: rgba(255,255,255,.92);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      cursor: pointer;
+      padding: 4px 9px;
+      font-size: .82rem;
+      line-height: 1.4;
+      color: var(--navy);
+      transition: background .12s;
+    }
+    .chart-toolbar button:hover {
+      background: #fff;
+    }
+
     .quarter-grid {
       display: grid;
       grid-template-columns: repeat(24, minmax(30px, 1fr));
@@ -738,7 +785,14 @@
           </div>
         </div>
         <div class="kpi-grid" id="kpiGrid"></div>
-        <div id="frequencyChart" class="chart"></div>
+        <div class="chart-wrapper" id="freqChartWrapper">
+          <div id="frequencyChart" class="chart"></div>
+          <div class="chart-toolbar">
+            <button type="button" title="Tam ekran" data-action="fullscreen" data-chart="frequencyChart">⛶</button>
+            <button type="button" title="PNG olarak kaydet" data-action="download" data-chart="frequencyChart">📷</button>
+            <button type="button" title="Yakınlaştırmayı sıfırla" data-action="resetzoom" data-chart="frequencyChart">⟲</button>
+          </div>
+        </div>
       </div>
 
       <div class="panel">
@@ -797,7 +851,14 @@
           </div>
           <span class="tag" id="oscCountTag" data-i18n="oscCountTag">0 bulgu</span>
         </div>
-        <div id="oscillationChart" class="chart tall"></div>
+        <div class="chart-wrapper" id="oscChartWrapper">
+          <div id="oscillationChart" class="chart tall"></div>
+          <div class="chart-toolbar">
+            <button type="button" title="Tam ekran" data-action="fullscreen" data-chart="oscillationChart">⛶</button>
+            <button type="button" title="PNG olarak kaydet" data-action="download" data-chart="oscillationChart">📷</button>
+            <button type="button" title="Yakınlaştırmayı sıfırla" data-action="resetzoom" data-chart="oscillationChart">⟲</button>
+          </div>
+        </div>
       </div>
 
       <div class="panel">
@@ -1587,6 +1648,65 @@
         state.frequencyChart?.resize();
         state.oscillationChart?.resize();
       });
+
+      document.addEventListener('click', e => {
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        const action = btn.dataset.action;
+        const chartId = btn.dataset.chart;
+        if (action === 'fullscreen') toggleChartFullscreen(chartId);
+        else if (action === 'download') downloadChart(chartId);
+        else if (action === 'resetzoom') resetChartZoom(chartId);
+      });
+      document.addEventListener('keydown', handleKeyboardShortcut);
+      document.addEventListener('fullscreenchange', handleFullscreenChange);
+    }
+
+    function toggleChartFullscreen(chartId) {
+      const wrapper = $('freqChartWrapper').contains($(chartId)) ? $('freqChartWrapper') : $('oscChartWrapper');
+      if (document.fullscreenElement === wrapper) {
+        document.exitFullscreen();
+      } else {
+        wrapper.requestFullscreen();
+      }
+    }
+
+    function downloadChart(chartId) {
+      const chart = chartId === 'frequencyChart' ? state.frequencyChart : state.oscillationChart;
+      if (!chart) return;
+      const url = chart.getDataURL({ type: 'png', pixelRatio: 2, backgroundColor: '#fff' });
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = chartId === 'frequencyChart' ? 'frekans_grafigi.png' : 'osilasyon_grafigi.png';
+      a.click();
+    }
+
+    function resetChartZoom(chartId) {
+      const chart = chartId === 'frequencyChart' ? state.frequencyChart : state.oscillationChart;
+      if (!chart) return;
+      chart.dispatchAction({ type: 'dataZoom', start: 0, end: 100 });
+    }
+
+    function handleFullscreenChange() {
+      state.frequencyChart?.resize();
+      state.oscillationChart?.resize();
+    }
+
+    function handleKeyboardShortcut(e) {
+      if (e.target.matches('input, select, textarea')) return;
+      if (e.key === 'ArrowLeft') { e.preventDefault(); navigateDay(-1); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); navigateDay(1); }
+      else if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault();
+        const wrapper = document.fullscreenElement ? null : ($('freqChartWrapper')?.contains($('frequencyChart')) ? $('freqChartWrapper') : $('oscChartWrapper'));
+        if (document.fullscreenElement) { document.exitFullscreen(); }
+        else if (state.current && wrapper) { wrapper.requestFullscreen(); }
+      }
+      else if (e.key === 'r' || e.key === 'R') {
+        e.preventDefault();
+        state.frequencyChart?.dispatchAction({ type: 'dataZoom', start: 0, end: 100 });
+        state.oscillationChart?.dispatchAction({ type: 'dataZoom', start: 0, end: 100 });
+      }
     }
 
     function navigateDay(dir) {
@@ -1609,7 +1729,18 @@
       $('calGrid').querySelectorAll('.cal-day').forEach(el => el.classList.toggle('selected', el.dataset.date === iso));
       updateAlignmentInfo();
       calculateDailyReport();
+      const url = new URL(window.location);
+      url.searchParams.set('date', iso);
+      window.history.pushState({ date: iso, t: Date.now() }, '', url);
     }
+
+    window.addEventListener('popstate', e => {
+      const p = new URLSearchParams(window.location.search);
+      const date = p.get('date') || e.state?.date;
+      if (date && date !== $('dateSelect').value && state.auto?.manifest?.sources?.teias?.availableDates?.includes(date)) {
+        selectDate(date);
+      }
+    });
 
     function checkLibraries() {
       const missing = [];
@@ -1649,7 +1780,11 @@
         if (hasTeias) {
           const latest = manifest.sources.teias.latestDate;
           setBanner('loadStatus', t('autoDataReady', { date: displayDate(latest) }), 'success');
-          if (!$('dateSelect').value) selectDate(latest);
+          if (!$('dateSelect').value) {
+            const urlDate = new URLSearchParams(window.location.search).get('date');
+            const initial = urlDate && manifest.sources.teias.availableDates.includes(urlDate) ? urlDate : latest;
+            selectDate(initial);
+          }
         }
       } catch (error) {
         state.auto.manifest = null;
@@ -2325,7 +2460,7 @@
 
       state.frequencyChart.setOption({
         animation: false,
-        color: ['#176b9c', '#178276', '#c83c3c'],
+        color: ['#176b9c', '#222222', '#c83c3c'],
         tooltip: {
           trigger: 'axis',
           axisPointer: { type: 'cross' },
@@ -2344,14 +2479,14 @@
         grid: { left: 62, right: showDiff ? 68 : 28, top: 54, bottom: 72 },
         xAxis: {
           type: 'value', min: axisMin, max: axisMax, boundaryGap: false,
+          interval: detailMode ? 900 : 3600,
           axisLabel: {
-            formatter: value => secondToTime(Math.round(value)).slice(0, 8),
+            formatter: value => secondToTime(Math.round(value)).slice(0, 5),
             hideOverlap: true,
             interval: labelInterval
           },
           splitLine: {
             show: true,
-            interval: detailMode ? 900 : 3600,
             lineStyle: { color: '#e5edf2' }
           }
         },
@@ -2667,7 +2802,7 @@
 
       state.oscillationChart.setOption({
         animation: false,
-        color: ['#c83c3c', '#176b9c', '#14877f'],
+        color: ['#c83c3c', '#176b9c', '#222222'],
         tooltip: {
           trigger: 'axis',
           axisPointer: { type: 'cross' },
