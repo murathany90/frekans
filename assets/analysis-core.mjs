@@ -1,4 +1,6 @@
 const DEFAULT_NOMINAL_HZ = 50;
+const DEFAULT_SAMPLE_RATE_HZ = 1;
+const EPSILON = 1e-18;
 
 export function createSyntheticSignal({
   seconds = 600,
@@ -73,8 +75,6 @@ export function analyzeDataQuality(timestamps, values, { expectedIntervalSeconds
   longestGapSeconds = Math.max(longestGapSeconds, currentGap * expectedIntervalSeconds);
   const expectedCount = n ? Math.round(((timestamps?.[n - 1] ?? n - 1) - (timestamps?.[0] ?? 0)) / expectedIntervalSeconds) + 1 : 0;
   const missingCount = Math.max(0, expectedCount - validCount);
-  const medianInterval = percentile(intervals, 0.5);
-  const intervalStd = standardDeviation(intervals);
   const coverageRatio = expectedCount ? validCount / expectedCount : 0;
   return {
     expectedCount,
@@ -90,8 +90,8 @@ export function analyzeDataQuality(timestamps, values, { expectedIntervalSeconds
     jumpCount,
     firstTimestamp: n ? timestamps?.[0] ?? 0 : null,
     lastTimestamp: n ? timestamps?.[n - 1] ?? n - 1 : null,
-    medianIntervalSeconds: medianInterval,
-    intervalStdSeconds: intervalStd
+    medianIntervalSeconds: percentile(intervals, 0.5),
+    intervalStdSeconds: standardDeviation(intervals)
   };
 }
 
@@ -154,28 +154,57 @@ export function computeBasicStats(values, {
 export function computeRocof(values, {
   method = "central",
   sampleIntervalSeconds = 1,
+  windowSeconds = 5,
+  preFilterSeconds = 5,
   thresholdHzPerSecond = 0.01,
   minEventSeconds = 1
 } = {}) {
   const n = values?.length || 0;
+  const dt = Math.max(EPSILON, Number(sampleIntervalSeconds) || 1);
   const rocof = new Float64Array(n);
   rocof.fill(NaN);
-  for (let i = 0; i < n; i += 1) {
-    const prevIndex = method === "simple" ? i - 1 : i - 1;
-    const nextIndex = method === "simple" ? i : i + 1;
-    if (prevIndex < 0 || nextIndex >= n) continue;
-    const a = values[prevIndex];
-    const b = values[nextIndex];
-    if (!Number.isFinite(a) || !Number.isFinite(b)) continue;
-    const dt = (nextIndex - prevIndex) * sampleIntervalSeconds;
-    rocof[i] = (b - a) / dt;
+
+  if (method === "movingRegression") {
+    const radius = Math.max(1, Math.floor((windowSeconds / dt) / 2));
+    for (let i = radius; i < n - radius; i += 1) {
+      let count = 0;
+      let sumT = 0;
+      let sumY = 0;
+      let sumTT = 0;
+      let sumTY = 0;
+      for (let j = i - radius; j <= i + radius; j += 1) {
+        const y = values[j];
+        if (!Number.isFinite(y)) continue;
+        const t = (j - i) * dt;
+        count += 1;
+        sumT += t;
+        sumY += y;
+        sumTT += t * t;
+        sumTY += t * y;
+      }
+      const denom = count * sumTT - sumT * sumT;
+      if (count >= 3 && Math.abs(denom) > EPSILON) rocof[i] = (count * sumTY - sumT * sumY) / denom;
+    }
+  } else {
+    const source = method === "filteredDerivative" ? movingAverage(values, Math.max(1, Math.round(preFilterSeconds / dt))) : values;
+    for (let i = 0; i < n; i += 1) {
+      const prevIndex = method === "simple" ? i - 1 : i - 1;
+      const nextIndex = method === "simple" ? i : i + 1;
+      if (prevIndex < 0 || nextIndex >= n) continue;
+      const a = source[prevIndex];
+      const b = source[nextIndex];
+      if (!Number.isFinite(a) || !Number.isFinite(b)) continue;
+      rocof[i] = (b - a) / ((nextIndex - prevIndex) * dt);
+    }
   }
+
   const clean = finiteValues(rocof);
   const abs = clean.map(Math.abs);
-  const events = thresholdEvents(rocof, thresholdHzPerSecond, minEventSeconds);
+  const events = thresholdEvents(rocof, thresholdHzPerSecond, minEventSeconds, dt);
   return {
     series: rocof,
     method,
+    sampleIntervalSeconds: dt,
     maxPositive: clean.length ? Math.max(...clean) : NaN,
     maxNegative: clean.length ? Math.min(...clean) : NaN,
     meanAbsolute: abs.length ? abs.reduce((a, b) => a + b, 0) / abs.length : NaN,
@@ -186,7 +215,69 @@ export function computeRocof(values, {
   };
 }
 
-export function estimateDominantFrequency(values, {
+export function computeWelchPsd(values, options = {}) {
+  const params = normalizeSpectralOptions(values, options);
+  const window = makeWindow(params.windowType, params.segmentLength);
+  const windowEnergy = window.reduce((sum, value) => sum + value * value, 0);
+  const binCount = Math.floor(params.segmentLength / 2) + 1;
+  const accum = new Float64Array(binCount);
+  let segmentCount = 0;
+  const starts = segmentStarts(values?.length || 0, params.segmentLength, params.stepSamples);
+
+  for (const start of starts) {
+    const prepared = prepareSegment(values, start, params.segmentLength, params);
+    if (!prepared) continue;
+    for (let i = 0; i < prepared.length; i += 1) prepared[i] *= window[i];
+    const spectrum = fftReal(prepared);
+    for (let k = 0; k < binCount; k += 1) {
+      let scale = 1 / (params.sampleRateHz * windowEnergy);
+      if (k > 0 && k < params.segmentLength / 2) scale *= 2;
+      accum[k] += (spectrum.re[k] * spectrum.re[k] + spectrum.im[k] * spectrum.im[k]) * scale;
+    }
+    segmentCount += 1;
+  }
+
+  if (!segmentCount) return emptyPsd(params);
+
+  const allFrequencies = new Float64Array(binCount);
+  const allPsd = new Float64Array(binCount);
+  for (let k = 0; k < binCount; k += 1) {
+    allFrequencies[k] = k * params.sampleRateHz / params.segmentLength;
+    allPsd[k] = accum[k] / segmentCount;
+  }
+  const filtered = filterFrequencyRange(allFrequencies, allPsd, params.minHz, params.maxHz);
+  const peaks = findPeaks(filtered.frequencies, filtered.values, params.maxPeaks).map(peak => ({
+    frequencyHz: peak.frequencyHz,
+    psd: peak.value,
+    power: peak.value
+  }));
+  const noiseFloor = medianWithoutPeakBins(filtered.values, peaks, filtered.frequencies);
+  const bandEnergies = computeBandEnergies(allFrequencies, allPsd, params.bands);
+  const firstPeak = peaks[0] || { frequencyHz: NaN, psd: NaN, power: NaN };
+  return {
+    method: "welch-psd",
+    units: "Hz^2/Hz",
+    sampleRateHz: params.sampleRateHz,
+    segmentLength: params.segmentLength,
+    overlapSamples: params.overlapSamples,
+    overlapRatio: params.overlapRatio,
+    windowType: params.windowType,
+    detrend: params.detrend,
+    segmentCount,
+    frequencies: Array.from(filtered.frequencies),
+    psd: Array.from(filtered.values),
+    allFrequencies: Array.from(allFrequencies),
+    allPsd: Array.from(allPsd),
+    peaks,
+    bandEnergies,
+    noiseFloor,
+    snr: Number.isFinite(firstPeak.psd) ? firstPeak.psd / Math.max(noiseFloor, EPSILON) : NaN,
+    frequencyHz: firstPeak.frequencyHz,
+    power: firstPeak.psd
+  };
+}
+
+export function dominantFrequencyScan(values, {
   sampleRateHz = 1,
   minHz = 0.01,
   maxHz = 0.5,
@@ -203,9 +294,9 @@ export function estimateDominantFrequency(values, {
     powers.push(power);
     if (power > best.power) best = { frequencyHz: f, power };
   }
-  const sorted = powers.slice().sort((a, b) => a - b);
-  const noiseFloor = percentile(sorted, 0.5) || 1e-12;
+  const noiseFloor = percentile(powers, 0.5) || EPSILON;
   return {
+    method: "dominant-frequency-scan",
     frequencyHz: best.frequencyHz,
     power: best.power,
     noiseFloor,
@@ -213,45 +304,245 @@ export function estimateDominantFrequency(values, {
   };
 }
 
-export function computeCrossCorrelation(a, b, { maxLagSeconds = 30 } = {}) {
-  let bestLagSeconds = 0;
-  let bestCorrelation = -Infinity;
-  for (let lag = -maxLagSeconds; lag <= maxLagSeconds; lag += 1) {
-    const corr = correlationAtLag(a, b, lag);
-    if (Number.isFinite(corr) && corr > bestCorrelation) {
-      bestCorrelation = corr;
-      bestLagSeconds = lag;
-    }
-  }
+export function estimateDominantFrequency(values, options = {}) {
+  const welch = computeWelchPsd(values, { maxPeaks: 1, ...options });
   return {
-    bestLagSeconds,
-    bestCorrelation,
-    classification: bestCorrelation > 0.8 ? "common-mode-indicator" : bestCorrelation < 0.3 ? "uncertain-event" : "local-behavior-indicator"
+    method: "welch-psd",
+    frequencyHz: welch.frequencyHz,
+    power: welch.power,
+    noiseFloor: welch.noiseFloor,
+    snr: welch.snr,
+    peaks: welch.peaks,
+    segmentCount: welch.segmentCount
   };
 }
 
-export function estimateCoherence(a, b, { targetHz = 0.12, sampleRateHz = 1 } = {}) {
-  const x = detrendedArray(a);
-  const y = detrendedArray(b);
-  const ax = complexAt(x, targetHz, sampleRateHz);
-  const by = complexAt(y, targetHz, sampleRateHz);
-  const crossRe = ax.re * by.re + ax.im * by.im;
-  const crossIm = ax.im * by.re - ax.re * by.im;
-  const crossPower = crossRe * crossRe + crossIm * crossIm;
-  const px = ax.re * ax.re + ax.im * ax.im;
-  const py = by.re * by.re + by.im * by.im;
-  return { frequencyHz: targetHz, coherence: px > 0 && py > 0 ? clamp01(crossPower / (px * py)) : 0 };
+export function computeCrossCorrelation(a, b, {
+  maxLagSeconds = 30,
+  sampleIntervalSeconds = 1
+} = {}) {
+  const dt = Math.max(EPSILON, Number(sampleIntervalSeconds) || 1);
+  const maxLagSamples = Math.max(0, Math.round(maxLagSeconds / dt));
+  const correlations = [];
+  let bestPositiveCorrelation = -Infinity;
+  let bestPositiveLagSamples = 0;
+  let bestNegativeCorrelation = Infinity;
+  let bestNegativeLagSamples = 0;
+  let bestAbsoluteCorrelation = 0;
+  let bestAbsoluteLagSamples = 0;
+
+  for (let lag = -maxLagSamples; lag <= maxLagSamples; lag += 1) {
+    const corr = correlationAtLag(a, b, lag);
+    if (!Number.isFinite(corr)) continue;
+    correlations.push({ lagSamples: lag, lagSeconds: lag * dt, correlation: corr });
+    if (corr > bestPositiveCorrelation) {
+      bestPositiveCorrelation = corr;
+      bestPositiveLagSamples = lag;
+    }
+    if (corr < bestNegativeCorrelation) {
+      bestNegativeCorrelation = corr;
+      bestNegativeLagSamples = lag;
+    }
+    if (Math.abs(corr) > Math.abs(bestAbsoluteCorrelation)) {
+      bestAbsoluteCorrelation = corr;
+      bestAbsoluteLagSamples = lag;
+    }
+  }
+
+  const bestCorrelation = Math.abs(bestAbsoluteCorrelation) >= Math.abs(bestPositiveCorrelation)
+    ? bestAbsoluteCorrelation
+    : bestPositiveCorrelation;
+  return {
+    sampleIntervalSeconds: dt,
+    correlations,
+    bestPositiveCorrelation,
+    bestPositiveLagSamples,
+    bestPositiveLagSeconds: bestPositiveLagSamples * dt,
+    bestNegativeCorrelation,
+    bestNegativeLagSamples,
+    bestNegativeLagSeconds: bestNegativeLagSamples * dt,
+    bestAbsoluteCorrelation,
+    bestAbsoluteLagSamples,
+    bestAbsoluteLagSeconds: bestAbsoluteLagSamples * dt,
+    bestCorrelation,
+    bestLagSeconds: bestAbsoluteLagSamples * dt,
+    classification: Math.abs(bestAbsoluteCorrelation) > 0.8 ? "common-mode-indicator" : Math.abs(bestAbsoluteCorrelation) < 0.3 ? "uncertain-event" : "local-behavior-indicator"
+  };
 }
 
-export function estimatePhaseDifference(a, b, { targetHz = 0.12, sampleRateHz = 1 } = {}) {
-  const ax = complexAt(detrendedArray(a), targetHz, sampleRateHz);
-  const by = complexAt(detrendedArray(b), targetHz, sampleRateHz);
-  const phaseA = Math.atan2(ax.im, ax.re);
-  const phaseB = Math.atan2(by.im, by.re);
+export function computeMagnitudeSquaredCoherence(a, b, options = {}) {
+  const spectra = computeWelchCrossSpectra(a, b, options);
+  const points = [];
+  let maxCoherence = -Infinity;
+  let maxCoherenceFrequencyHz = NaN;
+  let sum = 0;
+  let count = 0;
+  let weightedSum = 0;
+  let weightTotal = 0;
+  for (let i = 0; i < spectra.frequencies.length; i += 1) {
+    const pxx = spectra.pxx[i];
+    const pyy = spectra.pyy[i];
+    const pxyRe = spectra.pxyRe[i];
+    const pxyIm = spectra.pxyIm[i];
+    const coherence = clamp01((pxyRe * pxyRe + pxyIm * pxyIm) / Math.max(EPSILON, pxx * pyy));
+    const point = { frequencyHz: spectra.frequencies[i], coherence };
+    const weight = Math.sqrt(Math.max(0, pxx * pyy));
+    points.push(point);
+    sum += coherence;
+    count += 1;
+    weightedSum += coherence * weight;
+    weightTotal += weight;
+    if (coherence > maxCoherence) {
+      maxCoherence = coherence;
+      maxCoherenceFrequencyHz = spectra.frequencies[i];
+    }
+  }
+  const highCoherenceRegions = contiguousRegions(points, point => point.coherence >= 0.7);
   return {
-    frequencyHz: targetHz,
-    phaseRadians: normalizeRadians(phaseB - phaseA),
-    phaseDegrees: normalizeDegrees((phaseB - phaseA) * 180 / Math.PI)
+    method: "magnitude-squared-coherence",
+    frequencies: points.map(point => point.frequencyHz),
+    coherence: points.map(point => point.coherence),
+    points,
+    maxCoherence: Number.isFinite(maxCoherence) ? maxCoherence : NaN,
+    maxCoherenceFrequencyHz,
+    bandAverageCoherence: weightTotal > EPSILON ? weightedSum / weightTotal : count ? sum / count : NaN,
+    bandMaxCoherence: Number.isFinite(maxCoherence) ? maxCoherence : NaN,
+    highCoherenceRegions,
+    segmentCount: spectra.segmentCount,
+    confidence: spectra.segmentCount >= 4 ? "medium" : "low",
+    parameters: spectra.parameters
+  };
+}
+
+export function estimateCoherence(a, b, { targetHz = 0.12, ...options } = {}) {
+  const result = computeMagnitudeSquaredCoherence(a, b, {
+    targetHz,
+    minHz: Math.max(0, targetHz - 0.03),
+    maxHz: targetHz + 0.03,
+    ...options
+  });
+  const nearest = nearestPoint(result.points, targetHz, "coherence");
+  return {
+    method: "magnitude-squared-coherence",
+    frequencyHz: nearest?.frequencyHz ?? targetHz,
+    coherence: nearest?.coherence ?? 0,
+    segmentCount: result.segmentCount
+  };
+}
+
+export function computeCrossPowerSpectralDensity(a, b, options = {}) {
+  const targetHz = options.targetHz ?? ((options.minHz ?? 0.01) + (options.maxHz ?? 0.5)) / 2;
+  const spectra = computeWelchCrossSpectra(a, b, options);
+  const magnitudes = [];
+  const phases = [];
+  const coherenceValues = [];
+  for (let i = 0; i < spectra.frequencies.length; i += 1) {
+    const re = spectra.pxyRe[i];
+    const im = spectra.pxyIm[i];
+    magnitudes.push(Math.hypot(re, im));
+    phases.push(Math.atan2(im, re));
+    coherenceValues.push(clamp01((re * re + im * im) / Math.max(EPSILON, spectra.pxx[i] * spectra.pyy[i])));
+  }
+  const unwrapped = unwrapPhase(phases);
+  const selectedIndex = nearestIndex(spectra.frequencies, targetHz);
+  const selectedCoherence = coherenceValues[selectedIndex] ?? 0;
+  const highMask = coherenceValues.map(value => value >= 0.45);
+  const phaseStability = circularStability(phases.filter((_, index) => highMask[index]));
+  return {
+    method: "cross-power-spectral-density",
+    units: "Hz^2/Hz",
+    frequencies: Array.from(spectra.frequencies),
+    crossPsdMagnitude: magnitudes,
+    phaseRadians: phases,
+    phaseDegrees: phases.map(value => normalizeDegrees(value * 180 / Math.PI)),
+    unwrappedPhaseRadians: unwrapped,
+    selectedFrequencyHz: spectra.frequencies[selectedIndex] ?? targetHz,
+    selectedMagnitude: magnitudes[selectedIndex] ?? NaN,
+    selectedPhaseRadians: phases[selectedIndex] ?? NaN,
+    selectedPhaseDegrees: normalizeDegrees((phases[selectedIndex] ?? NaN) * 180 / Math.PI),
+    selectedCoherence,
+    bandAveragePhaseRadians: circularMean(phases.filter((_, index) => highMask[index])),
+    phaseStability,
+    phaseConfidence: selectedCoherence >= 0.7 ? "high" : selectedCoherence >= 0.4 ? "medium" : "low",
+    segmentCount: spectra.segmentCount,
+    parameters: spectra.parameters
+  };
+}
+
+export function estimatePhaseDifference(a, b, { targetHz = 0.12, ...options } = {}) {
+  const cross = computeCrossPowerSpectralDensity(a, b, {
+    targetHz,
+    minHz: Math.max(0, targetHz - 0.03),
+    maxHz: targetHz + 0.03,
+    ...options
+  });
+  return {
+    method: "cross-power-spectral-density",
+    frequencyHz: cross.selectedFrequencyHz,
+    phaseRadians: normalizeRadians(cross.selectedPhaseRadians),
+    phaseDegrees: normalizeDegrees(cross.selectedPhaseDegrees),
+    confidence: cross.phaseConfidence,
+    coherence: cross.selectedCoherence
+  };
+}
+
+export function computeStftSpectrogram(values, options = {}) {
+  const params = normalizeSpectralOptions(values, { segmentLength: 256, overlapRatio: 0.75, ...options });
+  const window = makeWindow(params.windowType, params.segmentLength);
+  const windowEnergy = window.reduce((sum, value) => sum + value * value, 0);
+  const binCount = Math.floor(params.segmentLength / 2) + 1;
+  const allFrequencies = new Float64Array(binCount);
+  for (let k = 0; k < binCount; k += 1) allFrequencies[k] = k * params.sampleRateHz / params.segmentLength;
+  const frequencyIndices = [];
+  const frequencyBins = [];
+  for (let k = 0; k < binCount; k += 1) {
+    if (allFrequencies[k] >= params.minHz - 1e-12 && allFrequencies[k] <= params.maxHz + 1e-12) {
+      frequencyIndices.push(k);
+      frequencyBins.push(allFrequencies[k]);
+    }
+  }
+
+  const timeBins = [];
+  const powerMatrix = [];
+  const peaksByTime = [];
+  for (const start of segmentStarts(values?.length || 0, params.segmentLength, params.stepSamples)) {
+    const time = (start + params.segmentLength / 2) / params.sampleRateHz;
+    timeBins.push(time);
+    const prepared = prepareSegment(values, start, params.segmentLength, params);
+    if (!prepared) {
+      powerMatrix.push(frequencyBins.map(() => NaN));
+      peaksByTime.push({ timeSeconds: time, frequencyHz: NaN, power: NaN });
+      continue;
+    }
+    for (let i = 0; i < prepared.length; i += 1) prepared[i] *= window[i];
+    const spectrum = fftReal(prepared);
+    const row = [];
+    let best = { frequencyHz: NaN, power: -Infinity };
+    for (const k of frequencyIndices) {
+      let scale = 1 / (params.sampleRateHz * windowEnergy);
+      if (k > 0 && k < params.segmentLength / 2) scale *= 2;
+      let power = (spectrum.re[k] * spectrum.re[k] + spectrum.im[k] * spectrum.im[k]) * scale;
+      if (params.scale === "log") power = 10 * Math.log10(Math.max(power, EPSILON));
+      row.push(power);
+      if (power > best.power) best = { frequencyHz: allFrequencies[k], power };
+    }
+    powerMatrix.push(row);
+    peaksByTime.push({ timeSeconds: time, ...best });
+  }
+
+  return {
+    method: "stft-spectrogram",
+    units: params.scale === "log" ? "dB(Hz^2/Hz)" : "Hz^2/Hz",
+    timeBins,
+    frequencyBins,
+    powerMatrix,
+    peaksByTime,
+    segmentLength: params.segmentLength,
+    overlapSamples: params.overlapSamples,
+    overlapRatio: params.overlapRatio,
+    windowType: params.windowType,
+    sampleRateHz: params.sampleRateHz,
+    scale: params.scale
   };
 }
 
@@ -266,17 +557,317 @@ export function computeOscillationConfidence({
   hasGaps = false
 } = {}) {
   let score = 0;
-  score += 22 * clamp01(coverageRatio);
-  score += 18 * clamp01(Math.log10(Math.max(1, snr)) / 2);
-  score += 14 * clamp01(durationSeconds / 300);
-  score += 12 * clamp01(bandEnergyRatio);
+  score += 24 * clamp01(coverageRatio);
+  score += 20 * clamp01(Math.log10(Math.max(1, snr)) / 2);
+  score += 16 * clamp01(durationSeconds / 300);
+  score += 14 * clamp01(bandEnergyRatio);
   score += 12 * clamp01(peakProminence);
-  score += simultaneousSources ? 10 : 0;
-  score += 10 * clamp01(coherence);
+  score += simultaneousSources ? 8 : 0;
+  score += 6 * clamp01(coherence);
   if (hasGaps) score -= 15;
   return {
     score: Math.max(0, Math.min(100, Math.round(score))),
     factors: { coverageRatio, snr, durationSeconds, bandEnergyRatio, peakProminence, simultaneousSources, coherence, hasGaps }
+  };
+}
+
+function computeWelchCrossSpectra(a, b, options = {}) {
+  const n = Math.min(a?.length || 0, b?.length || 0);
+  const params = normalizeSpectralOptions({ length: n }, options);
+  const window = makeWindow(params.windowType, params.segmentLength);
+  const windowEnergy = window.reduce((sum, value) => sum + value * value, 0);
+  const binCount = Math.floor(params.segmentLength / 2) + 1;
+  const pxxAll = new Float64Array(binCount);
+  const pyyAll = new Float64Array(binCount);
+  const pxyReAll = new Float64Array(binCount);
+  const pxyImAll = new Float64Array(binCount);
+  let segmentCount = 0;
+
+  for (const start of segmentStarts(n, params.segmentLength, params.stepSamples)) {
+    const x = prepareSegment(a, start, params.segmentLength, params);
+    const y = prepareSegment(b, start, params.segmentLength, params);
+    if (!x || !y) continue;
+    for (let i = 0; i < params.segmentLength; i += 1) {
+      x[i] *= window[i];
+      y[i] *= window[i];
+    }
+    const sx = fftReal(x);
+    const sy = fftReal(y);
+    for (let k = 0; k < binCount; k += 1) {
+      let scale = 1 / (params.sampleRateHz * windowEnergy);
+      if (k > 0 && k < params.segmentLength / 2) scale *= 2;
+      const xr = sx.re[k];
+      const xi = sx.im[k];
+      const yr = sy.re[k];
+      const yi = sy.im[k];
+      pxxAll[k] += (xr * xr + xi * xi) * scale;
+      pyyAll[k] += (yr * yr + yi * yi) * scale;
+      pxyReAll[k] += (xr * yr + xi * yi) * scale;
+      pxyImAll[k] += (xi * yr - xr * yi) * scale;
+    }
+    segmentCount += 1;
+  }
+
+  if (!segmentCount) {
+    return {
+      frequencies: [],
+      pxx: [],
+      pyy: [],
+      pxyRe: [],
+      pxyIm: [],
+      segmentCount: 0,
+      parameters: params
+    };
+  }
+
+  const allFrequencies = new Float64Array(binCount);
+  const pxx = [];
+  const pyy = [];
+  const pxyRe = [];
+  const pxyIm = [];
+  const frequencies = [];
+  for (let k = 0; k < binCount; k += 1) {
+    const f = k * params.sampleRateHz / params.segmentLength;
+    allFrequencies[k] = f;
+    if (f < params.minHz - 1e-12 || f > params.maxHz + 1e-12) continue;
+    frequencies.push(f);
+    pxx.push(pxxAll[k] / segmentCount);
+    pyy.push(pyyAll[k] / segmentCount);
+    pxyRe.push(pxyReAll[k] / segmentCount);
+    pxyIm.push(pxyImAll[k] / segmentCount);
+  }
+
+  return {
+    frequencies,
+    pxx,
+    pyy,
+    pxyRe,
+    pxyIm,
+    segmentCount,
+    parameters: params
+  };
+}
+
+function normalizeSpectralOptions(values, options) {
+  const n = values?.length || 0;
+  const sampleRateHz = Number(options.sampleRateHz || DEFAULT_SAMPLE_RATE_HZ);
+  const requested = Math.max(8, Math.min(Number(options.segmentLength || 256), Math.max(8, n || 8)));
+  const segmentLength = isPowerOfTwo(requested) ? requested : previousPowerOfTwo(requested);
+  const overlapRatio = clamp(Number(options.overlapRatio ?? 0.5), 0, 0.95);
+  const overlapSamples = Math.min(segmentLength - 1, Math.max(0, Math.round(options.overlapSamples ?? segmentLength * overlapRatio)));
+  return {
+    sampleRateHz,
+    segmentLength,
+    overlapRatio: overlapSamples / segmentLength,
+    overlapSamples,
+    stepSamples: Math.max(1, segmentLength - overlapSamples),
+    windowType: options.windowType || "hann",
+    detrend: options.detrend ?? "constant",
+    minHz: Number(options.minHz ?? 0),
+    maxHz: Number(options.maxHz ?? sampleRateHz / 2),
+    maxPeaks: Math.max(1, Number(options.maxPeaks ?? 5)),
+    minValidRatio: Number(options.minValidRatio ?? 0.75),
+    bands: options.bands || [{ name: "selected", minHz: Number(options.minHz ?? 0), maxHz: Number(options.maxHz ?? sampleRateHz / 2) }],
+    scale: options.scale || "linear"
+  };
+}
+
+function prepareSegment(values, start, length, params) {
+  let count = 0;
+  let sum = 0;
+  for (let i = 0; i < length; i += 1) {
+    const value = Number(values?.[start + i]);
+    if (Number.isFinite(value)) {
+      count += 1;
+      sum += value;
+    }
+  }
+  if (count / length < params.minValidRatio) return null;
+  const mean = count ? sum / count : 0;
+  const out = new Float64Array(length);
+  for (let i = 0; i < length; i += 1) {
+    const value = Number(values?.[start + i]);
+    out[i] = Number.isFinite(value) ? value : mean;
+  }
+  if (params.detrend === false || params.detrend === "none") return out;
+  if (params.detrend === "linear") removeLinearTrend(out);
+  else {
+    for (let i = 0; i < out.length; i += 1) out[i] -= mean;
+  }
+  return out;
+}
+
+function removeLinearTrend(values) {
+  const n = values.length;
+  let sumX = 0;
+  let sumY = 0;
+  let sumXX = 0;
+  let sumXY = 0;
+  for (let i = 0; i < n; i += 1) {
+    sumX += i;
+    sumY += values[i];
+    sumXX += i * i;
+    sumXY += i * values[i];
+  }
+  const denom = n * sumXX - sumX * sumX;
+  if (Math.abs(denom) < EPSILON) return;
+  const slope = (n * sumXY - sumX * sumY) / denom;
+  const intercept = (sumY - slope * sumX) / n;
+  for (let i = 0; i < n; i += 1) values[i] -= intercept + slope * i;
+}
+
+function segmentStarts(n, length, step) {
+  if (n < length) return n ? [0] : [];
+  const starts = [];
+  for (let start = 0; start + length <= n; start += step) starts.push(start);
+  return starts;
+}
+
+function makeWindow(type, n) {
+  const out = new Float64Array(n);
+  const key = String(type || "hann").toLowerCase();
+  if (key === "rectangular" || key === "rect") {
+    out.fill(1);
+    return out;
+  }
+  for (let i = 0; i < n; i += 1) {
+    if (key === "hamming") out[i] = 0.54 - 0.46 * Math.cos(2 * Math.PI * i / Math.max(1, n - 1));
+    else out[i] = 0.5 * (1 - Math.cos(2 * Math.PI * i / Math.max(1, n - 1)));
+  }
+  return out;
+}
+
+function fftReal(values) {
+  const n = values.length;
+  const re = new Float64Array(n);
+  const im = new Float64Array(n);
+  re.set(values);
+  if (isPowerOfTwo(n)) fftComplexInPlace(re, im);
+  else dftComplexInPlace(re, im);
+  return { re, im };
+}
+
+function fftComplexInPlace(re, im) {
+  const n = re.length;
+  for (let i = 1, j = 0; i < n; i += 1) {
+    let bit = n >> 1;
+    for (; j & bit; bit >>= 1) j ^= bit;
+    j ^= bit;
+    if (i < j) {
+      [re[i], re[j]] = [re[j], re[i]];
+      [im[i], im[j]] = [im[j], im[i]];
+    }
+  }
+  for (let len = 2; len <= n; len <<= 1) {
+    const angle = -2 * Math.PI / len;
+    const wlenRe = Math.cos(angle);
+    const wlenIm = Math.sin(angle);
+    for (let i = 0; i < n; i += len) {
+      let wRe = 1;
+      let wIm = 0;
+      for (let j = 0; j < len / 2; j += 1) {
+        const uRe = re[i + j];
+        const uIm = im[i + j];
+        const vRe = re[i + j + len / 2] * wRe - im[i + j + len / 2] * wIm;
+        const vIm = re[i + j + len / 2] * wIm + im[i + j + len / 2] * wRe;
+        re[i + j] = uRe + vRe;
+        im[i + j] = uIm + vIm;
+        re[i + j + len / 2] = uRe - vRe;
+        im[i + j + len / 2] = uIm - vIm;
+        const nextRe = wRe * wlenRe - wIm * wlenIm;
+        wIm = wRe * wlenIm + wIm * wlenRe;
+        wRe = nextRe;
+      }
+    }
+  }
+}
+
+function dftComplexInPlace(re, im) {
+  const n = re.length;
+  const outRe = new Float64Array(n);
+  const outIm = new Float64Array(n);
+  for (let k = 0; k < n; k += 1) {
+    let sumRe = 0;
+    let sumIm = 0;
+    for (let t = 0; t < n; t += 1) {
+      const angle = -2 * Math.PI * k * t / n;
+      sumRe += re[t] * Math.cos(angle) - im[t] * Math.sin(angle);
+      sumIm += re[t] * Math.sin(angle) + im[t] * Math.cos(angle);
+    }
+    outRe[k] = sumRe;
+    outIm[k] = sumIm;
+  }
+  re.set(outRe);
+  im.set(outIm);
+}
+
+function filterFrequencyRange(frequencies, values, minHz, maxHz) {
+  const outF = [];
+  const outV = [];
+  for (let i = 0; i < frequencies.length; i += 1) {
+    const f = frequencies[i];
+    if (f >= minHz - 1e-12 && f <= maxHz + 1e-12) {
+      outF.push(f);
+      outV.push(values[i]);
+    }
+  }
+  return { frequencies: outF, values: outV };
+}
+
+function findPeaks(frequencies, values, maxPeaks) {
+  const peaks = [];
+  for (let i = 0; i < values.length; i += 1) {
+    const left = i === 0 ? -Infinity : values[i - 1];
+    const right = i === values.length - 1 ? -Infinity : values[i + 1];
+    if (Number.isFinite(values[i]) && values[i] >= left && values[i] >= right) {
+      peaks.push({ frequencyHz: frequencies[i], value: values[i] });
+    }
+  }
+  if (!peaks.length && values.length) {
+    const index = values.reduce((best, value, i) => value > values[best] ? i : best, 0);
+    peaks.push({ frequencyHz: frequencies[index], value: values[index] });
+  }
+  return peaks.sort((a, b) => b.value - a.value).slice(0, maxPeaks);
+}
+
+function medianWithoutPeakBins(values, peaks, frequencies) {
+  const peakFrequencies = new Set(peaks.slice(0, 3).map(peak => peak.frequencyHz));
+  const filtered = values.filter((_, index) => !peakFrequencies.has(frequencies[index]));
+  return percentile(filtered.length ? filtered : values, 0.5) || EPSILON;
+}
+
+function computeBandEnergies(frequencies, psd, bands) {
+  const df = frequencies.length > 1 ? frequencies[1] - frequencies[0] : 0;
+  return bands.map(band => {
+    let energy = 0;
+    for (let i = 0; i < frequencies.length; i += 1) {
+      if (frequencies[i] >= band.minHz && frequencies[i] <= band.maxHz) energy += psd[i] * df;
+    }
+    return { name: band.name || `${band.minHz}-${band.maxHz}`, minHz: band.minHz, maxHz: band.maxHz, energy };
+  });
+}
+
+function emptyPsd(params) {
+  return {
+    method: "welch-psd",
+    units: "Hz^2/Hz",
+    sampleRateHz: params.sampleRateHz,
+    segmentLength: params.segmentLength,
+    overlapSamples: params.overlapSamples,
+    overlapRatio: params.overlapRatio,
+    windowType: params.windowType,
+    detrend: params.detrend,
+    segmentCount: 0,
+    frequencies: [],
+    psd: [],
+    allFrequencies: [],
+    allPsd: [],
+    peaks: [],
+    bandEnergies: [],
+    noiseFloor: NaN,
+    snr: NaN,
+    frequencyHz: NaN,
+    power: NaN
   };
 }
 
@@ -290,14 +881,14 @@ function detrendedArray(values) {
   return Array.from(values || [], value => Number.isFinite(value) ? value - mean : 0);
 }
 
-function percentile(sortedOrValues, p) {
-  const values = Array.from(sortedOrValues || []).filter(Number.isFinite).sort((a, b) => a - b);
-  if (!values.length) return NaN;
-  const index = (values.length - 1) * p;
+function percentile(values, p) {
+  const clean = finiteValues(values).sort((a, b) => a - b);
+  if (!clean.length) return NaN;
+  const index = (clean.length - 1) * p;
   const lower = Math.floor(index);
   const upper = Math.ceil(index);
-  if (lower === upper) return values[lower];
-  return values[lower] + (values[upper] - values[lower]) * (index - lower);
+  if (lower === upper) return clean[lower];
+  return clean[lower] + (clean[upper] - clean[lower]) * (index - lower);
 }
 
 function standardDeviation(values) {
@@ -330,7 +921,7 @@ function countBandViolationEvents(values, minHz, maxHz) {
   return { count, longestSeconds };
 }
 
-function thresholdEvents(series, threshold, minEventSeconds) {
+function thresholdEvents(series, threshold, minEventSeconds, sampleIntervalSeconds) {
   const events = [];
   let start = null;
   let peak = 0;
@@ -344,20 +935,22 @@ function thresholdEvents(series, threshold, minEventSeconds) {
       if (Math.abs(value) > Math.abs(peak)) peak = value;
     } else if (start !== null) {
       const end = i - 1;
-      const durationSeconds = end - start + 1;
-      if (durationSeconds >= minEventSeconds) events.push({ startSecond: start, endSecond: end, durationSeconds, peakHzPerSecond: peak });
+      const durationSeconds = (end - start + 1) * sampleIntervalSeconds;
+      if (durationSeconds >= minEventSeconds) {
+        events.push({ startSecond: start * sampleIntervalSeconds, endSecond: end * sampleIntervalSeconds, durationSeconds, peakHzPerSecond: peak });
+      }
       start = null;
     }
   }
   return events;
 }
 
-function correlationAtLag(a, b, lag) {
+function correlationAtLag(a, b, lagSamples) {
   const xs = [];
   const ys = [];
   const n = Math.min(a?.length || 0, b?.length || 0);
   for (let i = 0; i < n; i += 1) {
-    const j = i + lag;
+    const j = i + lagSamples;
     if (j < 0 || j >= n) continue;
     const x = a[i];
     const y = b[j];
@@ -392,6 +985,92 @@ function complexAt(values, frequencyHz, sampleRateHz) {
   return { re, im };
 }
 
+function movingAverage(values, windowSamples) {
+  const n = values?.length || 0;
+  const out = new Float64Array(n);
+  out.fill(NaN);
+  const radius = Math.max(0, Math.floor(windowSamples / 2));
+  for (let i = 0; i < n; i += 1) {
+    let sum = 0;
+    let count = 0;
+    for (let j = Math.max(0, i - radius); j <= Math.min(n - 1, i + radius); j += 1) {
+      const value = values[j];
+      if (Number.isFinite(value)) {
+        sum += value;
+        count += 1;
+      }
+    }
+    if (count) out[i] = sum / count;
+  }
+  return out;
+}
+
+function contiguousRegions(points, predicate) {
+  const regions = [];
+  let start = null;
+  let max = 0;
+  for (const point of points) {
+    if (predicate(point)) {
+      if (!start) {
+        start = point;
+        max = point.coherence;
+      } else {
+        max = Math.max(max, point.coherence);
+      }
+    } else if (start) {
+      const previous = points[points.indexOf(point) - 1];
+      regions.push({ startHz: start.frequencyHz, endHz: previous.frequencyHz, maxCoherence: max });
+      start = null;
+    }
+  }
+  if (start) {
+    const last = points[points.length - 1];
+    regions.push({ startHz: start.frequencyHz, endHz: last.frequencyHz, maxCoherence: max });
+  }
+  return regions;
+}
+
+function nearestPoint(points, target, valueKey) {
+  if (!points?.length) return null;
+  return points.reduce((best, point) => Math.abs(point.frequencyHz - target) < Math.abs(best.frequencyHz - target) ? point : best, points[0]);
+}
+
+function nearestIndex(values, target) {
+  if (!values?.length) return 0;
+  let best = 0;
+  for (let i = 1; i < values.length; i += 1) {
+    if (Math.abs(values[i] - target) < Math.abs(values[best] - target)) best = i;
+  }
+  return best;
+}
+
+function unwrapPhase(values) {
+  if (!values.length) return [];
+  const out = [values[0]];
+  let offset = 0;
+  for (let i = 1; i < values.length; i += 1) {
+    const delta = values[i] - values[i - 1];
+    if (delta > Math.PI) offset -= 2 * Math.PI;
+    else if (delta < -Math.PI) offset += 2 * Math.PI;
+    out.push(values[i] + offset);
+  }
+  return out;
+}
+
+function circularMean(values) {
+  if (!values.length) return NaN;
+  const re = values.reduce((sum, value) => sum + Math.cos(value), 0) / values.length;
+  const im = values.reduce((sum, value) => sum + Math.sin(value), 0) / values.length;
+  return Math.atan2(im, re);
+}
+
+function circularStability(values) {
+  if (!values.length) return 0;
+  const re = values.reduce((sum, value) => sum + Math.cos(value), 0) / values.length;
+  const im = values.reduce((sum, value) => sum + Math.sin(value), 0) / values.length;
+  return Math.hypot(re, im);
+}
+
 function normalizeRadians(value) {
   let out = value;
   while (out <= -Math.PI) out += 2 * Math.PI;
@@ -408,6 +1087,18 @@ function normalizeDegrees(value) {
 
 function clamp01(value) {
   return Math.max(0, Math.min(1, Number(value) || 0));
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function isPowerOfTwo(value) {
+  return value > 0 && (value & (value - 1)) === 0;
+}
+
+function previousPowerOfTwo(value) {
+  return 2 ** Math.max(3, Math.floor(Math.log2(Math.max(8, value))));
 }
 
 function emptyStats() {
@@ -440,9 +1131,14 @@ export const FrequencyAnalysisCore = {
   analyzeDataQuality,
   computeBasicStats,
   computeCrossCorrelation,
+  computeCrossPowerSpectralDensity,
+  computeMagnitudeSquaredCoherence,
   computeOscillationConfidence,
   computeRocof,
+  computeStftSpectrogram,
+  computeWelchPsd,
   createSyntheticSignal,
+  dominantFrequencyScan,
   estimateCoherence,
   estimateDominantFrequency,
   estimatePhaseDifference

@@ -1,3 +1,4 @@
+import json
 from datetime import date
 
 import pytest
@@ -102,6 +103,13 @@ def test_write_day_outputs_and_manifest_include_versioned_paths(tmp_path):
     assert manifest["storage"]["baseUrl"] == "./data"
     assert manifest["sources"]["teias"]["availableDates"] == ["2026-06-28"]
     assert manifest["sources"]["teias"]["files"]["2026-06-28"]["frequency"].endswith(
+        "20260628.frequency.i16"
+    )
+    summary = json.loads((tmp_path / "manifest-summary.json").read_text(encoding="utf-8"))
+    shard = json.loads((tmp_path / "manifest" / "2026.json").read_text(encoding="utf-8"))
+    assert summary["shards"]["2026"] == "manifest/2026.json"
+    assert summary["sources"]["teias"]["latestDate"] == "2026-06-28"
+    assert shard["sources"]["teias"]["days"]["2026-06-28"]["files"]["frequency"].endswith(
         "20260628.frequency.i16"
     )
 

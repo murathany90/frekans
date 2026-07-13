@@ -20,26 +20,149 @@ page.on("console", message => {
 });
 page.on("pageerror", error => consoleErrors.push(error.message));
 
+async function getFrequencySeriesNames(targetPage = page) {
+  return await targetPage.evaluate(() => {
+    const chart = window.echarts?.getInstanceByDom(document.querySelector("#frequencyChart"));
+    return chart?.getOption()?.series?.map(series => series.name) || [];
+  });
+}
+
+async function waitForFrequencySeries(predicate, label) {
+  await page.waitForFunction(predicate, { timeout: 15000 }).catch(error => {
+    throw new Error(`${label}: ${error.message}`);
+  });
+}
+
+function assertNoConsoleErrors(stage) {
+  if (consoleErrors.length) {
+    throw new Error(`${stage} console errors:\n${consoleErrors.join("\n")}`);
+  }
+}
+
 try {
   await page.context().tracing.start({ screenshots: true, snapshots: true });
   await page.goto(url, { waitUntil: "networkidle" });
   await page.waitForSelector("#autoModeBadge", { state: "attached" });
   await page.waitForFunction(() => Boolean(document.querySelector("#dateSelect")?.value));
   await page.click('[data-tab="tab-chart"]');
+
+  const defaults = await page.evaluate(() => ({
+    difference: document.querySelector("#showDifference")?.value,
+    minmax: document.querySelector("#showMinMaxEnvelope")?.value,
+    differencePressed: document.querySelector('[data-layer="difference"]')?.getAttribute("aria-pressed"),
+    minmaxPressed: document.querySelector('[data-layer="minmax"]')?.getAttribute("aria-pressed")
+  }));
+  if (defaults.difference !== "no" || defaults.minmax !== "no") {
+    throw new Error(`Layer defaults are not off: ${JSON.stringify(defaults)}`);
+  }
+  if (defaults.differencePressed !== "false" || defaults.minmaxPressed !== "false") {
+    throw new Error(`Layer buttons are not aria-off by default: ${JSON.stringify(defaults)}`);
+  }
+
   await page.click("#calculateBtn");
-  await page.waitForFunction(() => document.querySelector("#reportDateTag")?.textContent !== "Tarih seçilmedi");
+  await page.waitForFunction(() => document.querySelector("#reportDateTag")?.textContent.length > 4);
   await page.waitForSelector("#frequencyChart canvas");
+
+  const initialSeries = await getFrequencySeriesNames();
+  if (initialSeries.length !== 2) {
+    throw new Error(`Expected only base frequency series by default, got: ${initialSeries.join(", ")}`);
+  }
+
+  await page.click('[data-layer="difference"]');
+  await page.waitForFunction(() => document.querySelector('[data-layer="difference"]')?.getAttribute("aria-pressed") === "true");
+  await waitForFrequencySeries(() => {
+    const chart = window.echarts?.getInstanceByDom(document.querySelector("#frequencyChart"));
+    return (chart?.getOption()?.series || []).some(series => /fark|diff/i.test(series.name || ""));
+  }, "Difference layer did not render");
+
+  await page.click('[data-layer="minmax"]');
+  await page.waitForFunction(() => document.querySelector('[data-layer="minmax"]')?.getAttribute("aria-pressed") === "true");
+  await waitForFrequencySeries(() => {
+    const chart = window.echarts?.getInstanceByDom(document.querySelector("#frequencyChart"));
+    const names = (chart?.getOption()?.series || []).map(series => series.name || "");
+    return names.length >= 6 && names.some(name => /min/i.test(name)) && names.some(name => /max|maks/i.test(name));
+  }, "Min/max layer did not render");
+
+  const rapidDateResult = await page.evaluate(async () => {
+    const dates = (state.auto.manifest?.sources?.teias?.availableDates || []).slice(-5);
+    if (dates.length < 2) return { skipped: true, reason: "not enough dates" };
+    dates.forEach((date, index) => {
+      window.setTimeout(() => selectDate(date, { pushHistory: false, immediate: true }), index * 8);
+    });
+    await new Promise(resolve => window.setTimeout(resolve, 900));
+    return {
+      skipped: false,
+      expected: dates.at(-1),
+      selected: document.querySelector("#dateSelect")?.value,
+      rendered: state.datePerf.renderedDate,
+      loading: state.dateLoading,
+      requests: state.dateRequestSequence,
+      aborted: state.datePerf.abortedFetches
+    };
+  });
+  if (!rapidDateResult.skipped) {
+    await page.waitForFunction(() => !state.dateLoading, { timeout: 20000 });
+    const finalDateState = await page.evaluate(() => ({
+      selected: document.querySelector("#dateSelect")?.value,
+      rendered: state.datePerf.renderedDate,
+      loading: state.dateLoading
+    }));
+    if (finalDateState.loading || finalDateState.selected !== rapidDateResult.expected || finalDateState.rendered !== rapidDateResult.expected) {
+      throw new Error(`Rapid date navigation did not settle on the last request: ${JSON.stringify({ rapidDateResult, finalDateState })}`);
+    }
+  }
+
   await page.click(".hour-header");
   await page.waitForFunction(() => document.querySelector("#chartViewTag")?.textContent.includes("3.600 saniye"));
   await page.dblclick(".hour-header");
   await page.waitForFunction(() => document.querySelector("#chartViewTag")?.textContent.includes("24 saat"));
+
   await page.click('[data-tab="tab-oscillation"]');
+  await page.selectOption("#analysisTypeSelect", "psd");
+  const beforeWorkerRun = await page.evaluate(() => state.analysis.workerRequestId);
+  await page.click("#analysisRunBtn");
+  await page.waitForFunction(() => document.querySelectorAll("#analysisResultCards .analysis-result-card").length >= 2, { timeout: 20000 });
+  await page.waitForSelector("#analysisMainChart canvas");
+  const afterWorkerRun = await page.evaluate(() => state.analysis.workerRequestId);
+  if (afterWorkerRun <= beforeWorkerRun) throw new Error("PSD analysis did not enter the worker execution path.");
+
   await page.selectOption("#analysisSourceSelect", "de");
   const selected = await page.$eval("#analysisSourceSelect", el => el.value);
   if (selected !== "de") throw new Error("Oscillation source did not switch to Netztransparenz.");
-  if (consoleErrors.length) {
-    throw new Error(`Critical browser console errors:\n${consoleErrors.join("\n")}`);
+
+  await page.screenshot({ path: `${artifactDir}/desktop.png`, fullPage: false });
+
+  const mobileViewports = [
+    { width: 360, height: 800 },
+    { width: 390, height: 844 },
+    { width: 412, height: 915 },
+    { width: 768, height: 1024 }
+  ];
+  for (const viewport of mobileViewports) {
+    const mobilePage = await browser.newPage({ viewport, isMobile: viewport.width < 768 });
+    await mobilePage.goto(url, { waitUntil: "networkidle" });
+    await mobilePage.waitForSelector("#frequencyChart", { state: "attached" });
+    await mobilePage.waitForFunction(() => Boolean(document.querySelector("#dateSelect")?.value));
+    await mobilePage.click('[data-tab="tab-chart"]');
+    await mobilePage.click("#calculateBtn");
+    await mobilePage.waitForSelector("#frequencyChart canvas");
+    const mobileState = await mobilePage.evaluate(() => ({
+      horizontalScroll: document.documentElement.scrollWidth > window.innerWidth + 2,
+      layerControlsVisible: Boolean(document.querySelector('[data-layer="difference"]')?.offsetParent)
+        && Boolean(document.querySelector('[data-layer="minmax"]')?.offsetParent),
+      prevButtonHeight: document.querySelector("#prevDayBtn")?.getBoundingClientRect().height || 0,
+      nextButtonHeight: document.querySelector("#nextDayBtn")?.getBoundingClientRect().height || 0
+    }));
+    if (mobileState.horizontalScroll) throw new Error(`Horizontal scroll at ${viewport.width}x${viewport.height}`);
+    if (!mobileState.layerControlsVisible) throw new Error(`Layer controls not visible at ${viewport.width}x${viewport.height}`);
+    if (mobileState.prevButtonHeight < 36 || mobileState.nextButtonHeight < 36) {
+      throw new Error(`Date buttons are too small at ${viewport.width}x${viewport.height}: ${JSON.stringify(mobileState)}`);
+    }
+    if (viewport.width === 390) await mobilePage.screenshot({ path: `${artifactDir}/mobile.png`, fullPage: false });
+    await mobilePage.close();
   }
+
+  assertNoConsoleErrors("frontend smoke");
   console.log("frontend_smoke_playwright ok");
 } catch (error) {
   await page.screenshot({ path: `${artifactDir}/failure.png`, fullPage: true }).catch(() => {});

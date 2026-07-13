@@ -8,6 +8,12 @@
 
   <!-- CSV ayrıştırma Web Worker içinde akış tabanlı ve satır satır yapılır. -->
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+  <script>
+    const echartsLocalFallback = "assets/echarts.min.js";
+    if (!window.echarts) {
+      document.write('<script src="' + echartsLocalFallback + '"><\/script>');
+    }
+  </script>
   <script type="module" src="assets/analysis-core.mjs"></script>
 
   <style>
@@ -440,6 +446,8 @@
       right: 8px;
       display: flex;
       gap: 4px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
       opacity: 0;
       transition: opacity .18s;
       z-index: 10;
@@ -447,6 +455,31 @@
     .chart-wrapper:hover .chart-toolbar,
     .chart-wrapper:fullscreen .chart-toolbar {
       opacity: 1;
+    }
+    .chart-layer-controls {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+    }
+    .chart-layer-toggle {
+      min-height: 36px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--navy);
+      font-weight: 800;
+      font-size: .78rem;
+      padding: 0 10px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .chart-layer-toggle[aria-pressed="true"] {
+      background: var(--navy);
+      color: #fff;
     }
     .chart-toolbar button {
       background: rgba(255,255,255,.92);
@@ -488,6 +521,14 @@
       stroke-width: 2;
       stroke-linecap: round;
       stroke-linejoin: round;
+    }
+    .chart-layer-controls .chart-layer-toggle {
+      width: auto;
+      min-width: auto;
+      height: 36px;
+      min-height: 36px;
+      padding: 0 10px;
+      border: 0;
     }
 
     .quarter-grid {
@@ -656,6 +697,13 @@
       gap: 10px;
       align-items: end;
     }
+    .date-picker-shell .copy-date-btn {
+      width: 100%;
+      min-height: 32px;
+      margin-top: 6px;
+      padding: 4px 8px;
+      font-size: .78rem;
+    }
     .analysis-controls.compact { grid-template-columns: repeat(3, minmax(140px, 1fr)); }
     details.advanced-panel {
       margin-top: 10px;
@@ -819,6 +867,23 @@
       .settings-grid { grid-template-columns: 1fr; }
       .quarter-grid { grid-template-columns: repeat(12, minmax(26px, 1fr)); }
       .chart { height: 360px; }
+      .chart-wrapper {
+        padding-top: 52px;
+      }
+      .chart-toolbar {
+        left: 8px;
+        right: 8px;
+        justify-content: flex-end;
+        opacity: 1;
+      }
+      .chart-layer-controls {
+        max-width: 100%;
+        overflow-x: auto;
+      }
+      .chart-layer-controls .chart-layer-toggle {
+        min-height: 40px;
+        height: 40px;
+      }
       body { overflow-x: hidden; }
     }
 
@@ -857,15 +922,15 @@
     <section id="tab-chart" class="tab-panel active">
       <div class="panel no-print" style="padding-bottom:0">
         <div class="control-bar">
-          <div class="field" style="position:relative">
+          <div class="field date-picker-shell" data-date-picker="daily" style="position:relative">
             <label data-i18n="dateSelectLabel">Tarih Seçimi</label>
             <div style="display:flex;gap:4px;align-items:stretch">
-              <button class="btn btn-secondary" id="prevDayBtn" type="button" title="◀" style="min-height:39px;min-width:36px;padding:4px 8px">◀</button>
+              <button class="btn btn-secondary" id="prevDayBtn" type="button" aria-label="Önceki gün" title="◀" style="min-height:39px;min-width:36px;padding:4px 8px">◀</button>
               <button type="button" class="cal-toggle-btn" id="calToggle" style="flex:1;min-width:0">
                 <span id="calToggleText" data-i18n="calToggleText">Tarih seçin</span>
                 <span>▾</span>
               </button>
-              <button class="btn btn-secondary" id="nextDayBtn" type="button" title="▶" style="min-height:39px;min-width:36px;padding:4px 8px">▶</button>
+              <button class="btn btn-secondary" id="nextDayBtn" type="button" aria-label="Sonraki gün" title="▶" style="min-height:39px;min-width:36px;padding:4px 8px">▶</button>
             </div>
             <div class="cal-dropdown hidden" id="calDropdown">
               <div class="calendar-nav">
@@ -894,7 +959,11 @@
               </div>
               <div class="filter-row">
                 <label for="showDifference" data-i18n="diffLabel">Grafikte fark</label>
-                <select id="showDifference"><option value="yes" data-i18n="diffShow">Göster</option><option value="no" data-i18n="diffHide">Gizle</option></select>
+                <select id="showDifference"><option value="no" selected data-i18n="diffHide">Gizle</option><option value="yes" data-i18n="diffShow">Göster</option></select>
+              </div>
+              <div class="filter-row">
+                <label for="showMinMaxEnvelope" data-i18n="minMaxLabel">Maks/Min</label>
+                <select id="showMinMaxEnvelope"><option value="no" selected data-i18n="diffHide">Gizle</option><option value="yes" data-i18n="diffShow">Göster</option></select>
               </div>
             </div>
           </div>
@@ -916,6 +985,10 @@
         <div class="chart-wrapper" id="freqChartWrapper">
           <div id="frequencyChart" class="chart"></div>
           <div class="chart-toolbar">
+            <div class="chart-layer-controls" role="group" aria-label="Grafik katmanları">
+              <button type="button" class="chart-layer-toggle" data-layer="difference" aria-pressed="false" data-i18n="diffLayerBtn">Fark</button>
+              <button type="button" class="chart-layer-toggle" data-layer="minmax" aria-pressed="false" data-i18n="minMaxLayerBtn">Maks/Min</button>
+            </div>
             <button type="button" aria-label="Tam ekran" title="Tam ekran" data-action="fullscreen" data-chart="frequencyChart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5"/><path d="M16 3h5v5"/><path d="M21 16v5h-5"/><path d="M8 21H3v-5"/></svg></button>
             <button type="button" aria-label="Grafiği PNG olarak indir" title="Grafiği PNG olarak indir" data-action="download" data-chart="frequencyChart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg></button>
             <button type="button" aria-label="Yakınlaştırmayı sıfırla" title="Yakınlaştırmayı sıfırla" data-action="resetzoom" data-chart="frequencyChart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v6h6"/></svg></button>
@@ -929,7 +1002,7 @@
         <div class="section-title">
           <div>
             <h3 data-i18n="sectionHourlyMatrix">Saatlik İstatistik Matrisi</h3>
-            <p data-i18n="hourlyMatrixDesc">Tek tabloda Metrik ve 00–23 saat kolonları gösterilir. <span class="interaction-note" data-i18n="singleDoubleHint">Saat başlığına tek tıklama saniyelik saat grafiğini, çift tıklama günlük grafiği açar.</span></p>
+            <p data-i18n="hourlyMatrixDesc">Saat seçin; ayrıntı grafiği güncellenir.</p>
           </div>
         </div>
         <div id="hourBlocks" class="hour-matrix-shell"></div>
@@ -939,7 +1012,7 @@
         <div class="section-title">
           <div>
             <h3 data-i18n="sectionQuarterHeatmap">15 Dakikalık Ortalama Mutlak Frekans Farkı</h3>
-            <p data-i18n="quarterHeatmapDesc">Her hücre ilgili çeyrek saatteki eşlenmiş Türkiye–Almanya farkının MAE değerini gösterir. <span class="interaction-note" data-i18n="singleDoubleHintQuarter">Tek tıklama 900 saniyelik grafiği, çift tıklama günlük grafiği açar.</span></p>
+            <p data-i18n="quarterHeatmapDesc">Çeyrek saat seçin; ayrıntı grafiği güncellenir.</p>
           </div>
         </div>
         <div id="quarterHeatmap" class="quarter-grid"></div>
@@ -957,9 +1030,26 @@
         </div>
 
         <div class="analysis-controls">
-          <div class="field">
-            <label for="analysisDateSelect" data-i18n="analysisDateLabel">Tarih</label>
-            <input id="analysisDateSelect" type="date" />
+          <div class="field date-picker-shell" data-date-picker="analysis" style="position:relative">
+            <label data-i18n="analysisDateLabel">Tarih</label>
+            <div style="display:flex;gap:4px;align-items:stretch">
+              <button class="btn btn-secondary" id="analysisPrevDayBtn" type="button" aria-label="Önceki gün" title="◀" style="min-height:39px;min-width:36px;padding:4px 8px">◀</button>
+              <button type="button" class="cal-toggle-btn" id="analysisCalToggle" style="flex:1;min-width:0">
+                <span id="analysisCalToggleText" data-i18n="calToggleText">Tarih seçin</span>
+                <span>▾</span>
+              </button>
+              <button class="btn btn-secondary" id="analysisNextDayBtn" type="button" aria-label="Sonraki gün" title="▶" style="min-height:39px;min-width:36px;padding:4px 8px">▶</button>
+            </div>
+            <div class="cal-dropdown hidden" id="analysisCalDropdown">
+              <div class="calendar-nav">
+                <button id="analysisCalPrevMonth" type="button">◀</button>
+                <span id="analysisCalMonthYear"></span>
+                <button id="analysisCalNextMonth" type="button">▶</button>
+              </div>
+              <div class="calendar-grid" id="analysisCalGrid"></div>
+            </div>
+            <input id="analysisDateSelect" type="hidden" />
+            <button class="btn btn-light copy-date-btn" id="copyDailyDateBtn" type="button" data-i18n="copyDailyDateBtn">Günlük tarihten al</button>
           </div>
           <div class="field">
             <label for="analysisSourceSelect" data-i18n="analysisSourceLabel">Kaynak</label>
@@ -1698,6 +1788,8 @@
       minDuration: 30,
       oscillationSource: 'tr',
       locale: 'tr',
+      showDifference: 'no',
+      showMinMax: 'no',
       diffAxisMin: -20,
       diffAxisMax: 20
     };
@@ -1722,7 +1814,9 @@
         manifest: null,
         status: null,
         loadError: null,
-        loadedDays: new Set()
+        loadedDays: new Set(),
+        autoDataCache: new Map(),
+        inFlightAutoLoads: new Map()
       },
       settings: loadSettings(),
       calendarDate: new Date(),
@@ -1736,8 +1830,19 @@
         lastResult: null,
         rawSeries: [],
         displaySeries: [],
-        analysisSeries: []
+        analysisSeries: [],
+        worker: null,
+        workerRequestId: 0,
+        workerPending: null
       },
+      analysisCalendarDate: new Date(),
+      activeDateRequestController: null,
+      dateRequestSequence: 0,
+      dateChangeTimer: null,
+      dateChangeDebounceMs: 150,
+      pendingDateTarget: null,
+      dateLoading: false,
+      datePerf: { startedFetches: 0, abortedFetches: 0, renderedDate: null },
       secondSeriesCache: new Map(),
       zoomSwitching: false,
       parserWorker: null,
@@ -1882,7 +1987,7 @@
 
     function initButtons() {
       $('clearDataBtn').addEventListener('click', clearData);
-      $('calculateBtn').addEventListener('click', calculateDailyReport);
+      $('calculateBtn').addEventListener('click', () => selectDate($('dateSelect').value, { pushHistory: false, immediate: true, force: true }));
       $('analysisRunBtn').addEventListener('click', runAnalysisLab);
       $('analysisCancelBtn').addEventListener('click', cancelAnalysis);
       $('analysisSourceSelect').addEventListener('change', () => syncAnalysisSource('analysis'));
@@ -1894,10 +1999,11 @@
       $('analysisAlignment').addEventListener('change', () => updateUrlState({ alignment: $('analysisAlignment').value }));
       $('oscSourceSelect').addEventListener('change', handleOscillationSourceChange);
       $('resetZoomBtn').addEventListener('click', showDailyFrequencyChart);
-      $('calToggle').addEventListener('click', (e) => { e.stopPropagation(); $('calDropdown').classList.toggle('hidden'); });
-      $('calPrevMonth').addEventListener('click', (e) => { e.stopPropagation(); state.calendarDate.setMonth(state.calendarDate.getMonth() - 1); renderCalendar(); });
-      $('calNextMonth').addEventListener('click', (e) => { e.stopPropagation(); state.calendarDate.setMonth(state.calendarDate.getMonth() + 1); renderCalendar(); });
-      document.addEventListener('click', (e) => { if (!$('calDropdown').classList.contains('hidden') && !$('calToggle').contains(e.target) && !$('calDropdown').contains(e.target)) $('calDropdown').classList.add('hidden'); });
+      bindDatePickerControls('daily');
+      bindDatePickerControls('analysis');
+      $('copyDailyDateBtn').addEventListener('click', () => {
+        if ($('dateSelect').value) selectAnalysisDate($('dateSelect').value);
+      });
       $('useAutoDataBtn').addEventListener('click', useAutoDataMode);
       $('useManualDataBtn').addEventListener('click', useManualDataMode);
       $('reloadAutoDataBtn').addEventListener('click', () => loadAutoDataCatalog({ force: true }));
@@ -1910,12 +2016,14 @@
       $('reportExportCsvBtn').addEventListener('click', exportAnalysisCsv);
       $('reportPrintBtn').addEventListener('click', () => window.print());
 
-      $('prevDayBtn').addEventListener('click', () => navigateDay(-1));
-      $('nextDayBtn').addEventListener('click', () => navigateDay(1));
       $('filterToggleBtn').addEventListener('click', (e) => { e.stopPropagation(); $('filterDropdown').classList.toggle('hidden'); });
       document.addEventListener('click', (e) => { if (!$('filterDropdown').classList.contains('hidden') && !$('filterToggleBtn').contains(e.target) && !$('filterDropdown').contains(e.target)) $('filterDropdown').classList.add('hidden'); });
-      $('showDifference').addEventListener('change', () => { if (state.current) renderFrequencyChart(state.current); });
-      $('manualOffsetGraph').addEventListener('change', () => { if ($('dateSelect').value) calculateDailyReport(); });
+      $('showDifference').addEventListener('change', () => updateChartLayerControls());
+      $('showMinMaxEnvelope').addEventListener('change', () => updateChartLayerControls());
+      document.querySelectorAll('[data-layer]').forEach(button => {
+        button.addEventListener('click', () => toggleChartLayer(button.dataset.layer));
+      });
+      $('manualOffsetGraph').addEventListener('change', () => { if ($('dateSelect').value) selectDate($('dateSelect').value, { pushHistory: false, immediate: true, force: true }); });
 
       $('alignmentSelect').addEventListener('change', updateAlignmentInfo);
       $('manualOffsetGraph').addEventListener('change', updateAlignmentInfo);
@@ -1959,6 +2067,21 @@
       setTimeout(() => button?.classList.remove('loading'), 250);
     }
 
+    function toggleChartLayer(layer) {
+      const select = layer === 'minmax' ? $('showMinMaxEnvelope') : $('showDifference');
+      select.value = select.value === 'yes' ? 'no' : 'yes';
+      updateChartLayerControls();
+    }
+
+    function updateChartLayerControls() {
+      state.settings.showDifference = $('showDifference')?.value || 'no';
+      state.settings.showMinMax = $('showMinMaxEnvelope')?.value || 'no';
+      document.querySelector('[data-layer="difference"]')?.setAttribute('aria-pressed', String(state.settings.showDifference === 'yes'));
+      document.querySelector('[data-layer="minmax"]')?.setAttribute('aria-pressed', String(state.settings.showMinMax === 'yes'));
+      localStorage.setItem('frequencyAppSettings', JSON.stringify(state.settings));
+      if (state.current) renderFrequencyChart(state.current);
+    }
+
     function resetChartZoom(chartId) {
       const chart = chartId === 'frequencyChart' ? state.frequencyChart : state.oscillationChart;
       if (!chart) return;
@@ -1987,29 +2110,170 @@
       }
     }
 
-    function navigateDay(dir) {
-      const current = $('dateSelect').value;
-      if (!current) {
-        const dates = reportDatesForCurrentMode();
-        if (dates.length) { selectDate(dates[dates.length - 1]); }
-        return;
-      }
-      const d = new Date(current + 'T00:00:00');
-      d.setDate(d.getDate() + dir);
-      const iso = d.toISOString().slice(0, 10);
-      const available = reportDatesForCurrentMode();
-      if (available.includes(iso)) selectDate(iso);
+    function bindDatePickerControls(kind) {
+      const cfg = datePickerConfig(kind);
+      $(cfg.toggleId).addEventListener('click', event => {
+        event.stopPropagation();
+        $(cfg.dropdownId).classList.toggle('hidden');
+      });
+      $(cfg.prevMonthId).addEventListener('click', event => {
+        event.stopPropagation();
+        cfg.calendarDate.setMonth(cfg.calendarDate.getMonth() - 1);
+        renderCalendar();
+      });
+      $(cfg.nextMonthId).addEventListener('click', event => {
+        event.stopPropagation();
+        cfg.calendarDate.setMonth(cfg.calendarDate.getMonth() + 1);
+        renderCalendar();
+      });
+      $(cfg.prevDayId).addEventListener('click', () => navigateDay(-1, kind));
+      $(cfg.nextDayId).addEventListener('click', () => navigateDay(1, kind));
+      document.addEventListener('click', event => {
+        const dropdown = $(cfg.dropdownId);
+        if (!dropdown.classList.contains('hidden') && !$(cfg.toggleId).contains(event.target) && !dropdown.contains(event.target)) {
+          dropdown.classList.add('hidden');
+        }
+      });
     }
 
-    function selectDate(iso) {
-      $('dateSelect').value = iso;
-      $('calToggleText').textContent = displayDate(iso);
-      $('calGrid').querySelectorAll('.cal-day').forEach(el => el.classList.toggle('selected', el.dataset.date === iso));
+    function datePickerConfig(kind) {
+      if (kind === 'analysis') {
+        return {
+          kind,
+          hiddenId: 'analysisDateSelect',
+          toggleId: 'analysisCalToggle',
+          toggleTextId: 'analysisCalToggleText',
+          dropdownId: 'analysisCalDropdown',
+          gridId: 'analysisCalGrid',
+          monthYearId: 'analysisCalMonthYear',
+          prevMonthId: 'analysisCalPrevMonth',
+          nextMonthId: 'analysisCalNextMonth',
+          prevDayId: 'analysisPrevDayBtn',
+          nextDayId: 'analysisNextDayBtn',
+          calendarDate: state.analysisCalendarDate
+        };
+      }
+      return {
+        kind,
+        hiddenId: 'dateSelect',
+        toggleId: 'calToggle',
+        toggleTextId: 'calToggleText',
+        dropdownId: 'calDropdown',
+        gridId: 'calGrid',
+        monthYearId: 'calMonthYear',
+        prevMonthId: 'calPrevMonth',
+        nextMonthId: 'calNextMonth',
+        prevDayId: 'prevDayBtn',
+        nextDayId: 'nextDayBtn',
+        calendarDate: state.calendarDate
+      };
+    }
+
+    function availableDatesForPicker(kind) {
+      if (kind === 'analysis') {
+        const source = getAnalysisSource();
+        const type = $('analysisTypeSelect')?.value || 'stats';
+        return requiresPairedSource(source, type) ? commonReportDates() : reportDatesForCurrentMode();
+      }
+      if ($('showDifference')?.value === 'yes') return commonReportDates().length ? commonReportDates() : reportDatesForCurrentMode();
+      return reportDatesForCurrentMode();
+    }
+
+    function navigateDay(dir, kind = 'daily') {
+      const cfg = datePickerConfig(kind);
+      const available = availableDatesForPicker(kind);
+      if (!available.length) return;
+      const current = $(cfg.hiddenId).value || available.at(dir > 0 ? 0 : -1);
+      const currentIndex = available.indexOf(current);
+      const fallbackIndex = dir > 0 ? -1 : available.length;
+      const nextIndex = Math.max(0, Math.min(available.length - 1, (currentIndex >= 0 ? currentIndex : fallbackIndex) + dir));
+      const next = available[nextIndex];
+      if (!next || next === current && currentIndex >= 0) return;
+      if (kind === 'analysis') selectAnalysisDate(next);
+      else selectDate(next);
+    }
+
+    function selectDate(iso, { pushHistory = true, immediate = false, force = false } = {}) {
+      setPickerDate('daily', iso);
       updateAlignmentInfo();
-      calculateDailyReport();
-      const url = new URL(window.location);
-      url.searchParams.set('date', iso);
-      window.history.pushState({ date: iso, t: Date.now() }, '', url);
+      queueDailyDateChange(iso, { pushHistory, immediate, force });
+    }
+
+    function selectAnalysisDate(iso) {
+      setPickerDate('analysis', iso);
+      $('analysisStartDate').value ||= iso;
+      $('analysisEndDate').value ||= iso;
+      updateUrlState({ date: iso });
+    }
+
+    function setPickerDate(kind, iso) {
+      const cfg = datePickerConfig(kind);
+      $(cfg.hiddenId).value = iso;
+      $(cfg.toggleTextId).textContent = iso ? displayDate(iso) : t('calToggleText');
+      $(cfg.gridId).querySelectorAll('.cal-day').forEach(el => el.classList.toggle('selected', el.dataset.date === iso));
+      updateDateNavButtons(kind);
+    }
+
+    function queueDailyDateChange(iso, { pushHistory = true, immediate = false, force = false } = {}) {
+      state.pendingDateTarget = iso;
+      clearTimeout(state.dateChangeTimer);
+      const delay = immediate ? 0 : state.dateChangeDebounceMs;
+      state.dateChangeTimer = setTimeout(() => {
+        runDailyDateChange(state.pendingDateTarget, { pushHistory, force }).catch(error => {
+          if (error?.name !== 'AbortError') setBanner('loadStatus', t('autoDataError', { error: error?.message || error }), 'error');
+        });
+      }, delay);
+    }
+
+    async function runDailyDateChange(iso, { pushHistory = true, force = false } = {}) {
+      if (!iso) return;
+      const requestId = ++state.dateRequestSequence;
+      state.activeDateRequestController?.abort();
+      state.activeDateRequestController = new AbortController();
+      setDateLoading(true);
+      try {
+        await calculateDailyReport({ date: iso, requestId, signal: state.activeDateRequestController.signal, force });
+        if (requestId !== state.dateRequestSequence) return;
+        if (pushHistory) updateUrlState({ date: iso, tab: 'chart' });
+      } catch (error) {
+        if (error?.name === 'AbortError') {
+          state.datePerf.abortedFetches += 1;
+          return;
+        }
+        throw error;
+      } finally {
+        if (requestId === state.dateRequestSequence) setDateLoading(false);
+      }
+    }
+
+    function setDateLoading(isLoading) {
+      state.dateLoading = isLoading;
+      for (const id of ['prevDayBtn', 'nextDayBtn', 'analysisPrevDayBtn', 'analysisNextDayBtn']) {
+        const button = $(id);
+        if (button) button.disabled = isLoading || button.dataset.edge === 'true';
+      }
+      if (isLoading) $('chartViewTag').textContent = t('loadingShort');
+      updateDateNavButtons('daily');
+      updateDateNavButtons('analysis');
+    }
+
+    function updateDateNavButtons(kind) {
+      const cfg = datePickerConfig(kind);
+      const dates = availableDatesForPicker(kind);
+      const current = $(cfg.hiddenId)?.value;
+      const index = dates.indexOf(current);
+      const atStart = index <= 0;
+      const atEnd = index < 0 || index >= dates.length - 1;
+      const prev = $(cfg.prevDayId);
+      const next = $(cfg.nextDayId);
+      if (prev) {
+        prev.dataset.edge = String(atStart);
+        prev.disabled = state.dateLoading || atStart;
+      }
+      if (next) {
+        next.dataset.edge = String(atEnd);
+        next.disabled = state.dateLoading || atEnd;
+      }
     }
 
     window.addEventListener('popstate', e => {
@@ -2025,6 +2289,8 @@
       if (!window.echarts) missing.push('ECharts');
       if (missing.length) {
         setBanner('loadStatus', t('cdError', { libs: missing.join(', ') }), 'warn');
+        $('frequencyChart').innerHTML = `<div class="empty-state">${t('chartLoadFailed')}</div>`;
+        $('analysisMainChart').innerHTML = `<div class="empty-state">${t('chartLoadFailed')}</div>`;
       }
     }
 
@@ -2035,17 +2301,79 @@
       return `${AUTO_DATA_BASE}${String(relativePath || '').replace(/^\.?\/?data\//, '').replace(/^\/+/, '')}`;
     }
 
-    async function fetchJson(relativePath) {
-      const response = await fetch(autoDataUrl(relativePath), { cache: 'no-store' });
+    async function fetchJson(relativePath, { signal } = {}) {
+      const response = await fetch(autoDataUrl(relativePath), { cache: 'no-store', signal });
       if (!response.ok) throw new Error(`${relativePath} HTTP ${response.status}`);
       return response.json();
+    }
+
+    function defaultManifestShardPath(year) {
+      return Number(year) === 2026 ? 'manifest/2026.json' : `manifest/${year}.json`;
+    }
+
+    function mergeManifestSource(target, sourceInfo = {}) {
+      target.label = target.label || sourceInfo.label;
+      target.timezone = target.timezone || sourceInfo.timezone;
+      target.status = target.status || sourceInfo.status;
+      target.availableDates = [...new Set([...(target.availableDates || []), ...(sourceInfo.availableDates || [])])].sort();
+      target.excludedDates = [...new Set([...(target.excludedDates || []), ...(sourceInfo.excludedDates || [])])].sort();
+      target.days = { ...(target.days || {}), ...(sourceInfo.days || {}) };
+      target.files = { ...(target.files || {}), ...(sourceInfo.files || {}) };
+      target.firstDate = target.availableDates[0] || sourceInfo.firstDate || null;
+      target.latestDate = target.availableDates[target.availableDates.length - 1] || sourceInfo.latestDate || null;
+      return target;
+    }
+
+    async function loadManifestWithFallback({ signal } = {}) {
+      try {
+        const summary = await fetchJson('manifest-summary.json', { signal });
+        const years = (summary?.years?.length ? summary.years : Object.keys(summary?.shards || {}))
+          .map(year => Number(year))
+          .filter(Number.isFinite)
+          .sort((a, b) => a - b);
+        if (!years.length) throw new Error('manifest-summary has no yearly shards');
+        const shardPaths = years.map(year => summary?.shards?.[String(year)] || defaultManifestShardPath(year));
+        const shards = await Promise.all(shardPaths.map(path => fetchJson(path, { signal })));
+        const manifest = {
+          schemaVersion: summary.schemaVersion || 2,
+          updatedAtUtc: summary.updatedAtUtc,
+          storage: summary.storage || { type: 'github-pages', baseUrl: './data' },
+          sources: {}
+        };
+        Object.entries(summary.sources || {}).forEach(([source, sourceInfo]) => {
+          manifest.sources[source] = mergeManifestSource({
+            label: sourceInfo.label,
+            timezone: sourceInfo.timezone,
+            firstDate: sourceInfo.firstDate,
+            latestDate: sourceInfo.latestDate,
+            availableDates: sourceInfo.availableDates || [],
+            excludedDates: sourceInfo.excludedDates || [],
+            days: {},
+            status: sourceInfo.status,
+            files: {}
+          }, {});
+        });
+        shards.forEach(shard => {
+          Object.entries(shard?.sources || {}).forEach(([source, sourceInfo]) => {
+            if (!manifest.sources[source]) {
+              manifest.sources[source] = { availableDates: [], excludedDates: [], days: {}, files: {} };
+            }
+            mergeManifestSource(manifest.sources[source], sourceInfo);
+          });
+        });
+        manifest.splitManifest = true;
+        return manifest;
+      } catch (error) {
+        if (error?.name === 'AbortError') throw error;
+        return fetchJson('manifest.json', { signal });
+      }
     }
 
     async function loadAutoDataCatalog({ force = false } = {}) {
       if (state.auto.manifest && !force) return;
       updateAutoDataPanel('loading');
       try {
-        const manifest = await fetchJson('manifest.json');
+        const manifest = await loadManifestWithFallback();
         let status = null;
         try { status = await fetchJson('status.json'); } catch { status = null; }
         state.auto.manifest = manifest;
@@ -2193,7 +2521,8 @@
     function syncAnalysisDateDefaults() {
       const latest = latestCommonDate() || state.auto.manifest?.sources?.teias?.latestDate || latestMapDate(state.tr);
       if (!latest) return;
-      for (const id of ['analysisDateSelect', 'analysisStartDate', 'analysisEndDate']) {
+      if (!$('analysisDateSelect').value) setPickerDate('analysis', latest);
+      for (const id of ['analysisStartDate', 'analysisEndDate']) {
         const el = $(id);
         if (el && !el.value) el.value = latest;
       }
@@ -2239,7 +2568,7 @@
       return [...state.tr.keys()].filter(date => !isAutoLoaded('teias', date)).sort();
     }
 
-    async function ensureAutoDataForReport(date, alignmentMode = null) {
+    async function ensureAutoDataForReport(date, alignmentMode = null, { signal } = {}) {
       if (state.dataMode !== 'auto') return true;
       const alignment = getAlignment(date, alignmentMode);
       const deltaSeconds = Math.round(alignment.deltaHours * 3600);
@@ -2251,10 +2580,10 @@
       state.busy = true;
       setBanner('loadStatus', t('autoDataLoading', { date: displayDate(date) }), 'warn');
       try {
-        const trLoaded = await loadAutoDay('teias', date);
+        const trLoaded = await loadAutoDay('teias', date, { signal });
         let deLoaded = false;
         for (const deDate of deDates) {
-          deLoaded = (await loadAutoDay('netztransparenz', deDate)) || deLoaded;
+          deLoaded = (await loadAutoDay('netztransparenz', deDate, { signal })) || deLoaded;
         }
         updateInventory();
         if (!trLoaded) throw new Error(t('autoDataNoTr', { date: displayDate(date) }));
@@ -2267,7 +2596,7 @@
       }
     }
 
-    async function loadAutoDay(source, date) {
+    async function loadAutoDay(source, date, { signal } = {}) {
       const sourceInfo = state.auto.manifest?.sources?.[source];
       const day = sourceInfo?.days?.[date];
       const files = day?.files || sourceInfo?.files?.[date];
@@ -2275,18 +2604,48 @@
       if (!targetKey || !files?.frequency) return false;
       const target = targetKey === 'de' ? state.de : state.tr;
       if (target.has(date) && isAutoLoaded(source, date)) return true;
+      const version = state.auto.manifest?.updatedAtUtc || 'local';
+      const cacheKey = `${source}:${date}:${version}:1s`;
+      const cached = state.auto.autoDataCache.get(cacheKey);
+      if (cached) {
+        target.set(date, cached.series);
+        state.auto.loadedDays.add(`${source}:${date}`);
+        state.quality = state.quality.filter(q => !(q.source === targetKey && q.date === date));
+        state.quality.push(cached.quality);
+        return true;
+      }
+      if (state.auto.inFlightAutoLoads.has(cacheKey)) return state.auto.inFlightAutoLoads.get(cacheKey);
 
-      const [binaryResponse, meta] = await Promise.all([
-        fetch(autoDataUrl(files.frequency), { cache: 'no-store' }),
-        fetchJson(files.meta)
-      ]);
-      if (!binaryResponse.ok) throw new Error(`${files.frequency} HTTP ${binaryResponse.status}`);
-      const series = decodeFrequencyBinary(await binaryResponse.arrayBuffer(), meta);
-      target.set(date, series);
-      state.auto.loadedDays.add(`${source}:${date}`);
-      state.quality = state.quality.filter(q => !(q.source === targetKey && q.date === date));
-      state.quality.push(qualityFromMeta(meta, targetKey));
-      return true;
+      const task = (async () => {
+        state.datePerf.startedFetches += 1;
+        const [binaryResponse, meta] = await Promise.all([
+          fetch(autoDataUrl(files.frequency), { cache: 'no-store', signal }),
+          fetchJson(files.meta, { signal })
+        ]);
+        if (!binaryResponse.ok) throw new Error(`${files.frequency} HTTP ${binaryResponse.status}`);
+        const series = decodeFrequencyBinary(await binaryResponse.arrayBuffer(), meta);
+        const quality = qualityFromMeta(meta, targetKey);
+        target.set(date, series);
+        state.auto.loadedDays.add(`${source}:${date}`);
+        state.quality = state.quality.filter(q => !(q.source === targetKey && q.date === date));
+        state.quality.push(quality);
+        state.auto.autoDataCache.set(cacheKey, { series, quality });
+        trimAutoDataCache();
+        return true;
+      })();
+      state.auto.inFlightAutoLoads.set(cacheKey, task);
+      try {
+        return await task;
+      } finally {
+        state.auto.inFlightAutoLoads.delete(cacheKey);
+      }
+    }
+
+    function trimAutoDataCache(limit = 10) {
+      while (state.auto.autoDataCache.size > limit) {
+        const first = state.auto.autoDataCache.keys().next().value;
+        state.auto.autoDataCache.delete(first);
+      }
     }
 
     function decodeFrequencyBinary(buffer, meta) {
@@ -2407,10 +2766,10 @@
       const dates = reportDatesForCurrentMode();
       const hidden = $('dateSelect');
       if (dates.length && !hidden.value) {
-        hidden.value = dates[dates.length - 1];
+        setPickerDate('daily', dates[dates.length - 1]);
         renderCalendar();
         updateAlignmentInfo();
-        calculateDailyReport();
+        queueDailyDateChange(hidden.value, { pushHistory: false, immediate: true });
       } else {
         renderCalendar();
         updateAlignmentInfo();
@@ -2418,10 +2777,17 @@
     }
 
     function renderCalendar() {
-      const grid = $('calGrid');
-      const monthYear = $('calMonthYear');
-      const hidden = $('dateSelect');
-      const date = state.calendarDate;
+      renderDatePickerCalendar('daily');
+      renderDatePickerCalendar('analysis');
+    }
+
+    function renderDatePickerCalendar(kind) {
+      const cfg = datePickerConfig(kind);
+      const grid = $(cfg.gridId);
+      const monthYear = $(cfg.monthYearId);
+      const hidden = $(cfg.hiddenId);
+      if (!grid || !monthYear || !hidden) return;
+      const date = cfg.calendarDate;
       const year = date.getFullYear();
       const month = date.getMonth();
 
@@ -2472,15 +2838,17 @@
 
       grid.innerHTML = html;
 
-      const toggleText = $('calToggleText');
+      const toggleText = $(cfg.toggleTextId);
       toggleText.textContent = hidden.value ? displayDate(hidden.value) : t('calToggleText');
 
       grid.querySelectorAll('.cal-day[data-date]').forEach(day => {
         day.addEventListener('click', () => {
-          $('calDropdown').classList.add('hidden');
-          selectDate(day.dataset.date);
+          $(cfg.dropdownId).classList.add('hidden');
+          if (kind === 'analysis') selectAnalysisDate(day.dataset.date);
+          else selectDate(day.dataset.date);
         });
       });
+      updateDateNavButtons(kind);
     }
 
     function calendarDayTitle(iso, hasTr, hasDe, badQuality) {
@@ -2575,9 +2943,9 @@
     // -----------------------------
     // GÜNLÜK KARŞILAŞTIRMA
     // -----------------------------
-    async function prepareDailyContext(date, alignmentMode = null) {
+    async function prepareDailyContext(date, alignmentMode = null, { signal } = {}) {
       if (state.dataMode === 'auto') {
-        await ensureAutoDataForReport(date, alignmentMode);
+        await ensureAutoDataForReport(date, alignmentMode, { signal });
       }
       if (!state.tr.has(date)) {
         throw new Error(t('autoDataNoTr', { date: displayDate(date) }));
@@ -2626,22 +2994,29 @@
       };
     }
 
-    async function calculateDailyReport() {
-      const date = $('dateSelect').value;
+    async function calculateDailyReport({ date = $('dateSelect').value, requestId = state.dateRequestSequence, signal, force = false } = {}) {
       if (!date) {
         alert(t('noDateSelected'));
         return;
       }
+      if (!force && state.current?.date === date && requestId === state.dateRequestSequence) {
+        renderFrequencyChart(state.current);
+        updateDateNavButtons('daily');
+        return state.current;
+      }
       let current;
       try {
-        current = await prepareDailyContext(date);
+        current = await prepareDailyContext(date, null, { signal });
       } catch (error) {
+        if (error?.name === 'AbortError') throw error;
         setBanner('loadStatus', t('autoDataError', { error: error?.message || error }), 'error');
         alert(t('autoDataError', { error: error?.message || error }));
         return;
       }
+      if (requestId !== state.dateRequestSequence) return null;
 
       state.current = current;
+      state.datePerf.renderedDate = date;
       state.analysis.rawSeries = current.rawSeries;
       state.analysis.displaySeries = current.displaySeries;
       state.analysis.analysisSeries = current.analysisSeries;
@@ -2666,6 +3041,8 @@
       updateOscillationSourceUi();
       setBanner('analysisStatus', t('reportOscReady', { source: sourceLabel(getAnalysisSource()) }), 'success');
       renderCoverageSummary();
+      updateDateNavButtons('daily');
+      return current;
     }
 
     function sanitizeAndInterpolate(input, settings) {
@@ -2818,8 +3195,11 @@
       state.chartView = { ...view };
 
       const showDiff = $('showDifference').value === 'yes';
+      const showMinMax = $('showMinMaxEnvelope').value === 'yes' && view.mode === 'day';
       const fixed = state.settings.graphScale === 'fixed';
       const detailMode = view.mode !== 'day';
+      const minMaxButton = document.querySelector('[data-layer="minmax"]');
+      if (minMaxButton) minMaxButton.disabled = detailMode;
       const tr = [];
       const de = [];
       const diff = [];
@@ -2834,11 +3214,13 @@
           const second = row.minute * 60 + 30;
           tr.push([second, Number.isFinite(row.meanA) ? Number(row.meanA.toFixed(5)) : null]);
           de.push([second, Number.isFinite(row.meanB) ? Number(row.meanB.toFixed(5)) : null]);
-          diff.push([second, Number.isFinite(row.biasMhz) ? Number(row.biasMhz.toFixed(3)) : null]);
-          trMin.push([second, Number.isFinite(row.minA) ? Number(row.minA.toFixed(5)) : null]);
-          trMax.push([second, Number.isFinite(row.maxA) ? Number(row.maxA.toFixed(5)) : null]);
-          deMin.push([second, Number.isFinite(row.minB) ? Number(row.minB.toFixed(5)) : null]);
-          deMax.push([second, Number.isFinite(row.maxB) ? Number(row.maxB.toFixed(5)) : null]);
+          if (showDiff) diff.push([second, Number.isFinite(row.biasMhz) ? Number(row.biasMhz.toFixed(3)) : null]);
+          if (showMinMax) {
+            trMin.push([second, Number.isFinite(row.minA) ? Number(row.minA.toFixed(5)) : null]);
+            trMax.push([second, Number.isFinite(row.maxA) ? Number(row.maxA.toFixed(5)) : null]);
+            deMin.push([second, Number.isFinite(row.minB) ? Number(row.minB.toFixed(5)) : null]);
+            deMax.push([second, Number.isFinite(row.maxB) ? Number(row.maxB.toFixed(5)) : null]);
+          }
         });
       } else {
         // Detay görünümü: saat için 3.600, çeyrek saat için 900 saniyelik gerçek örnek.
@@ -2847,7 +3229,7 @@
           const b = current.de[second];
           tr.push([second, Number.isFinite(a) ? Number(a.toFixed(5)) : null]);
           de.push([second, Number.isFinite(b) ? Number(b.toFixed(5)) : null]);
-          diff.push([second, Number.isFinite(a) && Number.isFinite(b) ? Number(((a - b) * 1000).toFixed(3)) : null]);
+          if (showDiff) diff.push([second, Number.isFinite(a) && Number.isFinite(b) ? Number(((a - b) * 1000).toFixed(3)) : null]);
         }
       }
 
@@ -2872,7 +3254,12 @@
             return `<strong>${secondToTime(second)}</strong><br>${lines}`;
           }
         },
-        legend: { top: 8, data: showDiff ? [t('seriesTr'), t('seriesDe'), t('seriesDiff')] : [t('seriesTr'), t('seriesDe')] },
+        legend: { top: 8, data: [
+          t('seriesTr'),
+          t('seriesDe'),
+          ...(showMinMax ? [t('seriesTrMin'), t('seriesTrMax'), t('seriesDeMin'), t('seriesDeMax')] : []),
+          ...(showDiff ? [t('seriesDiff')] : [])
+        ] },
         grid: { left: 62, right: showDiff ? 68 : 28, top: 54, bottom: 72 },
         xAxis: {
           type: 'value', min: axisMin, max: axisMax, boundaryGap: false,
@@ -2895,7 +3282,7 @@
         series: [
           { name: t('seriesTr'), type: 'line', data: tr, symbol: 'none', connectNulls: false, sampling: detailMode ? undefined : 'lttb', progressive: 6000, lineStyle: { width: detailMode ? 1.2 : 1.5 } },
           { name: t('seriesDe'), type: 'line', data: de, symbol: 'none', connectNulls: false, sampling: detailMode ? undefined : 'lttb', progressive: 6000, lineStyle: { width: detailMode ? 1.2 : 1.5 } },
-          ...(!detailMode ? [
+          ...(showMinMax ? [
             { name: t('seriesTrMin'), type: 'line', data: trMin, symbol: 'none', connectNulls: false, silent: true, lineStyle: { width: .8, opacity: .32 } },
             { name: t('seriesTrMax'), type: 'line', data: trMax, symbol: 'none', connectNulls: false, silent: true, lineStyle: { width: .8, opacity: .32 } },
             { name: t('seriesDeMin'), type: 'line', data: deMin, symbol: 'none', connectNulls: false, silent: true, lineStyle: { width: .8, opacity: .24 } },
@@ -3421,7 +3808,8 @@
           calculateOscillation();
           return;
         }
-        const result = computeAnalysisResult(type, source, current, dateList);
+        const workerResult = shouldUseAnalysisWorker(type) ? await runAnalysisWorker(type, source, current) : null;
+        const result = computeAnalysisResult(type, source, current, dateList, workerResult);
         state.analysis.lastResult = result;
         renderAnalysisResult(result);
         renderReportPreview();
@@ -3438,6 +3826,10 @@
     }
 
     function cancelAnalysis() {
+      if (state.analysis.worker) {
+        state.analysis.worker.terminate();
+        state.analysis.worker = null;
+      }
       if (state.oscWorker) state.oscWorker.terminate();
       const oscBlob = new Blob([$('oscWorkerSource').textContent], { type: 'text/javascript' });
       state.oscWorker = new Worker(URL.createObjectURL(oscBlob));
@@ -3451,6 +3843,100 @@
 
     function requiresPairedSource(source, type) {
       return ['both', 'diff', 'common', 'differential'].includes(source) || ['crossCorrelation', 'coherence'].includes(type);
+    }
+
+    function shouldUseAnalysisWorker(type) {
+      return ['psd', 'spectrogram', 'coherence', 'crossCorrelation', 'rocof'].includes(type);
+    }
+
+    async function runAnalysisWorker(type, source, current) {
+      const id = `analysis-${Date.now()}-${++state.analysis.workerRequestId}`;
+      const parameters = workerAnalysisParameters(type);
+      const payload = {};
+      const transfers = [];
+      if (type === 'crossCorrelation' || type === 'coherence') {
+        payload.a = Float64Array.from(current.tr);
+        payload.b = Float64Array.from(current.de);
+        transfers.push(payload.a.buffer, payload.b.buffer);
+      } else {
+        payload.series = Float64Array.from(analysisWindowSeries(sourceSeries(source, current)));
+        transfers.push(payload.series.buffer);
+      }
+
+      let worker;
+      try {
+        worker = new Worker('assets/analysis-worker.mjs', { type: 'module' });
+      } catch (error) {
+        setBanner('analysisStatus', t('analysisWorkerFallback'), 'warn');
+        return runAnalysisFallback(type, payload, parameters);
+      }
+      state.analysis.worker = worker;
+      return await new Promise((resolve, reject) => {
+        worker.onmessage = event => {
+          const message = event.data || {};
+          if (message.id !== id) return;
+          worker.terminate();
+          state.analysis.worker = null;
+          if (message.status === 'success') resolve(message.result);
+          else if (message.status === 'cancelled') reject(new Error(t('analysisCanceled')));
+          else reject(new Error(message.error || t('analysisError')));
+        };
+        worker.onerror = event => {
+          worker.terminate();
+          state.analysis.worker = null;
+          reject(new Error(event.message || t('analysisError')));
+        };
+        worker.postMessage({ id, type: workerTypeForAnalysis(type), payload, parameters }, transfers);
+      });
+    }
+
+    function workerTypeForAnalysis(type) {
+      if (type === 'psd') return 'welchPsd';
+      return type;
+    }
+
+    function workerAnalysisParameters(type) {
+      const minHz = Number($('bandMin').value) || 0.05;
+      const maxHz = Number($('bandMax').value) || 0.25;
+      const base = {
+        sampleRateHz: 1,
+        sampleIntervalSeconds: 1,
+        segmentLength: type === 'spectrogram' ? 512 : 512,
+        overlapRatio: type === 'spectrogram' ? 0.75 : 0.5,
+        windowType: 'hann',
+        detrend: 'constant',
+        minHz,
+        maxHz,
+        maxPeaks: 5,
+        targetHz: minHz
+      };
+      if (type === 'rocof') {
+        return {
+          method: 'movingRegression',
+          sampleIntervalSeconds: 1,
+          windowSeconds: Number($('windowSec').value || 5),
+          preFilterSeconds: 5,
+          thresholdHzPerSecond: Number($('rocofThreshold').value || 0.01),
+          minEventSeconds: Number($('minDuration').value || 1)
+        };
+      }
+      if (type === 'crossCorrelation') return { maxLagSeconds: 30, sampleIntervalSeconds: 1 };
+      return base;
+    }
+
+    function runAnalysisFallback(type, payload, parameters) {
+      const core = window.FrequencyAnalysisCore;
+      if (type === 'psd') return core.computeWelchPsd(payload.series, parameters);
+      if (type === 'spectrogram') return core.computeStftSpectrogram(payload.series, parameters);
+      if (type === 'rocof') return core.computeRocof(payload.series, parameters);
+      if (type === 'crossCorrelation') return core.computeCrossCorrelation(payload.a, payload.b, parameters);
+      if (type === 'coherence') {
+        return {
+          coherence: core.computeMagnitudeSquaredCoherence(payload.a, payload.b, parameters),
+          crossPsd: core.computeCrossPowerSpectralDensity(payload.a, payload.b, parameters)
+        };
+      }
+      return null;
     }
 
     async function computeTrendRangeResult(source, dateList) {
@@ -3489,7 +3975,7 @@
       };
     }
 
-    function computeAnalysisResult(type, source, current, dateList = [current?.date].filter(Boolean)) {
+    function computeAnalysisResult(type, source, current, dateList = [current?.date].filter(Boolean), workerResult = null) {
       const core = window.FrequencyAnalysisCore;
       if (!core) throw new Error(t('analysisCoreMissing'));
       const baseSeries = sourceSeries(source, current);
@@ -3515,7 +4001,7 @@
         };
       }
       if (type === 'rocof') {
-        const rocof = core.computeRocof(series, { method: 'central', thresholdHzPerSecond: Number($('rocofThreshold').value || 0.01) });
+        const rocof = workerResult || core.computeRocof(series, { method: 'movingRegression', sampleIntervalSeconds: 1, windowSeconds: Number($('windowSec').value || 5), thresholdHzPerSecond: Number($('rocofThreshold').value || 0.01) });
         return {
           type,
           title: t('analysisRocof'),
@@ -3532,72 +4018,79 @@
         };
       }
       if (type === 'psd') {
-        const dominant = core.estimateDominantFrequency(series, { sampleRateHz: 1, minHz: Number($('bandMin').value), maxHz: Number($('bandMax').value) });
+        const dominant = workerResult || core.computeWelchPsd(series, workerAnalysisParameters('psd'));
+        const peak = dominant.peaks?.[0] || dominant;
         return {
           type,
           title: t('analysisPsd'),
           metadata,
           cards: [
-            [t('dominantFrequency'), `${fmt(dominant.frequencyHz, 4)} Hz`],
-            [t('spectralPower'), fmt(dominant.power, 2)],
+            [t('dominantFrequency'), `${fmt(peak.frequencyHz, 4)} Hz`],
+            [t('spectralPower'), `${fmt(peak.psd ?? peak.power, 8)} Hz²/Hz`],
             [t('noiseFloor'), fmt(dominant.noiseFloor, 2)],
-            [t('snr'), fmt(dominant.snr, 2)]
+            [t('snr'), fmt(dominant.snr, 2)],
+            [t('segmentCount'), String(dominant.segmentCount || 0)]
           ],
           events: [],
-          chart: { kind: 'bar', series: [{ name: t('analysisPsd'), data: [[dominant.frequencyHz, dominant.power]] }] },
+          chart: { kind: 'line', xKind: 'frequency', series: [{ name: t('analysisPsd'), data: dominant.frequencies.map((f, index) => [f, dominant.psd[index]]) }] },
           methodology: t('methodPsd')
         };
       }
       if (type === 'spectrogram') {
-        const chunks = dominantByChunks(series, Number($('bandMin').value), Number($('bandMax').value));
+        const spectrogram = workerResult || core.computeStftSpectrogram(series, workerAnalysisParameters('spectrogram'));
         return {
           type,
           title: t('analysisSpectrogram'),
           metadata,
           cards: [
-            [t('windowSecLabel'), '600 sn'],
-            [t('dominantFrequency'), chunks.length ? `${fmt(chunks[0][1], 4)} Hz` : '—'],
+            [t('windowSecLabel'), `${spectrogram.segmentLength} sn`],
+            [t('dominantFrequency'), spectrogram.peaksByTime?.length ? `${fmt(spectrogram.peaksByTime[0].frequencyHz, 4)} Hz` : '—'],
             [t('resolutionLabel'), t('resolutionSecond')],
             [t('qualityCoverage'), percent(current.overall.pairedCount / 86400)]
           ],
           events: [],
-          chart: { kind: 'scatter', series: [{ name: t('analysisSpectrogram'), data: chunks }] },
+          chart: { kind: 'heatmap', spectrogram },
           methodology: t('methodSpectrogram')
         };
       }
       if (type === 'crossCorrelation') {
-        const corr = core.computeCrossCorrelation(current.tr, current.de, { maxLagSeconds: 30 });
+        const corr = workerResult || core.computeCrossCorrelation(current.tr, current.de, { maxLagSeconds: 30, sampleIntervalSeconds: 1 });
         return {
           type,
           title: t('analysisCrossCorrelation'),
           metadata,
           cards: [
-            [t('bestLag'), `${fmt(corr.bestLagSeconds, 0)} sn`],
-            [t('kpiCorrelation'), fmt(corr.bestCorrelation, 4)],
-            [t('classification'), t('classCommonMode')],
+            [t('bestLag'), `${fmt(corr.bestAbsoluteLagSeconds, 0)} sn`],
+            [t('kpiCorrelation'), fmt(corr.bestAbsoluteCorrelation, 4)],
+            [t('negativeCorrelation'), fmt(corr.bestNegativeCorrelation, 4)],
+            [t('classification'), t('classCommonModeIndicator')],
             [t('qualityCoverage'), percent(current.overall.pairedCount / 86400)]
           ],
-          events: [{ start: 0, end: 86400, type: t('analysisCrossCorrelation'), value: corr.bestCorrelation, classification: t('classCommonMode') }],
-          chart: { kind: 'line', series: [{ name: t('seriesDiff'), data: sampleSeries(sourceSeries('diff', current), 60) }] },
+          events: [{ start: 0, end: 86400, type: t('analysisCrossCorrelation'), value: corr.bestAbsoluteCorrelation, classification: t('classCommonModeIndicator') }],
+          chart: { kind: 'line', xKind: 'lag', series: [{ name: t('analysisCrossCorrelation'), data: corr.correlations.map(row => [row.lagSeconds, row.correlation]) }] },
           methodology: t('methodCrossCorrelation')
         };
       }
       if (type === 'coherence') {
         const targetHz = Number($('bandMin').value) || 0.12;
-        const coh = core.estimateCoherence(current.tr, current.de, { targetHz });
-        const phase = core.estimatePhaseDifference(current.tr, current.de, { targetHz });
+        const result = workerResult || {
+          coherence: core.computeMagnitudeSquaredCoherence(current.tr, current.de, workerAnalysisParameters('coherence')),
+          crossPsd: core.computeCrossPowerSpectralDensity(current.tr, current.de, workerAnalysisParameters('coherence'))
+        };
+        const coh = result.coherence;
+        const crossPsd = result.crossPsd;
         return {
           type,
           title: t('analysisCoherence'),
           metadata,
           cards: [
-            [t('coherence'), fmt(coh.coherence, 3)],
-            [t('phaseDifference'), `${fmt(phase.phaseDegrees, 1)}°`],
-            [t('dominantFrequency'), `${fmt(targetHz, 3)} Hz`],
-            [t('classification'), t('classCommonMode')]
+            [t('coherence'), fmt(coh.maxCoherence, 3)],
+            [t('phaseDifference'), `${fmt(crossPsd.selectedPhaseDegrees, 1)}°`],
+            [t('dominantFrequency'), `${fmt(coh.maxCoherenceFrequencyHz || targetHz, 3)} Hz`],
+            [t('classification'), crossPsd.phaseConfidence === 'low' ? t('lowConfidence') : t('classCoherentCandidate')]
           ],
-          events: [{ start: 0, end: 86400, type: t('analysisCoherence'), value: coh.coherence, classification: t('classCommonMode') }],
-          chart: { kind: 'bar', series: [{ name: t('coherence'), data: [[targetHz, coh.coherence]], yName: t('coherence') }, { name: t('phaseDifference'), data: [[targetHz, phase.phaseDegrees]], yName: t('phaseDifference') }] },
+          events: [{ start: 0, end: 86400, type: t('analysisCoherence'), value: coh.maxCoherence, classification: t('classCommonModeIndicator') }],
+          chart: { kind: 'line', xKind: 'frequency', series: [{ name: t('coherence'), data: coh.points.map(point => [point.frequencyHz, point.coherence]) }] },
           methodology: t('methodCoherence')
         };
       }
@@ -3661,6 +4154,32 @@
 
     function renderGenericAnalysisChart(result) {
       if (!state.oscillationChart) return;
+      if (result.chart.kind === 'heatmap') {
+        const spectrogram = result.chart.spectrogram;
+        const data = [];
+        spectrogram.powerMatrix.forEach((row, timeIndex) => {
+          row.forEach((power, freqIndex) => {
+            data.push([timeIndex, freqIndex, Number.isFinite(power) ? power : null]);
+          });
+        });
+        const finite = data.map(item => item[2]).filter(Number.isFinite);
+        state.oscillationChart.setOption({
+          animation: false,
+          tooltip: {
+            position: 'top',
+            formatter: params => {
+              const [timeIndex, freqIndex, power] = params.value;
+              return `${secondToTime(spectrogram.timeBins[timeIndex])}<br>${fmt(spectrogram.frequencyBins[freqIndex], 4)} Hz<br>${fmt(power, 8)} ${spectrogram.units}`;
+            }
+          },
+          grid: { left: 68, right: 68, top: 42, bottom: 72 },
+          xAxis: { type: 'category', data: spectrogram.timeBins.map(second => secondToTime(second).slice(0, 5)), name: t('timeAxis') },
+          yAxis: { type: 'category', data: spectrogram.frequencyBins.map(freq => fmt(freq, 3)), name: 'Hz' },
+          visualMap: { min: finite.length ? Math.min(...finite) : 0, max: finite.length ? Math.max(...finite) : 1, calculable: true, orient: 'horizontal', left: 'center', bottom: 16 },
+          series: [{ name: result.title, type: 'heatmap', data, progressive: 5000 }]
+        }, true);
+        return;
+      }
       const series = result.chart.series.map(item => ({
         name: item.name,
         type: result.chart.kind === 'bar' ? 'bar' : result.chart.kind === 'scatter' ? 'scatter' : 'line',
@@ -3674,7 +4193,7 @@
         tooltip: { trigger: 'axis' },
         legend: { top: 8 },
         grid: { left: 68, right: 42, top: 58, bottom: 62 },
-        xAxis: { type: 'value', axisLabel: { formatter: value => result.chart.kind === 'bar' && value < 24 ? String(value) : secondToTime(Math.round(value)).slice(0, 5) } },
+        xAxis: { type: 'value', axisLabel: { formatter: value => result.chart.xKind === 'frequency' ? fmt(value, 3) : result.chart.xKind === 'lag' ? fmt(value, 0) : result.chart.kind === 'bar' && value < 24 ? String(value) : secondToTime(Math.round(value)).slice(0, 5) } },
         yAxis: { type: 'value', scale: true },
         dataZoom: [{ type: 'inside', filterMode: 'none' }, { type: 'slider', filterMode: 'none', height: 22, bottom: 18 }],
         series
@@ -3868,6 +4387,8 @@
       $('graphMin').value = s.graphMin;
       $('graphMax').value = s.graphMax;
       $('chartStep').value = s.chartStepSeconds;
+      $('showDifference').value = s.showDifference || 'no';
+      $('showMinMaxEnvelope').value = s.showMinMax || 'no';
       $('diffAxisMin').value = s.diffAxisMin;
       $('diffAxisMax').value = s.diffAxisMax;
       $('bandMin').value = s.bandMin;
@@ -3880,6 +4401,7 @@
       $('analysisSourceSelect').value = s.oscillationSource || 'tr';
       $('oscSourceSelect').value = s.oscillationSource || 'tr';
       state.oscillationSource = getAnalysisSource();
+      updateChartLayerControls();
       updateOscillationSourceUi();
     }
 
@@ -3909,7 +4431,9 @@
         stepSec: Number($('stepSec').value),
         filterTaps: Number($('filterTaps').value),
         minDuration: Number($('minDuration').value),
-        oscillationSource: getAnalysisSource()
+        oscillationSource: getAnalysisSource(),
+        showDifference: $('showDifference').value,
+        showMinMax: $('showMinMaxEnvelope').value
       };
       localStorage.setItem('frequencyAppSettings', JSON.stringify(state.settings));
       applySettingsToForm();
@@ -4061,11 +4585,11 @@
         chartViewTag: '24 saat • dakikalık',
         reportDateTag: 'Tarih seçilmedi',
         sectionHourlyMatrix: 'Saatlik İstatistik Matrisi',
-        hourlyMatrixDesc: 'Tek tabloda Metrik ve 00–23 saat kolonları gösterilir.',
-        singleDoubleHint: 'Saat başlığına tek tıklama saniyelik saat grafiğini, çift tıklama günlük grafiği açar.',
+        hourlyMatrixDesc: 'Saat seçin; ayrıntı grafiği güncellenir.',
+        singleDoubleHint: 'Saat seçin.',
         sectionQuarterHeatmap: '15 Dakikalık Ortalama Mutlak Frekans Farkı',
-        quarterHeatmapDesc: 'Her hücre ilgili çeyrek saatteki eşlenmiş Türkiye–Almanya farkının MAE değerini gösterir.',
-        singleDoubleHintQuarter: 'Tek tıklama 900 saniyelik grafiği, çift tıklama günlük grafiği açar.',
+        quarterHeatmapDesc: 'Çeyrek saat seçin; ayrıntı grafiği güncellenir.',
+        singleDoubleHintQuarter: 'Çeyrek saat seçin.',
         sectionOscillation: 'Analiz ve Raporlamalar',
         oscSourceLabel: 'Analiz kaynağı',
         teias: 'Türkiye',
@@ -4329,11 +4853,11 @@
         chartViewTag: '24h • minutely',
         reportDateTag: 'No date selected',
         sectionHourlyMatrix: 'Hourly Statistics Matrix',
-        hourlyMatrixDesc: 'Metrics and 00–23 hour columns in one table.',
-        singleDoubleHint: 'Single-click opens second-resolution chart, double-click opens daily chart.',
+        hourlyMatrixDesc: 'Select an hour to update the detail chart.',
+        singleDoubleHint: 'Select an hour.',
         sectionQuarterHeatmap: '15-Minute Mean Absolute Frequency Difference',
-        quarterHeatmapDesc: 'Each cell shows MAE of aligned TURKIYE–Germany difference for that quarter.',
-        singleDoubleHintQuarter: 'Single-click opens 900s chart, double-click opens daily chart.',
+        quarterHeatmapDesc: 'Select a quarter-hour to update the detail chart.',
+        singleDoubleHintQuarter: 'Select a quarter-hour.',
         sectionOscillation: 'Analysis & Reports',
         oscSourceLabel: 'Analysis source',
         teias: 'TURKIYE',
@@ -4691,10 +5215,23 @@
         reportPreviewEmpty: 'Önce analiz çalıştırın.',
         mobileHourLabel: 'Mobil saat detayı',
         mobileAllHours: 'Tüm saatler',
+        loadingShort: 'Yükleniyor...',
         loadingSecondData: 'Saniyelik veri yükleniyor',
         chartResolutionDaily: 'Görünen veri: dakikalık özet',
         chartResolutionRaw: 'Ham saniyelik veri',
         chartResolutionDisplay: 'Görünen veri',
+        diffLayerBtn: 'Fark',
+        minMaxLayerBtn: 'Maks/Min',
+        minMaxLabel: 'Maks/Min',
+        copyDailyDateBtn: 'Günlük tarihten al',
+        segmentCount: 'Segment',
+        negativeCorrelation: 'Negatif korelasyon',
+        classCommonModeIndicator: 'Ortak mod göstergesi',
+        classCoherentCandidate: 'Koherent osilasyon adayı',
+        lowConfidence: 'Düşük güven',
+        analysisWorkerFallback: 'Worker başlatılamadı; kısa analiz ana iş parçacığında çalışıyor.',
+        timeAxis: 'Zaman',
+        chartLoadFailed: 'Grafik yuklenemedi.',
         downloadPngLabel: 'Grafiği PNG olarak indir',
         fullscreenLabel: 'Tam ekran',
         resetZoomLabel: 'Yakınlaştırmayı sıfırla',
@@ -4823,10 +5360,23 @@
         reportPreviewEmpty: 'Run an analysis first.',
         mobileHourLabel: 'Mobile hour detail',
         mobileAllHours: 'All hours',
+        loadingShort: 'Loading...',
         loadingSecondData: 'Loading second-level data',
         chartResolutionDaily: 'Visible data: minutely summary',
         chartResolutionRaw: 'Raw second-level data',
         chartResolutionDisplay: 'Visible data',
+        diffLayerBtn: 'Difference',
+        minMaxLayerBtn: 'Min/Max',
+        minMaxLabel: 'Min/Max',
+        copyDailyDateBtn: 'Use daily date',
+        segmentCount: 'Segments',
+        negativeCorrelation: 'Negative correlation',
+        classCommonModeIndicator: 'Common-mode indicator',
+        classCoherentCandidate: 'Coherent oscillation candidate',
+        lowConfidence: 'Low confidence',
+        analysisWorkerFallback: 'Worker could not start; short analysis is running on the main thread.',
+        timeAxis: 'Time',
+        chartLoadFailed: 'Chart could not be loaded.',
         downloadPngLabel: 'Download chart as PNG',
         fullscreenLabel: 'Fullscreen',
         resetZoomLabel: 'Reset zoom',
@@ -4839,6 +5389,7 @@
 
     Object.assign(i18n.tr, translations.tr);
     Object.assign(i18n.en, translations.en);
+    const scientificInterpretationMarkers = "Ortak mod gostergesi | Common-mode indicator | Koherent osilasyon adayi | Coherent oscillation candidate";
 
     let lang = 'tr';
 

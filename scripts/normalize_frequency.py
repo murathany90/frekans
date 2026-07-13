@@ -501,30 +501,116 @@ def build_source_index(data_root: str | Path, source: str, year: int = 2026) -> 
     return index
 
 
+def manifest_years(root: Path) -> list[int]:
+    years = set()
+    for meta_path in iter_meta_files(root):
+        try:
+            years.add(int(meta_path.parts[-3]))
+        except (IndexError, ValueError):
+            continue
+    return sorted(years)
+
+
+def source_year_record(source_info: dict, year: int) -> dict:
+    prefix = f"{year}-"
+    days = {
+        local_date: day
+        for local_date, day in source_info.get("days", {}).items()
+        if local_date.startswith(prefix)
+    }
+    files = {
+        local_date: file_set
+        for local_date, file_set in source_info.get("files", {}).items()
+        if local_date.startswith(prefix)
+    }
+    excluded_dates = [
+        local_date
+        for local_date in source_info.get("excludedDates", [])
+        if str(local_date).startswith(prefix)
+    ]
+    available_dates = sorted(days)
+    return {
+        **source_info,
+        "firstDate": available_dates[0] if available_dates else None,
+        "latestDate": available_dates[-1] if available_dates else None,
+        "availableDates": available_dates,
+        "excludedDates": sorted(excluded_dates),
+        "days": days,
+        "files": files,
+    }
+
+
+def write_split_manifest_files(root: Path, manifest: dict, years: list[int]) -> None:
+    summary_sources = {}
+    for source, source_info in manifest.get("sources", {}).items():
+        summary_sources[source] = {
+            "label": source_info.get("label"),
+            "timezone": source_info.get("timezone"),
+            "firstDate": source_info.get("firstDate"),
+            "latestDate": source_info.get("latestDate"),
+            "availableDates": source_info.get("availableDates", []),
+            "excludedDates": source_info.get("excludedDates", []),
+            "status": source_info.get("status"),
+        }
+
+    summary = {
+        "schemaVersion": 2,
+        "updatedAtUtc": manifest["updatedAtUtc"],
+        "storage": manifest["storage"],
+        "years": years,
+        "sources": summary_sources,
+        "shards": {str(year): f"manifest/{year}.json" for year in years},
+        "fallback": "manifest.json",
+    }
+    write_json(root / "manifest-summary.json", summary)
+
+    for year in years:
+        year_manifest = {
+            "schemaVersion": 2,
+            "updatedAtUtc": manifest["updatedAtUtc"],
+            "storage": manifest["storage"],
+            "year": year,
+            "sources": {},
+        }
+        for source, source_info in manifest.get("sources", {}).items():
+            record = source_year_record(source_info, year)
+            if record["availableDates"] or record["excludedDates"]:
+                year_manifest["sources"][source] = record
+        write_json(root / "manifest" / f"{year}.json", year_manifest)
+
+
 def build_manifest(data_root: str | Path = "data") -> dict:
     root = Path(data_root)
     sources: dict[str, dict] = {}
+    years = manifest_years(root)
     for source in sorted({path.parts[-4] for path in iter_meta_files(root)}):
-        index = build_source_index(root, source)
-        dates = index["availableDates"]
+        source_indexes = [build_source_index(root, source, year) for year in years]
+        dates = sorted({date for index in source_indexes for date in index["availableDates"]})
+        excluded_dates = sorted({date for index in source_indexes for date in index.get("excludedDates", [])})
         label = SOURCE_LABELS.get(source, source)
         timezone = None
         files: dict[str, dict] = {}
-        for local_date, day in index["days"].items():
-            timezone = timezone or day["timezone"]
-            files[local_date] = day["files"]
+        days: dict[str, dict] = {}
+        for index in source_indexes:
+            for local_date, day in index["days"].items():
+                timezone = timezone or day["timezone"]
+                days[local_date] = day
+                files[local_date] = day["files"]
         if timezone is None:
-            for day in index.get("excludedDays", {}).values():
-                timezone = day["timezone"]
-                break
+            for index in source_indexes:
+                for day in index.get("excludedDays", {}).values():
+                    timezone = day["timezone"]
+                    break
+                if timezone:
+                    break
         sources[source] = {
             "label": label,
             "timezone": timezone,
             "firstDate": dates[0] if dates else None,
             "latestDate": dates[-1] if dates else None,
             "availableDates": dates,
-            "excludedDates": index.get("excludedDates", []),
-            "days": index["days"],
+            "excludedDates": excluded_dates,
+            "days": days,
             "status": "active" if source == "teias" else "manual_monthly_import",
             "files": files,
         }
@@ -536,4 +622,5 @@ def build_manifest(data_root: str | Path = "data") -> dict:
         "sources": sources,
     }
     write_json(root / "manifest.json", manifest)
+    write_split_manifest_files(root, manifest, years)
     return manifest

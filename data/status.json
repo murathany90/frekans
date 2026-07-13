@@ -1,5 +1,5 @@
 {
-  "updatedAtUtc": "2026-07-13T18:12:07.280224+00:00",
+  "updatedAtUtc": "2026-07-13T18:12:07Z",
   "lastWorkflowResult": "success",
   "lastSuccessfulTeiasCheckUtc": "2026-07-13T18:12:07Z",
   "lastSuccessfulTeiasDataDate": "2026-07-10",
@@ -14,5 +14,17 @@
   "lastErrorAtUtc": null,
   "lastSuccessfulNetztransparenzDataDate": "2026-06-30",
   "teiasDataDelayDays": 3,
-  "revisionDates": []
+  "revisionDates": [],
+  "lastRunAt": "2026-07-13T18:12:07Z",
+  "lastSuccessfulRunAt": "2026-07-13T18:12:07Z",
+  "lastFailedRunAt": null,
+  "lastSuccessfulDataDate": "2026-07-10",
+  "lastAttemptedDataDate": "2026-07-13",
+  "status": "success",
+  "missingDates": [
+    "2026-07-11",
+    "2026-07-12",
+    "2026-07-13"
+  ],
+  "lastError": null
 }
