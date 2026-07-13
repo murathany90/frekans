@@ -8,6 +8,7 @@
 
   <!-- CSV ayrıştırma Web Worker içinde akış tabanlı ve satır satır yapılır. -->
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+  <script type="module" src="assets/analysis-core.mjs"></script>
 
   <style>
     :root {
@@ -65,7 +66,7 @@
     .brand h1 {
       margin: 0;
       font-size: clamp(1rem, 1.8vw, 1.5rem);
-      letter-spacing: -0.025em;
+      letter-spacing: 0;
     }
 
     .brand p {
@@ -95,7 +96,7 @@
 
     .tabs {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       background: rgba(255,255,255,.12);
       border: 1px solid rgba(255,255,255,.2);
       border-radius: 10px;
@@ -178,6 +179,11 @@
     }
     .cal-day:hover { background: var(--soft-blue); }
     .cal-day.selected { background: #edf9fc; outline: 2px solid var(--cyan); outline-offset: -1px; }
+    .cal-day.has-both { background: #e7f7ee; }
+    .cal-day.has-tr { background: #e8f4fb; }
+    .cal-day.has-de { background: #fff6d8; }
+    .cal-day.no-data { color: #8794a0; background: #f2f4f5; }
+    .cal-day.bad-quality { box-shadow: inset 0 0 0 2px rgba(200,60,60,.55); }
     .cal-day.empty { cursor: default; background: transparent; }
     .cal-day.empty:hover { background: transparent; }
     .cal-dots { display: flex; gap: 2px; justify-content: center; min-height: 6px; }
@@ -445,16 +451,43 @@
     .chart-toolbar button {
       background: rgba(255,255,255,.92);
       border: 1px solid var(--line);
-      border-radius: 6px;
+      border-radius: 999px;
       cursor: pointer;
-      padding: 4px 9px;
+      padding: 0;
+      min-width: 40px;
+      min-height: 40px;
+      width: 40px;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       font-size: .82rem;
-      line-height: 1.4;
+      line-height: 1;
       color: var(--navy);
-      transition: background .12s;
+      transition: background .12s, transform .12s, border-color .12s;
     }
     .chart-toolbar button:hover {
       background: #fff;
+      transform: translateY(-1px);
+      border-color: rgba(23,107,156,.42);
+    }
+    .chart-toolbar button:focus-visible,
+    .btn:focus-visible,
+    select:focus-visible,
+    input:focus-visible,
+    summary:focus-visible {
+      outline: 3px solid rgba(23,107,156,.35);
+      outline-offset: 2px;
+    }
+    .chart-toolbar button.loading { opacity: .68; pointer-events: none; }
+    .chart-toolbar svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
     .quarter-grid {
@@ -506,7 +539,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: clip;
-      font-size: clamp(.50rem, .61vw, .72rem);
+      font-size: .75rem;
       line-height: 1.2;
       border: 1px solid #d9e4eb;
       font-variant-numeric: tabular-nums;
@@ -537,6 +570,37 @@
       cursor: help;
       overflow: visible !important;
     }
+    .mobile-hour-view { display: none; }
+    .mobile-hour-detail {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .mobile-hour-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px;
+      background: #fff;
+      min-height: 62px;
+    }
+    .mobile-hour-card .label { color: var(--muted); font-size: .78rem; font-weight: 700; }
+    .mobile-hour-card .value { font-size: .98rem; font-weight: 900; margin-top: 3px; color: var(--navy); }
+    .hour-heatmap-compact {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .hour-heat-cell {
+      min-height: 42px;
+      border: 1px solid rgba(19,42,58,.08);
+      border-radius: 8px;
+      font-size: .78rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .hour-heat-cell.worst { box-shadow: inset 0 0 0 2px rgba(200,60,60,.5); }
     .metric-name:hover::after,
     .metric-name:focus-visible::after {
       content: attr(data-tooltip);
@@ -585,6 +649,71 @@
       grid-template-columns: repeat(8, minmax(105px, 1fr));
       gap: 9px;
       align-items: end;
+    }
+    .analysis-controls {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(150px, 1fr));
+      gap: 10px;
+      align-items: end;
+    }
+    .analysis-controls.compact { grid-template-columns: repeat(3, minmax(140px, 1fr)); }
+    details.advanced-panel {
+      margin-top: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfdfe;
+      padding: 8px 10px 10px;
+    }
+    details.advanced-panel summary {
+      cursor: pointer;
+      font-weight: 900;
+      color: var(--navy);
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+    }
+    .coverage-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .coverage-item,
+    .analysis-result-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fff;
+    }
+    .coverage-item .label,
+    .analysis-result-card .label { color: var(--muted); font-size: .76rem; font-weight: 800; }
+    .coverage-item .value,
+    .analysis-result-card .value { margin-top: 4px; font-weight: 900; color: var(--navy); }
+    .result-card-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin: 12px 0;
+    }
+    .report-preview {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 14px;
+      min-height: 180px;
+    }
+    .report-preview h2,
+    .report-preview h3 { margin: 0 0 8px; color: var(--navy); }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
 
 
@@ -665,6 +794,8 @@
       .control-bar { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .kpi-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
       .oscillation-controls { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .analysis-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .result-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .settings-grid { grid-template-columns: 1fr 1fr; }
     }
 
@@ -673,15 +804,22 @@
       .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
       .auto-data-grid { grid-template-columns: 1fr; }
       .hour-blocks { grid-template-columns: 1fr; }
-      .hour-matrix th, .hour-matrix td { font-size: .43rem; padding: 4px 1px; }
-      .hour-matrix th:first-child, .hour-matrix td:first-child { width: 13.5%; padding-left: 3px; }
-      .hour-matrix th:not(:first-child), .hour-matrix td:not(:first-child) { width: 3.604%; }
+      .hour-matrix-shell { overflow-x: auto; padding-bottom: 6px; }
+      .hour-matrix { min-width: 760px; }
+      .hour-matrix th, .hour-matrix td { font-size: .75rem; padding: 6px 4px; }
+      .desktop-hour-view { display: none; }
+      .mobile-hour-view { display: block; }
       .control-bar { grid-template-columns: 1fr 1fr; }
       .kpi-grid { grid-template-columns: 1fr 1fr; }
       .oscillation-controls { grid-template-columns: 1fr 1fr; }
+      .analysis-controls,
+      .analysis-controls.compact { grid-template-columns: 1fr; }
+      .coverage-summary,
+      .result-card-grid { grid-template-columns: 1fr 1fr; }
       .settings-grid { grid-template-columns: 1fr; }
       .quarter-grid { grid-template-columns: repeat(12, minmax(26px, 1fr)); }
       .chart { height: 360px; }
+      body { overflow-x: hidden; }
     }
 
     @media print {
@@ -703,12 +841,13 @@
         <p data-i18n="appSubtitle">Türkiye ve ENTSO-e Günlük Şebeke Frekansı Analiz Platformu</p>
       </div>
       <nav class="tabs" aria-label="Uygulama sekmeleri">
-        <button class="tab-button active" data-tab="tab-chart" data-i18n="tabChart">Günlük Frekans</button>
-        <button class="tab-button" data-tab="tab-oscillation" data-i18n="tabOscillation">Analiz ve Raporlamalar</button>
-        <button class="tab-button" data-tab="tab-settings" data-i18n="tabSettings">Ayarlar</button>
+        <button class="tab-button active" data-tab="tab-chart" data-i18n="tabChart">Günlük</button>
+        <button class="tab-button" data-tab="tab-oscillation" data-i18n="tabOscillation">Analiz</button>
+        <button class="tab-button" data-tab="tab-reports" data-i18n="tabReports">Raporlar</button>
+        <button class="tab-button" data-tab="tab-settings" data-i18n="tabSettings">Veri</button>
       </nav>
       <div class="header-actions">
-        <button class="btn btn-light" id="langToggle" type="button" data-i18n="langToggle">TR</button>
+        <button class="btn btn-light" id="langToggle" type="button" aria-label="Dil seçimi">TR | EN</button>
       </div>
     </div>
   </header>
@@ -773,12 +912,13 @@
             <span class="tag" id="reportDateTag" data-i18n="reportDateTag">Tarih seçilmedi</span>
           </div>
         </div>
+        <div id="coverageSummary" class="coverage-summary" aria-live="polite"></div>
         <div class="chart-wrapper" id="freqChartWrapper">
           <div id="frequencyChart" class="chart"></div>
           <div class="chart-toolbar">
-            <button type="button" title="Tam ekran" data-action="fullscreen" data-chart="frequencyChart">⛶</button>
-            <button type="button" title="PNG olarak kaydet" data-action="download" data-chart="frequencyChart">📷</button>
-            <button type="button" title="Yakınlaştırmayı sıfırla" data-action="resetzoom" data-chart="frequencyChart">⟲</button>
+            <button type="button" aria-label="Tam ekran" title="Tam ekran" data-action="fullscreen" data-chart="frequencyChart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5"/><path d="M16 3h5v5"/><path d="M21 16v5h-5"/><path d="M8 21H3v-5"/></svg></button>
+            <button type="button" aria-label="Grafiği PNG olarak indir" title="Grafiği PNG olarak indir" data-action="download" data-chart="frequencyChart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg></button>
+            <button type="button" aria-label="Yakınlaştırmayı sıfırla" title="Yakınlaştırmayı sıfırla" data-action="resetzoom" data-chart="frequencyChart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v6h6"/></svg></button>
           </div>
         </div>
         <div class="kpi-grid" id="kpiGrid"></div>
@@ -807,32 +947,101 @@
       <div id="alignmentInfo" class="status-banner warn">&nbsp;</div>
     </section>
 
-    <!-- SEKME 2: OSİLASYON -->
+    <!-- SEKME 2: ANALİZ LABORATUVARI -->
     <section id="tab-oscillation" class="tab-panel">
       <div class="panel no-print">
         <div class="section-title">
           <div>
-            <h2 data-i18n="sectionOscillation">Analiz ve Raporlamalar</h2>
+            <h2 data-i18n="sectionOscillation">Analiz Laboratuvarı</h2>
           </div>
-          <div class="osc-source-selector">
-            <label for="oscSourceSelect" data-i18n="oscSourceLabel">Analiz kaynağı</label>
-            <select id="oscSourceSelect">
-              <option value="tr" selected data-i18n="teias">Türkiye</option>
-              <option value="de" data-i18n="netz">Almanya</option>
+        </div>
+
+        <div class="analysis-controls">
+          <div class="field">
+            <label for="analysisDateSelect" data-i18n="analysisDateLabel">Tarih</label>
+            <input id="analysisDateSelect" type="date" />
+          </div>
+          <div class="field">
+            <label for="analysisSourceSelect" data-i18n="analysisSourceLabel">Kaynak</label>
+            <select id="analysisSourceSelect">
+              <option value="tr" data-i18n="sourceTr">Türkiye</option>
+              <option value="de" data-i18n="sourceDe">Almanya</option>
+              <option value="both" data-i18n="sourceBoth">Türkiye + Almanya</option>
+              <option value="diff" data-i18n="sourceDiff">Türkiye - Almanya</option>
+              <option value="common" data-i18n="sourceCommon">Ortak bileşen</option>
+              <option value="differential" data-i18n="sourceDifferential">Diferansiyel bileşen</option>
+            </select>
+            <select id="oscSourceSelect" class="sr-only" aria-hidden="true" tabindex="-1">
+              <option value="tr" selected>Türkiye</option>
+              <option value="de">Almanya</option>
+              <option value="both">Türkiye + Almanya</option>
+              <option value="diff">Türkiye - Almanya</option>
+              <option value="common">Ortak bileşen</option>
+              <option value="differential">Diferansiyel bileşen</option>
             </select>
           </div>
+          <div class="field">
+            <label for="analysisTypeSelect" data-i18n="analysisTypeLabel">Analiz</label>
+            <select id="analysisTypeSelect">
+              <optgroup label="Veri Kalitesi" data-i18n-label="analysisGroupQuality">
+                <option value="quality" data-i18n="analysisQuality">Veri kapsama</option>
+              </optgroup>
+              <optgroup label="Frekans Kalitesi" data-i18n-label="analysisGroupFrequency">
+                <option value="stats" selected data-i18n="analysisStats">Temel istatistikler</option>
+              </optgroup>
+              <optgroup label="Olay Analizi" data-i18n-label="analysisGroupEvents">
+                <option value="events" data-i18n="analysisEvents">Bant ihlali</option>
+              </optgroup>
+              <optgroup label="RoCoF" data-i18n-label="analysisGroupRocof">
+                <option value="rocof" data-i18n="analysisRocof">RoCoF</option>
+              </optgroup>
+              <optgroup label="Spektral Analiz" data-i18n-label="analysisGroupSpectral">
+                <option value="psd" data-i18n="analysisPsd">Welch PSD</option>
+                <option value="spectrogram" data-i18n="analysisSpectrogram">Spektrogram</option>
+              </optgroup>
+              <optgroup label="Osilasyon Analizi" data-i18n-label="analysisGroupOscillation">
+                <option value="oscillation" data-i18n="analysisOscillation">Osilasyon adayı</option>
+              </optgroup>
+              <optgroup label="Türkiye-Almanya Ortak Analizi" data-i18n-label="analysisGroupJoint">
+                <option value="crossCorrelation" data-i18n="analysisCrossCorrelation">Çapraz korelasyon</option>
+                <option value="coherence" data-i18n="analysisCoherence">Koherens ve faz</option>
+              </optgroup>
+              <optgroup label="Uzun Dönem Analizi" data-i18n-label="analysisGroupTrend">
+                <option value="trend" data-i18n="analysisTrend">Günlük trend</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="field">
+            <label>&nbsp;</label>
+            <div class="button-row">
+              <button class="btn btn-success" id="analysisRunBtn" type="button" data-i18n="analysisRunBtn">Çalıştır</button>
+              <button class="btn btn-secondary" id="analysisCancelBtn" type="button" data-i18n="analysisCancelBtn">İptal</button>
+            </div>
+          </div>
         </div>
-        <div class="oscillation-controls">
-          <div class="field"><label for="bandMin" data-i18n="bandMinLabel">Alt bant (Hz)</label><input id="bandMin" type="number" min="0.01" max="0.45" step="0.01" value="0.10" /></div>
-          <div class="field"><label for="bandMax" data-i18n="bandMaxLabel">Üst bant (Hz)</label><input id="bandMax" type="number" min="0.02" max="0.49" step="0.01" value="0.20" /></div>
-          <div class="field"><label for="oscThreshold" data-i18n="oscThresholdLabel">Genlik eşiği (mHz)</label><input id="oscThreshold" type="number" min="0.1" max="200" step="0.5" value="10" /></div>
-          <div class="field"><label for="windowSec" data-i18n="windowSecLabel">Pencere (sn)</label><input id="windowSec" type="number" min="30" max="900" step="10" value="120" /></div>
-          <div class="field"><label for="stepSec" data-i18n="stepSecLabel">Adım (sn)</label><input id="stepSec" type="number" min="1" max="120" step="1" value="10" /></div>
-          <div class="field"><label for="filterTaps" data-i18n="filterTapsLabel">FIR kademe (tek)</label><input id="filterTaps" type="number" min="31" max="401" step="2" value="101" /></div>
-          <div class="field"><label for="minDuration" data-i18n="minDurationLabel">Min. olay süresi (sn)</label><input id="minDuration" type="number" min="10" max="1800" step="10" value="30" /></div>
-          <button class="btn btn-success" id="oscCalculateBtn" data-i18n="oscCalculateBtn">Hesaplama Yap</button>
-        </div>
-        <div id="oscStatus" class="status-banner warn" data-i18n="oscStatusDefault">Önce Günlük Frekans sekmesinde rapor hesaplayın.</div>
+
+        <details class="advanced-panel">
+          <summary data-i18n="advanced">Gelişmiş</summary>
+          <div class="analysis-controls compact">
+            <div class="field"><label for="analysisDateMode" data-i18n="analysisDateModeLabel">Tarih modu</label><select id="analysisDateMode"><option value="single" data-i18n="dateModeSingle">Tek gün</option><option value="range" data-i18n="dateModeRange">Tarih aralığı</option><option value="last7" data-i18n="dateModeLast7">Son 7 ortak gün</option><option value="last30" data-i18n="dateModeLast30">Son 30 ortak gün</option><option value="month" data-i18n="dateModeMonth">Ay seçimi</option><option value="customHours" data-i18n="dateModeCustomHours">Özel saat</option></select></div>
+            <div class="field"><label for="analysisStartDate" data-i18n="startDateLabel">Başlangıç</label><input id="analysisStartDate" type="date" /></div>
+            <div class="field"><label for="analysisEndDate" data-i18n="endDateLabel">Bitiş</label><input id="analysisEndDate" type="date" /></div>
+            <div class="field"><label for="analysisStartHour" data-i18n="startHourLabel">Başlangıç saati</label><input id="analysisStartHour" type="time" value="00:00" /></div>
+            <div class="field"><label for="analysisEndHour" data-i18n="endHourLabel">Bitiş saati</label><input id="analysisEndHour" type="time" value="23:59" /></div>
+            <div class="field"><label for="analysisResolution" data-i18n="resolutionLabel">Çözünürlük</label><select id="analysisResolution"><option value="auto" data-i18n="resolutionAuto">Otomatik</option><option value="1s" data-i18n="resolutionSecond">Saniyelik</option><option value="10s" data-i18n="resolution10s">10 saniyelik</option><option value="1m" data-i18n="resolutionMinute">Dakikalık</option><option value="1h" data-i18n="resolutionHour">Saatlik</option></select></div>
+            <div class="field"><label for="analysisAlignment" data-i18n="alignmentLabel">Zaman eşleştirme</label><select id="analysisAlignment"><option value="utcAuto" data-i18n="utcAuto">UTC - otomatik</option><option value="sameLocal" data-i18n="sameLocal">Aynı yerel saat</option><option value="manual" data-i18n="manualOption">Manuel</option></select></div>
+            <div class="field"><label for="bandMin" data-i18n="bandMinLabel">Alt bant (Hz)</label><input id="bandMin" type="number" min="0.01" max="0.45" step="0.01" value="0.10" /></div>
+            <div class="field"><label for="bandMax" data-i18n="bandMaxLabel">Üst bant (Hz)</label><input id="bandMax" type="number" min="0.02" max="0.49" step="0.01" value="0.20" /></div>
+            <div class="field"><label for="oscThreshold" data-i18n="oscThresholdLabel">Eşik (mHz)</label><input id="oscThreshold" type="number" min="0.1" max="200" step="0.5" value="10" /></div>
+            <div class="field"><label for="windowSec" data-i18n="windowSecLabel">Pencere (sn)</label><input id="windowSec" type="number" min="30" max="900" step="10" value="120" /></div>
+            <div class="field"><label for="stepSec" data-i18n="stepSecLabel">Adım (sn)</label><input id="stepSec" type="number" min="1" max="120" step="1" value="10" /></div>
+            <div class="field"><label for="filterTaps" data-i18n="filterTapsLabel">FIR kademe</label><input id="filterTaps" type="number" min="31" max="401" step="2" value="101" /></div>
+            <div class="field"><label for="minDuration" data-i18n="minDurationLabel">Min. süre (sn)</label><input id="minDuration" type="number" min="10" max="1800" step="10" value="30" /></div>
+            <div class="field"><label for="rocofThreshold" data-i18n="rocofThresholdLabel">RoCoF eşiği</label><input id="rocofThreshold" type="number" min="0.001" max="1" step="0.001" value="0.01" /></div>
+          </div>
+        </details>
+
+        <div id="analysisStatus" class="status-banner warn" aria-live="polite" data-i18n="analysisStatusDefault">Tarih ve kaynak seçin.</div>
       </div>
 
       <div class="panel">
@@ -842,12 +1051,13 @@
           </div>
           <span class="tag" id="oscCountTag" data-i18n="oscCountTag">0 bulgu</span>
         </div>
+        <div id="analysisResultCards" class="result-card-grid"></div>
         <div class="chart-wrapper" id="oscChartWrapper">
-          <div id="oscillationChart" class="chart tall"></div>
+          <div id="analysisMainChart" class="chart tall"></div>
           <div class="chart-toolbar">
-            <button type="button" title="Tam ekran" data-action="fullscreen" data-chart="oscillationChart">⛶</button>
-            <button type="button" title="PNG olarak kaydet" data-action="download" data-chart="oscillationChart">📷</button>
-            <button type="button" title="Yakınlaştırmayı sıfırla" data-action="resetzoom" data-chart="oscillationChart">⟲</button>
+            <button type="button" aria-label="Tam ekran" title="Tam ekran" data-action="fullscreen" data-chart="analysisMainChart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5"/><path d="M16 3h5v5"/><path d="M21 16v5h-5"/><path d="M8 21H3v-5"/></svg></button>
+            <button type="button" aria-label="Grafiği PNG olarak indir" title="Grafiği PNG olarak indir" data-action="download" data-chart="analysisMainChart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg></button>
+            <button type="button" aria-label="Yakınlaştırmayı sıfırla" title="Yakınlaştırmayı sıfırla" data-action="resetzoom" data-chart="analysisMainChart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v6h6"/></svg></button>
           </div>
         </div>
       </div>
@@ -864,13 +1074,42 @@
             <thead>
               <tr><th data-i18n="oscThNo">No</th><th data-i18n="oscThStart">Başlangıç</th><th data-i18n="oscThEnd">Bitiş</th><th data-i18n="oscThDuration">Süre</th><th data-i18n="oscThPeak">Tepe genlik</th><th data-i18n="oscThRms">RMS</th><th data-i18n="oscThDominant">Baskın frekans</th><th data-i18n="oscThWindow">Pencere</th><th id="eventSourceMeanHead" data-i18n="oscThSourceMean">Türkiye ort.</th><th id="eventSourceRangeHead" data-i18n="oscThSourceRange">Türkiye min–maks</th><th data-i18n="oscThClass">Sınıflandırma</th></tr>
             </thead>
-            <tbody id="eventBody"><tr><td colspan="11" class="empty-state" data-i18n="oscNoAnalysis">Henüz osilasyon analizi yapılmadı.</td></tr></tbody>
+            <tbody id="analysisEventsBody"><tr><td colspan="11" class="empty-state" data-i18n="oscNoAnalysis">Henüz analiz yapılmadı.</td></tr></tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- SEKME 3: AYARLAR -->
+    <!-- SEKME 3: RAPORLAR -->
+    <section id="tab-reports" class="tab-panel">
+      <div class="panel no-print">
+        <div class="section-title">
+          <div>
+            <h2 data-i18n="reportsTitle">Raporlar</h2>
+          </div>
+          <div class="button-row">
+            <select id="reportLanguageSelect" aria-label="Rapor dili">
+              <option value="tr">Türkçe</option>
+              <option value="en">English</option>
+            </select>
+            <button class="btn btn-secondary" id="reportExportJsonBtn" type="button" data-i18n="reportJsonBtn">JSON</button>
+            <button class="btn btn-secondary" id="reportExportCsvBtn" type="button" data-i18n="reportCsvBtn">CSV</button>
+            <button class="btn btn-primary" id="reportPrintBtn" type="button" data-i18n="reportPrintBtn">PDF</button>
+          </div>
+        </div>
+        <div class="grid-4">
+          <label><input type="checkbox" class="report-part" value="summary" checked /> <span data-i18n="reportPartSummary">Özet</span></label>
+          <label><input type="checkbox" class="report-part" value="quality" checked /> <span data-i18n="reportPartQuality">Veri kalitesi</span></label>
+          <label><input type="checkbox" class="report-part" value="methodology" checked /> <span data-i18n="reportPartMethodology">Yöntem</span></label>
+          <label><input type="checkbox" class="report-part" value="limitations" checked /> <span data-i18n="reportPartLimitations">Sınırlamalar</span></label>
+        </div>
+      </div>
+      <div class="panel">
+        <div id="reportPreview" class="report-preview" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- SEKME 4: VERİ VE AYARLAR -->
     <section id="tab-settings" class="tab-panel">
       <div class="panel">
         <div class="section-title">
@@ -1463,6 +1702,14 @@
       diffAxisMax: 20
     };
 
+    const chartResolutionConfig = {
+      dailyThresholdHours: 12,
+      mediumThresholdHours: 3,
+      dailyResolution: "1m",
+      mediumResolution: "10s",
+      detailResolution: "1s"
+    };
+
     const AUTO_DATA_BASE = './data/';
     const AUTO_SOURCE_TO_STATE = { teias: 'tr', netztransparenz: 'de' };
     const STATE_TO_AUTO_SOURCE = { tr: 'teias', de: 'netztransparenz' };
@@ -1484,6 +1731,15 @@
       filteredOscillation: null,
       oscillationSource: 'tr',
       pendingOscillationSource: null,
+      analysis: {
+        running: false,
+        lastResult: null,
+        rawSeries: [],
+        displaySeries: [],
+        analysisSeries: []
+      },
+      secondSeriesCache: new Map(),
+      zoomSwitching: false,
       parserWorker: null,
       oscWorker: null,
       frequencyChart: null,
@@ -1493,7 +1749,13 @@
     };
 
     const $ = (id) => document.getElementById(id);
-    const fmt = (v, digits = 3) => Number.isFinite(v) ? Number(v).toFixed(digits) : '—';
+    const fmt = (v, digits = 3) => {
+      if (!Number.isFinite(v)) return '—';
+      return new Intl.NumberFormat(lang === 'en' ? 'en-US' : 'tr-TR', {
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits
+      }).format(v);
+    };
     const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
 
     function singleSeriesStats(series, start, end, nominal = 50) {
@@ -1543,34 +1805,43 @@
       initDropZones();
       initButtons();
       applySettingsToForm();
-      // Dil başlatma
-      lang = state.settings.locale === 'en' ? 'en' : 'tr';
+      lang = initialLanguage();
+      state.settings.locale = lang;
       document.documentElement.setAttribute('data-current-lang', lang);
       $('langToggle').textContent = t('langToggle');
       applyTranslations();
+      applyUrlState();
       updateInventory();
       updateDateSelect();
       renderEmptyCharts();
       renderKpis(null);
       renderQuarterHeatmap(null);
       renderHourBlocks(null);
+      renderCoverageSummary();
+      renderReportPreview();
       checkLibraries();
       loadAutoDataCatalog();
     }
 
     function initTabs() {
       document.querySelectorAll('.tab-button').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-          document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-          btn.classList.add('active');
-          $(btn.dataset.tab).classList.add('active');
-          setTimeout(() => {
-            state.frequencyChart?.resize();
-            state.oscillationChart?.resize();
-          }, 60);
-        });
+        btn.addEventListener('click', () => activateTab(btn.dataset.tab, true));
       });
+    }
+
+    function activateTab(tabId, syncUrl = false) {
+      const btn = document.querySelector(`.tab-button[data-tab="${tabId}"]`);
+      const panel = $(tabId);
+      if (!btn || !panel) return;
+      document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      panel.classList.add('active');
+      if (syncUrl) updateUrlState({ tab: tabId.replace(/^tab-/, '') });
+      setTimeout(() => {
+        state.frequencyChart?.resize();
+        state.oscillationChart?.resize();
+      }, 60);
     }
 
     function initWorkers() {
@@ -1612,7 +1883,15 @@
     function initButtons() {
       $('clearDataBtn').addEventListener('click', clearData);
       $('calculateBtn').addEventListener('click', calculateDailyReport);
-      $('oscCalculateBtn').addEventListener('click', calculateOscillation);
+      $('analysisRunBtn').addEventListener('click', runAnalysisLab);
+      $('analysisCancelBtn').addEventListener('click', cancelAnalysis);
+      $('analysisSourceSelect').addEventListener('change', () => syncAnalysisSource('analysis'));
+      $('analysisDateSelect').addEventListener('change', () => updateUrlState({ date: $('analysisDateSelect').value }));
+      $('analysisDateMode').addEventListener('change', () => updateUrlState({ mode: $('analysisDateMode').value }));
+      $('analysisStartDate').addEventListener('change', () => updateUrlState({ start: $('analysisStartDate').value }));
+      $('analysisEndDate').addEventListener('change', () => updateUrlState({ end: $('analysisEndDate').value }));
+      $('analysisTypeSelect').addEventListener('change', () => updateUrlState({ analysis: $('analysisTypeSelect').value }));
+      $('analysisAlignment').addEventListener('change', () => updateUrlState({ alignment: $('analysisAlignment').value }));
       $('oscSourceSelect').addEventListener('change', handleOscillationSourceChange);
       $('resetZoomBtn').addEventListener('click', showDailyFrequencyChart);
       $('calToggle').addEventListener('click', (e) => { e.stopPropagation(); $('calDropdown').classList.toggle('hidden'); });
@@ -1625,6 +1904,11 @@
       $('saveSettingsBtn').addEventListener('click', saveSettingsFromForm);
       $('resetSettingsBtn').addEventListener('click', resetSettings);
       $('langToggle').addEventListener('click', () => setLanguage(lang === 'tr' ? 'en' : 'tr'));
+      $('reportLanguageSelect').addEventListener('change', renderReportPreview);
+      document.querySelectorAll('.report-part').forEach(input => input.addEventListener('change', renderReportPreview));
+      $('reportExportJsonBtn').addEventListener('click', exportAnalysisJson);
+      $('reportExportCsvBtn').addEventListener('click', exportAnalysisCsv);
+      $('reportPrintBtn').addEventListener('click', () => window.print());
 
       $('prevDayBtn').addEventListener('click', () => navigateDay(-1));
       $('nextDayBtn').addEventListener('click', () => navigateDay(1));
@@ -1654,7 +1938,7 @@
     }
 
     function toggleChartFullscreen(chartId) {
-      const wrapper = $('freqChartWrapper').contains($(chartId)) ? $('freqChartWrapper') : $('oscChartWrapper');
+      const wrapper = chartId === 'frequencyChart' ? $('freqChartWrapper') : $('oscChartWrapper');
       if (document.fullscreenElement === wrapper) {
         document.exitFullscreen();
       } else {
@@ -1665,11 +1949,14 @@
     function downloadChart(chartId) {
       const chart = chartId === 'frequencyChart' ? state.frequencyChart : state.oscillationChart;
       if (!chart) return;
+      const button = document.querySelector(`[data-action="download"][data-chart="${chartId}"]`);
+      button?.classList.add('loading');
       const url = chart.getDataURL({ type: 'png', pixelRatio: 2, backgroundColor: '#fff' });
       const a = document.createElement('a');
       a.href = url;
       a.download = chartId === 'frequencyChart' ? 'frekans_grafigi.png' : 'osilasyon_grafigi.png';
       a.click();
+      setTimeout(() => button?.classList.remove('loading'), 250);
     }
 
     function resetChartZoom(chartId) {
@@ -1827,6 +2114,89 @@
       $('autoStatusMeta').textContent = status
         ? t('autoStatusDays', { count: status.missingDayCount || 0, date: formatUtc(status.lastSuccessfulTeiasCheckUtc) })
         : t('autoNoStatus');
+      renderCoverageSummary();
+      syncAnalysisDateDefaults();
+    }
+
+    function renderCoverageSummary() {
+      const root = $('coverageSummary');
+      if (!root) return;
+      const teias = state.auto.manifest?.sources?.teias;
+      const de = state.auto.manifest?.sources?.netztransparenz;
+      const trLatest = teias?.latestDate || latestMapDate(state.tr);
+      const deLatest = de?.latestDate || latestMapDate(state.de);
+      const commonLatest = latestCommonDate();
+      root.innerHTML = [
+        [t('coverageTrLatest'), displayDate(trLatest)],
+        [t('coverageDeLatest'), displayDate(deLatest)],
+        [t('coverageCommonLatest'), displayDate(commonLatest)]
+      ].map(([label, value]) => `<div class="coverage-item"><div class="label">${label}</div><div class="value">${value}</div></div>`).join('');
+    }
+
+    function latestMapDate(map) {
+      return [...map.keys()].sort().at(-1) || null;
+    }
+
+    function commonReportDates() {
+      const trDates = new Set([...(state.auto.manifest?.sources?.teias?.availableDates || []), ...state.tr.keys()]);
+      const deDates = new Set([...(state.auto.manifest?.sources?.netztransparenz?.availableDates || []), ...state.de.keys()]);
+      return [...trDates].filter(date => deDates.has(date)).sort();
+    }
+
+    function latestCommonDate() {
+      return commonReportDates().at(-1) || null;
+    }
+
+    function resolveAnalysisDates(source = getAnalysisSource(), type = $('analysisTypeSelect')?.value) {
+      const paired = requiresPairedSource(source, type);
+      const base = paired ? commonReportDates() : reportDatesForCurrentMode();
+      const dates = (base.length ? base : reportDatesForCurrentMode()).sort();
+      const selected = $('analysisDateSelect').value || dates.at(-1) || latestCommonDate();
+      const mode = $('analysisDateMode')?.value || 'single';
+      if (!selected) return [];
+      if (mode === 'range') {
+        const start = $('analysisStartDate').value || selected;
+        const end = $('analysisEndDate').value || selected;
+        return dates.filter(date => date >= start && date <= end);
+      }
+      if (mode === 'last7' || mode === 'last30') {
+        const limit = mode === 'last7' ? 7 : 30;
+        return dates.filter(date => date <= selected).slice(-limit);
+      }
+      if (mode === 'month') {
+        const month = selected.slice(0, 7);
+        return dates.filter(date => date.startsWith(month));
+      }
+      return [selected];
+    }
+
+    function timeInputToSecond(value, fallback) {
+      if (!value) return fallback;
+      const [hour, minute] = value.split(':').map(Number);
+      if (!Number.isFinite(hour) || !Number.isFinite(minute)) return fallback;
+      return clamp(hour * 3600 + minute * 60, 0, 86399);
+    }
+
+    function analysisWindowBounds() {
+      if ($('analysisDateMode')?.value !== 'customHours') return { start: 0, end: 86400 };
+      const start = timeInputToSecond($('analysisStartHour').value, 0);
+      const end = Math.min(86400, timeInputToSecond($('analysisEndHour').value, 86340) + 60);
+      return end > start ? { start, end } : { start: 0, end: 86400 };
+    }
+
+    function analysisWindowSeries(series) {
+      const { start, end } = analysisWindowBounds();
+      if (start === 0 && end === 86400) return series;
+      return series.slice(start, end);
+    }
+
+    function syncAnalysisDateDefaults() {
+      const latest = latestCommonDate() || state.auto.manifest?.sources?.teias?.latestDate || latestMapDate(state.tr);
+      if (!latest) return;
+      for (const id of ['analysisDateSelect', 'analysisStartDate', 'analysisEndDate']) {
+        const el = $(id);
+        if (el && !el.value) el.value = latest;
+      }
     }
 
     function useAutoDataMode() {
@@ -1869,9 +2239,9 @@
       return [...state.tr.keys()].filter(date => !isAutoLoaded('teias', date)).sort();
     }
 
-    async function ensureAutoDataForReport(date) {
+    async function ensureAutoDataForReport(date, alignmentMode = null) {
       if (state.dataMode !== 'auto') return true;
-      const alignment = getAlignment(date);
+      const alignment = getAlignment(date, alignmentMode);
       const deltaSeconds = Math.round(alignment.deltaHours * 3600);
       const deDates = new Set([
         shiftSecondLabel(0, -deltaSeconds, date).date,
@@ -2077,6 +2447,7 @@
 
       const trPrefix = (d) => teiasDates.has(d) ? '<span class="cal-dot teias"></span>' : '';
       const dePrefix = (d) => deDates.has(d) ? '<span class="cal-dot netz"></span>' : '';
+      const badQualityDates = new Set(state.quality.filter(q => q.status === 'critical' || q.status === 'invalid' || q.qualityScore < 80).map(q => q.date));
 
       let headerDays = t('dayHeaders');
       if (!headerDays?.length || headerDays.length < 7) {
@@ -2092,7 +2463,11 @@
         const iso = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const selected = hidden.value === iso ? ' selected' : '';
         const dots = trPrefix(iso) + dePrefix(iso);
-        html += `<div class="cal-day${selected}" data-date="${iso}">${d}<div class="cal-dots">${dots}</div></div>`;
+        const hasTr = teiasDates.has(iso);
+        const hasDe = deDates.has(iso);
+        const coverageClass = hasTr && hasDe ? ' has-both' : hasTr ? ' has-tr' : hasDe ? ' has-de' : ' no-data';
+        const qualityClass = badQualityDates.has(iso) ? ' bad-quality' : '';
+        html += `<div class="cal-day${selected}${coverageClass}${qualityClass}" data-date="${iso}" title="${calendarDayTitle(iso, hasTr, hasDe, badQualityDates.has(iso))}">${d}<div class="cal-dots">${dots}</div></div>`;
       }
 
       grid.innerHTML = html;
@@ -2106,6 +2481,11 @@
           selectDate(day.dataset.date);
         });
       });
+    }
+
+    function calendarDayTitle(iso, hasTr, hasDe, badQuality) {
+      const status = hasTr && hasDe ? t('calBoth') : hasTr ? t('calTrOnly') : hasDe ? t('calDeOnly') : t('calNoData');
+      return `${displayDate(iso)} • ${status}${badQuality ? ` • ${t('calBadQuality')}` : ''}`;
     }
 
     function clearData() {
@@ -2126,7 +2506,8 @@
       renderKpis(null);
       renderQuarterHeatmap(null);
       renderHourBlocks(null);
-      $('eventBody').innerHTML = `<tr><td colspan="11" class="empty-state">${t('oscNoAnalysis')}</td></tr>`;
+      $('analysisEventsBody').innerHTML = `<tr><td colspan="11" class="empty-state">${t('oscNoAnalysis')}</td></tr>`;
+      $('analysisResultCards').innerHTML = '';
       setBanner('loadStatus', t('dataCleared'), 'success');
     }
 
@@ -2145,8 +2526,8 @@
       setBanner('alignmentInfo', t('alignInfo', { desc: description, trDate: displayDate(date), deDate: displayDate(example.date), deTime: secondToTime(example.second) }), 'warn');
     }
 
-    function getAlignment(date) {
-      const mode = $('alignmentSelect')?.value || state.settings.alignmentMode;
+    function getAlignment(date, forcedMode = null) {
+      const mode = forcedMode || $('alignmentSelect')?.value || state.settings.alignmentMode;
       if (mode === 'sameLocal') return { mode, deltaHours: 0, description: t('alignDescSameLocal') };
       if (mode === 'manual') {
         const deltaHours = Number($('manualOffsetGraph').value || state.settings.manualOffsetHours);
@@ -2194,27 +2575,15 @@
     // -----------------------------
     // GÜNLÜK KARŞILAŞTIRMA
     // -----------------------------
-    async function calculateDailyReport() {
-      const date = $('dateSelect').value;
-      if (!date) {
-        alert(t('noDateSelected'));
-        return;
-      }
+    async function prepareDailyContext(date, alignmentMode = null) {
       if (state.dataMode === 'auto') {
-        try {
-          await ensureAutoDataForReport(date);
-        } catch (error) {
-          setBanner('loadStatus', t('autoDataError', { error: error?.message || error }), 'error');
-          alert(t('autoDataError', { error: error?.message || error }));
-          return;
-        }
+        await ensureAutoDataForReport(date, alignmentMode);
       }
       if (!state.tr.has(date)) {
-        alert(t('noDateSelected'));
-        return;
+        throw new Error(t('autoDataNoTr', { date: displayDate(date) }));
       }
 
-      const alignment = getAlignment(date);
+      const alignment = getAlignment(date, alignmentMode);
       const deltaSeconds = Math.round(alignment.deltaHours * 3600);
       const trRaw = state.tr.get(date);
       const tr = sanitizeAndInterpolate(trRaw, state.settings);
@@ -2238,7 +2607,7 @@
       for (let h = 0; h < 24; h++) hourly.push(pairedStats(tr, de, h * 3600, (h + 1) * 3600, state.settings.nominalFrequency));
       const quarters = aggregateQuarters(tr, de);
 
-      state.current = {
+      return {
         date,
         alignment,
         deltaSeconds,
@@ -2248,13 +2617,39 @@
         minute,
         hourly,
         quarters,
+        rawSeries: { tr: trRaw, de: deAligned },
+        displaySeries: minute,
+        analysisSeries: { tr, de },
         dataMode: state.dataMode,
         manifestUpdatedAtUtc: state.auto.manifest?.updatedAtUtc || null,
         statusUpdatedAtUtc: state.auto.status?.updatedAtUtc || null
       };
+    }
+
+    async function calculateDailyReport() {
+      const date = $('dateSelect').value;
+      if (!date) {
+        alert(t('noDateSelected'));
+        return;
+      }
+      let current;
+      try {
+        current = await prepareDailyContext(date);
+      } catch (error) {
+        setBanner('loadStatus', t('autoDataError', { error: error?.message || error }), 'error');
+        alert(t('autoDataError', { error: error?.message || error }));
+        return;
+      }
+
+      state.current = current;
+      state.analysis.rawSeries = current.rawSeries;
+      state.analysis.displaySeries = current.displaySeries;
+      state.analysis.analysisSeries = current.analysisSeries;
       state.events = [];
       state.filteredOscillation = null;
       state.chartView = { mode: 'day', start: 0, end: 86400, label: t('chartViewTag') };
+      const pairedRatio = current.overall.pairedCount / 86400 * 100;
+      const alignment = current.alignment;
 
       renderKpis(state.current);
       renderFrequencyChart(state.current);
@@ -2262,13 +2657,15 @@
       renderHourBlocks(state.current);
       renderOscillationEmpty();
       $('reportDateTag').textContent = displayDate(date);
+      updateUrlState({ date, tab: 'chart' });
 
       const qualityMessage = pairedRatio >= state.settings.minPairedRatio
-        ? t('reportReady', { ratio: pairedRatio.toFixed(2) })
-        : t('reportLowQuality', { ratio: pairedRatio.toFixed(2) });
+        ? t('reportReady', { ratio: fmt(pairedRatio, 2) })
+        : t('reportLowQuality', { ratio: fmt(pairedRatio, 2) });
       setBanner('alignmentInfo', `${qualityMessage} ${alignment.description}`, pairedRatio >= state.settings.minPairedRatio ? 'success' : 'warn');
       updateOscillationSourceUi();
-      setBanner('oscStatus', t('reportOscReady', { source: sourceLabel($('oscSourceSelect').value) }), 'success');
+      setBanner('analysisStatus', t('reportOscReady', { source: sourceLabel(getAnalysisSource()) }), 'success');
+      renderCoverageSummary();
     }
 
     function sanitizeAndInterpolate(input, settings) {
@@ -2367,7 +2764,7 @@
     function renderEmptyCharts() {
       if (window.echarts) {
         state.frequencyChart = echarts.init($('frequencyChart'));
-        state.oscillationChart = echarts.init($('oscillationChart'));
+        state.oscillationChart = echarts.init($('analysisMainChart'));
       }
       renderFrequencyEmpty();
       renderOscillationEmpty();
@@ -2389,7 +2786,8 @@
         xAxis: { show: false }, yAxis: { show: false }, series: []
       }, true);
       $('oscCountTag').textContent = t('oscCountTag');
-      $('eventBody').innerHTML = `<tr><td colspan="11" class="empty-state">${t('oscNoAnalysis')}</td></tr>`;
+      $('analysisEventsBody').innerHTML = `<tr><td colspan="11" class="empty-state">${t('oscNoAnalysis')}</td></tr>`;
+      $('analysisResultCards').innerHTML = '';
     }
 
     function renderKpis(current) {
@@ -2409,7 +2807,7 @@
         [t('kpiBias'), `${fmt(s.biasMhz, 2)} mHz`, `${t('sourceTr')} − ${t('sourceDe')}`],
         [t('kpiMae'), `${fmt(s.maeMhz, 2)} mHz`, `RMSE ${fmt(s.rmseMhz, 2)} mHz`],
         [t('kpiCorrelation'), fmt(s.correlation, 4), `${t('kpiPairedData')}`],
-        [t('kpiPairedData'), `%${fmt(s.pairedCount / 864, 2)}`, `${s.pairedCount.toLocaleString(t('localeNumeric'))} ${t('kpiPairedData')}`]
+        [t('kpiPairedData'), `${fmt(s.pairedCount / 864, 2)}%`, `${s.pairedCount.toLocaleString(t('localeNumeric'))} ${t('kpiPairedData')}`]
       ];
       grid.innerHTML = cards.map(c => `<div class="kpi"><div class="label">${c[0]}</div><div class="value">${c[1]}</div><div class="sub">${c[2]}</div></div>`).join('');
     }
@@ -2425,6 +2823,10 @@
       const tr = [];
       const de = [];
       const diff = [];
+      const trMin = [];
+      const trMax = [];
+      const deMin = [];
+      const deMax = [];
 
       if (!detailMode) {
         // Günlük görünüm: 86.400 nokta yerine 1.440 dakikalık ortalama.
@@ -2433,6 +2835,10 @@
           tr.push([second, Number.isFinite(row.meanA) ? Number(row.meanA.toFixed(5)) : null]);
           de.push([second, Number.isFinite(row.meanB) ? Number(row.meanB.toFixed(5)) : null]);
           diff.push([second, Number.isFinite(row.biasMhz) ? Number(row.biasMhz.toFixed(3)) : null]);
+          trMin.push([second, Number.isFinite(row.minA) ? Number(row.minA.toFixed(5)) : null]);
+          trMax.push([second, Number.isFinite(row.maxA) ? Number(row.maxA.toFixed(5)) : null]);
+          deMin.push([second, Number.isFinite(row.minB) ? Number(row.minB.toFixed(5)) : null]);
+          deMax.push([second, Number.isFinite(row.maxB) ? Number(row.maxB.toFixed(5)) : null]);
         });
       } else {
         // Detay görünümü: saat için 3.600, çeyrek saat için 900 saniyelik gerçek örnek.
@@ -2489,11 +2895,18 @@
         series: [
           { name: t('seriesTr'), type: 'line', data: tr, symbol: 'none', connectNulls: false, sampling: detailMode ? undefined : 'lttb', progressive: 6000, lineStyle: { width: detailMode ? 1.2 : 1.5 } },
           { name: t('seriesDe'), type: 'line', data: de, symbol: 'none', connectNulls: false, sampling: detailMode ? undefined : 'lttb', progressive: 6000, lineStyle: { width: detailMode ? 1.2 : 1.5 } },
+          ...(!detailMode ? [
+            { name: t('seriesTrMin'), type: 'line', data: trMin, symbol: 'none', connectNulls: false, silent: true, lineStyle: { width: .8, opacity: .32 } },
+            { name: t('seriesTrMax'), type: 'line', data: trMax, symbol: 'none', connectNulls: false, silent: true, lineStyle: { width: .8, opacity: .32 } },
+            { name: t('seriesDeMin'), type: 'line', data: deMin, symbol: 'none', connectNulls: false, silent: true, lineStyle: { width: .8, opacity: .24 } },
+            { name: t('seriesDeMax'), type: 'line', data: deMax, symbol: 'none', connectNulls: false, silent: true, lineStyle: { width: .8, opacity: .24 } }
+          ] : []),
           ...(showDiff ? [{ name: t('seriesDiff'), type: 'line', yAxisIndex: 1, data: diff, symbol: 'none', connectNulls: false, sampling: detailMode ? undefined : 'lttb', lineStyle: { width: 1, type: 'dashed' } }] : [])
         ]
       }, true);
 
       updateChartViewTag(view);
+      bindFrequencyZoomHandler();
     }
 
     function updateChartViewTag(view) {
@@ -2514,8 +2927,35 @@
 
     function showFrequencyInterval(start, end, mode, label) {
       if (!state.current) return;
-      renderFrequencyChart(state.current, { mode, start, end, label });
-      $('frequencyChart').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const cacheKey = `${state.current.date}:${start}:${end}`;
+      const cached = state.secondSeriesCache.has(cacheKey);
+      if (!cached) {
+        state.secondSeriesCache.set(cacheKey, true);
+        $('chartViewTag').textContent = t('loadingSecondData');
+      }
+      setTimeout(() => {
+        renderFrequencyChart(state.current, { mode, start, end, label });
+        $('frequencyChart').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, cached ? 0 : 80);
+    }
+
+    function bindFrequencyZoomHandler() {
+      if (!state.frequencyChart || state.zoomHandlerBound) return;
+      state.zoomHandlerBound = true;
+      state.frequencyChart.on('dataZoom', event => {
+        if (!state.current || state.zoomSwitching || state.chartView?.mode !== 'day') return;
+        const batch = event.batch?.[0] || event;
+        const startPct = Number(batch.start ?? 0);
+        const endPct = Number(batch.end ?? 100);
+        const start = Math.max(0, Math.floor(86400 * startPct / 100));
+        const end = Math.min(86400, Math.ceil(86400 * endPct / 100));
+        const hours = (end - start) / 3600;
+        if (hours > 0 && hours <= chartResolutionConfig.mediumThresholdHours) {
+          state.zoomSwitching = true;
+          showFrequencyInterval(start, end, 'zoom', `${secondToTime(start).slice(0,5)}–${secondToTime(end).slice(0,5)} • ${t('resolutionSecond')}`);
+          setTimeout(() => { state.zoomSwitching = false; }, 250);
+        }
+      });
     }
 
     function renderQuarterHeatmap(current) {
@@ -2574,7 +3014,33 @@
         return `<tr><td class="metric-name" tabindex="0">${label}</td>${cells}</tr>`;
       }).join('');
 
-      root.innerHTML = `<table class="hour-matrix" aria-label="${t('hourBlockLabel')}"><thead>${head}</thead><tbody>${rows}</tbody></table>`;
+      const worst = [...current.hourly]
+        .map((row, hour) => ({ hour, score: Number.isFinite(row.maeMhz) ? row.maeMhz : -Infinity }))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3)
+        .map(item => item.hour);
+      const selectedHour = Number(root.dataset.selectedHour || 0);
+      const detail = current.hourly[selectedHour] || current.hourly[0];
+      const mobileCards = [
+        [t('metricMeanTr'), `${fmt(detail.meanA, 3)} Hz`],
+        [t('metricMeanDe'), `${fmt(detail.meanB, 3)} Hz`],
+        [t('metricBias'), `${fmt(detail.biasMhz, 2)} mHz`],
+        [t('metricMae'), `${fmt(detail.maeMhz, 2)} mHz`]
+      ].map(([label, value]) => `<div class="mobile-hour-card"><div class="label">${label}</div><div class="value">${value}</div></div>`).join('');
+      const maxMae = Math.max(1, ...current.hourly.map(row => Number.isFinite(row.maeMhz) ? row.maeMhz : 0));
+      const heat = current.hourly.map((row, hour) => {
+        const background = heatColor(row.maeMhz, 0, maxMae, false);
+        const cls = worst.includes(hour) ? 'hour-heat-cell worst' : 'hour-heat-cell';
+        return `<button type="button" class="${cls}" data-mobile-hour="${hour}" style="background:${background}" title="${t('hourBlockTooltip', { hour: String(hour).padStart(2,'0'), nextHour: String((hour + 1) % 24).padStart(2,'0') })}">${String(hour).padStart(2, '0')}</button>`;
+      }).join('');
+      root.innerHTML = `
+        <div class="desktop-hour-view"><table class="hour-matrix" aria-label="${t('hourBlockLabel')}"><thead>${head}</thead><tbody>${rows}</tbody></table></div>
+        <div class="mobile-hour-view">
+          <label for="mobileHourSelect">${t('mobileHourLabel')}</label>
+          <select id="mobileHourSelect">${Array.from({ length: 24 }, (_, hour) => `<option value="${hour}" ${hour === selectedHour ? 'selected' : ''}>${String(hour).padStart(2, '0')}:00</option>`).join('')}</select>
+          <div class="mobile-hour-detail">${mobileCards}</div>
+          <div class="hour-heatmap-compact" aria-label="${t('mobileAllHours')}">${heat}</div>
+        </div>`;
       root.querySelectorAll('[data-hour]').forEach(header => {
         const hour = Number(header.dataset.hour);
         bindSingleDoubleClick(
@@ -2582,6 +3048,18 @@
           () => showFrequencyInterval(hour * 3600, (hour + 1) * 3600, 'hour', `${String(hour).padStart(2,'0')}:00–${String((hour + 1) % 24).padStart(2,'0')}:00 • 3.600 ${lang === 'en' ? 'sec' : 'saniye'}`),
           showDailyFrequencyChart
         );
+      });
+      $('mobileHourSelect')?.addEventListener('change', event => {
+        root.dataset.selectedHour = event.target.value;
+        renderHourBlocks(current);
+      });
+      root.querySelectorAll('[data-mobile-hour]').forEach(button => {
+        button.addEventListener('click', () => {
+          const hour = Number(button.dataset.mobileHour);
+          root.dataset.selectedHour = String(hour);
+          renderHourBlocks(current);
+          showFrequencyInterval(hour * 3600, (hour + 1) * 3600, 'hour', `${String(hour).padStart(2,'0')}:00–${String((hour + 1) % 24).padStart(2,'0')}:00 • 3.600 ${lang === 'en' ? 'sec' : 'saniye'}`);
+        });
       });
     }
 
@@ -2613,27 +3091,68 @@
     // -----------------------------
     // OSİLASYON ANALİZİ
     // -----------------------------
+    function getAnalysisSource() {
+      return $('analysisSourceSelect')?.value || $('oscSourceSelect')?.value || state.settings.oscillationSource || 'tr';
+    }
+
+    function syncAnalysisSource(origin) {
+      const value = origin === 'legacy' ? $('oscSourceSelect').value : $('analysisSourceSelect').value;
+      if ($('analysisSourceSelect').value !== value) $('analysisSourceSelect').value = value;
+      if ($('oscSourceSelect').value !== value) $('oscSourceSelect').value = value;
+      state.settings.oscillationSource = value;
+      state.oscillationSource = value;
+      updateOscillationSourceUi();
+      updateUrlState({ source: value });
+    }
+
     function sourceLabel(source) {
-      return source === 'de' ? t('sourceDe') : t('sourceTr');
+      if (source === 'de') return t('sourceDe');
+      if (source === 'both') return t('sourceBoth');
+      if (source === 'diff') return t('sourceDiff');
+      if (source === 'common') return t('sourceCommon');
+      if (source === 'differential') return t('sourceDifferential');
+      return t('sourceTr');
     }
 
     function sourceShortLabel(source) {
-      return source === 'de' ? t('sourceDeShort') : t('sourceTrShort');
+      if (source === 'de') return t('sourceDeShort');
+      if (source === 'both') return t('sourceBothShort');
+      if (source === 'diff') return t('sourceDiffShort');
+      if (source === 'common') return t('sourceCommonShort');
+      if (source === 'differential') return t('sourceDifferentialShort');
+      return t('sourceTrShort');
     }
 
     function sourceSeries(source, current = state.current) {
-      return source === 'de' ? current?.de : current?.tr;
+      if (!current) return null;
+      if (source === 'de') return current.de;
+      if (source === 'both' || source === 'common') return combineSeries(current.tr, current.de, 'common');
+      if (source === 'diff' || source === 'differential') return combineSeries(current.tr, current.de, 'diff');
+      return current.tr;
+    }
+
+    function combineSeries(tr, de, mode) {
+      const out = new Float32Array(86400);
+      out.fill(NaN);
+      for (let i = 0; i < out.length; i++) {
+        const a = tr?.[i];
+        const b = de?.[i];
+        if (!Number.isFinite(a) || !Number.isFinite(b)) continue;
+        out[i] = mode === 'diff' ? a - b + state.settings.nominalFrequency : (a + b) / 2;
+      }
+      return out;
     }
 
     function updateOscillationSourceUi() {
-      const source = $('oscSourceSelect')?.value || state.settings.oscillationSource || 'tr';
+      const source = getAnalysisSource();
       state.oscillationSource = source;
       if ($('eventSourceMeanHead')) $('eventSourceMeanHead').textContent = t('eventSourceMeanHead', { source: sourceShortLabel(source) });
       if ($('eventSourceRangeHead')) $('eventSourceRangeHead').textContent = t('eventSourceRangeHead', { source: sourceShortLabel(source) });
     }
 
     function handleOscillationSourceChange() {
-      const source = $('oscSourceSelect').value;
+      syncAnalysisSource('legacy');
+      const source = getAnalysisSource();
       state.settings.oscillationSource = source;
       state.oscillationSource = source;
       state.events = [];
@@ -2641,17 +3160,17 @@
       updateOscillationSourceUi();
       renderOscillationEmpty();
       if (state.current) {
-        setBanner('oscStatus', t('oscSourceChanged', { source: sourceLabel(source) }), 'success');
+        setBanner('analysisStatus', t('oscSourceChanged', { source: sourceLabel(source) }), 'success');
       }
     }
 
     function calculateOscillation() {
       if (!state.current) {
-        setBanner('oscStatus', t('calculateFirst'), 'error');
+        setBanner('analysisStatus', t('analysisStatusDefault'), 'error');
         return;
       }
 
-      const source = $('oscSourceSelect').value || 'tr';
+      const source = getAnalysisSource();
       const sourceName = sourceLabel(source);
       const settings = {
         bandMin: Number($('bandMin').value),
@@ -2661,11 +3180,11 @@
         stepSec: Number($('stepSec').value),
         filterTaps: Number($('filterTaps').value),
         minDuration: Number($('minDuration').value),
-        oscillationSource: $('oscSourceSelect').value || 'tr'
+        oscillationSource: source
       };
 
       if (!(settings.bandMin > 0 && settings.bandMax > settings.bandMin && settings.bandMax < 0.5)) {
-        setBanner('oscStatus', t('oscBandError'), 'error');
+        setBanner('analysisStatus', t('oscBandError'), 'error');
         return;
       }
 
@@ -2681,35 +3200,40 @@
         }
       }
       if (valid < 3600) {
-        setBanner('oscStatus', t('oscNoData', { source: sourceName }), 'error');
+        setBanner('analysisStatus', t('oscNoData', { source: sourceName }), 'error');
         return;
       }
 
       state.pendingOscillationSource = source;
       state.oscillationSource = source;
       updateOscillationSourceUi();
-      setBanner('oscStatus', t('oscStarted', { source: sourceName }), 'warn');
-      $('oscCalculateBtn').disabled = true;
+      setBanner('analysisStatus', t('oscStarted', { source: sourceName }), 'warn');
+      $('analysisRunBtn').disabled = true;
       $('oscSourceSelect').disabled = true;
+      $('analysisSourceSelect').disabled = true;
       state.oscWorker.postMessage({ cmd: 'analyze', diffBuffer: signal.buffer, settings }, [signal.buffer]);
     }
 
     function handleOscWorkerMessage(event) {
       const msg = event.data || {};
       if (msg.type === 'progress') {
-        setBanner('oscStatus', t('oscCalculating', { percent: msg.percent, stage: msg.stage }), 'warn');
+        setBanner('analysisStatus', t('oscCalculating', { percent: msg.percent, stage: msg.stage }), 'warn');
         return;
       }
       if (msg.type === 'error') {
-        $('oscCalculateBtn').disabled = false;
+        state.analysis.running = false;
+        $('analysisRunBtn').disabled = false;
         $('oscSourceSelect').disabled = false;
+        $('analysisSourceSelect').disabled = false;
         state.pendingOscillationSource = null;
-        setBanner('oscStatus', t('oscError', { msg: msg.message }), 'error');
+        setBanner('analysisStatus', t('oscError', { msg: msg.message }), 'error');
         return;
       }
       if (msg.type === 'done') {
-        $('oscCalculateBtn').disabled = false;
+        state.analysis.running = false;
+        $('analysisRunBtn').disabled = false;
         $('oscSourceSelect').disabled = false;
+        $('analysisSourceSelect').disabled = false;
         const source = state.pendingOscillationSource || state.oscillationSource || 'tr';
         state.pendingOscillationSource = null;
         state.oscillationSource = source;
@@ -2719,7 +3243,9 @@
         renderOscillationChart(msg.meta);
         renderEventTable();
         $('oscCountTag').textContent = t('findingsCount', { count: state.events.length });
-        setBanner('oscStatus', t('oscDone', { source: sourceLabel(source), count: state.events.length }), state.events.length ? 'warn' : 'success');
+        setBanner('analysisStatus', t('oscDone', { source: sourceLabel(source), count: state.events.length }), state.events.length ? 'warn' : 'success');
+        state.analysis.lastResult = buildOscillationResult(msg.meta, source);
+        renderReportPreview();
       }
     }
 
@@ -2836,7 +3362,7 @@
     }
 
     function renderEventTable() {
-      const body = $('eventBody');
+      const body = $('analysisEventsBody');
       const source = state.oscillationSource || 'tr';
       updateOscillationSourceUi();
       if (!state.events.length) {
@@ -2853,8 +3379,463 @@
         const start = Math.max(0, Number(row.dataset.start) - 30);
         const end = Math.min(86400, Number(row.dataset.end) + 30);
         state.oscillationChart?.dispatchAction({ type: 'dataZoom', startValue: start, endValue: end });
-        $('oscillationChart').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        $('analysisMainChart').scrollIntoView({ behavior: 'smooth', block: 'center' });
       }));
+    }
+
+    async function runAnalysisLab() {
+      if (state.analysis.running) return;
+      const type = $('analysisTypeSelect').value;
+      const source = getAnalysisSource();
+      const dateList = resolveAnalysisDates(source, type);
+      const date = dateList.at(-1) || $('analysisDateSelect').value || latestCommonDate() || $('dateSelect').value;
+      if (!date) {
+        setBanner('analysisStatus', t('analysisStatusDefault'), 'error');
+        return;
+      }
+      state.analysis.running = true;
+      $('analysisRunBtn').disabled = true;
+      setBanner('analysisStatus', t('analysisRunning'), 'warn');
+      let delegatedToWorker = false;
+      try {
+        if (type === 'trend' && dateList.length > 1) {
+          const result = await computeTrendRangeResult(source, dateList);
+          state.analysis.lastResult = result;
+          renderAnalysisResult(result);
+          renderReportPreview();
+          updateUrlState({ date, source, analysis: type, tab: 'oscillation' });
+          setBanner('analysisStatus', t('analysisDone'), 'success');
+          return;
+        }
+        const current = await prepareDailyContext(date, $('analysisAlignment').value);
+        state.current = current;
+        state.analysis.rawSeries = current.rawSeries;
+        state.analysis.displaySeries = current.displaySeries;
+        state.analysis.analysisSeries = current.analysisSeries;
+        if (requiresPairedSource(source, type) && current.overall.pairedCount < 1800) {
+          throw new Error(t('analysisNoCommonDate'));
+        }
+        updateOscillationSourceUi();
+        if (type === 'oscillation') {
+          delegatedToWorker = true;
+          calculateOscillation();
+          return;
+        }
+        const result = computeAnalysisResult(type, source, current, dateList);
+        state.analysis.lastResult = result;
+        renderAnalysisResult(result);
+        renderReportPreview();
+        updateUrlState({ date, source, analysis: type, tab: 'oscillation' });
+        setBanner('analysisStatus', t('analysisDone'), 'success');
+      } catch (error) {
+        setBanner('analysisStatus', error?.message || t('analysisError'), 'error');
+      } finally {
+        if (!delegatedToWorker) {
+          state.analysis.running = false;
+          $('analysisRunBtn').disabled = false;
+        }
+      }
+    }
+
+    function cancelAnalysis() {
+      if (state.oscWorker) state.oscWorker.terminate();
+      const oscBlob = new Blob([$('oscWorkerSource').textContent], { type: 'text/javascript' });
+      state.oscWorker = new Worker(URL.createObjectURL(oscBlob));
+      state.oscWorker.onmessage = handleOscWorkerMessage;
+      state.analysis.running = false;
+      $('analysisRunBtn').disabled = false;
+      $('analysisSourceSelect').disabled = false;
+      $('oscSourceSelect').disabled = false;
+      setBanner('analysisStatus', t('analysisCanceled'), 'warn');
+    }
+
+    function requiresPairedSource(source, type) {
+      return ['both', 'diff', 'common', 'differential'].includes(source) || ['crossCorrelation', 'coherence'].includes(type);
+    }
+
+    async function computeTrendRangeResult(source, dateList) {
+      const core = window.FrequencyAnalysisCore;
+      if (!core) throw new Error(t('analysisCoreMissing'));
+      const rows = [];
+      let lastCurrent = null;
+      for (const [index, date] of dateList.entries()) {
+        const current = await prepareDailyContext(date, $('analysisAlignment').value);
+        lastCurrent = current;
+        const baseSeries = sourceSeries(source, current);
+        if (!baseSeries) continue;
+        const series = analysisWindowSeries(baseSeries);
+        const stats = core.computeBasicStats(series, { nominalHz: state.settings.nominalFrequency });
+        rows.push({ index, date, stats, pairedRatio: current.overall.pairedCount / 86400 });
+      }
+      if (lastCurrent) {
+        state.current = lastCurrent;
+        state.analysis.rawSeries = lastCurrent.rawSeries;
+        state.analysis.displaySeries = lastCurrent.displaySeries;
+        state.analysis.analysisSeries = lastCurrent.analysisSeries;
+      }
+      return {
+        type: 'trend',
+        title: t('analysisTrend'),
+        metadata: analysisMetadata('trend', source, lastCurrent, dateList),
+        cards: [
+          [t('eventCount'), rows.length.toLocaleString(t('localeNumeric'))],
+          [t('qualityCoverage'), percent(rows.reduce((sum, row) => sum + row.pairedRatio, 0) / Math.max(1, rows.length))],
+          [t('rmsDeviation'), `${fmt(rows.reduce((sum, row) => sum + row.stats.rmsDeviationMhz, 0) / Math.max(1, rows.length), 2)} mHz`],
+          [t('classification'), t('classUncertain')]
+        ],
+        events: [],
+        chart: { kind: 'line', series: [{ name: t('analysisTrend'), data: rows.map(row => [row.index, row.stats.rmsDeviationMhz]) }] },
+        methodology: t('methodTrend')
+      };
+    }
+
+    function computeAnalysisResult(type, source, current, dateList = [current?.date].filter(Boolean)) {
+      const core = window.FrequencyAnalysisCore;
+      if (!core) throw new Error(t('analysisCoreMissing'));
+      const baseSeries = sourceSeries(source, current);
+      if (!baseSeries) throw new Error(t('analysisNoSeries'));
+      const series = analysisWindowSeries(baseSeries);
+      const timestamps = Array.from({ length: series.length }, (_, second) => second);
+      const metadata = analysisMetadata(type, source, current, dateList);
+      if (type === 'quality') {
+        const q = core.analyzeDataQuality(timestamps, series, { expectedIntervalSeconds: 1 });
+        return {
+          type,
+          title: t('analysisQuality'),
+          metadata,
+          cards: [
+            [t('qualityCoverage'), percent(q.coverageRatio)],
+            [t('qualityMissing'), q.missingCount.toLocaleString(t('localeNumeric'))],
+            [t('qualityLongestGap'), `${fmt(q.longestGapSeconds, 0)} sn`],
+            [t('qualityDuplicate'), q.duplicateTimestampCount.toLocaleString(t('localeNumeric'))]
+          ],
+          events: q.longestGapSeconds ? [{ start: 0, end: q.longestGapSeconds, type: t('eventDataGap'), value: q.longestGapSeconds, classification: t('classNeedsReview') }] : [],
+          chart: { kind: 'line', series: [{ name: sourceLabel(source), data: sampleSeries(series, 60) }] },
+          methodology: t('methodQuality')
+        };
+      }
+      if (type === 'rocof') {
+        const rocof = core.computeRocof(series, { method: 'central', thresholdHzPerSecond: Number($('rocofThreshold').value || 0.01) });
+        return {
+          type,
+          title: t('analysisRocof'),
+          metadata,
+          cards: [
+            [t('rocofMaxPositive'), `${fmt(rocof.maxPositive, 5)} Hz/s`],
+            [t('rocofMaxNegative'), `${fmt(rocof.maxNegative, 5)} Hz/s`],
+            [t('rocofRms'), `${fmt(rocof.rms, 5)} Hz/s`],
+            [t('rocofEvents'), rocof.events.length.toLocaleString(t('localeNumeric'))]
+          ],
+          events: rocof.events.map(event => ({ start: event.startSecond, end: event.endSecond, type: t('analysisRocof'), value: event.peakHzPerSecond, classification: t('classNeedsReview') })),
+          chart: { kind: 'line', series: [{ name: t('analysisRocof'), data: sampleSeries(rocof.series, 10) }] },
+          methodology: t('methodRocof')
+        };
+      }
+      if (type === 'psd') {
+        const dominant = core.estimateDominantFrequency(series, { sampleRateHz: 1, minHz: Number($('bandMin').value), maxHz: Number($('bandMax').value) });
+        return {
+          type,
+          title: t('analysisPsd'),
+          metadata,
+          cards: [
+            [t('dominantFrequency'), `${fmt(dominant.frequencyHz, 4)} Hz`],
+            [t('spectralPower'), fmt(dominant.power, 2)],
+            [t('noiseFloor'), fmt(dominant.noiseFloor, 2)],
+            [t('snr'), fmt(dominant.snr, 2)]
+          ],
+          events: [],
+          chart: { kind: 'bar', series: [{ name: t('analysisPsd'), data: [[dominant.frequencyHz, dominant.power]] }] },
+          methodology: t('methodPsd')
+        };
+      }
+      if (type === 'spectrogram') {
+        const chunks = dominantByChunks(series, Number($('bandMin').value), Number($('bandMax').value));
+        return {
+          type,
+          title: t('analysisSpectrogram'),
+          metadata,
+          cards: [
+            [t('windowSecLabel'), '600 sn'],
+            [t('dominantFrequency'), chunks.length ? `${fmt(chunks[0][1], 4)} Hz` : '—'],
+            [t('resolutionLabel'), t('resolutionSecond')],
+            [t('qualityCoverage'), percent(current.overall.pairedCount / 86400)]
+          ],
+          events: [],
+          chart: { kind: 'scatter', series: [{ name: t('analysisSpectrogram'), data: chunks }] },
+          methodology: t('methodSpectrogram')
+        };
+      }
+      if (type === 'crossCorrelation') {
+        const corr = core.computeCrossCorrelation(current.tr, current.de, { maxLagSeconds: 30 });
+        return {
+          type,
+          title: t('analysisCrossCorrelation'),
+          metadata,
+          cards: [
+            [t('bestLag'), `${fmt(corr.bestLagSeconds, 0)} sn`],
+            [t('kpiCorrelation'), fmt(corr.bestCorrelation, 4)],
+            [t('classification'), t('classCommonMode')],
+            [t('qualityCoverage'), percent(current.overall.pairedCount / 86400)]
+          ],
+          events: [{ start: 0, end: 86400, type: t('analysisCrossCorrelation'), value: corr.bestCorrelation, classification: t('classCommonMode') }],
+          chart: { kind: 'line', series: [{ name: t('seriesDiff'), data: sampleSeries(sourceSeries('diff', current), 60) }] },
+          methodology: t('methodCrossCorrelation')
+        };
+      }
+      if (type === 'coherence') {
+        const targetHz = Number($('bandMin').value) || 0.12;
+        const coh = core.estimateCoherence(current.tr, current.de, { targetHz });
+        const phase = core.estimatePhaseDifference(current.tr, current.de, { targetHz });
+        return {
+          type,
+          title: t('analysisCoherence'),
+          metadata,
+          cards: [
+            [t('coherence'), fmt(coh.coherence, 3)],
+            [t('phaseDifference'), `${fmt(phase.phaseDegrees, 1)}°`],
+            [t('dominantFrequency'), `${fmt(targetHz, 3)} Hz`],
+            [t('classification'), t('classCommonMode')]
+          ],
+          events: [{ start: 0, end: 86400, type: t('analysisCoherence'), value: coh.coherence, classification: t('classCommonMode') }],
+          chart: { kind: 'bar', series: [{ name: t('coherence'), data: [[targetHz, coh.coherence]], yName: t('coherence') }, { name: t('phaseDifference'), data: [[targetHz, phase.phaseDegrees]], yName: t('phaseDifference') }] },
+          methodology: t('methodCoherence')
+        };
+      }
+      if (type === 'events') {
+        const events = detectFrequencyEvents(series);
+        return {
+          type,
+          title: t('analysisEvents'),
+          metadata,
+          cards: [
+            [t('eventCount'), events.length.toLocaleString(t('localeNumeric'))],
+            [t('eventMin'), `${fmt(Math.min(...finiteValues(series)), 4)} Hz`],
+            [t('eventMax'), `${fmt(Math.max(...finiteValues(series)), 4)} Hz`],
+            [t('classification'), t('classNeedsReview')]
+          ],
+          events,
+          chart: { kind: 'line', series: [{ name: sourceLabel(source), data: sampleSeries(series, 60) }] },
+          methodology: t('methodEvents')
+        };
+      }
+      if (type === 'trend') {
+        return {
+          type,
+          title: t('analysisTrend'),
+          metadata,
+          cards: [
+            [t('kpiMae'), `${fmt(current.overall.maeMhz, 2)} mHz`],
+            [t('metricCorr'), fmt(current.overall.correlation, 3)],
+            [t('qualityCoverage'), percent(current.overall.pairedCount / 86400)],
+            [t('classification'), t('classUncertain')]
+          ],
+          events: [],
+          chart: { kind: 'bar', series: [{ name: t('kpiMae'), data: current.hourly.map((row, hour) => [hour, row.maeMhz]) }] },
+          methodology: t('methodTrend')
+        };
+      }
+      const stats = core.computeBasicStats(series, { nominalHz: state.settings.nominalFrequency });
+      return {
+        type: 'stats',
+        title: t('analysisStats'),
+        metadata,
+        cards: [
+          [t('kpiTeiasMean'), `${fmt(stats.mean, 4)} Hz`],
+          [t('eventMin'), `${fmt(stats.min, 4)} Hz`],
+          [t('eventMax'), `${fmt(stats.max, 4)} Hz`],
+          [t('rmsDeviation'), `${fmt(stats.rmsDeviationMhz, 2)} mHz`]
+        ],
+        events: [],
+        chart: { kind: 'line', series: [{ name: sourceLabel(source), data: sampleSeries(series, 60) }] },
+        methodology: t('methodStats')
+      };
+    }
+
+    function renderAnalysisResult(result) {
+      $('oscChartTitle').textContent = result.title;
+      $('analysisResultCards').innerHTML = result.cards.map(([label, value]) => `<div class="analysis-result-card"><div class="label">${label}</div><div class="value">${value}</div></div>`).join('');
+      $('oscCountTag').textContent = t('findingsCount', { count: result.events.length });
+      renderGenericAnalysisChart(result);
+      renderGenericEvents(result.events);
+    }
+
+    function renderGenericAnalysisChart(result) {
+      if (!state.oscillationChart) return;
+      const series = result.chart.series.map(item => ({
+        name: item.name,
+        type: result.chart.kind === 'bar' ? 'bar' : result.chart.kind === 'scatter' ? 'scatter' : 'line',
+        data: item.data,
+        symbol: result.chart.kind === 'line' ? 'none' : 'circle',
+        connectNulls: false,
+        lineStyle: { width: 1.4 }
+      }));
+      state.oscillationChart.setOption({
+        animation: false,
+        tooltip: { trigger: 'axis' },
+        legend: { top: 8 },
+        grid: { left: 68, right: 42, top: 58, bottom: 62 },
+        xAxis: { type: 'value', axisLabel: { formatter: value => result.chart.kind === 'bar' && value < 24 ? String(value) : secondToTime(Math.round(value)).slice(0, 5) } },
+        yAxis: { type: 'value', scale: true },
+        dataZoom: [{ type: 'inside', filterMode: 'none' }, { type: 'slider', filterMode: 'none', height: 22, bottom: 18 }],
+        series
+      }, true);
+    }
+
+    function renderGenericEvents(events) {
+      const body = $('analysisEventsBody');
+      if (!events.length) {
+        body.innerHTML = `<tr><td colspan="11" class="empty-state">${t('eventEmpty', { source: sourceLabel(getAnalysisSource()) })}</td></tr>`;
+        return;
+      }
+      body.innerHTML = events.map((event, index) => `<tr class="event-row" data-start="${event.start}" data-end="${event.end}">
+        <td>${index + 1}</td><td>${secondToTime(event.start)}</td><td>${secondToTime(event.end)}</td><td>${durationText(Math.max(0, event.end - event.start))}</td>
+        <td>${fmt(event.value, 4)}</td><td>—</td><td>—</td><td>—</td><td>${sourceLabel(getAnalysisSource())}</td><td>—</td><td><span class="tag warn">${event.classification}</span></td>
+      </tr>`).join('');
+    }
+
+    function buildOscillationResult(meta, source) {
+      const result = {
+        type: 'oscillation',
+        title: t('analysisOscillation'),
+        metadata: analysisMetadata('oscillation', source, state.current),
+        cards: [
+          [t('eventCount'), state.events.length.toLocaleString(t('localeNumeric'))],
+          [t('bandMinLabel'), `${fmt(Number(meta.f1), 2)} Hz`],
+          [t('bandMaxLabel'), `${fmt(Number(meta.f2), 2)} Hz`],
+          [t('oscConfidence'), state.events.length ? '65/100' : '—']
+        ],
+        events: state.events.map(event => ({ start: event.start, end: event.end, type: t('analysisOscillation'), value: event.peakAmplitudeMhz, classification: event.classification })),
+        methodology: t('methodOscillation')
+      };
+      $('analysisResultCards').innerHTML = result.cards.map(([label, value]) => `<div class="analysis-result-card"><div class="label">${label}</div><div class="value">${value}</div></div>`).join('');
+      return result;
+    }
+
+    function analysisMetadata(type, source, current, dateList = [current?.date].filter(Boolean)) {
+      const windowBounds = analysisWindowBounds();
+      return {
+        appVersion: '1.1.0',
+        analysisVersion: '2026.07.prompt2',
+        dataSchemaVersion: String(state.auto.manifest?.schemaVersion || 1),
+        generatedAt: new Date().toISOString(),
+        parameters: {
+          type,
+          source,
+          dateMode: $('analysisDateMode')?.value || 'single',
+          dateRange: dateList,
+          timeWindowSeconds: [windowBounds.start, windowBounds.end],
+          alignment: $('analysisAlignment')?.value || state.settings.alignmentMode,
+          resolution: $('analysisResolution')?.value || 'auto',
+          bandHz: [Number($('bandMin').value), Number($('bandMax').value)]
+        },
+        sources: [sourceLabel(source)],
+        dataFiles: [current?.date].filter(Boolean)
+      };
+    }
+
+    function sampleSeries(series, step = 60) {
+      const data = [];
+      for (let second = 0; second < series.length; second += step) {
+        const value = series[second];
+        data.push([second, Number.isFinite(value) ? Number(value.toFixed(6)) : null]);
+      }
+      return data;
+    }
+
+    function dominantByChunks(series, minHz, maxHz) {
+      const core = window.FrequencyAnalysisCore;
+      const out = [];
+      for (let start = 0; start + 600 <= series.length; start += 600) {
+        const chunk = series.slice(start, start + 600);
+        const d = core.estimateDominantFrequency(chunk, { sampleRateHz: 1, minHz, maxHz });
+        out.push([start + 300, Number(d.frequencyHz.toFixed(4)), d.power]);
+      }
+      return out;
+    }
+
+    function detectFrequencyEvents(series) {
+      const events = [];
+      let start = null;
+      let peak = NaN;
+      for (let i = 0; i <= series.length; i++) {
+        const value = series[i];
+        const outside = Number.isFinite(value) && Math.abs(value - state.settings.nominalFrequency) * 1000 >= Number($('oscThreshold').value);
+        if (outside && start === null) {
+          start = i;
+          peak = value;
+        } else if (outside && Math.abs(value - state.settings.nominalFrequency) > Math.abs(peak - state.settings.nominalFrequency)) {
+          peak = value;
+        } else if (!outside && start !== null) {
+          const end = i - 1;
+          if (end - start + 1 >= Number($('minDuration').value)) {
+            events.push({ start, end, type: t('analysisEvents'), value: peak, classification: t('classNeedsReview') });
+          }
+          start = null;
+          peak = NaN;
+        }
+      }
+      return events;
+    }
+
+    function finiteValues(series) {
+      return Array.from(series || []).filter(Number.isFinite);
+    }
+
+    function percent(ratio) {
+      return `${fmt(Number(ratio) * 100, 2)}%`;
+    }
+
+    function renderReportPreview() {
+      const root = $('reportPreview');
+      if (!root) return;
+      const result = state.analysis.lastResult;
+      const reportLang = $('reportLanguageSelect')?.value || lang;
+      const trt = (key, vars) => {
+        let val = i18n[reportLang]?.[key] ?? i18n.tr[key] ?? key;
+        if (vars) {
+          Object.entries(vars).forEach(([k, v]) => {
+            val = String(val).replace(new RegExp(`\\{${k}\\}`, 'g'), v);
+          });
+        }
+        return val;
+      };
+      const parts = new Set([...document.querySelectorAll('.report-part:checked')].map(input => input.value));
+      if (!result) {
+        root.innerHTML = `<p>${trt('reportPreviewEmpty')}</p>`;
+        return;
+      }
+      const text = reportLang === 'en'
+        ? { title: 'Technical Report', summary: 'Summary', quality: 'Data Quality', method: 'Methodology', limits: 'Limitations' }
+        : { title: 'Teknik Rapor', summary: 'Özet', quality: 'Veri Kalitesi', method: 'Yöntem', limits: 'Sınırlamalar' };
+      root.innerHTML = `
+        <h2>${text.title}</h2>
+        <p><strong>${result.title}</strong> • ${displayDate(state.current?.date)} • ${result.metadata.generatedAt}</p>
+        ${parts.has('summary') ? `<h3>${text.summary}</h3><ul>${result.cards.map(([label, value]) => `<li>${label}: ${value}</li>`).join('')}</ul>` : ''}
+        ${parts.has('quality') ? `<h3>${text.quality}</h3><p>${trt('qualityCoverage')}: ${percent((state.current?.overall?.pairedCount || 0) / 86400)}</p>` : ''}
+        ${parts.has('methodology') ? `<h3>${text.method}</h3><p>${result.methodology}</p>` : ''}
+        ${parts.has('limitations') ? `<h3>${text.limits}</h3><p>${trt('reportLimitations')}</p>` : ''}
+      `;
+    }
+
+    function exportAnalysisJson() {
+      if (!state.analysis.lastResult) return;
+      downloadBlob('analysis-result.json', JSON.stringify(state.analysis.lastResult, null, 2), 'application/json');
+    }
+
+    function exportAnalysisCsv() {
+      const result = state.analysis.lastResult;
+      if (!result) return;
+      const rows = [['start', 'end', 'type', 'value', 'classification'], ...result.events.map(event => [event.start, event.end, event.type, event.value, event.classification])];
+      downloadBlob('analysis-events.csv', rows.map(row => row.map(cell => `"${String(cell ?? '').replace(/"/g, '""')}"`).join(',')).join('\n'), 'text/csv');
+    }
+
+    function downloadBlob(filename, content, type) {
+      const blob = new Blob([content], { type });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 500);
     }
 
     // (Excel ve PDF çıktı özellikleri kaldırıldı)
@@ -2896,8 +3877,9 @@
       $('stepSec').value = s.stepSec;
       $('filterTaps').value = s.filterTaps;
       $('minDuration').value = s.minDuration;
+      $('analysisSourceSelect').value = s.oscillationSource || 'tr';
       $('oscSourceSelect').value = s.oscillationSource || 'tr';
-      state.oscillationSource = $('oscSourceSelect').value;
+      state.oscillationSource = getAnalysisSource();
       updateOscillationSourceUi();
     }
 
@@ -2926,7 +3908,8 @@
         windowSec: Number($('windowSec').value),
         stepSec: Number($('stepSec').value),
         filterTaps: Number($('filterTaps').value),
-        minDuration: Number($('minDuration').value)
+        minDuration: Number($('minDuration').value),
+        oscillationSource: getAnalysisSource()
       };
       localStorage.setItem('frequencyAppSettings', JSON.stringify(state.settings));
       applySettingsToForm();
@@ -2950,10 +3933,80 @@
       el.className = `status-banner ${type}`.trim();
     }
 
+    function initialLanguage() {
+      const params = new URLSearchParams(window.location.search);
+      const fromUrl = params.get('lang');
+      if (fromUrl === 'tr' || fromUrl === 'en') return fromUrl;
+      return state.settings.locale === 'en' ? 'en' : 'tr';
+    }
+
+    function applyUrlState() {
+      const params = new URLSearchParams(window.location.search);
+      const theme = params.get('theme');
+      const tab = params.get('tab');
+      const date = params.get('date');
+      const source = params.get('source');
+      const analysis = params.get('analysis');
+      const alignment = params.get('alignment');
+      const mode = params.get('mode');
+      const start = params.get('start');
+      const end = params.get('end');
+      if (theme) document.documentElement.setAttribute('data-theme', theme);
+      if (date) {
+        $('dateSelect').value = date;
+        $('analysisDateSelect').value = date;
+        $('analysisStartDate').value = date;
+        $('analysisEndDate').value = date;
+      }
+      if (source && $('analysisSourceSelect').querySelector(`option[value="${source}"]`)) {
+        $('analysisSourceSelect').value = source;
+        syncAnalysisSource('analysis');
+      }
+      if (analysis && $('analysisTypeSelect').querySelector(`option[value="${analysis}"]`)) {
+        $('analysisTypeSelect').value = analysis;
+      }
+      if (alignment && $('analysisAlignment').querySelector(`option[value="${alignment}"]`)) {
+        $('analysisAlignment').value = alignment;
+      }
+      if (mode && $('analysisDateMode').querySelector(`option[value="${mode}"]`)) {
+        $('analysisDateMode').value = mode;
+      }
+      if (start) $('analysisStartDate').value = start;
+      if (end) $('analysisEndDate').value = end;
+      if (tab) activateTab(tab.startsWith('tab-') ? tab : `tab-${tab}`);
+    }
+
+    function updateUrlState(patch = {}) {
+      if (!window.history?.replaceState) return;
+      const params = new URLSearchParams(window.location.search);
+      const values = {
+        lang,
+        date: $('analysisDateSelect')?.value || $('dateSelect')?.value || undefined,
+        source: getAnalysisSource(),
+        analysis: $('analysisTypeSelect')?.value,
+        alignment: $('analysisAlignment')?.value,
+        mode: $('analysisDateMode')?.value,
+        ...patch
+      };
+      for (const [key, value] of Object.entries(values)) {
+        if (value === undefined || value === null || value === '') params.delete(key);
+        else params.set(key, value);
+      }
+      const query = params.toString();
+      const next = `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`;
+      window.history.replaceState(null, '', next);
+    }
+
     function displayDate(iso) {
       if (!iso) return '—';
-      const [y, m, d] = iso.split('-');
-      return `${d}.${m}.${y}`;
+      const parsed = new Date(`${iso}T00:00:00Z`);
+      if (Number.isNaN(parsed.getTime())) return String(iso);
+      return new Intl.DateTimeFormat(lang === 'en' ? 'en-GB' : 'tr-TR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        timeZone: 'UTC'
+      }).format(parsed);
     }
 
     function formatUtc(value) {
@@ -3025,7 +4078,7 @@
         filterTapsLabel: 'FIR kademe (tek)',
         minDurationLabel: 'Min. olay süresi (sn)',
         oscCalculateBtn: 'Hesaplama Yap',
-        oscStatusDefault: 'Önce Günlük Frekans sekmesinde rapor hesaplayın.',
+        oscStatusDefault: 'Tarih ve kaynak seçin.',
         oscChartTitle: 'Seçilen Kaynağın Bant Geçiren Bileşeni ve Bulgular',
         oscCountTag: '0 bulgu',
         sectionOscResults: 'Osilasyon Bulguları',
@@ -3163,7 +4216,7 @@
         settingsSaved: 'Ayarlar kaydedildi.',
         settingsSavedAlert: 'Ayarlar tarayıcıda kaydedildi.',
         confirmClear: 'Tarayıcı belleğindeki tüm yüklenmiş frekans verileri temizlensin mi?',
-        calculateFirst: 'Önce Frekans Grafiği sekmesinde günlük raporu hesaplayın.',
+        calculateFirst: 'Tarih ve kaynak seçin.',
         cdError: 'CDN yüklenemedi: {libs}.',
         // Progress messages
         parsingFiles: '{count} dosya ayrıştırılıyor. Büyük dosyalarda işlem birkaç dakika sürebilir.',
@@ -3293,7 +4346,7 @@
         filterTapsLabel: 'FIR taps (odd)',
         minDurationLabel: 'Min. event duration (sec)',
         oscCalculateBtn: 'Run Analysis',
-        oscStatusDefault: 'First calculate a daily report in the Daily Frequency tab.',
+        oscStatusDefault: 'Select a date and source.',
         oscChartTitle: 'Bandpass Component and Findings of Selected Source',
         oscCountTag: '0 findings',
         sectionOscResults: 'Oscillation Findings',
@@ -3431,7 +4484,7 @@
         settingsSaved: 'Settings saved.',
         settingsSavedAlert: 'Settings saved in browser.',
         confirmClear: 'Clear all loaded frequency data from browser memory?',
-        calculateFirst: 'First calculate a daily report in the Frequency Chart tab.',
+        calculateFirst: 'Select a date and source.',
         cdError: 'CDN load failed: {libs}.',
         // Progress messages
         parsingFiles: 'Parsing {count} file(s). Large files may take a few minutes.',
@@ -3517,6 +4570,276 @@
       }
     };
 
+    const translations = {
+      tr: {
+        langToggle: 'TR | EN',
+        tabChart: 'Günlük',
+        tabOscillation: 'Analiz',
+        tabReports: 'Raporlar',
+        tabSettings: 'Veri',
+        sectionOscillation: 'Analiz Laboratuvarı',
+        sectionOscResults: 'Analiz Bulguları',
+        oscNoAnalysis: 'Henüz analiz yapılmadı.',
+        oscStatusDefault: 'Tarih ve kaynak seçin.',
+        analysisStatusDefault: 'Tarih ve kaynak seçin.',
+        analysisDateLabel: 'Tarih',
+        analysisSourceLabel: 'Kaynak',
+        analysisTypeLabel: 'Analiz',
+        analysisRunBtn: 'Çalıştır',
+        analysisCancelBtn: 'İptal',
+        advanced: 'Gelişmiş',
+        analysisDateModeLabel: 'Tarih modu',
+        dateModeSingle: 'Tek gün',
+        dateModeRange: 'Tarih aralığı',
+        dateModeLast7: 'Son 7 ortak gün',
+        dateModeLast30: 'Son 30 ortak gün',
+        dateModeMonth: 'Ay seçimi',
+        dateModeCustomHours: 'Özel saat',
+        startDateLabel: 'Başlangıç',
+        endDateLabel: 'Bitiş',
+        startHourLabel: 'Başlangıç saati',
+        endHourLabel: 'Bitiş saati',
+        resolutionLabel: 'Çözünürlük',
+        resolutionAuto: 'Otomatik',
+        resolutionSecond: 'Saniyelik',
+        resolution10s: '10 saniyelik',
+        resolutionMinute: 'Dakikalık',
+        resolutionHour: 'Saatlik',
+        rocofThresholdLabel: 'RoCoF eşiği',
+        analysisGroupQuality: 'Veri Kalitesi',
+        analysisGroupFrequency: 'Frekans Kalitesi',
+        analysisGroupEvents: 'Olay Analizi',
+        analysisGroupRocof: 'RoCoF',
+        analysisGroupSpectral: 'Spektral Analiz',
+        analysisGroupOscillation: 'Osilasyon Analizi',
+        analysisGroupJoint: 'Türkiye-Almanya Ortak Analizi',
+        analysisGroupTrend: 'Uzun Dönem Analizi',
+        analysisQuality: 'Veri kapsama',
+        analysisStats: 'Temel istatistikler',
+        analysisEvents: 'Bant ihlali',
+        analysisRocof: 'RoCoF',
+        analysisPsd: 'Welch PSD',
+        analysisSpectrogram: 'Spektrogram',
+        analysisOscillation: 'Osilasyon adayı',
+        analysisCrossCorrelation: 'Çapraz korelasyon',
+        analysisCoherence: 'Koherens ve faz',
+        analysisTrend: 'Günlük trend',
+        analysisRunning: 'Analiz çalışıyor...',
+        analysisDone: 'Analiz tamamlandı.',
+        analysisCanceled: 'Analiz iptal edildi.',
+        analysisError: 'Analiz tamamlanamadı.',
+        analysisNoCommonDate: 'Seçilen tarih için ortak Türkiye-Almanya verisi yetersiz.',
+        analysisCoreMissing: 'Analiz çekirdeği yüklenemedi.',
+        analysisNoSeries: 'Seçilen kaynak için geçerli seri bulunamadı.',
+        sourceBoth: 'Türkiye + Almanya',
+        sourceDiff: 'Türkiye - Almanya',
+        sourceCommon: 'Ortak mod',
+        sourceDifferential: 'Diferansiyel bileşen',
+        sourceBothShort: 'TR+DE',
+        sourceDiffShort: 'TR-DE',
+        sourceCommonShort: 'Ortak',
+        sourceDifferentialShort: 'Diferansiyel',
+        sourceCommonFrequency: 'Ortak mod frekansı',
+        sourceDiffFrequency: 'Diferansiyel frekans',
+        coverageTrLatest: 'Son Türkiye verisi',
+        coverageDeLatest: 'Son Almanya verisi',
+        coverageCommonLatest: 'Son ortak gün',
+        qualityCoverage: 'Kapsama',
+        qualityMissing: 'Eksik örnek',
+        qualityLongestGap: 'En uzun boşluk',
+        qualityDuplicate: 'Yinelenen zaman',
+        eventDataGap: 'Veri boşluğu',
+        classNeedsReview: 'İnceleme gerekli',
+        classCommonMode: 'Ortak mod',
+        classUncertain: 'Belirsiz',
+        rocofMaxPositive: 'Maks. pozitif',
+        rocofMaxNegative: 'Maks. negatif',
+        rocofRms: 'RoCoF RMS',
+        rocofEvents: 'RoCoF olayı',
+        dominantFrequency: 'Baskın frekans',
+        spectralPower: 'Spektral güç',
+        noiseFloor: 'Gürültü tabanı',
+        snr: 'SNR',
+        bestLag: 'En iyi gecikme',
+        coherence: 'Koherens',
+        phaseDifference: 'Faz farkı',
+        classification: 'Sınıflandırma',
+        eventCount: 'Olay sayısı',
+        eventMin: 'Minimum',
+        eventMax: 'Maksimum',
+        rmsDeviation: 'RMS sapma',
+        oscConfidence: 'Güven skoru',
+        methodQuality: 'Kapsama, eksik örnekler ve en uzun boşluk saniyelik ham seri üzerinden hesaplanır.',
+        methodRocof: 'RoCoF ardışık saniyelik frekans farklarından Hz/s cinsinden hesaplanır.',
+        methodPsd: 'Welch PSD, gün içindeki baskın düşük frekanslı bileşeni ve gürültü tabanını özetler.',
+        methodSpectrogram: 'Spektrogram, 10 dakikalık pencerelerde baskın frekansın zamanla değişimini gösterir.',
+        methodCrossCorrelation: 'Çapraz korelasyon, Türkiye ve Almanya serileri arasındaki en güçlü gecikmeli benzerliği arar.',
+        methodCoherence: 'Koherens ve faz, seçilen frekansta ortak hareketin tutarlılığını tahmin eder.',
+        methodEvents: 'Olay analizi, nominal frekanstan sapmanın eşik üstünde kaldığı aralıkları çıkarır.',
+        methodTrend: 'Trend görünümü saatlik/günlük hata ölçülerini özetler.',
+        methodStats: 'Temel istatistikler, saniyelik geçerli örneklerin dağılımını hesaplar.',
+        methodOscillation: 'Osilasyon analizi band geçiren FIR filtresi ve kayan pencere eşikleme ile aday aralıkları çıkarır.',
+        reportLimitations: 'Sonuçlar veri kalitesi, hizalama seçimi, eksik saniyeler ve kaynak revizyonlarından etkilenebilir.',
+        reportsTitle: 'Raporlar',
+        reportJsonBtn: 'JSON',
+        reportCsvBtn: 'CSV',
+        reportPrintBtn: 'PDF',
+        reportPartSummary: 'Özet',
+        reportPartQuality: 'Veri kalitesi',
+        reportPartMethodology: 'Yöntem',
+        reportPartLimitations: 'Sınırlamalar',
+        reportPreviewEmpty: 'Önce analiz çalıştırın.',
+        mobileHourLabel: 'Mobil saat detayı',
+        mobileAllHours: 'Tüm saatler',
+        loadingSecondData: 'Saniyelik veri yükleniyor',
+        chartResolutionDaily: 'Görünen veri: dakikalık özet',
+        chartResolutionRaw: 'Ham saniyelik veri',
+        chartResolutionDisplay: 'Görünen veri',
+        downloadPngLabel: 'Grafiği PNG olarak indir',
+        fullscreenLabel: 'Tam ekran',
+        resetZoomLabel: 'Yakınlaştırmayı sıfırla',
+        seriesTrMin: 'Türkiye min',
+        seriesTrMax: 'Türkiye maks',
+        seriesDeMin: 'Almanya min',
+        seriesDeMax: 'Almanya maks'
+      },
+      en: {
+        langToggle: 'TR | EN',
+        tabChart: 'Daily',
+        tabOscillation: 'Analysis',
+        tabReports: 'Reports',
+        tabSettings: 'Data',
+        sectionOscillation: 'Analysis Lab',
+        sectionOscResults: 'Analysis Findings',
+        oscNoAnalysis: 'No analysis has been run yet.',
+        oscStatusDefault: 'Select a date and source.',
+        analysisStatusDefault: 'Select a date and source.',
+        analysisDateLabel: 'Date',
+        analysisSourceLabel: 'Source',
+        analysisTypeLabel: 'Analysis',
+        analysisRunBtn: 'Run',
+        analysisCancelBtn: 'Cancel',
+        advanced: 'Advanced',
+        analysisDateModeLabel: 'Date mode',
+        dateModeSingle: 'Single day',
+        dateModeRange: 'Date range',
+        dateModeLast7: 'Last 7 common days',
+        dateModeLast30: 'Last 30 common days',
+        dateModeMonth: 'Month',
+        dateModeCustomHours: 'Custom hours',
+        startDateLabel: 'Start',
+        endDateLabel: 'End',
+        startHourLabel: 'Start hour',
+        endHourLabel: 'End hour',
+        resolutionLabel: 'Resolution',
+        resolutionAuto: 'Auto',
+        resolutionSecond: 'Second-level',
+        resolution10s: '10-second',
+        resolutionMinute: 'Minutely',
+        resolutionHour: 'Hourly',
+        rocofThresholdLabel: 'RoCoF threshold',
+        analysisGroupQuality: 'Data Quality',
+        analysisGroupFrequency: 'Frequency Quality',
+        analysisGroupEvents: 'Event Analysis',
+        analysisGroupRocof: 'RoCoF',
+        analysisGroupSpectral: 'Spectral Analysis',
+        analysisGroupOscillation: 'Oscillation Analysis',
+        analysisGroupJoint: 'Turkey-Germany Joint Analysis',
+        analysisGroupTrend: 'Long-Term Analysis',
+        analysisQuality: 'Data coverage',
+        analysisStats: 'Basic statistics',
+        analysisEvents: 'Band breach',
+        analysisRocof: 'RoCoF',
+        analysisPsd: 'Welch PSD',
+        analysisSpectrogram: 'Spectrogram',
+        analysisOscillation: 'Oscillation candidate',
+        analysisCrossCorrelation: 'Cross-correlation',
+        analysisCoherence: 'Coherence and phase',
+        analysisTrend: 'Daily trend',
+        analysisRunning: 'Analysis is running...',
+        analysisDone: 'Analysis complete.',
+        analysisCanceled: 'Analysis canceled.',
+        analysisError: 'Analysis could not be completed.',
+        analysisNoCommonDate: 'Common Turkey-Germany data is insufficient for the selected date.',
+        analysisCoreMissing: 'Analysis core could not be loaded.',
+        analysisNoSeries: 'No valid series found for the selected source.',
+        sourceBoth: 'Turkey + Germany',
+        sourceDiff: 'Turkey - Germany',
+        sourceCommon: 'Common mode',
+        sourceDifferential: 'Differential component',
+        sourceBothShort: 'TR+DE',
+        sourceDiffShort: 'TR-DE',
+        sourceCommonShort: 'Common',
+        sourceDifferentialShort: 'Differential',
+        sourceCommonFrequency: 'Common-mode frequency',
+        sourceDiffFrequency: 'Differential frequency',
+        coverageTrLatest: 'Latest Turkey data',
+        coverageDeLatest: 'Latest Germany data',
+        coverageCommonLatest: 'Latest common day',
+        qualityCoverage: 'Coverage',
+        qualityMissing: 'Missing samples',
+        qualityLongestGap: 'Longest gap',
+        qualityDuplicate: 'Duplicate timestamps',
+        eventDataGap: 'Data gap',
+        classNeedsReview: 'Needs review',
+        classCommonMode: 'Common mode',
+        classUncertain: 'Uncertain',
+        rocofMaxPositive: 'Max positive',
+        rocofMaxNegative: 'Max negative',
+        rocofRms: 'RoCoF RMS',
+        rocofEvents: 'RoCoF events',
+        dominantFrequency: 'Dominant frequency',
+        spectralPower: 'Spectral power',
+        noiseFloor: 'Noise floor',
+        snr: 'SNR',
+        bestLag: 'Best lag',
+        coherence: 'Coherence',
+        phaseDifference: 'Phase difference',
+        classification: 'Classification',
+        eventCount: 'Event count',
+        eventMin: 'Minimum',
+        eventMax: 'Maximum',
+        rmsDeviation: 'RMS deviation',
+        oscConfidence: 'Confidence score',
+        methodQuality: 'Coverage, missing samples, and longest gap are computed from the raw second-level data.',
+        methodRocof: 'RoCoF is computed from adjacent second-level frequency differences in Hz/s.',
+        methodPsd: 'Welch PSD summarizes the dominant low-frequency component and noise floor within the day.',
+        methodSpectrogram: 'The spectrogram tracks dominant frequency changes across 10-minute windows.',
+        methodCrossCorrelation: 'Cross-correlation searches for the strongest delayed similarity between Turkey and Germany.',
+        methodCoherence: 'Coherence and phase estimate shared motion at the selected frequency.',
+        methodEvents: 'Event analysis extracts intervals where deviation from nominal frequency exceeds the threshold.',
+        methodTrend: 'The trend view summarizes hourly and daily error metrics.',
+        methodStats: 'Basic statistics describe the distribution of valid second-level samples.',
+        methodOscillation: 'Oscillation analysis uses a band-pass FIR filter and sliding-window thresholding.',
+        reportLimitations: 'Results may be affected by data quality, alignment mode, missing seconds, and source revisions.',
+        reportsTitle: 'Reports',
+        reportJsonBtn: 'JSON',
+        reportCsvBtn: 'CSV',
+        reportPrintBtn: 'PDF',
+        reportPartSummary: 'Summary',
+        reportPartQuality: 'Data quality',
+        reportPartMethodology: 'Methodology',
+        reportPartLimitations: 'Limitations',
+        reportPreviewEmpty: 'Run an analysis first.',
+        mobileHourLabel: 'Mobile hour detail',
+        mobileAllHours: 'All hours',
+        loadingSecondData: 'Loading second-level data',
+        chartResolutionDaily: 'Visible data: minutely summary',
+        chartResolutionRaw: 'Raw second-level data',
+        chartResolutionDisplay: 'Visible data',
+        downloadPngLabel: 'Download chart as PNG',
+        fullscreenLabel: 'Fullscreen',
+        resetZoomLabel: 'Reset zoom',
+        seriesTrMin: 'Turkey min',
+        seriesTrMax: 'Turkey max',
+        seriesDeMin: 'Germany min',
+        seriesDeMax: 'Germany max'
+      }
+    };
+
+    Object.assign(i18n.tr, translations.tr);
+    Object.assign(i18n.en, translations.en);
+
     let lang = 'tr';
 
     function t(key, vars) {
@@ -3535,6 +4858,17 @@
         const key = el.getAttribute('data-i18n');
         el.textContent = t(key);
       });
+      document.querySelectorAll('[data-i18n-label]').forEach(el => {
+        const key = el.getAttribute('data-i18n-label');
+        el.setAttribute('label', t(key));
+      });
+      const actionLabels = { fullscreen: 'fullscreenLabel', download: 'downloadPngLabel', resetzoom: 'resetZoomLabel' };
+      document.querySelectorAll('.chart-toolbar [data-action]').forEach(button => {
+        const key = actionLabels[button.dataset.action];
+        if (!key) return;
+        button.setAttribute('aria-label', t(key));
+        button.setAttribute('title', t(key));
+      });
     }
 
     function setLanguage(newLang) {
@@ -3543,11 +4877,9 @@
       state.settings.locale = newLang;
       localStorage.setItem('frequencyAppSettings', JSON.stringify(state.settings));
       document.documentElement.setAttribute('data-current-lang', newLang);
-      // Update toggle button text
       $('langToggle').textContent = t('langToggle');
-      // Apply static HTML translations
       applyTranslations();
-      // Re-render dynamic UI
+      updateUrlState({ lang: newLang });
       renderCalendar();
       if (state.current) {
         renderKpis(state.current);
@@ -3561,6 +4893,8 @@
       updateAutoDataPanel();
       updateInventory();
       updateChartViewTag(state.chartView);
+      renderCoverageSummary();
+      renderReportPreview();
     }
 
   </script>

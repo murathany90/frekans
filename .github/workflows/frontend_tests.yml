@@ -1,0 +1,66 @@
+name: Frontend Playwright Tests
+
+on:
+  push:
+    paths:
+      - "frekans_rapor_v1.html"
+      - "assets/**"
+      - "tests/frontend_smoke_playwright.mjs"
+      - "tests/frontend_prompt2_static.mjs"
+      - ".github/workflows/frontend_tests.yml"
+  pull_request:
+    paths:
+      - "frekans_rapor_v1.html"
+      - "assets/**"
+      - "tests/frontend_smoke_playwright.mjs"
+      - "tests/frontend_prompt2_static.mjs"
+      - ".github/workflows/frontend_tests.yml"
+  workflow_dispatch:
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Playwright
+        run: npm install --no-save playwright
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run static frontend checks
+        run: |
+          node tests/frontend_static_smoke.mjs
+          node tests/frontend_prompt2_static.mjs
+          node tests/synthetic_signal_analysis.mjs
+
+      - name: Start local HTTP server
+        run: |
+          python -m http.server 8080 > playwright-server.log 2>&1 &
+          echo $! > playwright-server.pid
+
+      - name: Run Playwright smoke
+        env:
+          APP_URL: http://127.0.0.1:8080/frekans_rapor_v1.html
+          PLAYWRIGHT_ARTIFACT_DIR: playwright-artifacts
+        run: node tests/frontend_smoke_playwright.mjs
+
+      - name: Upload Playwright artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: |
+            playwright-artifacts/
+            playwright-server.log
+          if-no-files-found: ignore

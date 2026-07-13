@@ -6,6 +6,7 @@ on:
     paths:
       - "frekans_rapor_v1.html"
       - "index.html"
+      - "assets/**"
       - "data/**"
       - "scripts/**"
       - "tests/**"
@@ -38,6 +39,8 @@ jobs:
         run: |
           python -m pytest tests
           node tests/frontend_static_smoke.mjs
+          node tests/frontend_prompt2_static.mjs
+          node tests/synthetic_signal_analysis.mjs
 
       - name: Build static site
         run: python scripts/build_site.py

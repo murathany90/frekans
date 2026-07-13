@@ -122,10 +122,17 @@ def write_status(data_root: Path, summary: dict) -> None:
             previous = json.loads(path.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             previous = {}
+    now_utc = datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    run_at = summary.get("workflowRunAt") or now_utc
     successful_dates = [item["date"] for item in summary["processed"] if item["status"] not in ("dry_run", "error")]
     if previous.get("lastSuccessfulTeiasDataDate"):
         successful_dates.append(previous["lastSuccessfulTeiasDataDate"])
+    if previous.get("lastSuccessfulDataDate"):
+        successful_dates.append(previous["lastSuccessfulDataDate"])
     latest_success = max(successful_dates, default=None)
+    attempted_dates = [item["date"] for item in summary.get("processed", []) if item.get("date")]
+    attempted_dates.extend(summary.get("missing", []))
+    attempted_date = summary.get("attemptedDate") or max(attempted_dates, default=previous.get("lastAttemptedDataDate"))
     netz_index = data_root / "netztransparenz" / "2026" / "index.json"
     latest_netz = previous.get("lastSuccessfulNetztransparenzDataDate")
     if netz_index.exists():
@@ -136,11 +143,34 @@ def write_status(data_root: Path, summary: dict) -> None:
     data_delay_days = None
     if latest_success:
         data_delay_days = (datetime.now(UTC).date() - parse_iso_date(latest_success)).days
+    failed_messages = summary.get("failed", [])
+    has_failed = bool(failed_messages)
+    has_success_this_run = bool([item for item in summary.get("processed", []) if item.get("status") not in ("dry_run", "error")])
+    prompt2_status = "partial" if has_failed and has_success_this_run else "failed" if has_failed else "success"
+    error_message = "; ".join(failed_messages)
+    last_error = (
+        {
+            "step": summary.get("errorStep") or "TEIAS daily update",
+            "message": error_message,
+            "httpStatus": summary.get("httpStatus"),
+            "retryCount": summary.get("retryCount"),
+        }
+        if has_failed
+        else None
+    )
     status = {
         **previous,
-        "updatedAtUtc": datetime.now().astimezone().isoformat(),
-        "lastWorkflowResult": "success" if not summary["failed"] else "warning",
-        "lastSuccessfulTeiasCheckUtc": datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        "updatedAtUtc": run_at,
+        "lastRunAt": run_at,
+        "lastSuccessfulRunAt": run_at if not has_failed else previous.get("lastSuccessfulRunAt"),
+        "lastFailedRunAt": run_at if has_failed else previous.get("lastFailedRunAt"),
+        "lastSuccessfulDataDate": latest_success,
+        "lastAttemptedDataDate": attempted_date,
+        "status": prompt2_status,
+        "missingDates": summary.get("missing", []),
+        "lastError": last_error,
+        "lastWorkflowResult": prompt2_status,
+        "lastSuccessfulTeiasCheckUtc": run_at if not has_failed else previous.get("lastSuccessfulTeiasCheckUtc"),
         "lastSuccessfulTeiasDataDate": latest_success,
         "lastSuccessfulNetztransparenzDataDate": latest_netz,
         "teiasDataDelayDays": data_delay_days,
@@ -148,8 +178,8 @@ def write_status(data_root: Path, summary: dict) -> None:
         "missingDayCount": len(summary.get("missing", [])),
         "qualityWarnings": [item for item in summary["processed"] if item.get("qualityScore", 100) < 95],
         "revisionDates": [item for item in summary["processed"] if item.get("revision")],
-        "lastErrorMessage": "; ".join(summary["failed"]) if summary["failed"] else previous.get("lastErrorMessage"),
-        "lastErrorAtUtc": datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z") if summary["failed"] else previous.get("lastErrorAtUtc"),
+        "lastErrorMessage": error_message if has_failed else None,
+        "lastErrorAtUtc": run_at if has_failed else None,
     }
     path.write_text(json.dumps(status, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
@@ -158,7 +188,15 @@ def run(args: argparse.Namespace) -> dict:
     data_root = Path(args.output_root)
     entries = discover_teias_entries()
     selected, missing = select_entries(args, entries)
-    summary = {"processed": [], "missing": missing, "failed": []}
+    attempted_dates = [entry.local_date for entry in selected] + missing
+    summary = {
+        "processed": [],
+        "missing": missing,
+        "failed": [],
+        "attemptedDate": max(attempted_dates, default=None),
+        "workflowRunAt": datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        "retryCount": 3,
+    }
     for index, entry in enumerate(selected):
         try:
             summary["processed"].append(process_entry(entry, data_root, dry_run=args.dry_run))
