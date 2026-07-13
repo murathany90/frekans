@@ -11,8 +11,9 @@ const requiredIds = [
   "dateSelect",
   "frequencyChart",
   "oscSourceSelect",
-  "excelBtn",
-  "pdfBtn"
+  "calGrid",
+  "calMonthYear",
+  "calculateBtn"
 ];
 
 for (const id of requiredIds) {
