@@ -28,6 +28,7 @@ for (const snippet of [
   "scripts/fetch_netztransparenz.py",
   "python -m pytest tests",
   "node tests/frontend_static_smoke.mjs",
+  "node tests/frontend_prompt4_static.mjs",
   "node tests/readme_documentation_static.mjs",
   "python scripts/validate_frequency.py",
   "python scripts/build_site.py",

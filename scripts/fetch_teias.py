@@ -96,7 +96,7 @@ def process_entry(entry: TeiasEntry, data_root: Path, dry_run: bool = False) -> 
         return {"date": entry.local_date, "status": "dry_run", "url": entry.file_url}
     raw_data, status = download_entry(entry)
     parse_data = unpack_if_zip(raw_data)
-    package = parse_teias_csv(parse_data, source_url=entry.file_url, http_status=status)
+    package = parse_teias_csv(parse_data, source_url=entry.file_url, http_status=status, fallback_date=entry.local_date)
     previous_hash = existing_meta_hash(data_root, entry)
     if previous_hash == package.sha256:
         return {"date": entry.local_date, "status": "unchanged", "sha256": package.sha256}

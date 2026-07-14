@@ -2,6 +2,10 @@ incoming/
 cache/
 raw/
 downloads/
+tmp/
+playwright-artifacts*/
+*.zip
+*.csv
 dist/
 *.tmp
 *.part

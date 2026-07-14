@@ -1870,6 +1870,7 @@
     const AUTO_DATA_BASE = './data/';
     const AUTO_SOURCE_TO_STATE = { teias: 'tr', netztransparenz: 'de' };
     const STATE_TO_AUTO_SOURCE = { tr: 'teias', de: 'netztransparenz' };
+    const MAX_ANALYSIS_DAY_CONCURRENCY = 3;
     const state = {
       de: new Map(),
       tr: new Map(),
@@ -1880,6 +1881,8 @@
         status: null,
         loadError: null,
         loadedDays: new Set(),
+        loadedManifestYears: new Set(),
+        manifestShardPromises: new Map(),
         autoDataCache: new Map(),
         inFlightAutoLoads: new Map()
       },
@@ -2387,7 +2390,12 @@
     }
 
     function defaultManifestShardPath(year) {
-      return Number(year) === 2026 ? 'manifest/2026.json' : `manifest/${year}.json`;
+      return Number(year) === 2025 ? 'manifest/2025.json' : `manifest/${year}.json`;
+    }
+
+    function dateToYear(isoDate) {
+      const year = Number(String(isoDate || '').slice(0, 4));
+      return Number.isFinite(year) ? year : null;
     }
 
     function mergeManifestSource(target, sourceInfo = {}) {
@@ -2403,6 +2411,52 @@
       return target;
     }
 
+    function mergeManifestShard(manifest, shard) {
+      Object.entries(shard?.sources || {}).forEach(([source, sourceInfo]) => {
+        if (!manifest.sources[source]) {
+          manifest.sources[source] = { availableDates: [], excludedDates: [], days: {}, files: {} };
+        }
+        mergeManifestSource(manifest.sources[source], sourceInfo);
+      });
+      return manifest;
+    }
+
+    function manifestDates(manifest) {
+      return [...new Set([
+        ...(manifest?.sources?.teias?.availableDates || []),
+        ...(manifest?.sources?.netztransparenz?.availableDates || [])
+      ])].sort();
+    }
+
+    function manifestShardPath(manifest, year) {
+      return manifest?.shards?.[String(year)] || defaultManifestShardPath(year);
+    }
+
+    async function ensureManifestYearLoadedFor(manifest, year, { signal } = {}) {
+      year = Number(year);
+      if (!manifest || !Number.isFinite(year)) return false;
+      const knownYears = new Set((manifest.years || []).map(Number));
+      if (knownYears.size && !knownYears.has(year)) return false;
+      if (state.auto.loadedManifestYears.has(year)) return true;
+      if (state.auto.manifestShardPromises.has(year)) {
+        await state.auto.manifestShardPromises.get(year);
+        return state.auto.loadedManifestYears.has(year);
+      }
+      const promise = fetchJson(manifestShardPath(manifest, year), { signal })
+        .then(shard => {
+          mergeManifestShard(manifest, shard);
+          state.auto.loadedManifestYears.add(year);
+          return true;
+        })
+        .finally(() => state.auto.manifestShardPromises.delete(year));
+      state.auto.manifestShardPromises.set(year, promise);
+      return promise;
+    }
+
+    async function ensureManifestYearLoaded(year, { signal } = {}) {
+      return ensureManifestYearLoadedFor(state.auto.manifest, year, { signal });
+    }
+
     async function loadManifestWithFallback({ signal } = {}) {
       try {
         const summary = await fetchJson('manifest-summary.json', { signal });
@@ -2411,12 +2465,12 @@
           .filter(Number.isFinite)
           .sort((a, b) => a - b);
         if (!years.length) throw new Error('manifest-summary has no yearly shards');
-        const shardPaths = years.map(year => summary?.shards?.[String(year)] || defaultManifestShardPath(year));
-        const shards = await Promise.all(shardPaths.map(path => fetchJson(path, { signal })));
         const manifest = {
           schemaVersion: summary.schemaVersion || 2,
           updatedAtUtc: summary.updatedAtUtc,
           storage: summary.storage || { type: 'github-pages', baseUrl: './data' },
+          years,
+          shards: summary.shards || Object.fromEntries(years.map(year => [String(year), defaultManifestShardPath(year)])),
           sources: {}
         };
         Object.entries(summary.sources || {}).forEach(([source, sourceInfo]) => {
@@ -2432,14 +2486,10 @@
             files: {}
           }, {});
         });
-        shards.forEach(shard => {
-          Object.entries(shard?.sources || {}).forEach(([source, sourceInfo]) => {
-            if (!manifest.sources[source]) {
-              manifest.sources[source] = { availableDates: [], excludedDates: [], days: {}, files: {} };
-            }
-            mergeManifestSource(manifest.sources[source], sourceInfo);
-          });
-        });
+        const urlDate = new URLSearchParams(window.location.search).get('date');
+        const dates = manifestDates(manifest);
+        const initialDate = urlDate && dates.includes(urlDate) ? urlDate : dates.at(-1);
+        if (initialDate) await ensureManifestYearLoadedFor(manifest, dateToYear(initialDate), { signal });
         manifest.splitManifest = true;
         return manifest;
       } catch (error) {
@@ -2450,6 +2500,10 @@
 
     async function loadAutoDataCatalog({ force = false } = {}) {
       if (state.auto.manifest && !force) return;
+      if (force) {
+        state.auto.loadedManifestYears.clear();
+        state.auto.manifestShardPromises.clear();
+      }
       updateAutoDataPanel('loading');
       try {
         const manifest = await loadManifestWithFallback();
@@ -2722,6 +2776,7 @@
 
     async function ensureAutoDataForReport(date, alignmentMode = null, { signal } = {}) {
       if (state.dataMode !== 'auto') return true;
+      await ensureManifestYearLoaded(dateToYear(date), { signal });
       const alignment = getAlignment(date, alignmentMode);
       const deltaSeconds = Math.round(alignment.deltaHours * 3600);
       const hasTrCandidate = state.tr.has(date) || hasAutoCatalogDay('teias', date);
@@ -2756,6 +2811,7 @@
     }
 
     async function loadAutoDay(source, date, { signal } = {}) {
+      await ensureManifestYearLoaded(dateToYear(date), { signal });
       const sourceInfo = state.auto.manifest?.sources?.[source];
       const day = sourceInfo?.days?.[date];
       const files = day?.files || sourceInfo?.files?.[date];
@@ -4106,19 +4162,38 @@
       return null;
     }
 
+    async function mapWithConcurrency(items, limit, mapper) {
+      const results = new Array(items.length);
+      let cursor = 0;
+      const workerCount = Math.min(Math.max(1, Number(limit) || 1), items.length || 1);
+      const workers = Array.from({ length: workerCount }, async () => {
+        while (cursor < items.length) {
+          const index = cursor++;
+          results[index] = await mapper(items[index], index);
+        }
+      });
+      await Promise.all(workers);
+      return results;
+    }
+
     async function computeTrendRangeResult(source, dateList) {
       const core = window.FrequencyAnalysisCore;
       if (!core) throw new Error(t('analysisCoreMissing'));
       const rows = [];
-      let lastCurrent = null;
-      for (const [index, date] of dateList.entries()) {
+      const trendItems = dateList.map((date, index) => ({ date, index }));
+      const trendResults = await mapWithConcurrency(trendItems, MAX_ANALYSIS_DAY_CONCURRENCY, async ({ date, index }) => {
         const current = await prepareDailyContext(date, $('analysisAlignment').value);
-        lastCurrent = current;
         const baseSeries = sourceSeries(source, current);
-        if (!baseSeries) continue;
+        if (!baseSeries) return null;
         const series = analysisWindowSeries(baseSeries);
         const stats = core.computeBasicStats(series, { nominalHz: state.settings.nominalFrequency });
-        rows.push({ index, date, stats, pairedRatio: current.overall.pairedCount / 86400 });
+        return { index, date, stats, pairedRatio: current.overall.pairedCount / 86400, current };
+      });
+      let lastCurrent = null;
+      for (const result of trendResults) {
+        if (!result) continue;
+        rows.push({ index: result.index, date: result.date, stats: result.stats, pairedRatio: result.pairedRatio });
+        lastCurrent = result.current;
       }
       if (lastCurrent) {
         state.current = lastCurrent;

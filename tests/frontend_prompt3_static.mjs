@@ -34,7 +34,7 @@ mustContain('computeMagnitudeSquaredCoherence');
 mustContain('computeCrossPowerSpectralDensity');
 mustContain('computeStftSpectrogram');
 mustContain('manifest-summary.json');
-mustContain('manifest/2026.json');
+mustContain('manifest/${year}.json');
 mustContain('loadManifestWithFallback');
 mustContain('echartsLocalFallback');
 mustContain('Grafik yuklenemedi.');

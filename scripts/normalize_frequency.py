@@ -333,17 +333,18 @@ def build_day_package(
 
 
 def split_csv_line(line: str) -> list[str]:
-    return next(csv.reader([line], delimiter=";", quotechar='"'))
+    delimiter = ";" if line.count(";") >= line.count(",") else ","
+    return next(csv.reader([line], delimiter=delimiter, quotechar='"'))
 
 
-def parse_teias_row(cols: list[str]) -> tuple[str, int, float] | None:
+def parse_teias_row(cols: list[str], fallback_date: str = "") -> tuple[str, int, float] | None:
     if len(cols) >= 8 and time_to_second(cols[4]) >= 0:
         return normalize_date(cols[7]), time_to_second(cols[4]), parse_frequency(cols[6])
     if any("frekans" in c.lower() or "frequency" in c.lower() for c in cols):
         return None
     time_index = next((i for i, c in enumerate(cols) if time_to_second(c) >= 0), -1)
     date_index = next((i for i, c in enumerate(cols) if normalize_date(c)), -1)
-    if time_index < 0 or date_index < 0:
+    if time_index < 0:
         return None
     freq_index = -1
     for i, col in enumerate(cols):
@@ -355,7 +356,8 @@ def parse_teias_row(cols: list[str]) -> tuple[str, int, float] | None:
             break
     if freq_index < 0:
         return None
-    return normalize_date(cols[date_index]), time_to_second(cols[time_index]), parse_frequency(cols[freq_index])
+    row_date = normalize_date(cols[date_index]) if date_index >= 0 else fallback_date
+    return row_date, time_to_second(cols[time_index]), parse_frequency(cols[freq_index])
 
 
 def parse_teias_csv(
@@ -364,6 +366,7 @@ def parse_teias_csv(
     source_url: str,
     downloaded_at_utc: str | None = None,
     http_status: int = 200,
+    fallback_date: str = "",
 ) -> DayPackage:
     text = data.decode("utf-8-sig", errors="replace")
     samples: dict[int, float] = {}
@@ -372,15 +375,54 @@ def parse_teias_csv(
     invalid_rows = 0
     invalid_frequency = 0
     duplicate_samples = 0
+    lines = [line for line in text.splitlines() if line.strip()]
 
-    for raw_line in text.splitlines():
-        if not raw_line.strip():
-            continue
+    if fallback_date and lines:
+        header = lines[0].strip().lower()
+        legacy_comma_without_date = "," in lines[0] and ";" not in lines[0] and (
+            "frekans" in header or "frequency" in header
+        )
+        if legacy_comma_without_date:
+            local_date = fallback_date
+            for raw_line in lines[1:]:
+                parsed_rows += 1
+                cols = raw_line.split(",")
+                if len(cols) < 3:
+                    invalid_rows += 1
+                    continue
+                second = time_to_second(cols[0])
+                frequency = parse_frequency(cols[2])
+                if second < 0:
+                    invalid_rows += 1
+                    continue
+                if not math.isfinite(frequency) or not (49.0 <= frequency <= 51.0):
+                    invalid_frequency += 1
+                    continue
+                if second in samples:
+                    duplicate_samples += 1
+                samples[second] = frequency
+            return build_day_package(
+                source="teias",
+                local_date=datetime.strptime(local_date, "%Y-%m-%d").date(),
+                timezone_name=TEIAS_TIMEZONE,
+                samples_by_second=samples,
+                source_url=source_url,
+                sha256=sha256_bytes(data),
+                downloaded_at_utc=downloaded_at_utc or utc_now_iso(),
+                http_status=http_status,
+                source_size=len(data),
+                duplicate_samples=duplicate_samples,
+                parsed_rows=parsed_rows,
+                invalid_rows=invalid_rows,
+                invalid_frequency_samples=invalid_frequency,
+            )
+
+    for raw_line in lines:
         parsed_rows += 1
         if raw_line.lstrip().startswith("<"):
             invalid_rows += 1
             continue
-        row = parse_teias_row(split_csv_line(raw_line))
+        row = parse_teias_row(split_csv_line(raw_line), fallback_date=fallback_date)
         if not row:
             invalid_rows += 1
             continue

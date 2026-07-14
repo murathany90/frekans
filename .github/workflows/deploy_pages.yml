@@ -41,12 +41,20 @@ jobs:
           node tests/frontend_static_smoke.mjs
           node tests/frontend_prompt2_static.mjs
           node tests/frontend_prompt3_static.mjs
+          node tests/frontend_prompt4_static.mjs
           node tests/readme_documentation_static.mjs
           node tests/synthetic_signal_analysis.mjs
           node tests/spectral_methods.mjs
 
       - name: Build static site
         run: python scripts/build_site.py
+
+      - name: Validate dist safety
+        run: |
+          python - <<'PY'
+          from scripts.backfill_2025_2026 import assert_publishable_dist
+          print(assert_publishable_dist("dist"))
+          PY
 
       - uses: actions/configure-pages@v5
 
