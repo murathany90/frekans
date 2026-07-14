@@ -20,6 +20,14 @@ for (const section of requiredSections) {
 }
 
 const requiredDetails = [
+  "Ana canlı uygulama: https://gridfreq.com/",
+  "GitHub Pages custom domain: `gridfreq.com`",
+  "www.gridfreq.com",
+  "Settings > Pages > Custom domain",
+  "Enforce HTTPS",
+  "TürkTicaret",
+  "DNS doğrulama tokenları",
+  "https://murathany90.github.io/frekans/",
   "scripts/fetch_teias.py",
   "scripts/fetch_netztransparenz.py",
   "scripts/netztransparenz_client.py",

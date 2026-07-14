@@ -5,6 +5,9 @@
 ## Kısa Durum
 
 - Ana uygulama: `frekans_rapor_v1.html`
+- Ana canlı uygulama: https://gridfreq.com/
+- GitHub Pages custom domain: `gridfreq.com`
+- Eski GitHub Pages adresi: `https://murathany90.github.io/frekans/` yalnızca platform/fallback adresidir.
 - Yayın girişi: `index.html`
 - Analiz çekirdeği: `assets/analysis-core.mjs`
 - Statik veri kökü: `data/`
@@ -259,7 +262,9 @@ Ana workflow dosyaları:
 - `.github/workflows/validate_data.yml`: Veri ve analiz testleri.
 - `.github/workflows/backfill_2026.yml`: 2026 backfill desteği.
 
-GitHub Pages yayını için repository ayarlarında Pages source olarak **GitHub Actions** seçilmelidir. `deploy_pages.yml` build sırasında `python scripts/build_site.py` çalıştırır ve `dist/` klasörünü Pages artifact olarak yükler. Kök `CNAME` dosyası `gridfreq.com` değerini taşır ve build sırasında `dist/CNAME` olarak kopyalanır. Ham CSV/ZIP kaynakları, `incoming/`, `cache/`, test artifactleri ve geçici dosyalar Pages çıktısına konmaz.
+GitHub Pages yayını için repository ayarlarında Pages source olarak **GitHub Actions** seçilmelidir. `deploy_pages.yml` build sırasında `python scripts/build_site.py` çalıştırır ve `dist/` klasörünü Pages artifact olarak yükler. Kök `CNAME` dosyası `gridfreq.com` değerini taşır ve build sırasında `dist/CNAME` olarak kopyalanır. Ana canonical adres `https://gridfreq.com/` değeridir; `www.gridfreq.com` adresinin ana domaine yönlenmesi DNS ve GitHub Pages tarafında yapılır.
+
+Custom domain ayarı GitHub arayüzünde **Settings > Pages > Custom domain** alanına `gridfreq.com` yazılarak kullanıcı tarafından yapılır. **Enforce HTTPS** ayarı da aynı arayüzden etkinleştirilmelidir. DNS kayıtları repo dışında TürkTicaret panelinde yönetilir; DNS doğrulama tokenları, registrar ayarları, secret değerleri veya nameserver bilgileri repoda tutulmaz. Ham CSV/ZIP kaynakları, `incoming/`, `cache/`, test artifactleri ve geçici dosyalar Pages çıktısına konmaz.
 
 ## Yerel Çalıştırma
 
