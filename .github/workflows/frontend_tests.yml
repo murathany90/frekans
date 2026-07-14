@@ -6,6 +6,7 @@ on:
       - "frekans_rapor_v1.html"
       - "assets/**"
       - "tests/frontend_smoke_playwright.mjs"
+      - "tests/frontend_germany_only_daily_playwright.mjs"
       - "tests/frontend_prompt2_static.mjs"
       - "tests/frontend_prompt3_static.mjs"
       - "tests/spectral_methods.mjs"
@@ -15,6 +16,7 @@ on:
       - "frekans_rapor_v1.html"
       - "assets/**"
       - "tests/frontend_smoke_playwright.mjs"
+      - "tests/frontend_germany_only_daily_playwright.mjs"
       - "tests/frontend_prompt2_static.mjs"
       - "tests/frontend_prompt3_static.mjs"
       - "tests/spectral_methods.mjs"
@@ -59,7 +61,9 @@ jobs:
         env:
           APP_URL: http://127.0.0.1:8080/frekans_rapor_v1.html
           PLAYWRIGHT_ARTIFACT_DIR: playwright-artifacts
-        run: node tests/frontend_smoke_playwright.mjs
+        run: |
+          node tests/frontend_smoke_playwright.mjs
+          node tests/frontend_germany_only_daily_playwright.mjs
 
       - name: Upload Playwright artifacts
         if: always()

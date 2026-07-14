@@ -1883,6 +1883,20 @@
       };
     }
 
+    function emptyFrequencySeries() {
+      const series = new Float32Array(86400);
+      series.fill(NaN);
+      return series;
+    }
+
+    function hasFiniteSamples(series) {
+      if (!series) return false;
+      for (let i = 0; i < series.length; i++) {
+        if (Number.isFinite(series[i])) return true;
+      }
+      return false;
+    }
+
     // Tek tık ile detay, çift tık ile günlük görünüm. Tek tık kısa süre ertelenir;
     // böylece çift tıklamada ilk tıklama yanlışlıkla detay görünümünü açmaz.
     function bindSingleDoubleClick(element, singleAction, doubleAction) {
@@ -2176,7 +2190,7 @@
       if (kind === 'analysis') {
         const source = getAnalysisSource();
         const type = $('analysisTypeSelect')?.value || 'stats';
-        return requiresPairedSource(source, type) ? commonReportDates() : reportDatesForCurrentMode();
+        return reportDatesForAnalysisSource(source, type);
       }
       if ($('showDifference')?.value === 'yes') return commonReportDates().length ? commonReportDates() : reportDatesForCurrentMode();
       return reportDatesForCurrentMode();
@@ -2282,7 +2296,7 @@
     window.addEventListener('popstate', e => {
       const p = new URLSearchParams(window.location.search);
       const date = p.get('date') || e.state?.date;
-      if (date && date !== $('dateSelect').value && state.auto?.manifest?.sources?.teias?.availableDates?.includes(date)) {
+      if (date && date !== $('dateSelect').value && reportDatesForCurrentMode().includes(date)) {
         selectDate(date);
       }
     });
@@ -2382,17 +2396,27 @@
         state.auto.manifest = manifest;
         state.auto.status = status;
         state.auto.loadError = null;
-        const hasTeias = Boolean(manifest?.sources?.teias?.availableDates?.length);
-        if (hasTeias && !hasManualDataLoaded()) state.dataMode = 'auto';
+        const hasAutoCatalog = Boolean(
+          manifest?.sources?.teias?.availableDates?.length ||
+          manifest?.sources?.netztransparenz?.availableDates?.length
+        );
+        if (hasAutoCatalog && !hasManualDataLoaded()) state.dataMode = 'auto';
         updateAutoDataPanel();
         updateDateSelect();
-        if (hasTeias) {
-          const latest = manifest.sources.teias.latestDate;
+        const reportDates = reportDatesForCurrentMode();
+        const hasAuto = Boolean(reportDates.length);
+        if (hasAuto) {
+          const latest = reportDates.at(-1);
           setBanner('loadStatus', t('autoDataReady', { date: displayDate(latest) }), 'success');
-          if (!$('dateSelect').value) {
-            const urlDate = new URLSearchParams(window.location.search).get('date');
-            const initial = urlDate && manifest.sources.teias.availableDates.includes(urlDate) ? urlDate : latest;
-            selectDate(initial);
+          const urlDate = new URLSearchParams(window.location.search).get('date');
+          const current = $('dateSelect').value;
+          const initial = urlDate && reportDates.includes(urlDate)
+            ? urlDate
+            : current && reportDates.includes(current)
+              ? current
+              : latest;
+          if (initial && (!state.current || state.current.date !== initial)) {
+            selectDate(initial, { pushHistory: false, immediate: true });
           }
         }
       } catch (error) {
@@ -2412,7 +2436,7 @@
       const de = manifest?.sources?.netztransparenz;
       const netzStatus = status && status.netztransparenz ? status.netztransparenz : null;
       const netzMethod = netzStatus?.sourceMethod || latestManifestSourceMethod(de) || (de?.status === 'manual_monthly_import' ? 'manual' : null);
-      const hasAuto = Boolean(teias?.availableDates?.length);
+      const hasAuto = Boolean(teias?.availableDates?.length || de?.availableDates?.length);
 
       if (mode === 'loading') {
         $('autoModeBadge').className = 'tag warn';
@@ -2508,9 +2532,28 @@
       return commonReportDates().at(-1) || null;
     }
 
+    function sourceReportDates(sourceKey) {
+      if (sourceKey === 'de') {
+        const dates = state.dataMode === 'auto'
+          ? state.auto.manifest?.sources?.netztransparenz?.availableDates || []
+          : [...state.de.keys()].filter(date => !isAutoLoaded('netztransparenz', date));
+        return [...new Set(dates)].sort();
+      }
+      const dates = state.dataMode === 'auto'
+        ? state.auto.manifest?.sources?.teias?.availableDates || []
+        : [...state.tr.keys()].filter(date => !isAutoLoaded('teias', date));
+      return [...new Set(dates)].sort();
+    }
+
+    function reportDatesForAnalysisSource(source = getAnalysisSource(), type = $('analysisTypeSelect')?.value) {
+      if (requiresPairedSource(source, type)) return commonReportDates();
+      if (source === 'de') return sourceReportDates('de');
+      if (source === 'tr') return sourceReportDates('tr');
+      return reportDatesForCurrentMode();
+    }
+
     function resolveAnalysisDates(source = getAnalysisSource(), type = $('analysisTypeSelect')?.value) {
-      const paired = requiresPairedSource(source, type);
-      const base = paired ? commonReportDates() : reportDatesForCurrentMode();
+      const base = reportDatesForAnalysisSource(source, type);
       const dates = (base.length ? base : reportDatesForCurrentMode()).sort();
       const selected = $('analysisDateSelect').value || dates.at(-1) || latestCommonDate();
       const mode = $('analysisDateMode')?.value || 'single';
@@ -2552,7 +2595,8 @@
     }
 
     function syncAnalysisDateDefaults() {
-      const latest = latestCommonDate() || state.auto.manifest?.sources?.teias?.latestDate || latestMapDate(state.tr);
+      const dates = reportDatesForAnalysisSource(getAnalysisSource(), $('analysisTypeSelect')?.value);
+      const latest = dates.at(-1) || reportDatesForCurrentMode().at(-1) || latestCommonDate();
       if (!latest) return;
       if (!$('analysisDateSelect').value) setPickerDate('analysis', latest);
       for (const id of ['analysisStartDate', 'analysisEndDate']) {
@@ -2562,7 +2606,7 @@
     }
 
     function useAutoDataMode() {
-      if (!state.auto.manifest?.sources?.teias?.availableDates?.length) {
+      if (!reportDatesForCurrentMode().length) {
         alert(t('autoManifestMissing'));
         return;
       }
@@ -2596,31 +2640,51 @@
 
     function reportDatesForCurrentMode() {
       if (state.dataMode === 'auto') {
-        return [...(state.auto.manifest?.sources?.teias?.availableDates || [])].sort();
+        return [...new Set([
+          ...(state.auto.manifest?.sources?.teias?.availableDates || []),
+          ...(state.auto.manifest?.sources?.netztransparenz?.availableDates || [])
+        ])].sort();
       }
-      return [...state.tr.keys()].filter(date => !isAutoLoaded('teias', date)).sort();
+      return [...new Set([
+        ...[...state.tr.keys()].filter(date => !isAutoLoaded('teias', date)),
+        ...[...state.de.keys()].filter(date => !isAutoLoaded('netztransparenz', date))
+      ])].sort();
+    }
+
+    function hasAutoCatalogDay(source, date) {
+      const sourceInfo = state.auto.manifest?.sources?.[source];
+      const day = sourceInfo?.days?.[date];
+      const files = day?.files || sourceInfo?.files?.[date];
+      return Boolean(files?.frequency);
     }
 
     async function ensureAutoDataForReport(date, alignmentMode = null, { signal } = {}) {
       if (state.dataMode !== 'auto') return true;
       const alignment = getAlignment(date, alignmentMode);
       const deltaSeconds = Math.round(alignment.deltaHours * 3600);
-      const deDates = new Set([
-        shiftSecondLabel(0, -deltaSeconds, date).date,
-        shiftSecondLabel(86399, -deltaSeconds, date).date
-      ]);
+      const hasTrCandidate = state.tr.has(date) || hasAutoCatalogDay('teias', date);
+      const hasDirectDeCandidate = state.de.has(date) || hasAutoCatalogDay('netztransparenz', date);
+      const deDates = new Set();
+      if (hasTrCandidate) {
+        deDates.add(shiftSecondLabel(0, -deltaSeconds, date).date);
+        deDates.add(shiftSecondLabel(86399, -deltaSeconds, date).date);
+      }
+      if (hasDirectDeCandidate || !hasTrCandidate) deDates.add(date);
 
       state.busy = true;
       setBanner('loadStatus', t('autoDataLoading', { date: displayDate(date) }), 'warn');
       try {
-        const trLoaded = await loadAutoDay('teias', date, { signal });
-        let deLoaded = false;
+        await loadAutoDay('teias', date, { signal });
         for (const deDate of deDates) {
-          deLoaded = (await loadAutoDay('netztransparenz', deDate, { signal })) || deLoaded;
+          await loadAutoDay('netztransparenz', deDate, { signal });
         }
         updateInventory();
-        if (!trLoaded) throw new Error(t('autoDataNoTr', { date: displayDate(date) }));
-        if (!deLoaded) {
+        const trLoaded = state.tr.has(date);
+        const deLoaded = [...deDates].some(deDate => state.de.has(deDate));
+        if (!trLoaded && !deLoaded) throw new Error(t('autoDataNoAny', { date: displayDate(date) }));
+        if (!trLoaded) {
+          setBanner('loadStatus', t('autoDataNoTrDeOnly', { date: displayDate(date) }), 'warn');
+        } else if (!deLoaded) {
           setBanner('loadStatus', t('autoDataNoDe', { date: displayDate(date) }), 'warn');
         }
         return true;
@@ -2798,11 +2862,14 @@
     function updateDateSelect() {
       const dates = reportDatesForCurrentMode();
       const hidden = $('dateSelect');
-      if (dates.length && !hidden.value) {
-        setPickerDate('daily', dates[dates.length - 1]);
+      if (dates.length) {
+        const selected = dates.includes(hidden.value) ? hidden.value : dates[dates.length - 1];
+        setPickerDate('daily', selected);
         renderCalendar();
         updateAlignmentInfo();
-        queueDailyDateChange(hidden.value, { pushHistory: false, immediate: true });
+        if (!state.current || state.current.date !== selected) {
+          queueDailyDateChange(selected, { pushHistory: false, immediate: true });
+        }
       } else {
         renderCalendar();
         updateAlignmentInfo();
@@ -2980,27 +3047,32 @@
       if (state.dataMode === 'auto') {
         await ensureAutoDataForReport(date, alignmentMode, { signal });
       }
-      if (!state.tr.has(date)) {
-        throw new Error(t('autoDataNoTr', { date: displayDate(date) }));
-      }
 
       const alignment = getAlignment(date, alignmentMode);
       const deltaSeconds = Math.round(alignment.deltaHours * 3600);
-      const trRaw = state.tr.get(date);
+      const hasTrDay = state.tr.has(date);
+      const hasDirectDeDay = state.de.has(date);
+      const trRaw = hasTrDay ? state.tr.get(date) : emptyFrequencySeries();
       const tr = sanitizeAndInterpolate(trRaw, state.settings);
-      const deAligned = new Float32Array(86400);
-      deAligned.fill(NaN);
+      const deAligned = emptyFrequencySeries();
 
-      for (let s = 0; s < 86400; s++) {
-        // Almanya yerel zamanı = TEİAŞ yerel zamanı - fark
-        const target = shiftSecondLabel(s, -deltaSeconds, date);
-        const day = state.de.get(target.date);
-        if (!day) continue;
-        const v = day[target.second];
-        if (isValidFrequency(v)) deAligned[s] = v;
+      if (hasTrDay) {
+        for (let s = 0; s < 86400; s++) {
+          // Almanya yerel zamanı = TEİAŞ yerel zamanı - fark
+          const target = shiftSecondLabel(s, -deltaSeconds, date);
+          const day = state.de.get(target.date);
+          if (!day) continue;
+          const v = day[target.second];
+          if (isValidFrequency(v)) deAligned[s] = v;
+        }
+      } else if (hasDirectDeDay) {
+        deAligned.set(state.de.get(date));
       }
 
       const de = sanitizeAndInterpolate(deAligned, state.settings);
+      if (!hasFiniteSamples(tr) && !hasFiniteSamples(de)) {
+        throw new Error(t('autoDataNoAny', { date: displayDate(date) }));
+      }
       const overall = pairedStats(tr, de, 0, 86400, state.settings.nominalFrequency);
       const pairedRatio = overall.pairedCount / 86400 * 100;
       const minute = aggregateMinutes(tr, de);
@@ -4762,10 +4834,12 @@
         alignDescDefault: 'Zaman eşleştirme bilgisi veri ve tarih seçildiğinde gösterilecektir.',
         alignInfo: '{desc} Türkiye {trDate} 00:00:00 kaydı, Almanya {deDate} {deTime} kaydıyla eşleştirilir.',
         // Various messages
-        noDateSelected: 'Lütfen Türkiye verisi bulunan bir gün seçin.',
+        noDateSelected: 'Lütfen Türkiye veya Almanya verisi bulunan bir gün seçin.',
         autoDataLoading: '{date} otomatik verisi yükleniyor.',
         autoDataNoDe: '{date} Türkiye verisi yüklendi; eşleşen Almanya günü bulunamadı.',
         autoDataNoTr: '{date} için Türkiye otomatik verisi yok.',
+        autoDataNoTrDeOnly: '{date} için Türkiye verisi yok; Almanya verisi tekil olarak gösteriliyor.',
+        autoDataNoAny: '{date} için Türkiye veya Almanya otomatik verisi yok.',
         autoDataReady: 'Otomatik veri kataloğu hazır. Son aktif gün: {date}.',
         autoDataSelected: 'Otomatik veri modu seçildi.',
         manualDataSelected: 'Manuel CSV modu seçildi.',
@@ -5047,11 +5121,13 @@
         alignDescDefault: 'Alignment info will be shown when data and date are selected.',
         alignInfo: '{desc} TURKIYE {trDate} 00:00:00 record aligns with Germany {deDate} {deTime} record.',
         // Various messages
-        noDateSelected: 'Please select a date with TURKIYE data.',
+        noDateSelected: 'Please select a date with TURKIYE or Germany data.',
         autoDataLoading: 'Loading auto data for {date}.',
         autoDataNoDe: '{date} TURKIYE data loaded; matching Germany day not found.',
         autoDataNoTr: 'No TURKIYE auto data for {date}.',
-        autoDataReady: 'Auto data catalog ready. Latest TURKIYE day: {date}.',
+        autoDataNoTrDeOnly: 'No TURKIYE data for {date}; Germany data is shown as a single-source day.',
+        autoDataNoAny: 'No TURKIYE or Germany auto data for {date}.',
+        autoDataReady: 'Auto data catalog ready. Latest active day: {date}.',
         autoDataSelected: 'Auto data mode selected.',
         manualDataSelected: 'Manual CSV mode selected.',
         dataCleared: 'Loaded data cleared.',
