@@ -1,46 +1,76 @@
 {
-  "updatedAtUtc": "2026-07-14T01:04:47Z",
+  "updatedAtUtc": "2026-07-14T02:47:52Z",
   "lastWorkflowResult": "success",
-  "lastSuccessfulTeiasCheckUtc": "2026-07-13T18:12:07Z",
+  "lastSuccessfulTeiasCheckUtc": "2026-07-14T02:27:07Z",
   "lastSuccessfulTeiasDataDate": "2026-07-10",
-  "lastTeiasLookback": [
-    "2026-07-11",
-    "2026-07-12",
-    "2026-07-13"
+  "lastTeiasLookback": [],
+  "missingDayCount": 0,
+  "qualityWarnings": [
+    {
+      "date": "2025-02-28",
+      "status": "partial",
+      "sha256": "71a3d3e60f535895cf61606fc4a01a82e2018a1f9f4920d75a55da43a0e26e78",
+      "validSamples": 86331,
+      "qualityScore": 86,
+      "revision": false
+    },
+    {
+      "date": "2025-03-11",
+      "status": "critical",
+      "sha256": "e1cd8d50db896eea8dbf20938606c6d11c05aa2ea5e720a3cc3d268a90a905c7",
+      "validSamples": 86400,
+      "qualityScore": 70,
+      "revision": false
+    },
+    {
+      "date": "2025-03-20",
+      "status": "critical",
+      "sha256": "bc9c6958d315f3d1e46815adffa9391464293a1b418f27fab481abe9275cc839",
+      "validSamples": 86073,
+      "qualityScore": 70,
+      "revision": false
+    },
+    {
+      "date": "2025-05-14",
+      "status": "partial",
+      "sha256": "c02aad596b29d1fb5dc7114874d6deae0852441f13814f812c3544e02b723cd8",
+      "validSamples": 79275,
+      "qualityScore": 92,
+      "revision": false
+    },
+    {
+      "date": "2025-12-14",
+      "status": "critical",
+      "sha256": "f091c9911d145b9341e7ecb85a324f66bb3e753acd044481c94627709cb53a07",
+      "validSamples": 61200,
+      "qualityScore": 71,
+      "revision": false
+    }
   ],
-  "missingDayCount": 3,
-  "qualityWarnings": [],
   "lastErrorMessage": null,
   "lastErrorAtUtc": null,
   "lastSuccessfulNetztransparenzDataDate": "2026-07-12",
-  "teiasDataDelayDays": 3,
+  "teiasDataDelayDays": 4,
   "revisionDates": [],
-  "lastRunAt": "2026-07-13T18:12:07Z",
-  "lastSuccessfulRunAt": "2026-07-13T18:12:07Z",
+  "lastRunAt": "2026-07-14T02:27:07Z",
+  "lastSuccessfulRunAt": "2026-07-14T02:27:07Z",
   "lastFailedRunAt": null,
   "lastSuccessfulDataDate": "2026-07-10",
-  "lastAttemptedDataDate": "2026-07-13",
+  "lastAttemptedDataDate": "2025-12-31",
   "status": "success",
-  "missingDates": [
-    "2026-07-11",
-    "2026-07-12",
-    "2026-07-13"
-  ],
+  "missingDates": [],
   "lastError": null,
   "netztransparenz": {
-    "lastRunAt": "2026-07-14T01:04:47Z",
-    "lastSuccessfulRunAt": "2026-07-14T01:04:47Z",
+    "lastRunAt": "2026-07-14T02:47:52Z",
+    "lastSuccessfulRunAt": "2026-07-14T02:47:52Z",
     "lastFailedRunAt": null,
     "lastSuccessfulDataDate": "2026-07-12",
-    "lastAttemptedDataDate": "2026-07-14",
-    "latestPublishedDate": "2026-07-12",
+    "lastAttemptedDataDate": "2025-12-31",
+    "latestPublishedDate": "2026-07-10",
     "status": "success",
     "sourceMethod": "official_zip",
     "missingDates": [],
-    "notYetPublishedDates": [
-      "2026-07-13",
-      "2026-07-14"
-    ],
+    "notYetPublishedDates": [],
     "invalidDates": [],
     "lastError": null
   }

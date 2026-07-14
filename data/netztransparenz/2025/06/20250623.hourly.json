@@ -1,0 +1,218 @@
+[
+  {
+    "hour": 0,
+    "validSamples": 3600,
+    "averageHz": 50.00359916666667,
+    "minimumHz": 49.892,
+    "maximumHz": 50.047,
+    "standardDeviationHz": 0.025958720422475202,
+    "meanAbsoluteDeviationFrom50Mhz": 20.23805555555596
+  },
+  {
+    "hour": 1,
+    "validSamples": 3600,
+    "averageHz": 50.00471944444444,
+    "minimumHz": 49.927,
+    "maximumHz": 50.045,
+    "standardDeviationHz": 0.018398781956128055,
+    "meanAbsoluteDeviationFrom50Mhz": 15.482777777778082
+  },
+  {
+    "hour": 2,
+    "validSamples": 3600,
+    "averageHz": 50.010218611111114,
+    "minimumHz": 49.954,
+    "maximumHz": 50.041,
+    "standardDeviationHz": 0.012532169195221569,
+    "meanAbsoluteDeviationFrom50Mhz": 13.700277777778096
+  },
+  {
+    "hour": 3,
+    "validSamples": 3600,
+    "averageHz": 50.00604055555556,
+    "minimumHz": 49.961,
+    "maximumHz": 50.049,
+    "standardDeviationHz": 0.013175082530723112,
+    "meanAbsoluteDeviationFrom50Mhz": 11.465555555555888
+  },
+  {
+    "hour": 4,
+    "validSamples": 3600,
+    "averageHz": 50.000099722222224,
+    "minimumHz": 49.963,
+    "maximumHz": 50.049,
+    "standardDeviationHz": 0.013383667489832747,
+    "meanAbsoluteDeviationFrom50Mhz": 11.008611111111447
+  },
+  {
+    "hour": 5,
+    "validSamples": 3600,
+    "averageHz": 49.99970583333333,
+    "minimumHz": 49.955,
+    "maximumHz": 50.059,
+    "standardDeviationHz": 0.01317777461296128,
+    "meanAbsoluteDeviationFrom50Mhz": 10.14694444444472
+  },
+  {
+    "hour": 6,
+    "validSamples": 3600,
+    "averageHz": 50.01163583333333,
+    "minimumHz": 49.971,
+    "maximumHz": 50.092,
+    "standardDeviationHz": 0.01828060278531455,
+    "meanAbsoluteDeviationFrom50Mhz": 16.263611111111388
+  },
+  {
+    "hour": 7,
+    "validSamples": 3600,
+    "averageHz": 50.001803333333335,
+    "minimumHz": 49.956,
+    "maximumHz": 50.045,
+    "standardDeviationHz": 0.016153282776094104,
+    "meanAbsoluteDeviationFrom50Mhz": 13.677777777778223
+  },
+  {
+    "hour": 8,
+    "validSamples": 3600,
+    "averageHz": 50.00521722222222,
+    "minimumHz": 49.945,
+    "maximumHz": 50.049,
+    "standardDeviationHz": 0.018403820045956795,
+    "meanAbsoluteDeviationFrom50Mhz": 16.255000000000344
+  },
+  {
+    "hour": 9,
+    "validSamples": 3600,
+    "averageHz": 50.01471361111111,
+    "minimumHz": 49.954,
+    "maximumHz": 50.06,
+    "standardDeviationHz": 0.018202088807603243,
+    "meanAbsoluteDeviationFrom50Mhz": 20.283611111111348
+  },
+  {
+    "hour": 10,
+    "validSamples": 3600,
+    "averageHz": 49.99758722222223,
+    "minimumHz": 49.914,
+    "maximumHz": 50.067,
+    "standardDeviationHz": 0.03046215599460265,
+    "meanAbsoluteDeviationFrom50Mhz": 24.432777777777975
+  },
+  {
+    "hour": 11,
+    "validSamples": 3600,
+    "averageHz": 50.00261777777778,
+    "minimumHz": 49.925,
+    "maximumHz": 50.063,
+    "standardDeviationHz": 0.021415467296003028,
+    "meanAbsoluteDeviationFrom50Mhz": 17.338333333333548
+  },
+  {
+    "hour": 12,
+    "validSamples": 3600,
+    "averageHz": 50.00177805555556,
+    "minimumHz": 49.946,
+    "maximumHz": 50.05,
+    "standardDeviationHz": 0.019141909129134268,
+    "meanAbsoluteDeviationFrom50Mhz": 15.85972222222249
+  },
+  {
+    "hour": 13,
+    "validSamples": 3600,
+    "averageHz": 49.998931388888884,
+    "minimumHz": 49.949,
+    "maximumHz": 50.066,
+    "standardDeviationHz": 0.01860863041303076,
+    "meanAbsoluteDeviationFrom50Mhz": 14.43972222222253
+  },
+  {
+    "hour": 14,
+    "validSamples": 3600,
+    "averageHz": 49.997950555555555,
+    "minimumHz": 49.95,
+    "maximumHz": 50.053,
+    "standardDeviationHz": 0.016207621654374997,
+    "meanAbsoluteDeviationFrom50Mhz": 13.283333333333607
+  },
+  {
+    "hour": 15,
+    "validSamples": 3600,
+    "averageHz": 49.99221361111111,
+    "minimumHz": 49.943,
+    "maximumHz": 50.045,
+    "standardDeviationHz": 0.021322319637826975,
+    "meanAbsoluteDeviationFrom50Mhz": 19.57805555555587
+  },
+  {
+    "hour": 16,
+    "validSamples": 3600,
+    "averageHz": 49.99889305555556,
+    "minimumHz": 49.943,
+    "maximumHz": 50.055,
+    "standardDeviationHz": 0.02305789709495136,
+    "meanAbsoluteDeviationFrom50Mhz": 19.626388888889142
+  },
+  {
+    "hour": 17,
+    "validSamples": 3600,
+    "averageHz": 49.99818166666667,
+    "minimumHz": 49.922,
+    "maximumHz": 50.091,
+    "standardDeviationHz": 0.032094224082293094,
+    "meanAbsoluteDeviationFrom50Mhz": 27.182777777777886
+  },
+  {
+    "hour": 18,
+    "validSamples": 3600,
+    "averageHz": 49.99276805555555,
+    "minimumHz": 49.944,
+    "maximumHz": 50.075,
+    "standardDeviationHz": 0.027128333519633396,
+    "meanAbsoluteDeviationFrom50Mhz": 24.301388888889047
+  },
+  {
+    "hour": 19,
+    "validSamples": 3600,
+    "averageHz": 50.004241388888886,
+    "minimumHz": 49.929,
+    "maximumHz": 50.084,
+    "standardDeviationHz": 0.03135456387591388,
+    "meanAbsoluteDeviationFrom50Mhz": 25.735833333333456
+  },
+  {
+    "hour": 20,
+    "validSamples": 3600,
+    "averageHz": 50.00011666666667,
+    "minimumHz": 49.953,
+    "maximumHz": 50.051,
+    "standardDeviationHz": 0.018793091224643885,
+    "meanAbsoluteDeviationFrom50Mhz": 15.496666666666997
+  },
+  {
+    "hour": 21,
+    "validSamples": 3600,
+    "averageHz": 49.999384166666665,
+    "minimumHz": 49.943,
+    "maximumHz": 50.058,
+    "standardDeviationHz": 0.02071987570680773,
+    "meanAbsoluteDeviationFrom50Mhz": 16.690833333333657
+  },
+  {
+    "hour": 22,
+    "validSamples": 3600,
+    "averageHz": 50.00400694444444,
+    "minimumHz": 49.867,
+    "maximumHz": 50.045,
+    "standardDeviationHz": 0.022551809648925565,
+    "meanAbsoluteDeviationFrom50Mhz": 17.48861111111157
+  },
+  {
+    "hour": 23,
+    "validSamples": 3600,
+    "averageHz": 50.005853333333334,
+    "minimumHz": 49.928,
+    "maximumHz": 50.057,
+    "standardDeviationHz": 0.022636993812980045,
+    "meanAbsoluteDeviationFrom50Mhz": 19.748333333333676
+  }
+]

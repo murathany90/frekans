@@ -1,0 +1,31 @@
+{
+  "source": "teias",
+  "sourceLabel": "TEİAŞ",
+  "localDate": "2025-02-20",
+  "timezone": "Europe/Istanbul",
+  "startUtc": "2025-02-19T21:00:00Z",
+  "sampleIntervalSeconds": 1,
+  "expectedSamples": 86400,
+  "validSamples": 86400,
+  "missingSamples": 0,
+  "duplicateSamples": 0,
+  "invalidRows": 0,
+  "invalidFrequencySamples": 0,
+  "encoding": {
+    "type": "int16-le",
+    "baseHz": 50.0,
+    "scale": 10000,
+    "missingValue": -32768
+  },
+  "minimumHz": 49.869,
+  "maximumHz": 50.089,
+  "averageHz": 49.99856510416667,
+  "sha256": "d9fb2007cc960da115e687ad24d8ce0616616c9feb2b9ca3acd28b3a92f0d2a3",
+  "sourceUrl": "https://webim.teias.gov.tr/file/4746a4ec-7c29-4ba6-a49f-a9d0f9978f2d?download",
+  "downloadedAtUtc": "2026-07-14T02:28:00Z",
+  "httpStatus": 200,
+  "sourceSize": 1889719,
+  "parsedRows": 86400,
+  "qualityScore": 100,
+  "status": "complete"
+}
