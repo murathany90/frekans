@@ -421,6 +421,24 @@
       align-items: end;
     }
 
+    .info-button {
+      gap: 8px;
+      min-height: 44px;
+    }
+
+    .info-button .icon {
+      display: inline-grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border: 2px solid currentColor;
+      border-radius: 999px;
+      font-size: .78rem;
+      font-weight: 900;
+      line-height: 1;
+      flex: 0 0 auto;
+    }
+
     .field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
     .field label { color: var(--muted); font-weight: 700; font-size: .78rem; }
     .field input,
@@ -1005,6 +1023,191 @@
     .tag.warn { background: var(--soft-amber); color: #714900; }
     .tag.bad { background: var(--soft-red); color: var(--red); }
 
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    .data-sources-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      display: grid;
+      place-items: center;
+      padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+      background: rgba(8, 21, 35, .58);
+    }
+
+    .data-sources-modal.hidden { display: none; }
+
+    .data-sources-dialog {
+      width: min(800px, 100%);
+      max-height: min(85dvh, 860px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid rgba(203, 217, 227, .9);
+      border-radius: 12px;
+      box-shadow: 0 24px 70px rgba(8, 21, 35, .32);
+      overflow: hidden;
+    }
+
+    .data-sources-header,
+    .data-sources-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px;
+      background: #f8fbfd;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .data-sources-footer {
+      justify-content: flex-end;
+      border-top: 1px solid var(--line);
+      border-bottom: 0;
+    }
+
+    .data-sources-header h2 {
+      margin: 0;
+      color: var(--navy);
+      font-size: 1.18rem;
+      line-height: 1.2;
+    }
+
+    .data-sources-header p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: .86rem;
+      line-height: 1.35;
+    }
+
+    .modal-close-btn {
+      min-width: 44px;
+      min-height: 44px;
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+
+    .data-sources-body {
+      overflow-y: auto;
+      overflow-x: hidden;
+      overscroll-behavior: contain;
+      padding: 18px;
+    }
+
+    .data-sources-section {
+      margin: 0 0 18px;
+    }
+
+    .data-sources-section h3 {
+      margin: 0 0 8px;
+      color: var(--navy);
+      font-size: 1rem;
+    }
+
+    .data-sources-section p {
+      margin: 0 0 9px;
+      line-height: 1.55;
+      color: #345064;
+    }
+
+    .data-sources-grid,
+    .data-sources-status-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .data-source-card,
+    .data-status-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      padding: 14px;
+      min-width: 0;
+    }
+
+    .data-source-card h3,
+    .data-status-card h4 {
+      margin: 0 0 8px;
+      color: var(--navy);
+      font-size: 1rem;
+    }
+
+    .data-source-card .card-subtitle {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: .84rem;
+      line-height: 1.4;
+    }
+
+    .data-source-card dl,
+    .data-status-card dl {
+      display: grid;
+      grid-template-columns: minmax(112px, .75fr) minmax(0, 1fr);
+      gap: 7px 10px;
+      margin: 10px 0 0;
+      font-size: .84rem;
+    }
+
+    .data-source-card dt,
+    .data-status-card dt {
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .data-source-card dd,
+    .data-status-card dd {
+      margin: 0;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .data-sources-list {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: #345064;
+      line-height: 1.5;
+    }
+
+    .data-sources-note {
+      border-left: 4px solid var(--cyan);
+      border-radius: 8px;
+      background: var(--soft-blue);
+      color: var(--navy);
+      padding: 12px 13px;
+      line-height: 1.5;
+    }
+
+    .data-sources-links {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .data-sources-links a {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 11px;
+      color: var(--navy);
+      background: #f8fbfd;
+      font-weight: 800;
+      text-decoration: none;
+      overflow-wrap: anywhere;
+    }
+
+    .data-sources-links a:hover,
+    .data-sources-links a:focus {
+      border-color: var(--cyan);
+      outline: 2px solid rgba(27, 152, 181, .22);
+      outline-offset: 1px;
+    }
+
     .footer-note {
       color: var(--muted);
       text-align: center;
@@ -1044,7 +1247,8 @@
       .coverage-summary,
       .result-card-grid { grid-template-columns: 1fr 1fr; }
       .settings-grid { grid-template-columns: 1fr; }
-      .quarter-grid { grid-template-columns: repeat(12, minmax(26px, 1fr)); }
+      .quarter-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+      .quarter-hour { min-width: 0; }
       .chart { height: 360px; }
       .chart-wrapper {
         padding-top: 52px;
@@ -1063,7 +1267,46 @@
         min-height: 40px;
         height: 40px;
       }
+      .data-sources-modal {
+        place-items: end center;
+        padding: 12px max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+      }
+      .data-sources-dialog {
+        width: 100%;
+        max-height: calc(100dvh - 24px - env(safe-area-inset-bottom));
+        border-radius: 14px 14px 10px 10px;
+      }
+      .data-sources-header {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        padding: 14px;
+      }
+      .data-sources-body { padding: 14px; }
+      .data-sources-grid,
+      .data-sources-status-grid,
+      .data-sources-links { grid-template-columns: 1fr; }
+      .data-source-card dl,
+      .data-status-card dl { grid-template-columns: 1fr; gap: 4px; }
       body { overflow-x: hidden; }
+    }
+
+    @media (max-width: 540px) {
+      .info-button .text { display: none; }
+      .info-button { min-width: 44px; padding-left: 10px; padding-right: 10px; }
+      .data-sources-header h2 { font-size: 1.04rem; }
+      .data-sources-header p { font-size: .8rem; }
+      .quarter-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .data-sources-modal:not(.hidden) .data-sources-dialog {
+        animation: modalIn .14s ease-out both;
+      }
+      @keyframes modalIn {
+        from { opacity: 0; transform: translateY(8px) scale(.99); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+      }
     }
 
     @media print {
@@ -1159,6 +1402,10 @@
           </div>
           <button class="btn btn-primary" id="calculateBtn" data-i18n="calculateBtn">Yenile</button>
           <button class="btn btn-secondary" id="resetZoomBtn" data-i18n="resetZoomBtn">Grafik Sıfırla</button>
+          <button class="btn btn-secondary info-button" id="dataSourcesInfoBtn" type="button" aria-label="Veri kaynakları hakkında bilgi" title="Veri kaynakları hakkında bilgi">
+            <span class="icon" aria-hidden="true">i</span>
+            <span class="text" data-i18n="dataSourcesInfoBtn">Bilgi</span>
+          </button>
         </div>
       </div>
       <div class="panel" style="padding-top:0">
@@ -1209,6 +1456,116 @@
       </div>
       <div id="alignmentInfo" class="status-banner warn">&nbsp;</div>
     </section>
+
+    <div id="dataSourcesModal" class="data-sources-modal hidden" role="dialog" aria-modal="true" aria-labelledby="dataSourcesModalTitle" aria-describedby="dataSourcesModalDesc" aria-hidden="true">
+      <div class="data-sources-dialog" role="document">
+        <header class="data-sources-header">
+          <div>
+            <h2 id="dataSourcesModalTitle" tabindex="-1" data-i18n="dataSourcesTitle">Veri Kaynakları ve Yöntem</h2>
+            <p id="dataSourcesModalDesc" data-i18n="dataSourcesSubtitle">GridFreq uygulamasında gösterilen şebeke frekansı verilerinin kaynakları, çözünürlükleri, zaman bilgileri ve işleme yöntemleri.</p>
+          </div>
+          <button class="btn btn-secondary modal-close-btn" id="dataSourcesCloseBtn" type="button" aria-label="Kapat" title="Kapat">×</button>
+        </header>
+
+        <div class="data-sources-body" id="dataSourcesModalBody">
+          <section class="data-sources-section">
+            <h3 data-i18n="dataSourcesShortTitle">Kısa açıklama</h3>
+            <p data-i18n="dataSourcesIntro">GridFreq, farklı senkron elektrik sistemlerine ait şebeke frekansı ölçümlerini aynı zaman ekseninde karşılaştırmak, veri kalitesini incelemek ve frekans davranışını analiz etmek amacıyla geliştirilmiştir.</p>
+            <p><strong data-i18n="dataSourcesDisclaimer">GridFreq bağımsız bir analiz uygulamasıdır. TEİAŞ, ENTSO-E, Netztransparenz veya ilgili TSO’ların resmî hizmeti değildir.</strong></p>
+          </section>
+
+          <section class="data-sources-section">
+            <h3 data-i18n="dataSourcesCurrentStatusTitle">Güncel veri durumu</h3>
+            <div id="dataSourcesModalStatus" class="status-banner muted" data-i18n="dataSourcesStatusLoading">Güncel durum bilgisi hazırlanıyor.</div>
+            <div id="dataSourcesStatusGrid" class="data-sources-status-grid" aria-live="polite"></div>
+          </section>
+
+          <section class="data-sources-section data-sources-grid" aria-label="Veri kaynağı kartları">
+            <article class="data-source-card" id="dataSourcesTrCard">
+              <span class="tag good" data-i18n="dataSourcesTrBadge">TEİAŞ · 50 Hz</span>
+              <h3 data-i18n="dataSourcesTrTitle">Türkiye Şebeke Frekansı</h3>
+              <p class="card-subtitle" data-i18n="dataSourcesTrSubtitle">Türkiye elektrik sistemi frekans zaman serisi.</p>
+              <dl>
+                <dt data-i18n="dataSourcesInstitution">Kurum</dt><dd>Türkiye Elektrik İletim A.Ş. (TEİAŞ)</dd>
+                <dt data-i18n="dataSourcesSystem">Sistem</dt><dd data-i18n="dataSourcesTrSystem">Türkiye elektrik sistemi</dd>
+                <dt data-i18n="dataSourcesNominal">Nominal frekans</dt><dd>50 Hz</dd>
+                <dt data-i18n="dataSourcesType">Veri türü</dt><dd data-i18n="dataSourcesTimeSeries">Şebeke frekansı zaman serisi</dd>
+                <dt data-i18n="dataSourcesTimezone">Yerel zaman dilimi</dt><dd id="dataSourcesTrTimezone">Europe/Istanbul</dd>
+                <dt data-i18n="dataSourcesResolution">Uygulamadaki çözünürlük</dt><dd id="dataSourcesTrResolution">—</dd>
+                <dt data-i18n="dataSourcesMethod">Güncelleme yöntemi</dt><dd id="dataSourcesTrMethod">—</dd>
+                <dt data-i18n="dataSourcesLatestDate">Son mevcut veri tarihi</dt><dd id="dataSourcesTrLatest">—</dd>
+                <dt data-i18n="dataSourcesLastCheck">Son başarılı güncelleme zamanı</dt><dd id="dataSourcesTrLastCheck">—</dd>
+                <dt data-i18n="dataSourcesDelay">Veri gecikmesi</dt><dd id="dataSourcesTrDelay">—</dd>
+                <dt data-i18n="dataSourcesStatus">Veri durumu</dt><dd id="dataSourcesTrStatus">—</dd>
+              </dl>
+            </article>
+
+            <article class="data-source-card" id="dataSourcesEuCard">
+              <span class="tag good" data-i18n="dataSourcesEuBadge">Netztransparenz · Continental Europe · 50 Hz</span>
+              <h3 data-i18n="dataSourcesEuTitle">Kıta Avrupası Şebeke Frekansı</h3>
+              <p class="card-subtitle" data-i18n="dataSourcesEuSubtitle">Kıta Avrupası – Netztransparenz</p>
+              <p data-i18n="dataSourcesEuDescription">Bu veri, Almanya’daki dört iletim sistemi işletmecisinin ortak veri portalı olan Netztransparenz üzerinden yayımlanan Kıta Avrupası senkron bölgesi şebeke frekansıdır.</p>
+              <dl>
+                <dt data-i18n="dataSourcesPortal">Kaynak portal</dt><dd>Netztransparenz</dd>
+                <dt data-i18n="dataSourcesTsos">İlgili TSO’lar</dt><dd>50Hertz Transmission, Amprion, TenneT TSO, TransnetBW</dd>
+                <dt data-i18n="dataSourcesArea">Senkron bölge</dt><dd data-i18n="dataSourcesEuArea">Continental Europe / Kıta Avrupası</dd>
+                <dt data-i18n="dataSourcesNominal">Nominal frekans</dt><dd>50 Hz</dd>
+                <dt data-i18n="dataSourcesType">Veri türü</dt><dd data-i18n="dataSourcesEuType">Saniyelik/yüksek çözünürlüklü frekans zaman serisi</dd>
+                <dt data-i18n="dataSourcesMethod">Kaynak yöntemi</dt><dd id="dataSourcesEuMethod">—</dd>
+                <dt data-i18n="dataSourcesSourceTimezone">Kaynak zaman dilimi</dt><dd id="dataSourcesEuTimezone">Europe/Berlin</dd>
+                <dt data-i18n="dataSourcesLatestDate">Son mevcut veri tarihi</dt><dd id="dataSourcesEuLatest">—</dd>
+                <dt data-i18n="dataSourcesLastCheck">Son başarılı güncelleme zamanı</dt><dd id="dataSourcesEuLastCheck">—</dd>
+                <dt data-i18n="dataSourcesPublicationDelay">Yayın gecikmesi</dt><dd id="dataSourcesEuDelay">—</dd>
+                <dt data-i18n="dataSourcesStatus">Veri durumu</dt><dd id="dataSourcesEuStatus">—</dd>
+              </dl>
+              <p class="data-sources-note" data-i18n="dataSourcesEuCritical">Doğrudan ENTSO-E Transparency API’sinden alınmamaktadır. Netztransparenz, Alman TSO’larının ortak resmî portalıdır. Gösterilen seri yalnızca Almanya’ya özgü yerel bir frekans değil, Kıta Avrupası senkron bölgesinin ortak sistem frekansını temsil eder.</p>
+            </article>
+          </section>
+
+          <details class="data-sources-section" open>
+            <summary data-i18n="dataSourcesTimeTitle">Zaman ve çözünürlük</summary>
+            <ul class="data-sources-list">
+              <li data-i18n="dataSourcesTimeBullet1">Türkiye ve Kıta Avrupası verileri farklı zaman dilimlerinden gelebilir; karşılaştırma öncesinde ortak zaman eksenine dönüştürülür.</li>
+              <li data-i18n="dataSourcesTimeBullet2">Türkiye tarafı Europe/Istanbul, Netztransparenz tarafı Europe/Berlin zaman dilimiyle paketlenir; yaz/kış saati geçişleri yerel gün uzunluğunu etkileyebilir.</li>
+              <li data-i18n="dataSourcesTimeBullet3">Kaynak veri saniyelik olarak saklanır; günlük grafik performans için dakikalık, yakın detay için saniyelik veya 10 saniyelik görünüm kullanabilir.</li>
+              <li data-i18n="dataSourcesTimeBullet4">Eksik örnekler gerçek ölçüm gibi interpolasyonla oluşturulmaz; binary seride eksik değer olarak korunur ve kalite hesaplarına yansır.</li>
+            </ul>
+          </details>
+
+          <details class="data-sources-section" open>
+            <summary data-i18n="dataSourcesQualityTitle">Veri işleme ve kalite</summary>
+            <ul class="data-sources-list">
+              <li data-i18n="dataSourcesQualityBullet1">Tarih ve saat damgaları ayrıştırılır, geçersiz zaman kayıtları sayılır.</li>
+              <li data-i18n="dataSourcesQualityBullet2">49–51 Hz dışındaki frekans değerleri geçersiz frekans örneği olarak işaretlenir.</li>
+              <li data-i18n="dataSourcesQualityBullet3">Yinelenen saniye kayıtları sayılır; son değer korunurken kalite puanı etkilenir.</li>
+              <li data-i18n="dataSourcesQualityBullet4">Eksik örnek sayısı, beklenen yerel gün uzunluğu ve geçerli örnek sayısından hesaplanır.</li>
+              <li data-i18n="dataSourcesQualityBullet5">Günlük .frequency.i16 dosyaları, meta.json, minute.json ve hourly.json özetleri üretilir.</li>
+              <li data-i18n="dataSourcesQualityBullet6">Dakikalık ve saatlik özetler grafik ve envanter performansı için kullanılır; kalite skoru meta dosyalarında tutulur.</li>
+            </ul>
+          </details>
+
+          <section class="data-sources-section data-sources-note">
+            <h3 data-i18n="dataSourcesImportantTitle">Önemli teknik not</h3>
+            <p data-i18n="dataSourcesImportantText">Farklı senkron bölgelerin frekans serileri fiziksel olarak birbirinden bağımsız sistemleri temsil edebilir. Benzer zamanlı hareketler doğrudan elektriksel bağlantı veya nedensellik anlamına gelmez. Karşılaştırmalı analizler veri çözünürlüğü, zaman eşleştirmesi ve veri kalitesi dikkate alınarak yorumlanmalıdır.</p>
+          </section>
+
+          <section class="data-sources-section">
+            <h3 data-i18n="dataSourcesOfficialLinksTitle">Resmî kaynak bağlantıları</h3>
+            <div class="data-sources-links">
+              <a href="https://www.teias.gov.tr/" target="_blank" rel="noopener noreferrer" data-i18n="dataSourcesTeiasOfficialLink">TEİAŞ resmî sitesi</a>
+              <a href="https://www.teias.gov.tr/gunluk-frekans-bilgisi" target="_blank" rel="noopener noreferrer" data-i18n="dataSourcesTeiasDataLink">TEİAŞ günlük frekans verisi</a>
+              <a href="https://www.netztransparenz.de/en/Balancing-Capacity/Balancing-Capacity-data/Data-in-second-resolution" target="_blank" rel="noopener noreferrer" data-i18n="dataSourcesNetzDataLink">Netztransparenz saniyelik frekans verisi</a>
+              <a href="https://www.entsoe.eu/" target="_blank" rel="noopener noreferrer" data-i18n="dataSourcesEntsoeLink">ENTSO-E resmî sitesi</a>
+              <a href="https://github.com/murathany90/frekans" target="_blank" rel="noopener noreferrer" data-i18n="dataSourcesGithubLink">GridFreq GitHub deposu</a>
+            </div>
+          </section>
+        </div>
+
+        <footer class="data-sources-footer">
+          <button class="btn btn-primary" id="dataSourcesFooterCloseBtn" type="button" data-i18n="dataSourcesClose">Kapat</button>
+        </footer>
+      </div>
+    </div>
 
     <!-- SEKME 2: ANALİZ LABORATUVARI -->
     <section id="tab-oscillation" class="tab-panel">
@@ -2179,6 +2536,10 @@
         autoDataCache: new Map(),
         inFlightAutoLoads: new Map()
       },
+      dataSourcesModal: {
+        previousFocus: null,
+        statusLoadFailed: false
+      },
       settings: loadSettings(),
       calendarDate: new Date(),
       current: null,
@@ -2368,6 +2729,12 @@
       $('calculateBtn').addEventListener('click', () => selectDate($('dateSelect').value, { pushHistory: false, immediate: true, force: true }));
       $('analysisRunBtn').addEventListener('click', runAnalysisLab);
       $('analysisCancelBtn').addEventListener('click', cancelAnalysis);
+      $('dataSourcesInfoBtn').addEventListener('click', openDataSourcesModal);
+      $('dataSourcesCloseBtn').addEventListener('click', closeDataSourcesModal);
+      $('dataSourcesFooterCloseBtn').addEventListener('click', closeDataSourcesModal);
+      $('dataSourcesModal').addEventListener('click', event => {
+        if (event.target === $('dataSourcesModal')) closeDataSourcesModal();
+      });
       $('analysisInfoToggle').addEventListener('click', event => {
         event.stopPropagation();
         toggleAnalysisInfoPanel();
@@ -2419,6 +2786,7 @@
       document.addEventListener('keydown', e => {
         if (e.key === 'Escape') toggleAnalysisInfoPanel(false);
       });
+      document.addEventListener('keydown', handleDataSourcesModalKeydown);
       $('showDifference').addEventListener('change', () => updateChartLayerControls());
       $('showMinMaxEnvelope').addEventListener('change', () => updateChartLayerControls());
       document.querySelectorAll('[data-layer]').forEach(button => {
@@ -2917,6 +3285,7 @@
         : t('autoNoStatus');
       renderCoverageSummary();
       renderSourceHealthSummary();
+      renderDataSourceStatus();
       syncAnalysisDateDefaults();
     }
 
@@ -2999,6 +3368,228 @@
           ${t('healthLastError')}: ${escapeHtml(info.lastError || t('tagNone'))}
         </div>
       </div>`;
+    }
+
+    async function openDataSourcesModal() {
+      const modal = $('dataSourcesModal');
+      if (!modal || !modal.classList.contains('hidden')) return;
+      state.dataSourcesModal.previousFocus = document.activeElement;
+      modal.classList.remove('hidden');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
+      setDataSourcesBackgroundInert(true);
+      updateDataSourceModalLanguage();
+      renderDataSourceStatus({ loading: true });
+      setTimeout(() => $('dataSourcesCloseBtn')?.focus(), 0);
+      await loadDataSourceStatus({ force: !state.auto.status });
+      renderDataSourceStatus();
+    }
+
+    function closeDataSourcesModal() {
+      const modal = $('dataSourcesModal');
+      if (!modal || modal.classList.contains('hidden')) return;
+      modal.classList.add('hidden');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('modal-open');
+      setDataSourcesBackgroundInert(false);
+      const previous = state.dataSourcesModal.previousFocus;
+      state.dataSourcesModal.previousFocus = null;
+      if (previous && typeof previous.focus === 'function') previous.focus();
+      else $('dataSourcesInfoBtn')?.focus();
+    }
+
+    function setDataSourcesBackgroundInert(isInert) {
+      document.querySelectorAll('body > header, .tab-panel').forEach(element => {
+        if (isInert) {
+          element.setAttribute('aria-hidden', 'true');
+          element.inert = true;
+        } else {
+          element.removeAttribute('aria-hidden');
+          element.inert = false;
+        }
+      });
+    }
+
+    async function loadDataSourceStatus({ force = false } = {}) {
+      if (!state.auto.manifest) {
+        try { state.auto.manifest = await loadManifestWithFallback(); } catch { /* modal remains usable without manifest */ }
+      }
+      const manifest = state.auto.manifest;
+      const sourceDates = [
+        manifest?.sources?.teias?.latestDate,
+        manifest?.sources?.netztransparenz?.latestDate
+      ].map(dateToYear).filter(Boolean);
+      await Promise.all([...new Set(sourceDates)].map(year => ensureManifestYearLoadedFor(manifest, year, {}).catch(() => null)));
+      if (state.auto.status && !force) {
+        state.dataSourcesModal.statusLoadFailed = false;
+        return state.auto.status;
+      }
+      try {
+        state.auto.status = await fetchJson('status.json');
+        state.dataSourcesModal.statusLoadFailed = false;
+      } catch {
+        state.dataSourcesModal.statusLoadFailed = true;
+      }
+      return state.auto.status;
+    }
+
+    function updateDataSourceModalLanguage() {
+      const infoBtn = $('dataSourcesInfoBtn');
+      if (infoBtn) {
+        infoBtn.setAttribute('aria-label', t('dataSourcesInfoAria'));
+        infoBtn.setAttribute('title', t('dataSourcesInfoAria'));
+      }
+      ['dataSourcesCloseBtn', 'dataSourcesFooterCloseBtn'].forEach(id => {
+        const button = $(id);
+        if (!button) return;
+        button.setAttribute('aria-label', t('dataSourcesClose'));
+        button.setAttribute('title', t('dataSourcesClose'));
+      });
+    }
+
+    function handleDataSourcesModalKeydown(event) {
+      const modal = $('dataSourcesModal');
+      if (!modal || modal.classList.contains('hidden')) return;
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeDataSourcesModal();
+        return;
+      }
+      trapModalFocus(event);
+    }
+
+    function trapModalFocus(event) {
+      if (event.key !== 'Tab') return;
+      const modal = $('dataSourcesModal');
+      const focusable = [...modal.querySelectorAll('a[href], button:not([disabled]), summary, [tabindex]:not([tabindex="-1"])')]
+        .filter(element => element.offsetParent !== null || element === document.activeElement);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    function renderDataSourceStatus({ loading = false } = {}) {
+      const manifest = state.auto.manifest || {};
+      const status = state.auto.status || {};
+      const teias = manifest.sources?.teias || {};
+      const netz = manifest.sources?.netztransparenz || {};
+      const netzStatus = status.netztransparenz || {};
+      const trLatest = status.lastSuccessfulTeiasDataDate || teias.latestDate || latestMapDate(state.tr);
+      const euLatest = netzStatus.lastSuccessfulDataDate || status.lastSuccessfulNetztransparenzDataDate || netz.latestDate || latestMapDate(state.de);
+      const trDay = teias.days?.[trLatest] || {};
+      const euDay = netz.days?.[euLatest] || {};
+      const trDelay = Number.isFinite(Number(status.teiasDataDelayDays)) ? Number(status.teiasDataDelayDays) : dataDelayDays(trLatest);
+      const euDelay = dataDelayDays(euLatest, netzStatus.lastSuccessfulRunAt || status.updatedAtUtc || new Date());
+      const trHealth = sourceHealthState({
+        latestDate: trLatest,
+        delayDays: trDelay,
+        lastError: status.lastErrorMessage || status.lastError?.message
+      });
+      const euHealth = sourceHealthState({
+        latestDate: euLatest,
+        delayDays: euDelay,
+        lastError: netzStatus.lastError?.message || netzStatus.lastError
+      });
+      const trMethod = formatDetailedSourceMethod(latestManifestSourceMethod(teias), 'teias');
+      const euMethod = formatDetailedSourceMethod(netzStatus.sourceMethod || latestManifestSourceMethod(netz) || euDay.sourceMethod, 'netztransparenz');
+
+      setText('dataSourcesTrTimezone', teias.timezone || trDay.timezone || 'Europe/Istanbul');
+      setText('dataSourcesEuTimezone', netz.timezone || euDay.timezone || 'Europe/Berlin');
+      setText('dataSourcesTrResolution', formatSourceResolution(trDay));
+      setText('dataSourcesEuMethod', euMethod);
+      setText('dataSourcesTrMethod', trMethod);
+      setText('dataSourcesTrLatest', displayDate(trLatest));
+      setText('dataSourcesEuLatest', displayDate(euLatest));
+      setText('dataSourcesTrLastCheck', formatUtc(status.lastSuccessfulTeiasCheckUtc || status.lastSuccessfulRunAt || status.updatedAtUtc));
+      setText('dataSourcesEuLastCheck', formatUtc(netzStatus.lastSuccessfulRunAt || netzStatus.lastRunAt || status.updatedAtUtc));
+      setText('dataSourcesTrDelay', Number.isFinite(trDelay) ? t('healthDelayDays', { count: trDelay }) : '—');
+      setText('dataSourcesEuDelay', Number.isFinite(euDelay) ? t('healthDelayDays', { count: euDelay }) : '—');
+      setText('dataSourcesTrStatus', `${statusIconForHealth(trHealth)} ${trHealth.text}`);
+      setText('dataSourcesEuStatus', `${statusIconForHealth(euHealth)} ${euHealth.text}`);
+
+      const statusBanner = $('dataSourcesModalStatus');
+      if (statusBanner) {
+        const failed = state.dataSourcesModal.statusLoadFailed && !state.auto.status;
+        statusBanner.className = failed ? 'status-banner muted' : loading ? 'status-banner warn' : 'status-banner success';
+        statusBanner.textContent = failed ? t('dataSourcesStatusUnavailable') : loading ? t('dataSourcesStatusLoading') : t('dataSourcesStatusReady');
+      }
+      const grid = $('dataSourcesStatusGrid');
+      if (grid) {
+        grid.innerHTML = [
+          dataSourceStatusCard({
+            title: t('dataSourcesTrStatusTitle'),
+            latest: trLatest,
+            check: status.lastSuccessfulTeiasCheckUtc || status.lastSuccessfulRunAt || status.updatedAtUtc,
+            delay: trDelay,
+            method: trMethod,
+            health: trHealth,
+            quality: Number.isFinite(trDay.qualityScore) ? trDay.qualityScore : latestQualityScore('tr', trLatest)
+          }),
+          dataSourceStatusCard({
+            title: t('dataSourcesEuStatusTitle'),
+            latest: euLatest,
+            check: netzStatus.lastSuccessfulRunAt || netzStatus.lastRunAt || status.updatedAtUtc,
+            delay: euDelay,
+            method: euMethod,
+            health: euHealth,
+            quality: Number.isFinite(euDay.qualityScore) ? euDay.qualityScore : latestQualityScore('de', euLatest)
+          })
+        ].join('');
+      }
+    }
+
+    function dataSourceStatusCard(info) {
+      return `<article class="data-status-card ${info.health.className}">
+        <h4>${escapeHtml(info.title)}</h4>
+        <dl>
+          <dt>${t('dataSourcesLatestDate')}</dt><dd>${displayDate(info.latest)}</dd>
+          <dt>${t('healthLastCheck')}</dt><dd>${formatUtc(info.check)}</dd>
+          <dt>${t('healthDelay')}</dt><dd>${Number.isFinite(info.delay) ? t('healthDelayDays', { count: info.delay }) : '—'}</dd>
+          <dt>${t('dataSourcesStatus')}</dt><dd>${statusIconForHealth(info.health)} ${escapeHtml(info.health.text)}</dd>
+          <dt>${t('dataSourcesUsedMethod')}</dt><dd>${escapeHtml(info.method || t('statusUnknown'))}</dd>
+          <dt>${t('healthQuality')}</dt><dd>${Number.isFinite(info.quality) ? fmt(info.quality, 1) : '—'}</dd>
+        </dl>
+      </article>`;
+    }
+
+    function setText(id, value) {
+      const element = $(id);
+      if (element) element.textContent = value ?? '—';
+    }
+
+    function formatSourceResolution(dayInfo = {}) {
+      const expected = Number(dayInfo.expectedSamples);
+      if (Number.isFinite(expected) && expected >= 82800) return t('dataSourcesResolutionSecondSummary');
+      return t('dataSourcesResolutionUnknown');
+    }
+
+    function formatDetailedSourceMethod(method, source) {
+      const normalized = String(method || '').toLowerCase();
+      if (source === 'teias') {
+        if (normalized === 'manual') return t('dataSourcesMethodManual');
+        if (normalized === 'official_file') return t('dataSourcesMethodOfficialFile');
+        if (normalized === 'api') return t('dataSourcesMethodOfficialApi');
+        return t('dataSourcesTeiasMethodActual');
+      }
+      if (normalized === 'api') return t('dataSourcesMethodOfficialApi');
+      if (normalized === 'official_zip') return t('dataSourcesMethodOfficialZip');
+      if (normalized === 'manual') return t('dataSourcesMethodManual');
+      return formatNetzSourceMethod(method);
+    }
+
+    function statusIconForHealth(health) {
+      if (health.className === 'good') return '✓';
+      if (health.className === 'warn') return '!';
+      if (health.className === 'orange') return '!';
+      if (health.className === 'bad') return '×';
+      return '·';
     }
 
     function sourceHealthState(info) {
@@ -6382,6 +6973,76 @@
         healthOrange: 'Kaynak gecikmeli',
         healthBad: 'İndirme veya doğrulama hatası',
         healthMuted: 'Henüz yayımlanmadı',
+        dataSourcesInfoBtn: 'Bilgi',
+        dataSourcesInfoAria: 'Veri kaynakları hakkında bilgi',
+        dataSourcesTitle: 'Veri Kaynakları ve Yöntem',
+        dataSourcesSubtitle: 'GridFreq uygulamasında gösterilen şebeke frekansı verilerinin kaynakları, çözünürlükleri, zaman bilgileri ve işleme yöntemleri.',
+        dataSourcesShortTitle: 'Kısa açıklama',
+        dataSourcesIntro: 'GridFreq, farklı senkron elektrik sistemlerine ait şebeke frekansı ölçümlerini aynı zaman ekseninde karşılaştırmak, veri kalitesini incelemek ve frekans davranışını analiz etmek amacıyla geliştirilmiştir.',
+        dataSourcesDisclaimer: 'GridFreq bağımsız bir analiz uygulamasıdır. TEİAŞ, ENTSO-E, Netztransparenz veya ilgili TSO’ların resmî hizmeti değildir.',
+        dataSourcesCurrentStatusTitle: 'Güncel veri durumu',
+        dataSourcesStatusLoading: 'Güncel durum bilgisi hazırlanıyor.',
+        dataSourcesStatusReady: 'Güncel durum bilgisi status ve manifest dosyalarından alındı.',
+        dataSourcesStatusUnavailable: 'Güncel durum bilgisi alınamadı.',
+        dataSourcesTrBadge: 'TEİAŞ · 50 Hz',
+        dataSourcesTrTitle: 'Türkiye Şebeke Frekansı',
+        dataSourcesTrSubtitle: 'Türkiye elektrik sistemi frekans zaman serisi.',
+        dataSourcesEuBadge: 'Netztransparenz · Continental Europe · 50 Hz',
+        dataSourcesEuTitle: 'Kıta Avrupası Şebeke Frekansı',
+        dataSourcesEuSubtitle: 'Kıta Avrupası – Netztransparenz',
+        dataSourcesEuDescription: 'Bu veri, Almanya’daki dört iletim sistemi işletmecisinin ortak veri portalı olan Netztransparenz üzerinden yayımlanan Kıta Avrupası senkron bölgesi şebeke frekansıdır.',
+        dataSourcesEuCritical: 'Doğrudan ENTSO-E Transparency API’sinden alınmamaktadır. Netztransparenz, Alman TSO’larının ortak resmî portalıdır. Gösterilen seri yalnızca Almanya’ya özgü yerel bir frekans değil, Kıta Avrupası senkron bölgesinin ortak sistem frekansını temsil eder.',
+        dataSourcesInstitution: 'Kurum',
+        dataSourcesSystem: 'Sistem',
+        dataSourcesTrSystem: 'Türkiye elektrik sistemi',
+        dataSourcesNominal: 'Nominal frekans',
+        dataSourcesType: 'Veri türü',
+        dataSourcesTimeSeries: 'Şebeke frekansı zaman serisi',
+        dataSourcesTimezone: 'Yerel zaman dilimi',
+        dataSourcesSourceTimezone: 'Kaynak zaman dilimi',
+        dataSourcesResolution: 'Uygulamadaki çözünürlük',
+        dataSourcesMethod: 'Güncelleme yöntemi',
+        dataSourcesPortal: 'Kaynak portal',
+        dataSourcesTsos: 'İlgili TSO’lar',
+        dataSourcesArea: 'Senkron bölge',
+        dataSourcesEuArea: 'Continental Europe / Kıta Avrupası',
+        dataSourcesEuType: 'Saniyelik/yüksek çözünürlüklü frekans zaman serisi',
+        dataSourcesLatestDate: 'Son mevcut veri tarihi',
+        dataSourcesLastCheck: 'Son başarılı güncelleme zamanı',
+        dataSourcesDelay: 'Veri gecikmesi',
+        dataSourcesPublicationDelay: 'Yayın gecikmesi',
+        dataSourcesStatus: 'Veri durumu',
+        dataSourcesUsedMethod: 'Kullanılan yöntem',
+        dataSourcesTrStatusTitle: 'Türkiye',
+        dataSourcesEuStatusTitle: 'Kıta Avrupası',
+        dataSourcesResolutionSecondSummary: 'Saniyelik kaynak veri; günlük binary, dakikalık ve saatlik özet',
+        dataSourcesResolutionUnknown: 'Manifest/meta bilgisi bekleniyor',
+        dataSourcesTeiasMethodActual: 'Resmî TEİAŞ sayfası ve gallery API',
+        dataSourcesMethodOfficialApi: 'Resmî API',
+        dataSourcesMethodOfficialFile: 'Resmî veri dosyası',
+        dataSourcesMethodOfficialZip: 'Resmî ZIP dosyası',
+        dataSourcesMethodManual: 'Manuel veri',
+        dataSourcesTimeTitle: 'Zaman ve çözünürlük',
+        dataSourcesTimeBullet1: 'Türkiye ve Kıta Avrupası verileri farklı zaman dilimlerinden gelebilir; karşılaştırma öncesinde ortak zaman eksenine dönüştürülür.',
+        dataSourcesTimeBullet2: 'Türkiye tarafı Europe/Istanbul, Netztransparenz tarafı Europe/Berlin zaman dilimiyle paketlenir; yaz/kış saati geçişleri yerel gün uzunluğunu etkileyebilir.',
+        dataSourcesTimeBullet3: 'Kaynak veri saniyelik olarak saklanır; günlük grafik performans için dakikalık, yakın detay için saniyelik veya 10 saniyelik görünüm kullanabilir.',
+        dataSourcesTimeBullet4: 'Eksik örnekler gerçek ölçüm gibi interpolasyonla oluşturulmaz; binary seride eksik değer olarak korunur ve kalite hesaplarına yansır.',
+        dataSourcesQualityTitle: 'Veri işleme ve kalite',
+        dataSourcesQualityBullet1: 'Tarih ve saat damgaları ayrıştırılır, geçersiz zaman kayıtları sayılır.',
+        dataSourcesQualityBullet2: '49–51 Hz dışındaki frekans değerleri geçersiz frekans örneği olarak işaretlenir.',
+        dataSourcesQualityBullet3: 'Yinelenen saniye kayıtları sayılır; son değer korunurken kalite puanı etkilenir.',
+        dataSourcesQualityBullet4: 'Eksik örnek sayısı, beklenen yerel gün uzunluğu ve geçerli örnek sayısından hesaplanır.',
+        dataSourcesQualityBullet5: 'Günlük .frequency.i16 dosyaları, meta.json, minute.json ve hourly.json özetleri üretilir.',
+        dataSourcesQualityBullet6: 'Dakikalık ve saatlik özetler grafik ve envanter performansı için kullanılır; kalite skoru meta dosyalarında tutulur.',
+        dataSourcesImportantTitle: 'Önemli teknik not',
+        dataSourcesImportantText: 'Farklı senkron bölgelerin frekans serileri fiziksel olarak birbirinden bağımsız sistemleri temsil edebilir. Benzer zamanlı hareketler doğrudan elektriksel bağlantı veya nedensellik anlamına gelmez. Karşılaştırmalı analizler veri çözünürlüğü, zaman eşleştirmesi ve veri kalitesi dikkate alınarak yorumlanmalıdır.',
+        dataSourcesOfficialLinksTitle: 'Resmî kaynak bağlantıları',
+        dataSourcesTeiasOfficialLink: 'TEİAŞ resmî sitesi',
+        dataSourcesTeiasDataLink: 'TEİAŞ günlük frekans verisi',
+        dataSourcesNetzDataLink: 'Netztransparenz saniyelik frekans verisi',
+        dataSourcesEntsoeLink: 'ENTSO-E resmî sitesi',
+        dataSourcesGithubLink: 'GridFreq GitHub deposu',
+        dataSourcesClose: 'Kapat',
         qualityCoverage: 'Kapsama',
         qualityMissing: 'Eksik örnek',
         qualityLongestGap: 'En uzun boşluk',
@@ -6593,6 +7254,76 @@
         healthOrange: 'Source delayed',
         healthBad: 'Download or validation error',
         healthMuted: 'Not yet published',
+        dataSourcesInfoBtn: 'Info',
+        dataSourcesInfoAria: 'Information about data sources',
+        dataSourcesTitle: 'Data Sources and Methodology',
+        dataSourcesSubtitle: 'Sources, resolutions, time handling, and processing methods for the grid frequency data shown in GridFreq.',
+        dataSourcesShortTitle: 'Short overview',
+        dataSourcesIntro: 'GridFreq is designed to compare grid frequency measurements from different synchronous electrical systems on the same time axis, inspect data quality, and analyze frequency behavior.',
+        dataSourcesDisclaimer: 'GridFreq is an independent analytics application. It is not an official service of TEİAŞ, ENTSO-E, Netztransparenz, or the related Transmission System Operators.',
+        dataSourcesCurrentStatusTitle: 'Current data status',
+        dataSourcesStatusLoading: 'Preparing current status information.',
+        dataSourcesStatusReady: 'Current status was read from status and manifest files.',
+        dataSourcesStatusUnavailable: 'Current status information could not be loaded.',
+        dataSourcesTrBadge: 'TEİAŞ · 50 Hz',
+        dataSourcesTrTitle: 'Türkiye Grid Frequency',
+        dataSourcesTrSubtitle: 'Frequency time series for the Türkiye power system.',
+        dataSourcesEuBadge: 'Netztransparenz · Continental Europe · 50 Hz',
+        dataSourcesEuTitle: 'Continental Europe Grid Frequency',
+        dataSourcesEuSubtitle: 'Continental Europe – Netztransparenz',
+        dataSourcesEuDescription: 'This data is the Continental Europe synchronous area grid frequency published through Netztransparenz, the joint data portal of the four German Transmission System Operators.',
+        dataSourcesEuCritical: 'It is not taken directly from the standard ENTSO-E Transparency API. Netztransparenz is the joint official portal of the German TSOs. The displayed series is not a Germany-only local frequency; it represents the common system frequency of the Continental Europe synchronous area.',
+        dataSourcesInstitution: 'Institution',
+        dataSourcesSystem: 'System',
+        dataSourcesTrSystem: 'Türkiye power system',
+        dataSourcesNominal: 'Nominal frequency',
+        dataSourcesType: 'Data type',
+        dataSourcesTimeSeries: 'Grid frequency time series',
+        dataSourcesTimezone: 'Local time zone',
+        dataSourcesSourceTimezone: 'Source time zone',
+        dataSourcesResolution: 'Application resolution',
+        dataSourcesMethod: 'Update method',
+        dataSourcesPortal: 'Source portal',
+        dataSourcesTsos: 'Related TSOs',
+        dataSourcesArea: 'Synchronous area',
+        dataSourcesEuArea: 'Continental Europe',
+        dataSourcesEuType: 'Second-level/high-resolution frequency time series',
+        dataSourcesLatestDate: 'Latest available data date',
+        dataSourcesLastCheck: 'Last successful update time',
+        dataSourcesDelay: 'Data lag',
+        dataSourcesPublicationDelay: 'Publication lag',
+        dataSourcesStatus: 'Data status',
+        dataSourcesUsedMethod: 'Method used',
+        dataSourcesTrStatusTitle: 'Türkiye',
+        dataSourcesEuStatusTitle: 'Continental Europe',
+        dataSourcesResolutionSecondSummary: 'Second-level source data; daily binary plus minute and hourly summaries',
+        dataSourcesResolutionUnknown: 'Waiting for manifest/meta information',
+        dataSourcesTeiasMethodActual: 'Official TEİAŞ page and gallery API',
+        dataSourcesMethodOfficialApi: 'Official API',
+        dataSourcesMethodOfficialFile: 'Official data file',
+        dataSourcesMethodOfficialZip: 'Official ZIP file',
+        dataSourcesMethodManual: 'Manual data',
+        dataSourcesTimeTitle: 'Time and resolution',
+        dataSourcesTimeBullet1: 'Türkiye and Continental Europe data can originate from different time zones; they are converted to a common time axis before comparison.',
+        dataSourcesTimeBullet2: 'Türkiye is packaged with Europe/Istanbul and Netztransparenz with Europe/Berlin; daylight-saving transitions can change local day length.',
+        dataSourcesTimeBullet3: 'Source data is stored at second level; the daily chart can use minutely summaries for performance and second-level or 10-second detail for zoomed views.',
+        dataSourcesTimeBullet4: 'Missing samples are not invented as real measurements by interpolation; they are preserved as missing values in the binary series and reflected in quality metrics.',
+        dataSourcesQualityTitle: 'Data processing and quality',
+        dataSourcesQualityBullet1: 'Date and timestamp fields are parsed, and invalid time records are counted.',
+        dataSourcesQualityBullet2: 'Frequency values outside 49–51 Hz are marked as invalid frequency samples.',
+        dataSourcesQualityBullet3: 'Duplicate second records are counted; the latest value is kept and the quality score is affected.',
+        dataSourcesQualityBullet4: 'Missing samples are calculated from expected local day length and valid sample count.',
+        dataSourcesQualityBullet5: 'Daily .frequency.i16 files, meta.json, minute.json, and hourly.json summaries are generated.',
+        dataSourcesQualityBullet6: 'Minute and hourly summaries are used for chart and inventory performance; quality score is stored in metadata.',
+        dataSourcesImportantTitle: 'Important technical note',
+        dataSourcesImportantText: 'Frequency series from different synchronous areas can represent physically independent systems. Similar movements in time do not directly imply electrical connection or causality. Comparative analyses should be interpreted with data resolution, time matching, and data quality in mind.',
+        dataSourcesOfficialLinksTitle: 'Official source links',
+        dataSourcesTeiasOfficialLink: 'TEİAŞ official website',
+        dataSourcesTeiasDataLink: 'TEİAŞ daily frequency data',
+        dataSourcesNetzDataLink: 'Netztransparenz second-level frequency data',
+        dataSourcesEntsoeLink: 'ENTSO-E official website',
+        dataSourcesGithubLink: 'GridFreq GitHub repository',
+        dataSourcesClose: 'Close',
         qualityCoverage: 'Coverage',
         qualityMissing: 'Missing samples',
         qualityLongestGap: 'Longest gap',
@@ -6705,6 +7436,7 @@
         infoToggle.setAttribute('aria-label', t('analysisInfoButtonLabel'));
         infoToggle.setAttribute('title', t('analysisInfoButtonLabel'));
       }
+      updateDataSourceModalLanguage();
     }
 
     function setLanguage(newLang) {
@@ -6732,6 +7464,7 @@
       updateChartViewTag(state.chartView);
       renderCoverageSummary();
       renderReportPreview();
+      renderDataSourceStatus();
     }
 
   </script>
