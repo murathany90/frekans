@@ -72,6 +72,17 @@ jobs:
           python -m http.server 8080 > playwright-server.log 2>&1 &
           echo $! > playwright-server.pid
 
+      - name: Wait for local HTTP server
+        run: |
+          for attempt in {1..30}; do
+            if curl -fsS http://127.0.0.1:8080/frekans_rapor_v1.html > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat playwright-server.log
+          exit 1
+
       - name: Run Playwright smoke
         env:
           APP_URL: http://127.0.0.1:8080/frekans_rapor_v1.html
