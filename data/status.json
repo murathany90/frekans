@@ -1,64 +1,33 @@
 {
-  "updatedAtUtc": "2026-07-14T02:47:52Z",
+  "updatedAtUtc": "2026-07-14T06:27:32Z",
   "lastWorkflowResult": "success",
-  "lastSuccessfulTeiasCheckUtc": "2026-07-14T02:27:07Z",
+  "lastSuccessfulTeiasCheckUtc": "2026-07-14T06:27:32Z",
   "lastSuccessfulTeiasDataDate": "2026-07-10",
-  "lastTeiasLookback": [],
-  "missingDayCount": 0,
-  "qualityWarnings": [
-    {
-      "date": "2025-02-28",
-      "status": "partial",
-      "sha256": "71a3d3e60f535895cf61606fc4a01a82e2018a1f9f4920d75a55da43a0e26e78",
-      "validSamples": 86331,
-      "qualityScore": 86,
-      "revision": false
-    },
-    {
-      "date": "2025-03-11",
-      "status": "critical",
-      "sha256": "e1cd8d50db896eea8dbf20938606c6d11c05aa2ea5e720a3cc3d268a90a905c7",
-      "validSamples": 86400,
-      "qualityScore": 70,
-      "revision": false
-    },
-    {
-      "date": "2025-03-20",
-      "status": "critical",
-      "sha256": "bc9c6958d315f3d1e46815adffa9391464293a1b418f27fab481abe9275cc839",
-      "validSamples": 86073,
-      "qualityScore": 70,
-      "revision": false
-    },
-    {
-      "date": "2025-05-14",
-      "status": "partial",
-      "sha256": "c02aad596b29d1fb5dc7114874d6deae0852441f13814f812c3544e02b723cd8",
-      "validSamples": 79275,
-      "qualityScore": 92,
-      "revision": false
-    },
-    {
-      "date": "2025-12-14",
-      "status": "critical",
-      "sha256": "f091c9911d145b9341e7ecb85a324f66bb3e753acd044481c94627709cb53a07",
-      "validSamples": 61200,
-      "qualityScore": 71,
-      "revision": false
-    }
+  "lastTeiasLookback": [
+    "2026-07-11",
+    "2026-07-12",
+    "2026-07-13",
+    "2026-07-14"
   ],
+  "missingDayCount": 4,
+  "qualityWarnings": [],
   "lastErrorMessage": null,
   "lastErrorAtUtc": null,
   "lastSuccessfulNetztransparenzDataDate": "2026-07-12",
   "teiasDataDelayDays": 4,
   "revisionDates": [],
-  "lastRunAt": "2026-07-14T02:27:07Z",
-  "lastSuccessfulRunAt": "2026-07-14T02:27:07Z",
+  "lastRunAt": "2026-07-14T06:27:32Z",
+  "lastSuccessfulRunAt": "2026-07-14T06:27:32Z",
   "lastFailedRunAt": null,
   "lastSuccessfulDataDate": "2026-07-10",
-  "lastAttemptedDataDate": "2025-12-31",
+  "lastAttemptedDataDate": "2026-07-14",
   "status": "success",
-  "missingDates": [],
+  "missingDates": [
+    "2026-07-11",
+    "2026-07-12",
+    "2026-07-13",
+    "2026-07-14"
+  ],
   "lastError": null,
   "netztransparenz": {
     "lastRunAt": "2026-07-14T02:47:52Z",
