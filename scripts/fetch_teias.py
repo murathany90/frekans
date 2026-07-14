@@ -91,10 +91,16 @@ def existing_meta_hash(data_root: Path, entry: TeiasEntry) -> str | None:
         return None
 
 
-def process_entry(entry: TeiasEntry, data_root: Path, dry_run: bool = False) -> dict:
+def process_entry(
+    entry: TeiasEntry,
+    data_root: Path,
+    dry_run: bool = False,
+    download_timeout: int = 60,
+    download_retries: int = 3,
+) -> dict:
     if dry_run:
         return {"date": entry.local_date, "status": "dry_run", "url": entry.file_url}
-    raw_data, status = download_entry(entry)
+    raw_data, status = download_entry(entry, timeout=download_timeout, retries=download_retries)
     parse_data = unpack_if_zip(raw_data)
     package = parse_teias_csv(parse_data, source_url=entry.file_url, http_status=status, fallback_date=entry.local_date)
     previous_hash = existing_meta_hash(data_root, entry)
@@ -186,7 +192,11 @@ def write_status(data_root: Path, summary: dict) -> None:
 
 def run(args: argparse.Namespace) -> dict:
     data_root = Path(args.output_root)
-    entries = discover_teias_entries()
+    entries = discover_teias_entries(
+        timeout=int(args.discovery_timeout),
+        retries=int(args.discovery_retries),
+        retry_delay=float(args.discovery_delay),
+    )
     selected, missing = select_entries(args, entries)
     attempted_dates = [entry.local_date for entry in selected] + missing
     summary = {
@@ -195,11 +205,21 @@ def run(args: argparse.Namespace) -> dict:
         "failed": [],
         "attemptedDate": max(attempted_dates, default=None),
         "workflowRunAt": datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
-        "retryCount": 3,
+        "retryCount": int(args.discovery_retries),
+        "discoveredCount": len(entries),
+        "latestDiscoveredDate": entries[-1].local_date if entries else None,
     }
     for index, entry in enumerate(selected):
         try:
-            summary["processed"].append(process_entry(entry, data_root, dry_run=args.dry_run))
+            summary["processed"].append(
+                process_entry(
+                    entry,
+                    data_root,
+                    dry_run=args.dry_run,
+                    download_timeout=int(args.download_timeout),
+                    download_retries=int(args.download_retries),
+                )
+            )
         except Exception as error:  # noqa: BLE001 - CLI summary should continue across days
             summary["failed"].append(f"{entry.local_date}: {error}")
         if not args.dry_run and index < len(selected) - 1:
@@ -220,13 +240,19 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--output-root", default="data")
     parser.add_argument("--request-delay", default="0.25")
+    parser.add_argument("--discovery-timeout", type=int, default=60)
+    parser.add_argument("--discovery-retries", type=int, default=3)
+    parser.add_argument("--discovery-delay", type=float, default=2)
+    parser.add_argument("--download-timeout", type=int, default=120)
+    parser.add_argument("--download-retries", type=int, default=3)
     return parser
 
 
 def main() -> int:
     args = build_parser().parse_args()
-    print(json.dumps(run(args), ensure_ascii=False, indent=2))
-    return 0
+    summary = run(args)
+    print(json.dumps(summary, ensure_ascii=False, indent=2))
+    return 1 if summary.get("failed") else 0
 
 
 if __name__ == "__main__":

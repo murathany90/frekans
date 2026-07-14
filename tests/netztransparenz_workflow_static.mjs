@@ -8,7 +8,7 @@ if (!existsSync(path)) {
 const workflow = readFileSync(path, "utf8");
 
 for (const snippet of [
-  'cron: "30 4 * * *"',
+  'cron: "30 7,15 * * *"',
   "workflow_dispatch:",
   "date_from:",
   "date_to:",

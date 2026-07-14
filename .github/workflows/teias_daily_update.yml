@@ -2,7 +2,7 @@ name: TEIAS Daily Frequency Update
 
 on:
   schedule:
-    - cron: "17 4,8,12,16 * * *"
+    - cron: "15 7,9,12,15 * * *"
   workflow_dispatch:
 
 concurrency:
@@ -31,7 +31,7 @@ jobs:
 
       - name: Fetch last 14 TEIAS days
         id: fetch
-        run: python scripts/fetch_teias.py --lookback-days 14
+        run: python scripts/fetch_teias.py --lookback-days 14 --discovery-retries 5 --discovery-timeout 90 --discovery-delay 3 --download-retries 5 --download-timeout 180
 
       - name: Rebuild manifest
         id: manifest

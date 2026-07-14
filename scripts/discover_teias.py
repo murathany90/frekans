@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import time
 from dataclasses import dataclass
 from typing import Any
 from urllib.request import Request, urlopen
@@ -60,8 +61,20 @@ def fetch_gallery_payload(timeout: int = 30) -> dict[str, Any]:
         return json.loads(response.read().decode("utf-8"))
 
 
-def discover_teias_entries(timeout: int = 30) -> list[TeiasEntry]:
-    return entries_from_gallery_payload(fetch_gallery_payload(timeout=timeout))
+def discover_teias_entries(timeout: int = 30, retries: int = 1, retry_delay: float = 0) -> list[TeiasEntry]:
+    attempts = max(1, int(retries))
+    last_error: Exception | None = None
+    for attempt in range(attempts):
+        try:
+            return entries_from_gallery_payload(fetch_gallery_payload(timeout=timeout))
+        except Exception as error:  # noqa: BLE001 - source discovery should retry transient API issues
+            last_error = error
+            if attempt >= attempts - 1:
+                break
+            delay_seconds = max(0.0, float(retry_delay)) * (2**attempt)
+            if delay_seconds:
+                time.sleep(min(30.0, delay_seconds))
+    raise RuntimeError(f"TEIAS gallery discovery failed after {attempts} attempt(s): {last_error}") from last_error
 
 
 def entry_by_date(local_date: str, entries: list[TeiasEntry] | None = None) -> TeiasEntry | None:

@@ -2,7 +2,7 @@ name: Netztransparenz Daily Frequency Update
 
 on:
   schedule:
-    - cron: "30 4 * * *"
+    - cron: "30 7,15 * * *"
   workflow_dispatch:
     inputs:
       date_from:

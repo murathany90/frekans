@@ -3,6 +3,8 @@ import { readFileSync, existsSync } from "node:fs";
 const dailyWorkflow = readFileSync(".github/workflows/teias_daily_update.yml", "utf8");
 
 const requiredDailySnippets = [
+  'cron: "15 7,9,12,15 * * *"',
+  "python scripts/fetch_teias.py --lookback-days 14 --discovery-retries 5 --discovery-timeout 90 --discovery-delay 3 --download-retries 5 --download-timeout 180",
   "automation/teias-update",
   "TEİAŞ veri güncelleme sorunu",
   "issues.listForRepo",

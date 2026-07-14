@@ -158,8 +158,8 @@ TEİAŞ keşfi `scripts/discover_teias.py` ile yapılır. Betik `https://www.tei
 
 İndirme ve normalizasyon akışı:
 
-1. `.github/workflows/teias_daily_update.yml` Türkiye saatiyle yaklaşık 07:17, 11:17, 15:17 ve 19:17 olacak şekilde `17 4,8,12,16 * * *` UTC cron ile çalışır.
-2. `scripts/fetch_teias.py --lookback-days 14` son 14 günü tekrar tarar.
+1. `.github/workflows/teias_daily_update.yml` Türkiye saatiyle 10:15, 12:15, 15:15 ve 18:15 olacak şekilde `15 7,9,12,15 * * *` UTC cron ile çalışır.
+2. `scripts/fetch_teias.py --lookback-days 14 --discovery-retries 5 --discovery-timeout 90 --discovery-delay 3 --download-retries 5 --download-timeout 180` son 14 günü tekrar tarar; TEİAŞ gallery API veya dosya indirme aşaması zaman aşımı/geçici yavaşlık yaşarsa artan bekleme süresiyle yeniden dener.
 3. Dosya ZIP ise açılır; CSV/TXT içeriği `parse_teias_csv` ile ayrıştırılır.
 4. Önceki `sha256` ile yeni veri karşılaştırılır; revizyon varsa `previousSha256` ve `revisionDetected` meta alanları yazılır.
 5. `write_day_outputs` günlük `.frequency.i16`, `minute.json`, `hourly.json`, `meta.json` dosyalarını üretir.
@@ -177,7 +177,7 @@ Netztransparenz için yapılandırma `config/netztransparenz.json` içindedir. O
 
 Workflow akışı:
 
-1. `.github/workflows/netztransparenz_daily_update.yml` her gün `30 4 * * *` UTC cron ile çalışır.
+1. `.github/workflows/netztransparenz_daily_update.yml` her gün Türkiye saatiyle 10:30 ve 18:30 kontrollerine denk gelen `30 7,15 * * *` UTC cron ile çalışır.
 2. Secret adları ve env var varlığı kontrol edilir.
 3. `python scripts/netztransparenz_client.py --check` ile OAuth token check yapılır.
 4. `scripts/fetch_netztransparenz.py` çalıştırılır.
@@ -279,7 +279,7 @@ http://127.0.0.1:8080/frekans_rapor_v1.html
 TEİAŞ son günleri çek:
 
 ```powershell
-python scripts/fetch_teias.py --lookback-days 14
+python scripts/fetch_teias.py --lookback-days 14 --discovery-retries 5 --discovery-timeout 90 --discovery-delay 3 --download-retries 5 --download-timeout 180
 ```
 
 Netztransparenz eksik günleri doldur:
