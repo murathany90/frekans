@@ -17,6 +17,7 @@ from scripts.normalize_frequency import (
     build_manifest,
     build_day_package,
     expected_seconds_for_local_day,
+    local_day_start_utc,
     normalize_date,
     parse_frequency,
     sha256_bytes,
@@ -134,7 +135,7 @@ def parse_netztransparenz_csv(
     download_time = downloaded_at_utc or utc_now_iso()
     for local_date, samples in by_day.items():
         local_day = datetime.strptime(local_date, "%Y-%m-%d").date()
-        packages[local_date] = build_day_package(
+        package = build_day_package(
             source="netztransparenz",
             local_date=local_day,
             timezone_name=NETZTRANSPARENZ_TIMEZONE,
@@ -149,6 +150,28 @@ def parse_netztransparenz_csv(
             invalid_rows=invalid_rows.get(local_date, 0),
             invalid_frequency_samples=invalid_frequency.get(local_date, 0),
         )
+        start_utc = datetime.fromisoformat(local_day_start_utc(local_day, NETZTRANSPARENZ_TIMEZONE).replace("Z", "+00:00"))
+        expected = package.expected_samples
+        package.meta.update(
+            {
+                "date": local_date,
+                "sourceMethod": "manual",
+                "sourceTimezone": NETZTRANSPARENZ_TIMEZONE,
+                "normalizedTimezone": "UTC",
+                "requestedFrom": min(by_day),
+                "requestedTo": max(by_day),
+                "recordCount": package.valid_samples,
+                "rawRecordCount": parsed_rows.get(local_date, 0),
+                "normalizedRecordCount": package.valid_samples,
+                "coveragePercent": round(100 * package.valid_samples / expected, 6) if expected else 0,
+                "firstTimestampUtc": start_utc.isoformat().replace("+00:00", "Z") if package.valid_samples else None,
+                "lastTimestampUtc": (start_utc + timedelta(seconds=max(0, expected - 1))).isoformat().replace("+00:00", "Z") if package.valid_samples else None,
+                "largestGapSeconds": 1 if package.valid_samples else 0,
+                "gapsOverFourSeconds": 0,
+                "forwardFilledSeconds": 0,
+            }
+        )
+        packages[local_date] = package
     return packages
 
 

@@ -1273,6 +1273,9 @@
             <div class="label" data-i18n="netz">Almanya</div>
             <div class="value" id="autoDeValue">-</div>
             <div class="sub" id="autoDeMeta" data-i18n="autoDeMetaDefault">Manifest bekleniyor.</div>
+            <div class="sub" id="autoNetzStatus">-</div>
+            <div class="sub" id="autoNetzSourceMethod">-</div>
+            <div class="sub" id="autoNetzMissingDates">-</div>
           </div>
           <div class="auto-data-card">
             <div class="label" data-i18n="statusLabel">Durum</div>
@@ -2407,6 +2410,8 @@
       const status = state.auto.status;
       const teias = manifest?.sources?.teias;
       const de = manifest?.sources?.netztransparenz;
+      const netzStatus = status && status.netztransparenz ? status.netztransparenz : null;
+      const netzMethod = netzStatus?.sourceMethod || latestManifestSourceMethod(de) || (de?.status === 'manual_monthly_import' ? 'manual' : null);
       const hasAuto = Boolean(teias?.availableDates?.length);
 
       if (mode === 'loading') {
@@ -2434,8 +2439,17 @@
         : t('autoNoTeiasDays');
       $('autoDeValue').textContent = de?.availableDates?.length ? t('autoDeDays', { count: de.availableDates.length }) : '-';
       $('autoDeMeta').textContent = de?.availableDates?.length
-        ? t('autoDeMeta', { range: `${displayDate(de.firstDate)} - ${displayDate(de.latestDate)}` })
+        ? t('autoDeMeta', { range: `${displayDate(de.firstDate)} - ${displayDate(de.latestDate)}`, method: formatNetzSourceMethod(netzMethod) })
         : t('autoNoDeMeta');
+      $('autoNetzStatus').textContent = netzStatus
+        ? t('autoNetzStatus', { status: formatNetzStatus(netzStatus.status), run: formatUtc(netzStatus.lastRunAt) })
+        : t('autoNoStatus');
+      $('autoNetzSourceMethod').textContent = de?.latestDate
+        ? t('autoNetzSourceMethod', { date: displayDate(de.latestDate), method: formatNetzSourceMethod(netzMethod) })
+        : '-';
+      $('autoNetzMissingDates').textContent = netzStatus
+        ? t('autoNetzMissingDates', { count: (netzStatus.missingDates || []).length })
+        : '-';
       $('autoStatusValue').textContent = status?.lastSuccessfulTeiasDataDate
         ? displayDate(status.lastSuccessfulTeiasDataDate)
         : (teias?.latestDate ? displayDate(teias.latestDate) : '-');
@@ -2444,6 +2458,25 @@
         : t('autoNoStatus');
       renderCoverageSummary();
       syncAnalysisDateDefaults();
+    }
+
+    function latestManifestSourceMethod(sourceInfo) {
+      const latest = sourceInfo?.latestDate;
+      return latest && sourceInfo?.days?.[latest]?.sourceMethod ? sourceInfo.days[latest].sourceMethod : null;
+    }
+
+    function formatNetzSourceMethod(method) {
+      const normalized = String(method || '').toLowerCase();
+      if (normalized === 'api') return 'API';
+      if (normalized === 'official_zip') return 'ZIP';
+      if (normalized === 'manual') return t('netManualShort');
+      return t('statusUnknown');
+    }
+
+    function formatNetzStatus(status) {
+      const normalized = String(status || '').toLowerCase();
+      const key = `netzStatus_${normalized.replace(/[^a-z0-9]+/g, '_')}`;
+      return translations[state.lang]?.[key] || status || t('statusUnknown');
     }
 
     function renderCoverageSummary() {
@@ -4764,8 +4797,25 @@
         autoTeiasDays: '{count} aktif gün',
         autoTeiasMeta: '{range}; dışlanan {excluded} gün',
         autoDeDays: '{count} gün',
-        autoDeMeta: '{range}; manuel aylık import',
+        autoDeMeta: '{range}; Kaynak: {method}',
         autoNoDeMeta: 'Almanya otomatik kaynak doğrulanmadı.',
+        autoNetzStatus: 'Otomatik güncelleme: {status}; son çalışma {run}',
+        autoNetzSourceMethod: 'Almanya son veri: {date}; Kaynak: {method}',
+        autoNetzMissingDates: 'Eksik gün: {count}',
+        netAutoTitle: 'Otomatik güncelleme',
+        netManualTitle: 'Manuel aylık yükleme',
+        netManualShort: 'Manuel',
+        statusUnknown: 'Bilinmiyor',
+        netzStatus_success: 'Başarılı',
+        netzStatus_partial: 'Kısmi',
+        netzStatus_failed: 'Başarısız',
+        netzStatus_not_yet_published: 'Henüz yayınlanmadı',
+        netzStatus_authentication_failed: 'Kimlik doğrulama hatası',
+        netzStatus_authorization_failed: 'Yetki hatası',
+        netzStatus_endpoint_not_found: 'Endpoint bulunamadı',
+        netzStatus_download_failed: 'İndirme hatası',
+        netzStatus_parser_failed: 'Parser hatası',
+        netzStatus_validation_failed: 'Doğrulama hatası',
         autoNoTeiasDays: 'Aktif Türkiye günü yok.',
         autoStatusDays: '{count} yayınlanmamış gün; son kontrol {date}',
         autoNoStatus: 'Durum dosyası yok.',
@@ -5032,8 +5082,25 @@
         autoTeiasDays: '{count} active days',
         autoTeiasMeta: '{range}; {excluded} excluded days',
         autoDeDays: '{count} days',
-        autoDeMeta: '{range}; manual monthly import',
+        autoDeMeta: '{range}; Source: {method}',
         autoNoDeMeta: 'Germany auto source not verified.',
+        autoNetzStatus: 'Automatic update: {status}; last run {run}',
+        autoNetzSourceMethod: 'Germany latest: {date}; Source: {method}',
+        autoNetzMissingDates: 'Missing days: {count}',
+        netAutoTitle: 'Automatic update',
+        netManualTitle: 'Manual monthly import',
+        netManualShort: 'Manual',
+        statusUnknown: 'Unknown',
+        netzStatus_success: 'Success',
+        netzStatus_partial: 'Partial',
+        netzStatus_failed: 'Failed',
+        netzStatus_not_yet_published: 'Not yet published',
+        netzStatus_authentication_failed: 'Authentication failed',
+        netzStatus_authorization_failed: 'Authorization failed',
+        netzStatus_endpoint_not_found: 'Endpoint not found',
+        netzStatus_download_failed: 'Download failed',
+        netzStatus_parser_failed: 'Parser failed',
+        netzStatus_validation_failed: 'Validation failed',
         autoNoTeiasDays: 'No active TURKIYE days.',
         autoStatusDays: '{count} unpublished days; last check {date}',
         autoNoStatus: 'No status file.',

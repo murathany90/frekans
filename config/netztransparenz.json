@@ -1,0 +1,41 @@
+{
+  "apiBaseUrl": "https://ds.netztransparenz.de/api/v1",
+  "tokenUrl": "https://identity.netztransparenz.de/users/connect/token",
+  "swaggerUrl": "https://extranet.netztransparenz.de/DesktopModules/LotesDataManagementExtranet/Swagger/Json/public.json",
+  "frequencyData": "",
+  "frequencyProduct": "",
+  "responseFormat": "official_zip",
+  "sourceTimezone": "Europe/Berlin",
+  "publicationLagToleranceDays": 4,
+  "maxRequestDays": 10,
+  "apiDiscovery": {
+    "endpointFound": false,
+    "rejectedCandidates": [
+      "NRVSaldo"
+    ],
+    "note": "Public Swagger exposes NrvSaldo balancing products but no verified second-resolution grid frequency Web API endpoint. NrvSaldo is not used as frequency."
+  },
+  "officialDownload": {
+    "pageUrl": "https://www.netztransparenz.de/en/Balancing-Capacity/Balancing-Capacity-data/Data-in-second-resolution",
+    "csvDownloadUrl": "https://www.netztransparenz.de/DesktopModules/LotesCharts/CsvDownloadHandler.ashx",
+    "moduleId": "dnn_ctr3323_View",
+    "eventTarget": "dnn$ctr3323$View$btnHiddenNrvSecondlyValueFileDownload",
+    "dataType": 20,
+    "productId": 35,
+    "title": "Sekuendliche Frequenz",
+    "dataUnit": "Hz",
+    "resultTimezone": "cet",
+    "timeInterval": 15,
+    "csvColumns": [
+      "50Hertz",
+      "Amprion",
+      "TenneT TSO",
+      "TransnetBW"
+    ],
+    "tsoIds": [
+      0
+    ],
+    "nrvDirection": 0,
+    "dateToIsExclusive": true
+  }
+}

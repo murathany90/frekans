@@ -486,6 +486,8 @@ def build_source_index(data_root: str | Path, source: str, year: int = 2026) -> 
             "validSamples": meta["validSamples"],
             "files": files,
         }
+        if meta.get("sourceMethod"):
+            day_record["sourceMethod"] = meta["sourceMethod"]
         if meta.get("status") not in ACTIVE_STATUSES:
             index["excludedDates"].append(local_date)
             index["excludedDays"][local_date] = {
@@ -611,7 +613,11 @@ def build_manifest(data_root: str | Path = "data") -> dict:
             "availableDates": dates,
             "excludedDates": excluded_dates,
             "days": days,
-            "status": "active" if source == "teias" else "manual_monthly_import",
+            "status": "active" if source == "teias" else (
+                "automatic_update"
+                if any(day.get("sourceMethod") in {"api", "official_zip"} for day in days.values())
+                else "manual_monthly_import"
+            ),
             "files": files,
         }
 
