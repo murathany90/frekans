@@ -27,8 +27,8 @@ try {
   await page.waitForFunction(() => Boolean(document.querySelector("#dateSelect")?.value));
 
   const header = await page.locator(".brand h1").textContent();
-  if (header?.trim() !== "Şebeke Frekansı") {
-    throw new Error(`Unexpected Turkish header title: ${header}`);
+  if (header?.trim() !== "GridFreq") {
+    throw new Error(`Unexpected header title: ${header}`);
   }
 
   await page.click('[data-tab="tab-chart"]');
@@ -59,12 +59,12 @@ try {
   await page.click("#analysisInfoToggle");
   await page.waitForSelector("#analysisInfoPanel:not(.hidden)");
   const infoText = await page.locator("#analysisInfoPanel").textContent();
-  if (!/Veri kapsama|Çapraz korelasyon|koherens|örnekleme|Nyquist/i.test(infoText || "")) {
+  if (!/Veri kapsama|koherens|rnekleme|Nyquist/i.test(infoText || "")) {
     throw new Error(`Analysis info panel does not contain moved guidance: ${infoText}`);
   }
 
   await page.click("#langToggle");
-  await page.waitForFunction(() => document.querySelector(".brand h1")?.textContent?.trim() === "Grid Frequency");
+  await page.waitForFunction(() => document.querySelector(".brand h1")?.textContent?.trim() === "GridFreq");
   const enLabels = await page.$$eval("#analysisSourceSelect option, #coverageSummary .label", items => items.map(item => item.textContent?.trim() || ""));
   if (!enLabels.some(label => /ENTSO-E \(Germany\)/.test(label)) && !enLabels.some(label => /Latest ENTSO-E data/.test(label))) {
     throw new Error(`English ENTSO-E labels are missing: ${JSON.stringify(enLabels)}`);

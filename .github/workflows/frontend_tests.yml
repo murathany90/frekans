@@ -6,6 +6,7 @@ on:
       - "frekans_rapor_v1.html"
       - "README.md"
       - "assets/**"
+      - "site.webmanifest"
       - "tests/frontend_smoke_playwright.mjs"
       - "tests/frontend_germany_only_daily_playwright.mjs"
       - "tests/frontend_prompt2_static.mjs"
@@ -14,6 +15,7 @@ on:
       - "tests/frontend_prompt5_static.mjs"
       - "tests/frontend_prompt5_playwright.mjs"
       - "tests/frontend_prompt6_static.mjs"
+      - "tests/frontend_brand_static.mjs"
       - "tests/frontend_prompt6_playwright.mjs"
       - "tests/frontend_initial_load_playwright.mjs"
       - "tests/readme_documentation_static.mjs"
@@ -24,6 +26,7 @@ on:
       - "frekans_rapor_v1.html"
       - "README.md"
       - "assets/**"
+      - "site.webmanifest"
       - "tests/frontend_smoke_playwright.mjs"
       - "tests/frontend_germany_only_daily_playwright.mjs"
       - "tests/frontend_prompt2_static.mjs"
@@ -32,6 +35,7 @@ on:
       - "tests/frontend_prompt5_static.mjs"
       - "tests/frontend_prompt5_playwright.mjs"
       - "tests/frontend_prompt6_static.mjs"
+      - "tests/frontend_brand_static.mjs"
       - "tests/frontend_prompt6_playwright.mjs"
       - "tests/frontend_initial_load_playwright.mjs"
       - "tests/readme_documentation_static.mjs"
@@ -68,6 +72,7 @@ jobs:
           node tests/frontend_prompt4_static.mjs
           node tests/frontend_prompt5_static.mjs
           node tests/frontend_prompt6_static.mjs
+          node tests/frontend_brand_static.mjs
           node tests/readme_documentation_static.mjs
           node tests/synthetic_signal_analysis.mjs
           node tests/spectral_methods.mjs

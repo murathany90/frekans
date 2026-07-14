@@ -9,6 +9,8 @@
 - GitHub Pages custom domain: `gridfreq.com`
 - Eski GitHub Pages adresi: `https://murathany90.github.io/frekans/` yalnızca platform/fallback adresidir.
 - Yayın girişi: `index.html`
+- Marka ve ikon paketi: `assets/brand/`
+- Web uygulaması manifesti: `site.webmanifest`
 - Analiz çekirdeği: `assets/analysis-core.mjs`
 - Statik veri kökü: `data/`
 - GitHub Pages çıktısı: `dist/`
@@ -26,6 +28,8 @@ Uygulama tek HTML dosyası etrafında çalışan statik bir ön yüz ve önceden
 - `assets/analysis-core.mjs`: Veri kalitesi, temel istatistik, RoCoF, Welch PSD, spektrogram, çapraz korelasyon, koherens ve sentetik sinyal yardımcıları.
 - `assets/analysis-worker.mjs`: Ağır analizlerin Web Worker üzerinde çalıştırılması.
 - `assets/echarts.min.js`: CDN erişimi yoksa kullanılan yerel ECharts yedeği.
+- `assets/brand/`: GridFreq SVG logo, favicon, mobil ikonlar ve sosyal paylaşım kartı.
+- `site.webmanifest`: Mobil ana ekrana ekleme ve PWA ikon tanımları.
 - `scripts/normalize_frequency.py`: Günlük frekans paketini üretir, int16 binary yazar, dakika/saat özetlerini oluşturur ve manifestleri üretir.
 - `scripts/build_site.py`: GitHub Pages için `dist/` klasörünü oluşturur.
 - `scripts/validate_frequency.py`: Veri boyutu, manifest tutarlılığı ve kalite uyarılarını kontrol eder.

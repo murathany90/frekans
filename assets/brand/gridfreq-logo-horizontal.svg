@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 112" role="img" aria-label="GridFreq Şebeke Frekansı Analiz Platformu">
+  <defs>
+    <linearGradient id="horizontalPulse" x1="12" y1="44" x2="76" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#22D3EE"/>
+      <stop offset="1" stop-color="#3B82F6"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="16" width="80" height="80" rx="18" fill="#0B1220"/>
+  <path d="M28 28v56M48 28v56M68 28v56M20 42h56M20 70h56" fill="none" stroke="#F8FAFC" stroke-opacity=".12" stroke-width="1.4"/>
+  <path d="M18 60C26 60 26 36 35 36S44 78 53 78 62 48 71 48s9 16 12 16" fill="none" stroke="url(#horizontalPulse)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="53" cy="78" r="5.5" fill="#F8FAFC"/>
+  <circle cx="53" cy="78" r="8.5" fill="none" stroke="#22D3EE" stroke-opacity=".28" stroke-width="2"/>
+  <text x="108" y="53" fill="#F8FAFC" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="34" font-weight="800">GridFreq</text>
+  <text x="110" y="81" fill="#CFE8F3" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" font-weight="500">Şebeke Frekansı Analiz Platformu</text>
+</svg>

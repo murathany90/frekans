@@ -12,7 +12,7 @@ from scripts.normalize_frequency import build_manifest
 from scripts.validate_frequency import validate_data_root, write_storage_report
 
 CUSTOM_DOMAIN = "gridfreq.com"
-REQUIRED_DOMAIN_FILES = ("CNAME", "robots.txt", "sitemap.xml")
+REQUIRED_DOMAIN_FILES = ("CNAME", "robots.txt", "sitemap.xml", "site.webmanifest")
 OPTIONAL_DOMAIN_FILES = ("404.html",)
 
 

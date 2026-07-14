@@ -31,6 +31,7 @@ def test_build_site_copies_domain_seo_files(monkeypatch, tmp_path):
         '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://gridfreq.com/</loc></url></urlset>\n',
         encoding="utf-8",
     )
+    (tmp_path / "site.webmanifest").write_text('{"name":"GridFreq"}\n', encoding="utf-8")
     (tmp_path / "404.html").write_text("<!doctype html><title>404</title>", encoding="utf-8")
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(build_site_module, "build_manifest", lambda _data_root: None)
@@ -42,4 +43,5 @@ def test_build_site_copies_domain_seo_files(monkeypatch, tmp_path):
     assert (tmp_path / "dist" / "CNAME").read_text(encoding="utf-8").strip() == "gridfreq.com"
     assert (tmp_path / "dist" / "robots.txt").exists()
     assert (tmp_path / "dist" / "sitemap.xml").exists()
+    assert (tmp_path / "dist" / "site.webmanifest").exists()
     assert (tmp_path / "dist" / "404.html").exists()

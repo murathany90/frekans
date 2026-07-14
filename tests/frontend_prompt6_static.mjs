@@ -78,10 +78,10 @@ for (const marker of [
   '<link rel="canonical" href="https://gridfreq.com/">',
   '<meta property="og:type" content="website">',
   '<meta property="og:url" content="https://gridfreq.com/">',
-  '<meta property="og:site_name" content="Frekans Atlası">',
-  '<meta property="og:title" content="Frekans Atlası">',
+  '<meta property="og:site_name" content="GridFreq">',
+  '<meta property="og:title" content="GridFreq">',
   '<meta name="twitter:card" content="summary_large_image">',
-  '<meta name="twitter:title" content="Frekans Atlası">'
+  '<meta name="twitter:title" content="GridFreq">'
 ]) {
   if (!html.includes(marker)) {
     throw new Error(`Missing custom-domain SEO marker: ${marker}`);

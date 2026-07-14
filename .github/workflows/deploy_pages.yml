@@ -12,6 +12,7 @@ on:
       - "robots.txt"
       - "sitemap.xml"
       - "404.html"
+      - "site.webmanifest"
       - "scripts/**"
       - "tests/**"
       - ".github/workflows/deploy_pages.yml"
@@ -48,6 +49,7 @@ jobs:
           node tests/frontend_prompt4_static.mjs
           node tests/frontend_prompt5_static.mjs
           node tests/frontend_prompt6_static.mjs
+          node tests/frontend_brand_static.mjs
           node tests/readme_documentation_static.mjs
           node tests/synthetic_signal_analysis.mjs
           node tests/spectral_methods.mjs
