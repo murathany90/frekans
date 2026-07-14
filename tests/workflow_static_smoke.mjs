@@ -31,7 +31,7 @@ if (!existsSync(".github/workflows/frontend_tests.yml")) {
 }
 
 const frontendWorkflow = readFileSync(".github/workflows/frontend_tests.yml", "utf8");
-for (const snippet of ["npx playwright install --with-deps chromium", "node tests/frontend_smoke_playwright.mjs", "node tests/frontend_germany_only_daily_playwright.mjs", "node tests/frontend_initial_load_playwright.mjs", "node tests/frontend_prompt4_static.mjs", "node tests/readme_documentation_static.mjs", "python -m http.server"]) {
+for (const snippet of ["npx playwright install --with-deps chromium", "node tests/frontend_smoke_playwright.mjs", "node tests/frontend_germany_only_daily_playwright.mjs", "node tests/frontend_initial_load_playwright.mjs", "node tests/frontend_prompt4_static.mjs", "node tests/frontend_prompt5_static.mjs", "node tests/frontend_prompt5_playwright.mjs", "node tests/readme_documentation_static.mjs", "python -m http.server"]) {
   if (!frontendWorkflow.includes(snippet)) {
     throw new Error(`Frontend workflow is missing: ${snippet}`);
   }
