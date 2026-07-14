@@ -17,6 +17,7 @@ on:
       - "tests/frontend_prompt6_static.mjs"
       - "tests/frontend_brand_static.mjs"
       - "tests/frontend_data_sources_modal_static.mjs"
+      - "tests/frontend_daily_mobile_compact_playwright.mjs"
       - "tests/frontend_prompt6_playwright.mjs"
       - "tests/frontend_data_sources_modal_playwright.mjs"
       - "tests/frontend_initial_load_playwright.mjs"
@@ -39,6 +40,7 @@ on:
       - "tests/frontend_prompt6_static.mjs"
       - "tests/frontend_brand_static.mjs"
       - "tests/frontend_data_sources_modal_static.mjs"
+      - "tests/frontend_daily_mobile_compact_playwright.mjs"
       - "tests/frontend_prompt6_playwright.mjs"
       - "tests/frontend_data_sources_modal_playwright.mjs"
       - "tests/frontend_initial_load_playwright.mjs"
@@ -109,6 +111,7 @@ jobs:
           node tests/frontend_prompt5_playwright.mjs
           node tests/frontend_prompt6_playwright.mjs
           node tests/frontend_data_sources_modal_playwright.mjs
+          node tests/frontend_daily_mobile_compact_playwright.mjs
 
       - name: Upload Playwright artifacts
         if: always()

@@ -47,6 +47,9 @@ const modalHtml = html.slice(html.indexOf('id="dataSourcesModal"'), html.indexOf
 if (!/target="_blank"\s+rel="noopener noreferrer"/.test(modalHtml)) {
   throw new Error("Official source links in the modal must use rel=\"noopener noreferrer\".");
 }
+if (/github\.com\/murathany90\/frekans|dataSourcesGithubLink|GridFreq GitHub/.test(modalHtml)) {
+  throw new Error("The data sources modal must not list the GridFreq GitHub repository as an official source link.");
+}
 
 for (const key of [
   "dataSourcesInfoBtn",
