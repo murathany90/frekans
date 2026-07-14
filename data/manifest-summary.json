@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAtUtc": "2026-07-14T01:03:00Z",
+  "updatedAtUtc": "2026-07-14T01:05:40Z",
   "storage": {
     "type": "github-pages",
     "baseUrl": "./data"
@@ -13,7 +13,7 @@
       "label": "Netztransparenz",
       "timezone": "Europe/Berlin",
       "firstDate": "2026-01-01",
-      "latestDate": "2026-06-30",
+      "latestDate": "2026-07-12",
       "availableDates": [
         "2026-01-01",
         "2026-01-02",
@@ -164,10 +164,22 @@
         "2026-06-27",
         "2026-06-28",
         "2026-06-29",
-        "2026-06-30"
+        "2026-06-30",
+        "2026-07-01",
+        "2026-07-02",
+        "2026-07-03",
+        "2026-07-04",
+        "2026-07-05",
+        "2026-07-06",
+        "2026-07-07",
+        "2026-07-08",
+        "2026-07-09",
+        "2026-07-10",
+        "2026-07-11",
+        "2026-07-12"
       ],
       "excludedDates": [],
-      "status": "manual_monthly_import"
+      "status": "automatic_update"
     },
     "teias": {
       "label": "TEİAŞ",
