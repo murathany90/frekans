@@ -44,7 +44,7 @@ try {
   await page.waitForTimeout(3000);
 
   if (dialogs.length) {
-    throw new Error(`Germany-only daily date triggered blocking dialog: ${dialogs.join(" | ")}`);
+    throw new Error(`ENTSO-E-only daily date triggered blocking dialog: ${dialogs.join(" | ")}`);
   }
 
   await page.waitForFunction(
@@ -78,16 +78,16 @@ try {
   }, targetDate);
 
   if (result.selectedDate !== targetDate || result.renderedDate !== targetDate) {
-    throw new Error(`Germany-only date did not render: ${JSON.stringify(result)}`);
+    throw new Error(`ENTSO-E-only date did not render: ${JSON.stringify(result)}`);
   }
   if (!result.hasDe || result.deFinite < 80000 || result.countB < 80000) {
-    throw new Error(`Germany series is not available on the daily page: ${JSON.stringify(result)}`);
+    throw new Error(`ENTSO-E series is not available on the daily page: ${JSON.stringify(result)}`);
   }
   if (result.hasTr || result.trFinite !== 0 || result.countA !== 0 || result.pairedCount !== 0) {
-    throw new Error(`Germany-only daily page should keep missing Turkey data empty: ${JSON.stringify(result)}`);
+    throw new Error(`ENTSO-E-only daily page should keep missing Turkey data empty: ${JSON.stringify(result)}`);
   }
-  if (!result.seriesNames.some(name => /Almanya|Germany/i.test(name))) {
-    throw new Error(`Germany chart series is missing: ${JSON.stringify(result)}`);
+  if (!result.seriesNames.some(name => /ENTSO-E|Almanya|Germany/i.test(name))) {
+    throw new Error(`ENTSO-E chart series is missing: ${JSON.stringify(result)}`);
   }
   if (consoleErrors.length) {
     throw new Error(`Console errors:\n${consoleErrors.join("\n")}`);

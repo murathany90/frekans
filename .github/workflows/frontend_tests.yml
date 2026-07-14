@@ -13,6 +13,8 @@ on:
       - "tests/frontend_prompt4_static.mjs"
       - "tests/frontend_prompt5_static.mjs"
       - "tests/frontend_prompt5_playwright.mjs"
+      - "tests/frontend_prompt6_static.mjs"
+      - "tests/frontend_prompt6_playwright.mjs"
       - "tests/frontend_initial_load_playwright.mjs"
       - "tests/readme_documentation_static.mjs"
       - "tests/spectral_methods.mjs"
@@ -29,6 +31,8 @@ on:
       - "tests/frontend_prompt4_static.mjs"
       - "tests/frontend_prompt5_static.mjs"
       - "tests/frontend_prompt5_playwright.mjs"
+      - "tests/frontend_prompt6_static.mjs"
+      - "tests/frontend_prompt6_playwright.mjs"
       - "tests/frontend_initial_load_playwright.mjs"
       - "tests/readme_documentation_static.mjs"
       - "tests/spectral_methods.mjs"
@@ -63,6 +67,7 @@ jobs:
           node tests/frontend_prompt3_static.mjs
           node tests/frontend_prompt4_static.mjs
           node tests/frontend_prompt5_static.mjs
+          node tests/frontend_prompt6_static.mjs
           node tests/readme_documentation_static.mjs
           node tests/synthetic_signal_analysis.mjs
           node tests/spectral_methods.mjs
@@ -92,6 +97,7 @@ jobs:
           node tests/frontend_germany_only_daily_playwright.mjs
           node tests/frontend_initial_load_playwright.mjs
           node tests/frontend_prompt5_playwright.mjs
+          node tests/frontend_prompt6_playwright.mjs
 
       - name: Upload Playwright artifacts
         if: always()

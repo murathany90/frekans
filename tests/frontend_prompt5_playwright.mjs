@@ -34,7 +34,7 @@ try {
     value: item.querySelector(".value")?.textContent?.trim() || ""
   })));
   const labels = cards.map(card => card.label);
-  if (labels.slice(0, 5).join("|") !== "Görünüm|Rapor tarihi|Son Türkiye verisi|Son Almanya verisi|Son ortak gün") {
+  if (labels.slice(0, 5).join("|") !== "Görünüm|Rapor tarihi|Son Türkiye verisi|Son ENTSO-E verisi|Son ortak gün") {
     throw new Error(`Unexpected daily coverage card order: ${JSON.stringify(cards)}`);
   }
   if (!/24 saat|24h/i.test(cards[0].value) || !/\d{2}\.\d{2}\.\d{4}/.test(cards[1].value)) {

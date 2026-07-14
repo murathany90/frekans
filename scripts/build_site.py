@@ -33,6 +33,8 @@ def build_site(data_root: Path = Path("data"), dist_root: Path = Path("dist")) -
     shutil.copy2("frekans_rapor_v1.html", dist_root / "index.html")
     if Path("index.html").exists():
         shutil.copy2("index.html", dist_root / "source-index.html")
+    if Path("CNAME").exists():
+        shutil.copy2("CNAME", dist_root / "CNAME")
     copy_tree(Path("assets"), dist_root / "assets")
     build_manifest(data_root)
     copy_tree(data_root, dist_root / "data")

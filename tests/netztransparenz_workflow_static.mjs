@@ -30,6 +30,7 @@ for (const snippet of [
   "node tests/frontend_static_smoke.mjs",
   "node tests/frontend_prompt4_static.mjs",
   "node tests/frontend_prompt5_static.mjs",
+  "node tests/frontend_prompt6_static.mjs",
   "node tests/readme_documentation_static.mjs",
   "python scripts/validate_frequency.py",
   "python scripts/build_site.py",

@@ -1,6 +1,6 @@
-# Frekans Atlası
+# Şebeke Frekansı
 
-Frekans Atlası, TEİAŞ Türkiye günlük şebeke frekansı verileri ile Netztransparenz/ENTSO-e Almanya frekans verilerini aynı statik web uygulamasında inceleyen, karşılaştıran ve analiz eden bir frekans kalite platformudur. Uygulama GitHub Pages üzerinde çalışır; tarayıcı doğrudan TEİAŞ veya Netztransparenz sistemlerine bağlanmaz. Otomatik indirme, normalizasyon, kalite kontrolü ve yayınlama işleri GitHub Actions ve yerel Python betikleriyle yapılır.
+Şebeke Frekansı, TEİAŞ Türkiye günlük şebeke frekansı verileri ile ENTSO-E (Almanya) / Netztransparenz frekans verilerini aynı statik web uygulamasında inceleyen, karşılaştıran ve analiz eden bir frekans kalite platformudur. Uygulama GitHub Pages üzerinde çalışır ve `gridfreq.com` alan adı için `CNAME` üretir; tarayıcı doğrudan TEİAŞ veya Netztransparenz sistemlerine bağlanmaz. Otomatik indirme, normalizasyon, kalite kontrolü ve yayınlama işleri GitHub Actions ve yerel Python betikleriyle yapılır.
 
 ## Kısa Durum
 
@@ -13,7 +13,7 @@ Frekans Atlası, TEİAŞ Türkiye günlük şebeke frekansı verileri ile Netztr
 - Netztransparenz son otomatik kaynak: `scripts/fetch_netztransparenz.py`
 - Netztransparenz OAuth istemcisi: `scripts/netztransparenz_client.py`
 
-Mevcut manifest özetinde TEİAŞ ve Netztransparenz günleri ayrı tutulur. Türkiye ve Almanya günleri birebir aynı takvim aralığında olmak zorunda değildir; uygulama ortak günleri karşılaştırma için, tekil ülke günlerini ise tek kaynak grafiği ve tek kaynak analizleri için kullanır.
+Mevcut manifest özetinde TEİAŞ ve Netztransparenz günleri ayrı tutulur. Türkiye ve ENTSO-E (Almanya) günleri birebir aynı takvim aralığında olmak zorunda değildir; uygulama ortak günleri karşılaştırma için, tekil kaynak günlerini ise tek kaynak grafiği ve tek kaynak analizleri için kullanır.
 
 ## Mimari
 
@@ -31,7 +31,7 @@ Uygulama tek HTML dosyası etrafında çalışan statik bir ön yüz ve önceden
 
 ### Günlük
 
-Günlük sekmesi tarih seçimi, zaman hizalama, grafik katmanları ve 24 saatlik frekans grafiği için ana ekrandır. Tarih seçicide Türkiye, Almanya veya ikisinde birden bulunan günler gösterilir. Gün yalnızca Almanya verisine sahipse Almanya serisi tekil olarak çizilir; Türkiye verisi boş kalır. Ortak günlerde Türkiye ve Almanya aynı grafik üzerinde karşılaştırılır.
+Günlük sekmesi tarih seçimi, zaman hizalama, grafik katmanları ve 24 saatlik frekans grafiği için ana ekrandır. Tarih seçicide Türkiye, ENTSO-E (Almanya) veya ikisinde birden bulunan günler gösterilir. Gün yalnızca ENTSO-E verisine sahipse ENTSO-E serisi tekil olarak çizilir; Türkiye verisi boş kalır. Ortak günlerde Türkiye ve ENTSO-E aynı grafik üzerinde karşılaştırılır.
 
 Günlük sekmesindeki ana kontroller:
 
@@ -48,9 +48,9 @@ Analiz sekmesi seçili gün veya tarih aralığı üzerinde bilimsel analizleri 
 Kaynak seçenekleri:
 
 - `Türkiye`: TEİAŞ serisini tek başına analiz eder.
-- `Almanya`: Netztransparenz serisini tek başına analiz eder.
-- `Türkiye + Almanya`: Ortak veri gerektiren çift kaynak görünümü.
-- `Türkiye - Almanya`: İki ülke arasındaki fark bileşeni.
+- `ENTSO-E (Almanya)`: Netztransparenz serisini tek başına analiz eder.
+- `Türkiye + ENTSO-E`: Ortak veri gerektiren çift kaynak görünümü.
+- `Türkiye - ENTSO-E`: İki kaynak arasındaki fark bileşeni.
 - `Ortak bileşen`: İki serinin ortak mod davranışı.
 - `Diferansiyel bileşen`: Yerel farklılaşma davranışı.
 
@@ -69,7 +69,7 @@ Raporlar sekmesi son analiz sonucundan rapor ön izlemesi, JSON çıktısı ve o
 
 ### Veri
 
-Veri sekmesi otomatik katalog durumu, son TEİAŞ tarihi, son Almanya tarihi, Netztransparenz kaynak yöntemi, eksik gün sayısı ve manuel CSV yükleme alanlarını gösterir. Manuel yükleme halen desteklenir ve tarayıcı belleğinde çalışır.
+Veri sekmesi otomatik katalog durumu, son TEİAŞ tarihi, son ENTSO-E tarihi, Netztransparenz kaynak yöntemi, kaynak sağlık kartları, eksik gün sayısı ve manuel CSV yükleme alanlarını gösterir. Manuel yükleme halen desteklenir ve tarayıcı belleğinde çalışır.
 
 ## Grafik Yapısı
 
@@ -80,10 +80,10 @@ Günlük grafik ECharts ile çizilir. Tam gün görünümünde 86.400 saniyelik 
 Grafik katmanları:
 
 - Türkiye frekansı
-- Almanya frekansı
-- Türkiye - Almanya farkı
+- ENTSO-E frekansı
+- Türkiye - ENTSO-E farkı
 - Türkiye minimum/maksimum zarfı
-- Almanya minimum/maksimum zarfı
+- ENTSO-E minimum/maksimum zarfı
 
 Saatlik matris ve 15 dakikalık heatmap grafiğe bağlıdır. Saat veya çeyrek saat seçildiğinde saniyelik detay görünümü açılır. Çift tıklama günlük görünüme geri döndürür. Grafik araç çubuğu tam ekran, PNG indirme ve yakınlaştırma sıfırlama kontrolleri içerir.
 
@@ -92,9 +92,9 @@ Saatlik matris ve 15 dakikalık heatmap grafiğe bağlıdır. Saat veya çeyrek 
 Günlük hesap sonrası KPI alanı şu metrikleri gösterir:
 
 - Türkiye ortalaması
-- Almanya ortalaması
+- ENTSO-E ortalaması
 - Türkiye ortalama mutlak sapma
-- Almanya ortalama mutlak sapma
+- ENTSO-E ortalama mutlak sapma
 - Bias
 - MAE/RMSE
 - Korelasyon
@@ -138,7 +138,7 @@ Osilasyon adayı analizi bant geçiren FIR filtre, kayan pencere ve mHz eşiklem
 
 ### Çapraz korelasyon
 
-Çapraz korelasyon Türkiye ve Almanya ortak günlerinde çalışır. İki seri arasındaki en iyi gecikme, korelasyon büyüklüğü ve ortak mod göstergesi hesaplanır.
+Çapraz korelasyon Türkiye ve ENTSO-E ortak günlerinde çalışır. İki seri arasındaki en iyi gecikme, korelasyon büyüklüğü ve ortak mod göstergesi hesaplanır.
 
 ### Koherens ve faz
 
@@ -259,7 +259,7 @@ Ana workflow dosyaları:
 - `.github/workflows/validate_data.yml`: Veri ve analiz testleri.
 - `.github/workflows/backfill_2026.yml`: 2026 backfill desteği.
 
-GitHub Pages yayını için repository ayarlarında Pages source olarak **GitHub Actions** seçilmelidir. `deploy_pages.yml` build sırasında `python scripts/build_site.py` çalıştırır ve `dist/` klasörünü Pages artifact olarak yükler. Ham CSV/ZIP kaynakları, `incoming/`, `cache/`, test artifactleri ve geçici dosyalar Pages çıktısına konmaz.
+GitHub Pages yayını için repository ayarlarında Pages source olarak **GitHub Actions** seçilmelidir. `deploy_pages.yml` build sırasında `python scripts/build_site.py` çalıştırır ve `dist/` klasörünü Pages artifact olarak yükler. Kök `CNAME` dosyası `gridfreq.com` değerini taşır ve build sırasında `dist/CNAME` olarak kopyalanır. Ham CSV/ZIP kaynakları, `incoming/`, `cache/`, test artifactleri ve geçici dosyalar Pages çıktısına konmaz.
 
 ## Yerel Çalıştırma
 
@@ -308,6 +308,9 @@ python -m pytest tests
 node tests/frontend_static_smoke.mjs
 node tests/frontend_prompt2_static.mjs
 node tests/frontend_prompt3_static.mjs
+node tests/frontend_prompt4_static.mjs
+node tests/frontend_prompt5_static.mjs
+node tests/frontend_prompt6_static.mjs
 node tests/frontend_netztransparenz_status_static.mjs
 node tests/readme_documentation_static.mjs
 node tests/workflow_static_smoke.mjs
@@ -325,6 +328,9 @@ python -m http.server 8080
 $env:APP_URL="http://127.0.0.1:8080/frekans_rapor_v1.html"
 node tests/frontend_smoke_playwright.mjs
 node tests/frontend_germany_only_daily_playwright.mjs
+node tests/frontend_initial_load_playwright.mjs
+node tests/frontend_prompt5_playwright.mjs
+node tests/frontend_prompt6_playwright.mjs
 ```
 
 Test kapsamı parser, timezone hizalama, int16 encode/decode, manifest üretimi, otomatik workflow statikleri, Netztransparenz OAuth istemci davranışı, analiz çekirdeği, grafik UI kontrolleri ve README dokümantasyon kapsamını içerir.
