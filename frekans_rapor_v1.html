@@ -697,6 +697,59 @@
       gap: 10px;
       align-items: end;
     }
+    .analysis-panel .section-title { margin-bottom: 6px; }
+    .analysis-filter-bar {
+      grid-template-columns: minmax(260px, .9fr) minmax(220px, 1fr) minmax(220px, 1fr) minmax(180px, .7fr);
+      gap: 8px;
+      align-items: end;
+      margin-top: 2px;
+    }
+    .analysis-filter-bar .field { gap: 4px; }
+    .analysis-filter-bar .field > label,
+    .analysis-date-label-row {
+      height: 18px;
+      min-height: 18px;
+      line-height: 18px;
+    }
+    .analysis-date-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 18px;
+    }
+    .analysis-filter-bar .copy-date-btn {
+      width: auto;
+      min-height: 0;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--blue);
+      font-size: .74rem;
+      font-weight: 850;
+      line-height: 1.2;
+      box-shadow: none;
+    }
+    .analysis-filter-bar .copy-date-btn:hover {
+      transform: none;
+      text-decoration: underline;
+    }
+    .analysis-filter-bar .button-row {
+      display: grid;
+      grid-template-columns: minmax(86px, 1fr) minmax(74px, .85fr);
+      gap: 8px;
+      align-items: stretch;
+    }
+    .analysis-action-field > label {
+      visibility: hidden;
+    }
+    .analysis-filter-bar .cal-toggle-btn,
+    .analysis-filter-bar .field select,
+    .analysis-action-field .btn {
+      height: 41px;
+      min-height: 41px;
+    }
     .date-picker-shell .copy-date-btn {
       width: 100%;
       min-height: 32px;
@@ -704,19 +757,26 @@
       padding: 4px 8px;
       font-size: .78rem;
     }
+    .analysis-filter-bar .copy-date-btn {
+      width: auto;
+      min-height: 0;
+      margin: 0;
+      padding: 0;
+      font-size: .74rem;
+    }
     .analysis-controls.compact { grid-template-columns: repeat(3, minmax(140px, 1fr)); }
     details.advanced-panel {
-      margin-top: 10px;
+      margin-top: 8px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: #fbfdfe;
-      padding: 8px 10px 10px;
+      padding: 0 10px 8px;
     }
     details.advanced-panel summary {
       cursor: pointer;
       font-weight: 900;
       color: var(--navy);
-      min-height: 40px;
+      min-height: 32px;
       display: flex;
       align-items: center;
     }
@@ -1022,16 +1082,19 @@
 
     <!-- SEKME 2: ANALİZ LABORATUVARI -->
     <section id="tab-oscillation" class="tab-panel">
-      <div class="panel no-print">
+      <div class="panel no-print analysis-panel">
         <div class="section-title">
           <div>
             <h2 data-i18n="sectionOscillation">Analiz Laboratuvarı</h2>
           </div>
         </div>
 
-        <div class="analysis-controls">
-          <div class="field date-picker-shell" data-date-picker="analysis" style="position:relative">
-            <label data-i18n="analysisDateLabel">Tarih</label>
+        <div class="analysis-controls analysis-filter-bar">
+          <div class="field date-picker-shell analysis-date-field" data-date-picker="analysis" style="position:relative">
+            <div class="analysis-date-label-row">
+              <label data-i18n="analysisDateLabel">Tarih</label>
+              <button id="copyDailyDateBtn" class="copy-date-btn" type="button" data-i18n="copyDailyDateBtn">Günlük tarihten al</button>
+            </div>
             <div style="display:flex;gap:4px;align-items:stretch">
               <button class="btn btn-secondary" id="analysisPrevDayBtn" type="button" aria-label="Önceki gün" title="◀" style="min-height:39px;min-width:36px;padding:4px 8px">◀</button>
               <button type="button" class="cal-toggle-btn" id="analysisCalToggle" style="flex:1;min-width:0">
@@ -1049,7 +1112,6 @@
               <div class="calendar-grid" id="analysisCalGrid"></div>
             </div>
             <input id="analysisDateSelect" type="hidden" />
-            <button class="btn btn-light copy-date-btn" id="copyDailyDateBtn" type="button" data-i18n="copyDailyDateBtn">Günlük tarihten al</button>
           </div>
           <div class="field">
             <label for="analysisSourceSelect" data-i18n="analysisSourceLabel">Kaynak</label>
@@ -1101,7 +1163,7 @@
               </optgroup>
             </select>
           </div>
-          <div class="field">
+          <div class="field analysis-action-field">
             <label>&nbsp;</label>
             <div class="button-row">
               <button class="btn btn-success" id="analysisRunBtn" type="button" data-i18n="analysisRunBtn">Çalıştır</button>
@@ -1110,7 +1172,7 @@
           </div>
         </div>
 
-        <details class="advanced-panel">
+        <details class="advanced-panel analysis-advanced-panel">
           <summary data-i18n="advanced">Gelişmiş</summary>
           <div class="analysis-controls compact">
             <div class="field"><label for="analysisDateMode" data-i18n="analysisDateModeLabel">Tarih modu</label><select id="analysisDateMode"><option value="single" data-i18n="dateModeSingle">Tek gün</option><option value="range" data-i18n="dateModeRange">Tarih aralığı</option><option value="last7" data-i18n="dateModeLast7">Son 7 ortak gün</option><option value="last30" data-i18n="dateModeLast30">Son 30 ortak gün</option><option value="month" data-i18n="dateModeMonth">Ay seçimi</option><option value="customHours" data-i18n="dateModeCustomHours">Özel saat</option></select></div>

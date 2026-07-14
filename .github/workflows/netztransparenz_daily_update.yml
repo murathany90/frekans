@@ -111,6 +111,7 @@ jobs:
           node tests/frontend_prompt2_static.mjs
           node tests/frontend_prompt3_static.mjs
           node tests/frontend_netztransparenz_status_static.mjs
+          node tests/readme_documentation_static.mjs
           node tests/workflow_static_smoke.mjs
           node tests/netztransparenz_workflow_static.mjs
           node tests/synthetic_signal_analysis.mjs

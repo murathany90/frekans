@@ -12,6 +12,10 @@ mustContain('data-layer="difference"');
 mustContain('data-layer="minmax"');
 mustContain('data-date-picker="daily"');
 mustContain('data-date-picker="analysis"');
+mustContain('analysis-controls analysis-filter-bar');
+mustContain('analysis-date-label-row');
+mustContain('analysis-action-field');
+mustContain('analysis-advanced-panel');
 mustContain('analysisPrevDayBtn');
 mustContain('analysisNextDayBtn');
 mustContain('analysisCalGrid');
@@ -48,6 +52,14 @@ if (!/<select id="showMinMaxEnvelope"[^>]*>[\s\S]*<option value="no"[^>]*selecte
 
 if (/seriesTrMin[\s\S]{0,600}!\s*detailMode\s*\?/.test(html)) {
   throw new Error("Min/max series appear to be included without a min/max toggle guard.");
+}
+
+if (!/\.analysis-filter-bar\s*\{[\s\S]*grid-template-columns:\s*minmax\(260px,\s*\.9fr\)\s*minmax\(220px,\s*1fr\)\s*minmax\(220px,\s*1fr\)\s*minmax\(180px,\s*\.7fr\)/.test(html)) {
+  throw new Error("Analysis filter bar must use the compact symmetric desktop grid.");
+}
+
+if (!/class="analysis-date-label-row"[\s\S]*id="copyDailyDateBtn"[\s\S]*<\/div>\s*<div[^>]*>\s*<button[^>]*id="analysisPrevDayBtn"[\s\S]*id="analysisCalToggle"/.test(html)) {
+  throw new Error("Copy daily date action must live in the analysis date label row, before the date control row.");
 }
 
 console.log("frontend_prompt3_static ok");

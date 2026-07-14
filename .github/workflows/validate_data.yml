@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - "data/**"
+      - "README.md"
       - "scripts/**"
       - "tests/**"
   workflow_dispatch:
@@ -34,5 +35,6 @@ jobs:
           node tests/frontend_static_smoke.mjs
           node tests/frontend_prompt2_static.mjs
           node tests/frontend_prompt3_static.mjs
+          node tests/readme_documentation_static.mjs
           node tests/synthetic_signal_analysis.mjs
           node tests/spectral_methods.mjs

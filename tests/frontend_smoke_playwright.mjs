@@ -33,6 +33,53 @@ async function waitForFrequencySeries(predicate, label) {
   });
 }
 
+async function assertAnalysisFilterLayout(targetPage = page) {
+  const layout = await targetPage.evaluate(() => {
+    const bar = document.querySelector(".analysis-filter-bar");
+    const advanced = document.querySelector(".analysis-advanced-panel");
+    const controls = [
+      document.querySelector("#analysisCalToggle"),
+      document.querySelector("#analysisSourceSelect"),
+      document.querySelector("#analysisTypeSelect"),
+      document.querySelector("#analysisRunBtn")
+    ];
+    const boxes = controls.map(element => {
+      const rect = element?.getBoundingClientRect();
+      return rect ? { top: rect.top, bottom: rect.bottom, height: rect.height } : null;
+    });
+    const barRect = bar?.getBoundingClientRect();
+    const advancedRect = advanced?.getBoundingClientRect();
+    const copyRect = document.querySelector("#copyDailyDateBtn")?.getBoundingClientRect();
+    return {
+      childCount: bar?.children.length || 0,
+      boxes,
+      topSpread: Math.max(...boxes.map(box => box?.top || 0)) - Math.min(...boxes.map(box => box?.top || 0)),
+      controlHeightSpread: Math.max(...boxes.map(box => box?.height || 0)) - Math.min(...boxes.map(box => box?.height || 0)),
+      barHeight: barRect?.height || 0,
+      advancedGap: advancedRect && barRect ? advancedRect.top - barRect.bottom : null,
+      copyAboveControls: copyRect && boxes[0] ? copyRect.bottom <= boxes[0].top : false
+    };
+  });
+  if (layout.childCount !== 4) {
+    throw new Error(`Analysis filter bar should have four aligned groups: ${JSON.stringify(layout)}`);
+  }
+  if (layout.boxes.some(box => !box)) {
+    throw new Error(`Analysis filter controls are missing: ${JSON.stringify(layout)}`);
+  }
+  if (layout.topSpread > 4) {
+    throw new Error(`Analysis filter controls are not symmetrically top-aligned: ${JSON.stringify(layout)}`);
+  }
+  if (layout.controlHeightSpread > 2) {
+    throw new Error(`Analysis filter controls should have matching heights: ${JSON.stringify(layout)}`);
+  }
+  if (layout.barHeight > 72 || layout.advancedGap === null || layout.advancedGap > 10) {
+    throw new Error(`Analysis filter spacing is too loose: ${JSON.stringify(layout)}`);
+  }
+  if (!layout.copyAboveControls) {
+    throw new Error(`Copy daily date action should be in the analysis date label row: ${JSON.stringify(layout)}`);
+  }
+}
+
 function assertNoConsoleErrors(stage) {
   if (consoleErrors.length) {
     throw new Error(`${stage} console errors:\n${consoleErrors.join("\n")}`);
@@ -118,6 +165,7 @@ try {
   await page.waitForFunction(() => document.querySelector("#chartViewTag")?.textContent.includes("24 saat"));
 
   await page.click('[data-tab="tab-oscillation"]');
+  await assertAnalysisFilterLayout();
   await page.selectOption("#analysisTypeSelect", "psd");
   const beforeWorkerRun = await page.evaluate(() => state.analysis.workerRequestId);
   await page.click("#analysisRunBtn");
