@@ -739,6 +739,10 @@
       cursor: help;
       overflow: visible !important;
     }
+    .metric-name:focus-visible {
+      outline: 2px solid rgba(27, 152, 181, .42);
+      outline-offset: -2px;
+    }
     .mobile-hour-view { display: none; }
     .mobile-hour-detail {
       display: grid;
@@ -770,35 +774,6 @@
       cursor: pointer;
     }
     .hour-heat-cell.worst { box-shadow: inset 0 0 0 2px rgba(200,60,60,.5); }
-    .metric-name:hover::after,
-    .metric-name:focus-visible::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      z-index: 50;
-      left: 6px;
-      bottom: calc(100% + 7px);
-      width: min(330px, 76vw);
-      padding: 8px 10px;
-      border-radius: 8px;
-      background: #102f4a;
-      color: #fff;
-      box-shadow: 0 6px 18px rgba(13,47,79,.2);
-      white-space: normal;
-      text-align: left;
-      font-size: .75rem;
-      font-weight: 600;
-      line-height: 1.35;
-    }
-    .metric-name:hover::before,
-    .metric-name:focus-visible::before {
-      content: "";
-      position: absolute;
-      z-index: 51;
-      left: 18px;
-      bottom: calc(100% + 1px);
-      border: 6px solid transparent;
-      border-top-color: #102f4a;
-    }
     .quarter-hour {
       cursor: pointer;
       user-select: none;
@@ -5105,23 +5080,23 @@
       }
 
       const metrics = [
-        [t('metricMeanTr'), 'meanA', 'freq', ''],
-        [t('metricMinTr'), 'minA', 'freq', ''],
-        [t('metricMaxTr'), 'maxA', 'freq', ''],
-        [t('metricMeanDe'), 'meanB', 'freq', ''],
-        [t('metricMinDe'), 'minB', 'freq', ''],
-        [t('metricMaxDe'), 'maxB', 'freq', ''],
-        [t('metricBias'), 'biasMhz', 'bias', ''],
-        [t('metricMae'), 'maeMhz', 'mae', ''],
-        [t('metricRmse'), 'rmseMhz', 'mae', ''],
-        [t('metricCorr'), 'correlation', 'corr', '']
+        [t('metricMeanTr'), 'meanA', 'freq', t('metricMeanTrHelp')],
+        [t('metricMinTr'), 'minA', 'freq', t('metricMinTrHelp')],
+        [t('metricMaxTr'), 'maxA', 'freq', t('metricMaxTrHelp')],
+        [t('metricMeanDe'), 'meanB', 'freq', t('metricMeanDeHelp')],
+        [t('metricMinDe'), 'minB', 'freq', t('metricMinDeHelp')],
+        [t('metricMaxDe'), 'maxB', 'freq', t('metricMaxDeHelp')],
+        [t('metricBias'), 'biasMhz', 'bias', t('metricBiasHelp')],
+        [t('metricMae'), 'maeMhz', 'mae', t('metricMaeHelp')],
+        [t('metricRmse'), 'rmseMhz', 'mae', t('metricRmseHelp')],
+        [t('metricCorr'), 'correlation', 'corr', t('metricCorrHelp')]
       ];
 
       const head = `<tr><th>${t('hourBlockMetric')}</th>${Array.from({ length: 24 }, (_, hour) => {
         const tooltip = t('hourBlockTooltip', { hour: String(hour).padStart(2,'0'), nextHour: String((hour + 1) % 24).padStart(2,'0') });
         return `<th class="hour-header" tabindex="0" data-hour="${hour}" data-hour-tooltip="${escapeHtml(tooltip)}" aria-label="${escapeHtml(tooltip)}">${String(hour).padStart(2, '0')}</th>`;
       }).join('')}</tr>`;
-      const rows = metrics.map(([label, key, type]) => {
+      const rows = metrics.map(([label, key, type, help]) => {
         const cells = current.hourly.map((row, hour) => {
           const value = row[key];
           const background = metricColor(value, type);
@@ -5131,7 +5106,7 @@
           const tooltip = `${hourRangeLabel(hour)} • ${label}: ${valueText} ${unit}`;
           return `<td tabindex="0" style="background:${background}" data-hour-tooltip="${escapeHtml(tooltip)}" aria-label="${escapeHtml(tooltip)}">${valueText}</td>`;
         }).join('');
-        return `<tr><td class="metric-name" tabindex="0">${label}</td>${cells}</tr>`;
+        return `<tr><td class="metric-name" tabindex="0" data-tooltip="${escapeHtml(help)}" aria-label="${escapeHtml(`${label}: ${help}`)}">${label}</td>${cells}</tr>`;
       }).join('');
 
       const worst = [...current.hourly]
@@ -5142,11 +5117,11 @@
       const selectedHour = Number(root.dataset.selectedHour || 0);
       const detail = current.hourly[selectedHour] || current.hourly[0];
       const mobileCards = [
-        [t('metricMeanTr'), `${fmt(detail.meanA, 3)} Hz`],
-        [t('metricMeanDe'), `${fmt(detail.meanB, 3)} Hz`],
-        [t('metricBias'), `${fmt(detail.biasMhz, 2)} mHz`],
-        [t('metricMae'), `${fmt(detail.maeMhz, 2)} mHz`]
-      ].map(([label, value]) => `<div class="mobile-hour-card"><div class="label">${label}</div><div class="value">${value}</div></div>`).join('');
+        [t('metricMeanTr'), `${fmt(detail.meanA, 3)} Hz`, t('metricMeanTrHelp')],
+        [t('metricMeanDe'), `${fmt(detail.meanB, 3)} Hz`, t('metricMeanDeHelp')],
+        [t('metricBias'), `${fmt(detail.biasMhz, 2)} mHz`, t('metricBiasHelp')],
+        [t('metricMae'), `${fmt(detail.maeMhz, 2)} mHz`, t('metricMaeHelp')]
+      ].map(([label, value, help]) => `<div class="mobile-hour-card" tabindex="0" data-tooltip="${escapeHtml(help)}" aria-label="${escapeHtml(`${label}: ${help}`)}"><div class="label">${label}</div><div class="value">${value}</div></div>`).join('');
       const maxMae = Math.max(1, ...current.hourly.map(row => Number.isFinite(row.maeMhz) ? row.maeMhz : 0));
       const heat = current.hourly.map((row, hour) => {
         const background = heatColor(row.maeMhz, 0, maxMae, false);
@@ -6917,6 +6892,16 @@
         metricMae: 'MAE',
         metricRmse: 'RMSE',
         metricCorr: 'Korel.',
+        metricMeanTrHelp: 'Türkiye saatlik ortalama frekansı. Birim: Hz.',
+        metricMinTrHelp: 'Türkiye saat içindeki en düşük frekans. Birim: Hz.',
+        metricMaxTrHelp: 'Türkiye saat içindeki en yüksek frekans. Birim: Hz.',
+        metricMeanDeHelp: 'ENTSO-E saatlik ortalama frekansı. Birim: Hz.',
+        metricMinDeHelp: 'ENTSO-E saat içindeki en düşük frekans. Birim: Hz.',
+        metricMaxDeHelp: 'ENTSO-E saat içindeki en yüksek frekans. Birim: Hz.',
+        metricBiasHelp: 'Saatlik ortalama fark: Türkiye eksi ENTSO-E. Birim: mHz.',
+        metricMaeHelp: 'Saatlik ortalama mutlak fark. Birim: mHz.',
+        metricRmseHelp: 'Saatlik RMS farkı. Birim: mHz.',
+        metricCorrHelp: 'Saatlik eşlenmiş örneklerin korelasyonu. Birimsiz.',
         unitlessUnit: 'birimsiz',
         // Oscillation chart labels
         oscFilteredName: '{source} eşik üstü {f1}–{f2} Hz bileşeni',
@@ -7214,6 +7199,16 @@
         metricMae: 'MAE',
         metricRmse: 'RMSE',
         metricCorr: 'Corr.',
+        metricMeanTrHelp: 'Türkiye hourly mean frequency. Unit: Hz.',
+        metricMinTrHelp: 'Türkiye hourly minimum frequency. Unit: Hz.',
+        metricMaxTrHelp: 'Türkiye hourly maximum frequency. Unit: Hz.',
+        metricMeanDeHelp: 'ENTSO-E hourly mean frequency. Unit: Hz.',
+        metricMinDeHelp: 'ENTSO-E hourly minimum frequency. Unit: Hz.',
+        metricMaxDeHelp: 'ENTSO-E hourly maximum frequency. Unit: Hz.',
+        metricBiasHelp: 'Hourly mean difference: Türkiye minus ENTSO-E. Unit: mHz.',
+        metricMaeHelp: 'Hourly mean absolute difference. Unit: mHz.',
+        metricRmseHelp: 'Hourly RMS difference. Unit: mHz.',
+        metricCorrHelp: 'Hourly correlation of paired samples. Unitless.',
         unitlessUnit: 'unitless',
         // Oscillation chart labels
         oscFilteredName: '{source} bandpass {f1}–{f2} Hz component',

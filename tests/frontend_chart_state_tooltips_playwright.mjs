@@ -156,6 +156,27 @@ try {
       throw new Error(`Hour tooltip must be compact and readable: ${JSON.stringify({ tooltipBox, tooltipText })}`);
     }
 
+    const metricTooltip = await page.locator(".metric-name", { hasText: "Bias" }).first().getAttribute("data-tooltip");
+    if (!metricTooltip || !/hourly|mean difference|mHz/i.test(metricTooltip)) {
+      throw new Error(`Hourly metric names must expose descriptive tooltip text: ${metricTooltip}`);
+    }
+    await page.focus(".metric-name:text-is('Bias')");
+    await page.waitForSelector("#appTooltip:not(.hidden)");
+    const metricTipState = await page.locator("#appTooltip").evaluate(node => {
+      const rect = node.getBoundingClientRect();
+      const style = getComputedStyle(node);
+      return {
+        text: node.textContent || "",
+        width: rect.width,
+        background: style.backgroundColor,
+        color: style.color,
+        zIndex: Number(style.zIndex || 0)
+      };
+    });
+    if (!/Bias|mean difference|mHz/i.test(metricTipState.text) || metricTipState.width < 80 || metricTipState.zIndex < 3000) {
+      throw new Error(`Hourly metric tooltip must render readable text in the shared tooltip: ${JSON.stringify(metricTipState)}`);
+    }
+
     await page.click("#dataSourcesInfoBtn");
     await page.waitForSelector("#dataSourcesModal:not(.hidden)");
     const modalShape = await page.evaluate(() => ({
