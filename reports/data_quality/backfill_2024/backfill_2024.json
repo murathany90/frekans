@@ -1,0 +1,5027 @@
+{
+  "schemaVersion": 1,
+  "generatedAtUtc": "2026-07-15T21:43:35Z",
+  "targetRange": {
+    "start": "2024-01-01",
+    "end": "2024-12-31",
+    "targetDays": 366
+  },
+  "sources": {
+    "teias": {
+      "source": "teias",
+      "targetDays": 366,
+      "availableDays": 366,
+      "missingDays": [],
+      "invalidDays": [
+        "2024-06-29"
+      ],
+      "duplicateDays": [],
+      "non86400OrPartialDays": [
+        {
+          "date": "2024-01-01",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-02",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-03",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-04",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-05",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-06",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-07",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-08",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-09",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-10",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-11",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-12",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-13",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-14",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-15",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-16",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-17",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-18",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-19",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-20",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-21",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-22",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-23",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-24",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-25",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-26",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-27",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-28",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-29",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-30",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-31",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-01",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-02",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-03",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-04",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-05",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-06",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-07",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-08",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-09",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-10",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-11",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-12",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-13",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-14",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-15",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-16",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-17",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-18",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-19",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-20",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-21",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-22",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-23",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-24",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-25",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-26",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-27",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-28",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-29",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-01",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-02",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-03",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-04",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-05",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-06",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-07",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-08",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-09",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-10",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-11",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-12",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-13",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-14",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-15",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-16",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-17",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-18",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-19",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-20",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-21",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-22",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-23",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-24",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-25",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-26",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-27",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-28",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-29",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-30",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-31",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-01",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-02",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-03",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-04",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-05",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-06",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-07",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-08",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-09",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-10",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-11",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-12",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-13",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-14",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-15",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-16",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-17",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-18",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-19",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-20",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-21",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-22",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-23",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-24",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-25",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-26",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-27",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-28",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-29",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-30",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-01",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-02",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-03",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-04",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-05",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-06",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-07",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-08",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-09",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-10",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-11",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-12",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-13",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-14",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-15",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-16",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-17",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-18",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-19",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-20",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-21",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-22",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-23",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-24",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-25",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-26",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-27",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-28",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-29",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-30",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-31",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-01",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-02",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-03",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-04",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-05",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-06",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-07",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-08",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-09",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-10",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-11",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-12",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-13",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-14",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-15",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-16",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-17",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-18",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-19",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-20",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-21",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-22",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-23",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-24",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-25",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-26",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-27",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-28",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-29",
+          "validSamples": 85863,
+          "expectedSamples": 86400,
+          "missingSamples": 537,
+          "status": "critical"
+        },
+        {
+          "date": "2024-06-30",
+          "validSamples": 86374,
+          "expectedSamples": 86400,
+          "missingSamples": 26,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-01",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-02",
+          "validSamples": 86370,
+          "expectedSamples": 86400,
+          "missingSamples": 30,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-03",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-04",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-05",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-06",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-07",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-08",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-09",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-10",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-11",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-12",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-13",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-14",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-15",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-16",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-17",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-18",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-19",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-20",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-21",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-22",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-23",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-24",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-25",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-26",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-27",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-28",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-29",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-30",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-31",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-01",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-02",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-03",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-04",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-05",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-06",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-07",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-08",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-09",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-10",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-11",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-12",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-13",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-14",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-15",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-16",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-17",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-18",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-19",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-20",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-21",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-22",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-23",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-24",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-25",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-26",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-27",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-28",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-29",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-30",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-31",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-01",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-02",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-03",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-04",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-05",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-06",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-07",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-08",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-09",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-10",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-11",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-12",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-13",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-14",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-15",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-16",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-17",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-18",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-19",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-20",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-21",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-22",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-23",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-24",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-25",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-26",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-27",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-28",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-29",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-30",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-01",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-02",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-03",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-04",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-05",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-06",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-07",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-08",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-09",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-10",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-11",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-12",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-13",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-14",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-15",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-16",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-17",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-18",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-19",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-20",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-21",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-22",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-23",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-24",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-25",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-26",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-27",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-28",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-29",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-30",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-31",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-01",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-02",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-03",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-04",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-05",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-06",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-07",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-08",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-09",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-10",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-11",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-12",
+          "validSamples": 86393,
+          "expectedSamples": 86400,
+          "missingSamples": 7,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-13",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-14",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-15",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-16",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-17",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-18",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-19",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-20",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-21",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-22",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-23",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-24",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-25",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-26",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-27",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-28",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-29",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-30",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-01",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-02",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-03",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-04",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-05",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-06",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-07",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-08",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-09",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-10",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-11",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-12",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-13",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-14",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-15",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-16",
+          "validSamples": 86394,
+          "expectedSamples": 86400,
+          "missingSamples": 6,
+          "status": "partial"
+        }
+      ],
+      "dstSpecialDays": [],
+      "minimumHz": 49.0,
+      "maximumHz": 51.0,
+      "suspiciousFrequencyDays": [
+        {
+          "date": "2024-01-01",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-02",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-03",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-04",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-05",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-06",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-07",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-08",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-09",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-10",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-11",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-12",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-13",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-14",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-15",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-16",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-17",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-18",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-19",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-20",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-21",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-22",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-23",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-24",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-25",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-26",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-27",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-28",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-29",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-30",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-01-31",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-01",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-02",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-03",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-04",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-05",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-06",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-07",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-08",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-09",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-10",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-11",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-12",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-13",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-14",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-15",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-16",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-17",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-18",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-19",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-20",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-21",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-22",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-23",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-24",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-25",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-26",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-27",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-28",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-02-29",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-01",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-02",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-03",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-04",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-05",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-06",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-07",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-08",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-09",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-10",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-11",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-12",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-13",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-14",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-15",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-16",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-17",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-18",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-19",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-20",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-21",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-22",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-23",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-24",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-25",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-26",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-27",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-28",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-29",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-30",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-03-31",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-01",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-02",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-03",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-04",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-05",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-06",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-07",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-08",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-09",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-10",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-11",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-12",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-13",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-14",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-15",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-16",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-17",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-18",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-19",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-20",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-21",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-22",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-23",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-24",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-25",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-26",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-27",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-28",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-29",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-04-30",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-01",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-02",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-03",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-04",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-05",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-06",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-07",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-08",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-09",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-10",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-11",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-12",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-13",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-14",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-15",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-16",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-17",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-18",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-19",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-20",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-21",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-22",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-23",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-24",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-25",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-26",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-27",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-28",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-29",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-30",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-05-31",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-01",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-02",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-03",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-04",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-05",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-06",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-07",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-08",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-09",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-10",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-11",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-12",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-13",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-14",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-15",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-16",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-17",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-18",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-19",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-20",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-21",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-22",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-23",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-24",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-25",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-26",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-27",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-28",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-06-29",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "critical"
+        },
+        {
+          "date": "2024-06-30",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-01",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-02",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-03",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-04",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-05",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-06",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-07",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-08",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-09",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-10",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-11",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-12",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-13",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-14",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-15",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-16",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-17",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-18",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-19",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-20",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-21",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-22",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-23",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-24",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-25",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-26",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-27",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-28",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-29",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-30",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-07-31",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-01",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-02",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-03",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-04",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-05",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-06",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-07",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-08",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-09",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-10",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-11",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-12",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-13",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-14",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-15",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-16",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-17",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-18",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-19",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-20",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-21",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-22",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-23",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-24",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-25",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-26",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-27",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-28",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-29",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-30",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-08-31",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-01",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-02",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-03",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-04",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-05",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-06",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-07",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-08",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-09",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-10",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-11",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-12",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-13",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-14",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-15",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-16",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-17",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-18",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-19",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-20",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-21",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-22",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-23",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-24",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-25",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-26",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-27",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-28",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-29",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-09-30",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-01",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-02",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-03",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-04",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-05",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-06",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-07",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-08",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-09",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-10",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-11",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-12",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-13",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-14",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-15",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-16",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-17",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-18",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-19",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-20",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-21",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-22",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-23",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-24",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-25",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-26",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-27",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-28",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-29",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-30",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-10-31",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-01",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-02",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-03",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-04",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-05",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-06",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-07",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-08",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-09",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-10",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-11",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-12",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 7,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-13",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-14",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-15",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-16",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-17",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-18",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-19",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-20",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-21",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-22",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-23",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-24",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-25",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-26",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-27",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-28",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-29",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-11-30",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-01",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-02",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-03",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-04",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-05",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-06",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-07",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-08",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-09",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-10",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-11",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-12",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-13",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-14",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-15",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        },
+        {
+          "date": "2024-12-16",
+          "minimumHz": 49.0,
+          "maximumHz": 51.0,
+          "invalidFrequencySamples": 6,
+          "status": "partial"
+        }
+      ],
+      "total2024Bytes": 140819032,
+      "firstDate": "2024-01-01",
+      "lastDate": "2024-12-31",
+      "statusCounts": {
+        "complete": 15,
+        "critical": 1,
+        "partial": 350
+      },
+      "totalMissingSamples": 2682,
+      "totalDuplicateSamples": 0,
+      "totalInvalidRows": 597,
+      "totalInvalidFrequencySamples": 2107
+    },
+    "netztransparenz": {
+      "source": "netztransparenz",
+      "targetDays": 366,
+      "availableDays": 366,
+      "missingDays": [],
+      "invalidDays": [],
+      "duplicateDays": [],
+      "non86400OrPartialDays": [
+        {
+          "date": "2024-03-31",
+          "validSamples": 82800,
+          "expectedSamples": 82800,
+          "missingSamples": 0,
+          "status": "complete"
+        },
+        {
+          "date": "2024-10-27",
+          "validSamples": 90000,
+          "expectedSamples": 90000,
+          "missingSamples": 0,
+          "status": "complete"
+        }
+      ],
+      "dstSpecialDays": [
+        {
+          "date": "2024-03-31",
+          "expectedSamples": 82800,
+          "validSamples": 82800,
+          "startUtc": "2024-03-30T23:00:00Z"
+        },
+        {
+          "date": "2024-10-27",
+          "expectedSamples": 90000,
+          "validSamples": 90000,
+          "startUtc": "2024-10-26T22:00:00Z"
+        }
+      ],
+      "minimumHz": 49.816,
+      "maximumHz": 50.146,
+      "suspiciousFrequencyDays": [],
+      "total2024Bytes": 141000912,
+      "firstDate": "2024-01-01",
+      "lastDate": "2024-12-31",
+      "statusCounts": {
+        "complete": 366
+      },
+      "totalMissingSamples": 0,
+      "totalDuplicateSamples": 0,
+      "totalInvalidRows": 0,
+      "totalInvalidFrequencySamples": 0
+    }
+  },
+  "manifestYears": [
+    2024,
+    2025,
+    2026
+  ],
+  "common2024Days": 366,
+  "size": {
+    "dataBeforeBytes": 431839363,
+    "distBeforeBytes": 433580119,
+    "dataAfterBytes": 715099164,
+    "distAfterBytes": 716839920,
+    "dataAddedBytes": 283259801,
+    "distAddedBytes": 283259801,
+    "distWarnThresholdBytes": 891289600,
+    "distStopThresholdBytes": 943718400,
+    "pagesLimitBytes": 1073741824,
+    "pagesRemainingBytes": 356901904
+  },
+  "rawArtifactScan": {
+    "dataRawFiles": [],
+    "distRawFiles": []
+  }
+}
