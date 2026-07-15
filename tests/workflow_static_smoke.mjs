@@ -33,7 +33,7 @@ if (!existsSync(".github/workflows/frontend_tests.yml")) {
 }
 
 const frontendWorkflow = readFileSync(".github/workflows/frontend_tests.yml", "utf8");
-for (const snippet of ["npx playwright install --with-deps chromium", "node tests/frontend_smoke_playwright.mjs", "node tests/frontend_germany_only_daily_playwright.mjs", "node tests/frontend_initial_load_playwright.mjs", "node tests/frontend_prompt4_static.mjs", "node tests/frontend_prompt5_static.mjs", "node tests/frontend_prompt5_playwright.mjs", "node tests/frontend_prompt6_static.mjs", "node tests/frontend_prompt6_playwright.mjs", "node tests/readme_documentation_static.mjs", "python -m http.server", "Wait for local HTTP server", "curl -fsS http://127.0.0.1:8080/frekans_rapor_v1.html"]) {
+for (const snippet of ["npx playwright install --with-deps chromium", "node tests/frontend_smoke_playwright.mjs", "node tests/frontend_germany_only_daily_playwright.mjs", "node tests/frontend_initial_load_playwright.mjs", "node tests/frontend_prompt4_static.mjs", "node tests/frontend_prompt5_static.mjs", "node tests/frontend_prompt5_playwright.mjs", "node tests/frontend_prompt6_static.mjs", "node tests/frontend_prompt6_playwright.mjs", "node tests/frontend_hash_routing_static.mjs", "node tests/frontend_hash_routing_playwright.mjs", "node tests/readme_documentation_static.mjs", "python -m http.server", "Wait for local HTTP server", "curl -fsS http://127.0.0.1:8080/frekans_rapor_v1.html"]) {
   if (!frontendWorkflow.includes(snippet)) {
     throw new Error(`Frontend workflow is missing: ${snippet}`);
   }

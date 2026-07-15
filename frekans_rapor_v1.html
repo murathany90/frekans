@@ -2697,6 +2697,75 @@
       }
     };
     const CHART_SESSION_STORAGE_KEY = 'frequencyChartSessionState';
+    const ROUTE_TAB_TO_PATH = {
+      'tab-chart': 'daily',
+      'tab-oscillation': 'analysis',
+      'tab-reports': 'reports',
+      'tab-settings': 'data'
+    };
+    const ROUTE_PATH_TO_TAB = {
+      daily: 'tab-chart',
+      analysis: 'tab-oscillation',
+      reports: 'tab-reports',
+      data: 'tab-settings'
+    };
+    const ROUTE_SOURCE_TO_SLUG = {
+      tr: 'turkiye',
+      de: 'entsoe',
+      both: 'both',
+      diff: 'diff',
+      common: 'common',
+      differential: 'differential'
+    };
+    const ROUTE_SOURCE_ALIASES = {
+      turkiye: 'tr',
+      türkiye: 'tr',
+      turkey: 'tr',
+      tr: 'tr',
+      entsoe: 'de',
+      'entso-e': 'de',
+      de: 'de',
+      germany: 'de',
+      almanya: 'de',
+      netztransparenz: 'de',
+      both: 'both',
+      diff: 'diff',
+      difference: 'diff',
+      common: 'common',
+      differential: 'differential'
+    };
+    const ROUTE_RESOLUTION_ALIASES = {
+      second: '1s',
+      seconds: '1s',
+      saniyelik: '1s',
+      '1s': '1s',
+      '10s': '10s',
+      minute: '1m',
+      minutely: '1m',
+      dakikalik: '1m',
+      dakikalık: '1m',
+      '1m': '1m',
+      hour: '1h',
+      hourly: '1h',
+      saatlik: '1h',
+      '1h': '1h',
+      auto: 'auto'
+    };
+    const ROUTE_ANALYSIS_ALIASES = {
+      quality: 'quality',
+      coverage: 'quality',
+      stats: 'stats',
+      statistics: 'stats',
+      events: 'events',
+      rocof: 'rocof',
+      psd: 'psd',
+      spectrogram: 'spectrogram',
+      oscillation: 'oscillation',
+      crosscorrelation: 'crossCorrelation',
+      'cross-correlation': 'crossCorrelation',
+      coherence: 'coherence',
+      trend: 'trend'
+    };
 
     function loadChartSessionState() {
       try {
@@ -2780,6 +2849,9 @@
       chartLegendSelection: sanitizeChartLegendSelection(chartSessionState.legendSelection),
       chartZoomRange: sanitizeChartZoomRange(chartSessionState.zoomRange),
       chartEventSyncing: false,
+      routing: {
+        isApplyingRoute: false
+      },
       busy: false
     };
 
@@ -2900,7 +2972,7 @@
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
       panel.classList.add('active');
-      if (syncUrl) updateUrlState({ tab: tabId.replace(/^tab-/, '') });
+      if (syncUrl) updateRoute({ path: routePathForTab(tabId) }, { mode: 'push' });
       setTimeout(() => {
         state.frequencyChart?.resize();
         state.oscillationChart?.resize();
@@ -2968,7 +3040,7 @@
       $('analysisEndDate').addEventListener('change', () => updateUrlState({ end: $('analysisEndDate').value }));
       $('analysisTypeSelect').addEventListener('change', () => {
         updateAnalysisAvailability();
-        updateUrlState({ analysis: $('analysisTypeSelect').value });
+        updateRoute({ path: 'analysis', analysis: $('analysisTypeSelect').value }, { mode: 'push' });
       });
       $('analysisResolution').addEventListener('change', () => {
         updateAnalysisAvailability();
@@ -3264,7 +3336,7 @@
       try {
         await calculateDailyReport({ date: iso, requestId, signal: state.activeDateRequestController.signal, force });
         if (requestId !== state.dateRequestSequence) return;
-        if (pushHistory) updateUrlState({ date: iso, tab: 'chart' });
+        if (pushHistory) updateRoute({ path: 'daily', date: iso }, { mode: 'push' });
       } catch (error) {
         if (error?.name === 'AbortError') {
           state.datePerf.abortedFetches += 1;
@@ -3306,13 +3378,8 @@
       }
     }
 
-    window.addEventListener('popstate', e => {
-      const p = new URLSearchParams(window.location.search);
-      const date = p.get('date') || e.state?.date;
-      if (date && date !== $('dateSelect').value && reportDatesForCurrentMode().includes(date)) {
-        selectDate(date);
-      }
-    });
+    window.addEventListener('hashchange', () => applyRoute(parseHashRoute()));
+    window.addEventListener('popstate', () => applyRoute(parseHashRoute()));
 
     function checkLibraries() {
       const missing = [];
@@ -3434,7 +3501,7 @@
             files: {}
           }, {});
         });
-        const urlDate = new URLSearchParams(window.location.search).get('date');
+        const urlDate = routeDateFromLocation();
         const dates = manifestDates(manifest);
         const initialDate = urlDate && dates.includes(urlDate) ? urlDate : dates.at(-1);
         if (initialDate) await ensureManifestYearLoadedFor(manifest, dateToYear(initialDate), { signal });
@@ -3472,7 +3539,7 @@
         if (hasAuto) {
           const latest = reportDates.at(-1);
           setBanner('loadStatus', t('autoDataReady', { date: displayDate(latest) }), 'success');
-          const urlDate = new URLSearchParams(window.location.search).get('date');
+          const urlDate = routeDateFromLocation();
           const current = $('dateSelect').value;
           const initial = urlDate && reportDates.includes(urlDate)
             ? urlDate
@@ -6621,73 +6688,238 @@
       if (id === 'analysisStatus') updateAnalysisInfoPanel();
     }
 
+    function normalizeRouteToken(value) {
+      return String(value || '').trim().toLowerCase();
+    }
+
+    function routeSourceAlias(value) {
+      return ROUTE_SOURCE_ALIASES[normalizeRouteToken(value)] || null;
+    }
+
+    function routeResolutionAlias(value) {
+      return ROUTE_RESOLUTION_ALIASES[normalizeRouteToken(value)] || null;
+    }
+
+    function routeAnalysisAlias(value) {
+      const raw = String(value || '').trim();
+      if (analysisRegistry[raw]) return raw;
+      return ROUTE_ANALYSIS_ALIASES[normalizeRouteToken(raw)] || null;
+    }
+
+    function routePathForTab(tabId) {
+      return ROUTE_TAB_TO_PATH[tabId] || 'daily';
+    }
+
+    function tabForRoutePath(path) {
+      return ROUTE_PATH_TO_TAB[path] || 'tab-chart';
+    }
+
+    function normalizeRouteQueryParams(params) {
+      const next = new URLSearchParams(params || '');
+      const source = routeSourceAlias(next.get('source'));
+      const resolution = routeResolutionAlias(next.get('resolution'));
+      const analysis = routeAnalysisAlias(next.get('analysis'));
+      const langParam = normalizeRouteToken(next.get('lang'));
+      if (source) next.set('source', source);
+      else next.delete('source');
+      if (resolution) next.set('resolution', resolution);
+      else next.delete('resolution');
+      if (analysis) next.set('analysis', analysis);
+      else next.delete('analysis');
+      if (langParam === 'tr' || langParam === 'en') next.set('lang', langParam);
+      else next.delete('lang');
+      return next;
+    }
+
+    function combinedRouteParams(hashParams = new URLSearchParams()) {
+      const legacy = new URLSearchParams(window.location.search);
+      const combined = new URLSearchParams(legacy);
+      hashParams.forEach((value, key) => combined.set(key, value));
+      return normalizeRouteQueryParams(combined);
+    }
+
+    function routeDateFromLocation() {
+      const route = parseHashRoute({ normalizeInvalid: false });
+      return route.date || route.params.get('date') || null;
+    }
+
+    function parseHashRoute(options = {}) {
+      const normalizeInvalid = options.normalizeInvalid !== false;
+      const rawHash = String(window.location.hash || '');
+      const raw = rawHash.startsWith('#') ? rawHash.slice(1) : rawHash;
+      const [rawPath = '', rawQuery = ''] = raw.split('?');
+      const hashParams = new URLSearchParams(rawQuery);
+      const params = combinedRouteParams(hashParams);
+      const segments = rawPath.split('/').filter(Boolean).map(part => decodeURIComponent(part));
+      const legacyTabPath = params.get('tab') ? routePathForTab(params.get('tab').startsWith?.('tab-') ? params.get('tab') : `tab-${params.get('tab')}`) : '';
+      const path = normalizeRouteToken(segments[0] || legacyTabPath);
+      let route = {
+        path: 'daily',
+        tabId: 'tab-chart',
+        date: params.get('date') || null,
+        analysis: routeAnalysisAlias(params.get('analysis')),
+        params,
+        invalid: false,
+        empty: !rawHash
+      };
+      if (path === 'daily' || !path) {
+        route.path = 'daily';
+        route.tabId = 'tab-chart';
+        if (segments[1]) route.date = segments[1];
+      } else if (path === 'analysis') {
+        route.path = 'analysis';
+        route.tabId = 'tab-oscillation';
+        route.analysis = routeAnalysisAlias(segments[1]) || route.analysis;
+      } else if (path === 'reports') {
+        route.path = 'reports';
+        route.tabId = 'tab-reports';
+      } else if (path === 'data') {
+        route.path = 'data';
+        route.tabId = 'tab-settings';
+      } else {
+        route.invalid = normalizeInvalid;
+      }
+      if (route.date) route.params.set('date', route.date);
+      if (route.analysis) route.params.set('analysis', route.analysis);
+      return route;
+    }
+
+    function routeQueryValue(key, route, fallback) {
+      const value = route?.params?.get(key);
+      return value === null || value === undefined || value === '' ? fallback : value;
+    }
+
+    function serializeRouteQuery(params, keys) {
+      const query = new URLSearchParams();
+      keys.forEach(key => {
+        const value = params[key];
+        if (value !== undefined && value !== null && value !== '') query.set(key, value);
+      });
+      return query.toString();
+    }
+
+    function currentRoutePath() {
+      const active = document.querySelector('.tab-button.active')?.dataset.tab || 'tab-chart';
+      return routePathForTab(active);
+    }
+
+    function buildRouteHash(patch = {}) {
+      const tabPath = patch.tab ? routePathForTab(patch.tab.startsWith?.('tab-') ? patch.tab : `tab-${patch.tab}`) : null;
+      const path = patch.path || patch.route || patch.tabPath || tabPath || currentRoutePath();
+      const normalizedPath = path === 'chart' ? 'daily' : path === 'oscillation' ? 'analysis' : path;
+      const analysis = routeAnalysisAlias(patch.analysis ?? $('analysisTypeSelect')?.value) || 'stats';
+      const dailyDate = patch.date ?? $('dateSelect')?.value;
+      let hashPath = '#/daily';
+      if (normalizedPath === 'analysis') hashPath = `#/analysis/${encodeURIComponent(analysis)}`;
+      else if (normalizedPath === 'reports') hashPath = '#/reports';
+      else if (normalizedPath === 'data') hashPath = '#/data';
+      else if (dailyDate) hashPath = `#/daily/${encodeURIComponent(dailyDate)}`;
+
+      const source = routeSourceAlias(patch.source ?? getAnalysisSource()) || getAnalysisSource();
+      const resolution = routeResolutionAlias(patch.resolution ?? $('analysisResolution')?.value) || $('analysisResolution')?.value;
+      const routeParams = {
+        lang: patch.lang ?? lang,
+        date: patch.date ?? $('analysisDateSelect')?.value ?? $('dateSelect')?.value,
+        source: ROUTE_SOURCE_TO_SLUG[source] || source,
+        resolution,
+        alignment: patch.alignment ?? $('analysisAlignment')?.value,
+        mode: patch.mode ?? $('analysisDateMode')?.value,
+        start: patch.start ?? $('analysisStartDate')?.value,
+        end: patch.end ?? $('analysisEndDate')?.value
+      };
+      if (routeParams.lang === 'tr') delete routeParams.lang;
+      const queryKeys = normalizedPath === 'analysis'
+        ? ['lang', 'date', 'source', 'resolution', 'alignment', 'mode', 'start', 'end']
+        : ['lang'];
+      const query = serializeRouteQuery(routeParams, queryKeys);
+      return `${hashPath}${query ? `?${query}` : ''}`;
+    }
+
+    function updateRoute(patch = {}, options = {}) {
+      if (state.routing.isApplyingRoute) return;
+      const hash = buildRouteHash(patch);
+      if (hash === window.location.hash) return;
+      const next = `${window.location.pathname}${hash}`;
+      const useReplace = options.replace === true || options.mode === 'replace';
+      if (useReplace && window.history?.replaceState) {
+        window.history.replaceState(null, '', next);
+      } else if (window.history?.pushState) {
+        window.history.pushState(null, '', next);
+      } else {
+        window.location.hash = hash;
+      }
+    }
+
+    function applyRoute(route = parseHashRoute()) {
+      state.routing.isApplyingRoute = true;
+      try {
+        if (route.invalid) {
+          activateTab('tab-chart');
+          if (window.history?.replaceState) window.history.replaceState(null, '', `${window.location.pathname}#/daily`);
+          else window.location.hash = '#/daily';
+          return;
+        }
+        const theme = route.params.get('theme');
+        const routeLang = route.params.get('lang');
+        const date = route.date || route.params.get('date');
+        const source = routeSourceAlias(route.params.get('source'));
+        const analysis = route.analysis || routeAnalysisAlias(route.params.get('analysis'));
+        const alignment = route.params.get('alignment');
+        const resolution = routeResolutionAlias(route.params.get('resolution'));
+        const mode = route.params.get('mode');
+        const start = route.params.get('start');
+        const end = route.params.get('end');
+        if (theme) document.documentElement.setAttribute('data-theme', theme);
+        if (routeLang && routeLang !== lang) setLanguage(routeLang);
+        if (date) {
+          $('dateSelect').value = date;
+          $('analysisDateSelect').value = date;
+          $('analysisStartDate').value = $('analysisStartDate').value || date;
+          $('analysisEndDate').value = $('analysisEndDate').value || date;
+        }
+        if (source && $('analysisSourceSelect').querySelector(`option[value="${source}"]`)) {
+          $('analysisSourceSelect').value = source;
+          syncAnalysisSource('analysis');
+        }
+        if (analysis && $('analysisTypeSelect').querySelector(`option[value="${analysis}"]`)) {
+          $('analysisTypeSelect').value = analysis;
+        }
+        if (alignment && $('analysisAlignment').querySelector(`option[value="${alignment}"]`)) {
+          $('analysisAlignment').value = alignment;
+        }
+        if (resolution && $('analysisResolution').querySelector(`option[value="${resolution}"]`)) {
+          $('analysisResolution').value = resolution;
+        }
+        if (mode && $('analysisDateMode').querySelector(`option[value="${mode}"]`)) {
+          $('analysisDateMode').value = mode;
+        }
+        if (start) $('analysisStartDate').value = start;
+        if (end) $('analysisEndDate').value = end;
+        updateAnalysisAvailability();
+        activateTab(route.tabId || tabForRoutePath(route.path));
+        const dates = reportDatesForCurrentMode();
+        if (route.path === 'daily' && date && dates.includes(date)) {
+          selectDate(date, { pushHistory: false, immediate: true });
+        }
+      } finally {
+        state.routing.isApplyingRoute = false;
+      }
+      if (!window.location.hash || route.empty) updateRoute({}, { replace: true });
+    }
+
     function initialLanguage() {
-      const params = new URLSearchParams(window.location.search);
-      const fromUrl = params.get('lang');
+      const route = parseHashRoute({ normalizeInvalid: false });
+      const fromUrl = route.params.get('lang');
       if (fromUrl === 'tr' || fromUrl === 'en') return fromUrl;
       return state.settings.locale === 'en' ? 'en' : 'tr';
     }
 
     function applyUrlState() {
-      const params = new URLSearchParams(window.location.search);
-      const theme = params.get('theme');
-      const tab = params.get('tab');
-      const date = params.get('date');
-      const source = params.get('source');
-      const analysis = params.get('analysis');
-      const alignment = params.get('alignment');
-      const resolution = params.get('resolution');
-      const mode = params.get('mode');
-      const start = params.get('start');
-      const end = params.get('end');
-      if (theme) document.documentElement.setAttribute('data-theme', theme);
-      if (date) {
-        $('dateSelect').value = date;
-        $('analysisDateSelect').value = date;
-        $('analysisStartDate').value = date;
-        $('analysisEndDate').value = date;
-      }
-      if (source && $('analysisSourceSelect').querySelector(`option[value="${source}"]`)) {
-        $('analysisSourceSelect').value = source;
-        syncAnalysisSource('analysis');
-      }
-      if (analysis && $('analysisTypeSelect').querySelector(`option[value="${analysis}"]`)) {
-        $('analysisTypeSelect').value = analysis;
-      }
-      if (alignment && $('analysisAlignment').querySelector(`option[value="${alignment}"]`)) {
-        $('analysisAlignment').value = alignment;
-      }
-      if (resolution && $('analysisResolution').querySelector(`option[value="${resolution}"]`)) {
-        $('analysisResolution').value = resolution;
-      }
-      if (mode && $('analysisDateMode').querySelector(`option[value="${mode}"]`)) {
-        $('analysisDateMode').value = mode;
-      }
-      if (start) $('analysisStartDate').value = start;
-      if (end) $('analysisEndDate').value = end;
-      if (tab) activateTab(tab.startsWith('tab-') ? tab : `tab-${tab}`);
+      applyRoute(parseHashRoute());
     }
 
     function updateUrlState(patch = {}) {
-      if (!window.history?.replaceState) return;
-      const params = new URLSearchParams(window.location.search);
-      const values = {
-        lang,
-        date: $('analysisDateSelect')?.value || $('dateSelect')?.value || undefined,
-        source: getAnalysisSource(),
-        analysis: $('analysisTypeSelect')?.value,
-        resolution: $('analysisResolution')?.value,
-        alignment: $('analysisAlignment')?.value,
-        mode: $('analysisDateMode')?.value,
-        ...patch
-      };
-      for (const [key, value] of Object.entries(values)) {
-        if (value === undefined || value === null || value === '') params.delete(key);
-        else params.set(key, value);
-      }
-      const query = params.toString();
-      const next = `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`;
-      window.history.replaceState(null, '', next);
+      updateRoute(patch, { replace: true });
     }
 
     function displayDate(iso) {
