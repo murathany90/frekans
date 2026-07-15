@@ -1,6 +1,6 @@
 # Şebeke Frekansı
 
-Şebeke Frekansı, TEİAŞ Türkiye günlük şebeke frekansı verileri ile ENTSO-E (Almanya) / Netztransparenz frekans verilerini aynı statik web uygulamasında inceleyen, karşılaştıran ve analiz eden bir frekans kalite platformudur. Uygulama GitHub Pages üzerinde çalışır ve `gridfreq.com` alan adı için `CNAME` üretir; tarayıcı doğrudan TEİAŞ veya Netztransparenz sistemlerine bağlanmaz. Otomatik indirme, normalizasyon, kalite kontrolü ve yayınlama işleri GitHub Actions ve yerel Python betikleriyle yapılır.
+Şebeke Frekansı, TEİAŞ Türkiye günlük şebeke frekansı verileri ile arayüzde ENTSO-E olarak etiketlenen Kıta Avrupası / Netztransparenz frekans verilerini aynı statik web uygulamasında inceleyen, karşılaştıran ve analiz eden bir frekans kalite platformudur. Uygulamanın marka adı GridFreq'tir; GitHub Pages üzerinde çalışır ve `gridfreq.com` alan adı için `CNAME` üretir. Tarayıcı doğrudan TEİAŞ veya Netztransparenz sistemlerine bağlanmaz. Otomatik indirme, normalizasyon, kalite kontrolü ve yayınlama işleri GitHub Actions ve yerel Python betikleriyle yapılır.
 
 ## Kısa Durum
 
@@ -11,6 +11,10 @@
 - Yayın girişi: `index.html`
 - Marka ve ikon paketi: `assets/brand/`
 - Web uygulaması manifesti: `site.webmanifest`
+- Ana başlık bağlantısı: üst bardaki GridFreq ikon ve yazısı `https://gridfreq.com/` adresine gider.
+- SEO ve alan adı dosyaları: `CNAME`, `robots.txt`, `sitemap.xml`, `404.html`
+- Günlük veri kaynağı açıklaması: Günlük sekmesindeki **Bilgi** düğmesi ile açılan "Veri Kaynakları ve Yöntem" penceresi.
+- Günlük grafik etkileşim durumu: katman seçimi ve zoom aralığı oturum boyunca `sessionStorage` içinde saklanır.
 - Analiz çekirdeği: `assets/analysis-core.mjs`
 - Statik veri kökü: `data/`
 - GitHub Pages çıktısı: `dist/`
@@ -46,7 +50,26 @@ Günlük sekmesindeki ana kontroller:
 - Zaman eşleştirme: `UTC - otomatik`, `Aynı yerel saat`, `Manuel saat farkı`.
 - Grafik katmanları: Fark katmanı ve Maks/Min zarfı.
 - Yenile: Seçili günü yeniden hesaplar.
-- Grafik sıfırla: Yakınlaştırmayı günlük görünüme döndürür.
+- Grafik sıfırla: Yakınlaştırmayı günlük görünüme döndürür ve katman seçimlerini varsayılan duruma alır.
+- Bilgi: TEİAŞ ve Kıta Avrupası / Netztransparenz kaynaklarını, çözünürlükleri, güncel veri durumunu ve işleme yöntemini açıklayan erişilebilir modal pencereyi açar.
+
+Günlük grafik üstünde ilk iki bilgi kartı görünüm bağlamını taşır:
+
+- **Görünüm**: `24 saat • dakikalık`, saatlik yakınlaştırmada ise örneğin `11:00–12:00 • 3.600 saniye`.
+- **Rapor tarihi**: Grafiğin ve rapor bağlamının seçili takvim günü.
+
+Masaüstünde bu kartların yanında son Türkiye verisi, son ENTSO-E verisi ve son ortak gün kartları görünmeye devam eder. Mobilde gereksiz dikey alanı azaltmak için yalnızca **Görünüm** ve **Rapor tarihi** kartları gösterilir; kaynak güncelliği bilgileri **Veri** sekmesindeki sağlık kartlarında ve **Bilgi** penceresinde korunur.
+
+Mobil Günlük sekmesi 320-430 px genişliklerde iki satırlı kompakt kontrol düzeni kullanır:
+
+- Birinci satır: önceki gün, tarih seçimi, sonraki gün.
+- İkinci satır: ayarlar, yenile, grafik sıfırla ve bilgi.
+
+Bu düzen yatay sayfa kaydırması üretmeden çalışacak şekilde tasarlanmıştır. Dar ekranlarda bazı düğmeler ikon ağırlıklı görünür, ancak erişilebilir adları korunur.
+
+**Veri Kaynakları ve Yöntem** penceresi masaüstünde ortalanmış modal, mobilde ekranı taşırmayan alt sayfa/tam ekran uyumlu görünüm olarak çalışır. Pencere `role="dialog"` ve `aria-modal="true"` kullanır; açıldığında odak pencereye taşınır, Tab odağı içeride kalır, Escape ve kapatma düğmesi ile kapanır, kapanınca odak yeniden **Bilgi** düğmesine döner. İçerik TEİAŞ, Kıta Avrupası - Netztransparenz, zaman/çözünürlük, veri işleme/kalite, teknik not, resmî kaynak bağlantıları ve güncel durum bölümlerine ayrılmıştır. Güncel durum alanı mümkün olduğunda `data/status.json` ve manifest bilgilerinden dinamik üretilir; status dosyası okunamazsa modal çökmeden "Güncel durum bilgisi alınamadı." mesajı gösterir.
+
+Kaynak terminolojisi bilinçli olarak ayrılmıştır. İngilizce arayüzde de ülke adı **Türkiye** olarak kullanılır. Netztransparenz verisi standart ENTSO-E Transparency API'sinden doğrudan alınmış gibi sunulmaz; Alman TSO'larının resmî ortak portalı üzerinden yayımlanan Kıta Avrupası senkron bölgesi frekansı olarak açıklanır. Modal içindeki resmî kaynak bağlantıları TEİAŞ, TEİAŞ günlük frekans sayfası, Netztransparenz saniyelik frekans sayfası ve ENTSO-E resmî sitesiyle sınırlıdır; GridFreq GitHub deposu resmî kaynak bağlantıları arasında gösterilmez.
 
 ### Analiz
 
@@ -70,13 +93,21 @@ Tarih modları:
 - Ay seçimi
 - Özel saat
 
+Analiz sekmesi kaynak ve analiz türü uyumluluğunu baştan denetler. Tek kaynak seçiliyken çapraz korelasyon ve koherens gibi iki eşlenmiş seri gerektiren analizler devre dışı bırakılır; geçersiz seçenekler yalnızca hata üretmek yerine seçim listesinden pasifleştirilir ve kısa bir bilgi notu **i** bilgi düğmesine taşınır. Çalıştırma anında aynı doğrulama tekrar yapılır, böylece DOM manipülasyonu ile geçersiz kombinasyon seçilse bile analiz başlamaz.
+
+Çözünürlük seçimi de analiz türüne göre güvenli hale getirilmiştir. `auto`, `1s`, `10s`, `1m` ve `1h` seçenekleri gerçek seri çözünürlüğü, örnekleme frekansı, Nyquist frekansı, analiz edilebilir maksimum bant, yeniden örnekleme yöntemi ve eksik veri oranı ile birlikte değerlendirilir. Bant sınırı veya pencere/segment değeri seçili çözünürlükle uyumsuzsa analiz çalıştırılmaz ve kullanıcıya kısa, teknik neden gösterilir.
+
 ### Raporlar
 
 Raporlar sekmesi son analiz sonucundan rapor ön izlemesi, JSON çıktısı ve olay CSV çıktısı üretir. Rapor dili Türkçe/İngilizce seçilebilir. Çıktılar tarayıcıda üretilir; sunucuya rapor gönderilmez.
 
+PDF/yazdırma akışı `printReport()` üzerinden yönetilir. Yazdırma sırasında `body.print-report` sınıfı eklenir ve yalnızca `#tab-reports` rapor konteyneri görünür kalır; Günlük, Analiz ve Veri sekmeleri PDF çıktısına karışmaz. Analiz grafiği yazdırma öncesi geçici PNG görüntüsüne dönüştürülerek rapor DOM'una eklenir, `afterprint` ve güvenli zaman aşımı sonrasında geçici sınıflar ve `.print-chart-snapshot` öğeleri temizlenir.
+
 ### Veri
 
 Veri sekmesi otomatik katalog durumu, son TEİAŞ tarihi, son ENTSO-E tarihi, Netztransparenz kaynak yöntemi, kaynak sağlık kartları, eksik gün sayısı ve manuel CSV yükleme alanlarını gösterir. Manuel yükleme halen desteklenir ve tarayıcı belleğinde çalışır.
+
+Kaynak sağlık kartları artık Günlük grafiğin üstünü kalabalıklaştırmaz; **GitHub Pages Otomatik Veri** paneli içinde yer alır. Türkiye ve ENTSO-E / Netztransparenz için son başarılı kontrol, son mevcut veri, veri gecikmesi, durum, eksik veya henüz yayımlanmamış günler, kaynak yöntemi, kalite skoru ve son hata ayrı ayrı gösterilir. "Workflow başarılı" ile "veri güncel" aynı şey olarak sunulmaz; veri gecikmesi normal yayın gecikmesi, beklenenden uzun gecikme, indirme/doğrulama hatası veya henüz yayımlanmamış durumlarıyla ayrıca belirtilir.
 
 ## Grafik Yapısı
 
@@ -94,6 +125,10 @@ Grafik katmanları:
 
 Saatlik matris ve 15 dakikalık heatmap grafiğe bağlıdır. Saat veya çeyrek saat seçildiğinde saniyelik detay görünümü açılır. Çift tıklama günlük görünüme geri döndürür. Grafik araç çubuğu tam ekran, PNG indirme ve yakınlaştırma sıfırlama kontrolleri içerir.
 
+Grafik katman tercihleri oturum boyunca korunur. Kullanıcı efsaneden Türkiye, ENTSO-E veya fark serisini kapattığında; gün değiştirme, günlük/saatlik görünüme geçme, çözünürlük değiştirme veya zaman eksenini yenileme sonrasında aynı katman seçimi korunur. Zoom aralığı da mümkün olduğunda korunur. Bu durum `frequencyChartSessionState` anahtarıyla `sessionStorage` içinde tutulur. **Grafik Sıfırla** düğmesi hem zoom'u tam güne döndürür hem de katmanları tanımlı varsayılan görünüme alır.
+
+Grafik ve UI araç ipuçları tek yüksek kontrastlı tooltip sistemiyle gösterilir. `#appTooltip` genel buton, KPI ve metrik açıklamalarını; `#hourMatrixTooltip` saatlik matris hücrelerini gösterir. Tooltipler masaüstünde hover/focus ile, mobilde dokunma/focus ile açılır; ekran kenarlarına göre otomatik konumlanır ve yatay taşma üretmez.
+
 ### KPI kartları
 
 Günlük hesap sonrası KPI alanı şu metrikleri gösterir:
@@ -107,6 +142,14 @@ Günlük hesap sonrası KPI alanı şu metrikleri gösterir:
 - Korelasyon
 - Eşlenmiş veri oranı
 
+Her KPI kartında kısa açıklama tooltip'i bulunur. Tooltip metinleri metriğin anlamını ve birimini açıklar; örneğin ortalama değerler Hz, ortalama mutlak sapma ve MAE mHz, korelasyon birimsiz katsayı, ortak veri ise eşlenmiş örnek oranı olarak belirtilir. Mobilde günlük grafik altındaki KPI alanı dört temel kartla sadeleşir: Türkiye ortalaması, ENTSO-E ortalaması, Türkiye ortalama mutlak sapma ve ENTSO-E ortalama mutlak sapma. Bias, MAE/RMSE, korelasyon ve eşlenmiş veri oranı masaüstünde görünür kalır; mobilde bilgi yoğunluğunu azaltmak için gizlenir.
+
+### Saatlik istatistik matrisi
+
+Saatlik istatistik matrisi her saat için ortalama, minimum, maksimum, bias, MAE ve benzeri metrikleri gösterir. Masaüstünde tablo hücreleri seçilebilir ve hover/focus tooltipleriyle saat aralığı, metrik adı, değer ve birim okunabilir. Metrik adlarında da kısa açıklama tooltipleri vardır; `Türkiye Ort.`, `Türkiye Min`, `Bias`, `MAE`, `Korelasyon` gibi satırlar boş veya yalnızca koyu zeminli tooltip üretmez.
+
+Mobilde geniş tablo yerine saat seçici ve kompakt metrik kartları kullanılır. Seçili saat değiştirildiğinde detay kartları güncellenir; tüm saatler için kompakt heatmap düğmeleri kalır. Tooltipler dokunma ile açılır ve 320-430 px ekranlarda ekran dışına taşmayacak şekilde sınırlanır.
+
 ### Analiz grafikleri
 
 Analiz sekmesindeki grafik tipi seçilen analize göre değişir. Veri kalitesi, istatistik, RoCoF, PSD, çapraz korelasyon ve trend sonuçları çizgi grafik üretir. Spektrogram ısı haritası üretir. Osilasyon adayı analizi, bant geçiren bileşeni ve eşik üstü aralıkları gösterir.
@@ -114,6 +157,10 @@ Analiz sekmesindeki grafik tipi seçilen analize göre değişir. Veri kalitesi,
 ## Analiz Laboratuvarı
 
 Analizler `assets/analysis-core.mjs` ve gerekirse `assets/analysis-worker.mjs` üzerinden çalışır. Büyük hesaplar ana UI iş parçacığını kilitlememek için Web Worker yoluna devredilir.
+
+Ön yüzde `analysisRegistry` yapısı her analiz türünün başlığını, açıklamasını, izin verilen kaynaklarını, izin verilen çözünürlüklerini, parametrelerini, KPI kartlarını, tablo kolonlarını, yöntem metnini ve sınırlamalarını tanımlar. Bu nedenle analiz seçimi değiştiğinde sayfa başlığı, açıklama, parametre paneli, grafik tipi, sonuç tablosu ve rapor bölümü birlikte değişir. Örneğin veri kapsama analizinde osilasyon tablosu veya baskın frekans kolonları gösterilmez; olay üretmeyen analizlerde uygun özet tablo veya "olay tablosu yok" durumu kullanılır.
+
+Parametre paneli hızlı analiz ve uzman kullanımını ayırır. Varsayılan görünüm önerilen parametrelerle tek tıkla çalıştırmaya uygundur. `details.analysis-advanced-panel` açıldığında pencere tipi, pencere uzunluğu, örtüşme, detrend, filtre tipi/derecesi, bant, eşik, minimum olay süresi, yeniden örnekleme ve eksik veri yöntemi gibi uzman parametreler yalnızca seçili analiz için anlamlıysa görünür.
 
 ### Veri kapsama
 
@@ -270,6 +317,10 @@ GitHub Pages yayını için repository ayarlarında Pages source olarak **GitHub
 
 Custom domain ayarı GitHub arayüzünde **Settings > Pages > Custom domain** alanına `gridfreq.com` yazılarak kullanıcı tarafından yapılır. **Enforce HTTPS** ayarı da aynı arayüzden etkinleştirilmelidir. DNS kayıtları repo dışında TürkTicaret panelinde yönetilir; DNS doğrulama tokenları, registrar ayarları, secret değerleri veya nameserver bilgileri repoda tutulmaz. Ham CSV/ZIP kaynakları, `incoming/`, `cache/`, test artifactleri ve geçici dosyalar Pages çıktısına konmaz.
 
+Deploy workflow'u uygulama, veri, marka ve SEO dosyaları değiştiğinde tetiklenecek şekilde tutulur. `CNAME`, `robots.txt`, `sitemap.xml`, `404.html`, `site.webmanifest` ve `assets/brand/` değişiklikleri build çıktısına dahil edilir. `robots.txt` yalnızca ana sitemap adresini gösterir; `sitemap.xml` gerçek statik rota olan `https://gridfreq.com/` adresini içerir.
+
+Marka paketi `50 Hz Grid Pulse` konseptine göre üretilmiştir. `assets/brand/favicon.svg` metinsiz sembol ikon olarak kalır; `gridfreq-logo.svg` ve `gridfreq-logo-horizontal.svg` GridFreq markasını taşır. PNG/ICO ikonları, Apple touch icon, maskable Android ikon ve `gridfreq-social-card.png` sosyal paylaşım görseli build sırasında `dist/assets/brand/` altına kopyalanır. HTML head alanı canonical, Open Graph, Twitter card, favicon ve `site.webmanifest` bağlantılarını göreli varlık yollarıyla içerir.
+
 ## Yerel Çalıştırma
 
 ```powershell
@@ -320,6 +371,8 @@ node tests/frontend_prompt3_static.mjs
 node tests/frontend_prompt4_static.mjs
 node tests/frontend_prompt5_static.mjs
 node tests/frontend_prompt6_static.mjs
+node tests/frontend_brand_static.mjs
+node tests/frontend_data_sources_modal_static.mjs
 node tests/frontend_netztransparenz_status_static.mjs
 node tests/readme_documentation_static.mjs
 node tests/workflow_static_smoke.mjs
@@ -340,9 +393,12 @@ node tests/frontend_germany_only_daily_playwright.mjs
 node tests/frontend_initial_load_playwright.mjs
 node tests/frontend_prompt5_playwright.mjs
 node tests/frontend_prompt6_playwright.mjs
+node tests/frontend_data_sources_modal_playwright.mjs
+node tests/frontend_daily_mobile_compact_playwright.mjs
+node tests/frontend_chart_state_tooltips_playwright.mjs
 ```
 
-Test kapsamı parser, timezone hizalama, int16 encode/decode, manifest üretimi, otomatik workflow statikleri, Netztransparenz OAuth istemci davranışı, analiz çekirdeği, grafik UI kontrolleri ve README dokümantasyon kapsamını içerir.
+Test kapsamı parser, timezone hizalama, int16 encode/decode, manifest üretimi, otomatik workflow statikleri, Netztransparenz OAuth istemci davranışı, analiz çekirdeği, grafik UI kontrolleri ve README dokümantasyon kapsamını içerir. Ek frontend testleri GridFreq marka varlıklarını, custom domain build çıktısını, veri kaynakları modalının erişilebilir davranışını, 320-430 px mobil günlük düzeni, tooltip taşma kontrolünü, saatlik metrik açıklamalarını, grafik katman/zoom durumunun korunmasını ve Grafik Sıfırla davranışını denetler.
 
 ## Repo Boyutu ve Yayın Sınırı
 
