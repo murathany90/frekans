@@ -80,3 +80,25 @@ def test_teias_parser_accepts_legacy_comma_csv_without_date_column():
     assert package.local_date == "2025-01-01"
     assert package.valid_samples == 3
     assert package.meta["validSamples"] == 3
+
+
+def test_teias_parser_accepts_tab_delimited_frequency_without_date_column():
+    data = "\n".join(
+        [
+            "00:00:00\t1,000\t49,985",
+            "00:00:01\t2,000\t49,983",
+            "00:00:02\t3,000\t49,982",
+        ]
+    ).encode("utf-8")
+
+    package = parse_teias_csv(
+        data,
+        source_url="https://webim.teias.gov.tr/file/example?download",
+        fallback_date="2024-01-01",
+    )
+
+    assert package.local_date == "2024-01-01"
+    assert package.valid_samples == 3
+    assert package.meta["validSamples"] == 3
+    assert package.minimum_hz == 49.982
+    assert package.maximum_hz == 49.985

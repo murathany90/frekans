@@ -333,7 +333,7 @@ def build_day_package(
 
 
 def split_csv_line(line: str) -> list[str]:
-    delimiter = ";" if line.count(";") >= line.count(",") else ","
+    delimiter = max(("\t", ";", ","), key=line.count)
     return next(csv.reader([line], delimiter=delimiter, quotechar='"'))
 
 
