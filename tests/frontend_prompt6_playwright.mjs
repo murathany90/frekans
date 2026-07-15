@@ -40,7 +40,7 @@ try {
   await page.click('[data-tab="tab-settings"]');
   await page.waitForSelector("#tab-settings #sourceHealthSummary .source-health-card");
   const dataHealth = await page.$$eval("#tab-settings #sourceHealthSummary .source-health-card", cards => cards.map(card => card.textContent || ""));
-  if (dataHealth.length < 2 || !dataHealth.some(text => /Türkiye/.test(text)) || !dataHealth.some(text => /ENTSO-E|Almanya/.test(text))) {
+  if (dataHealth.length < 2 || !dataHealth.some(text => /Türkiye/.test(text)) || !dataHealth.some(text => /Kıta Avrupası|Netztransparenz|ENTSO-E/.test(text))) {
     throw new Error(`Data tab source health cards are missing or mislabeled: ${JSON.stringify(dataHealth)}`);
   }
 
@@ -66,8 +66,8 @@ try {
   await page.click("#langToggle");
   await page.waitForFunction(() => document.querySelector(".brand h1")?.textContent?.trim() === "GridFreq");
   const enLabels = await page.$$eval("#analysisSourceSelect option, #coverageSummary .label", items => items.map(item => item.textContent?.trim() || ""));
-  if (!enLabels.some(label => /ENTSO-E \(Germany\)/.test(label)) && !enLabels.some(label => /Latest ENTSO-E data/.test(label))) {
-    throw new Error(`English ENTSO-E labels are missing: ${JSON.stringify(enLabels)}`);
+  if (!enLabels.some(label => /Continental Europe.*Netztransparenz/.test(label)) && !enLabels.some(label => /Latest ENTSO-E data/.test(label))) {
+    throw new Error(`English Continental Europe labels are missing: ${JSON.stringify(enLabels)}`);
   }
 
   if (consoleErrors.length) {

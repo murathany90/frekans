@@ -1,6 +1,8 @@
-# Şebeke Frekansı
+# GridFreq
 
-Şebeke Frekansı, TEİAŞ Türkiye günlük şebeke frekansı verileri ile arayüzde ENTSO-E olarak etiketlenen Kıta Avrupası / Netztransparenz frekans verilerini aynı statik web uygulamasında inceleyen, karşılaştıran ve analiz eden bir frekans kalite platformudur. Uygulamanın marka adı GridFreq'tir; GitHub Pages üzerinde çalışır ve `gridfreq.com` alan adı için `CNAME` üretir. Tarayıcı doğrudan TEİAŞ veya Netztransparenz sistemlerine bağlanmaz. Otomatik indirme, normalizasyon, kalite kontrolü ve yayınlama işleri GitHub Actions ve yerel Python betikleriyle yapılır.
+Türkiye ve Kıta Avrupası Şebeke Frekansı Analiz Platformu
+
+GridFreq, TEİAŞ Türkiye günlük şebeke frekansı verileri ile Kıta Avrupası – Netztransparenz frekans verilerini aynı statik web uygulamasında inceleyen, karşılaştıran ve analiz eden bir frekans kalite platformudur. GitHub Pages üzerinde çalışır ve ana canlı uygulama adresi `https://gridfreq.com/` olarak yapılandırılmıştır. Tarayıcı doğrudan TEİAŞ veya Netztransparenz sistemlerine bağlanmaz. Otomatik indirme, normalizasyon, kalite kontrolü ve yayınlama işleri GitHub Actions ve yerel Python betikleriyle yapılır.
 
 ## Kısa Durum
 
@@ -22,7 +24,7 @@
 - Netztransparenz son otomatik kaynak: `scripts/fetch_netztransparenz.py`
 - Netztransparenz OAuth istemcisi: `scripts/netztransparenz_client.py`
 
-Mevcut manifest özetinde TEİAŞ ve Netztransparenz günleri ayrı tutulur. Türkiye ve ENTSO-E (Almanya) günleri birebir aynı takvim aralığında olmak zorunda değildir; uygulama ortak günleri karşılaştırma için, tekil kaynak günlerini ise tek kaynak grafiği ve tek kaynak analizleri için kullanır.
+Mevcut manifest özetinde TEİAŞ ve Netztransparenz günleri ayrı tutulur. Türkiye ve Kıta Avrupası – Netztransparenz günleri birebir aynı takvim aralığında olmak zorunda değildir; uygulama ortak günleri karşılaştırma için, tekil kaynak günlerini ise tek kaynak grafiği ve tek kaynak analizleri için kullanır.
 
 ## Mimari
 
@@ -42,7 +44,7 @@ Uygulama tek HTML dosyası etrafında çalışan statik bir ön yüz ve önceden
 
 ### Günlük
 
-Günlük sekmesi tarih seçimi, zaman hizalama, grafik katmanları ve 24 saatlik frekans grafiği için ana ekrandır. Tarih seçicide Türkiye, ENTSO-E (Almanya) veya ikisinde birden bulunan günler gösterilir. Gün yalnızca ENTSO-E verisine sahipse ENTSO-E serisi tekil olarak çizilir; Türkiye verisi boş kalır. Ortak günlerde Türkiye ve ENTSO-E aynı grafik üzerinde karşılaştırılır.
+Günlük sekmesi tarih seçimi, zaman hizalama, grafik katmanları ve 24 saatlik frekans grafiği için ana ekrandır. Tarih seçicide Türkiye, Kıta Avrupası – Netztransparenz veya ikisinde birden bulunan günler gösterilir. Gün yalnızca Kıta Avrupası verisine sahipse bu seri tekil olarak çizilir; Türkiye verisi boş kalır. Ortak günlerde Türkiye ve Kıta Avrupası serileri aynı grafik üzerinde karşılaştırılır.
 
 Günlük sekmesindeki ana kontroller:
 
@@ -78,7 +80,7 @@ Analiz sekmesi seçili gün veya tarih aralığı üzerinde bilimsel analizleri 
 Kaynak seçenekleri:
 
 - `Türkiye`: TEİAŞ serisini tek başına analiz eder.
-- `ENTSO-E (Almanya)`: Netztransparenz serisini tek başına analiz eder.
+- `Kıta Avrupası – Netztransparenz`: Netztransparenz serisini tek başına analiz eder.
 - `Türkiye + ENTSO-E`: Ortak veri gerektiren çift kaynak görünümü.
 - `Türkiye - ENTSO-E`: İki kaynak arasındaki fark bileşeni.
 - `Ortak bileşen`: İki serinin ortak mod davranışı.
@@ -372,6 +374,7 @@ node tests/frontend_prompt4_static.mjs
 node tests/frontend_prompt5_static.mjs
 node tests/frontend_prompt6_static.mjs
 node tests/frontend_brand_static.mjs
+node tests/frontend_public_sharing_static.mjs
 node tests/frontend_data_sources_modal_static.mjs
 node tests/frontend_netztransparenz_status_static.mjs
 node tests/readme_documentation_static.mjs
@@ -403,6 +406,12 @@ Test kapsamı parser, timezone hizalama, int16 encode/decode, manifest üretimi,
 ## Repo Boyutu ve Yayın Sınırı
 
 Ham TEİAŞ CSV dosyaları, ham Netztransparenz aylık ZIP/CSV dosyaları ve geçici indirmeler repoya veya Pages çıktısına dahil edilmemelidir. Optimize günlük binary dosyalar commitlenebilir. Boyut raporu `reports/data_quality/storage_report.md` içindedir.
+
+## Lisans
+
+Bu repodaki uygulama kodu MIT lisansı altındadır. Ayrıntılar için [LICENSE](LICENSE) dosyasına bakın.
+
+MIT lisansı yalnızca GridFreq uygulama kodunu kapsar; veri kaynaklarının kullanım haklarını kapsamaz. TEİAŞ, Netztransparenz, ENTSO-E veya ilgili TSO veri kaynaklarının lisansları, yeniden dağıtım izinleri ve kaynak şartları bu lisansın kapsamında değildir; veri kullanımı ilgili kurumların güncel şartlarına tabidir.
 
 ## Sınırlamalar
 

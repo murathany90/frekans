@@ -13,7 +13,7 @@ from scripts.validate_frequency import validate_data_root, write_storage_report
 
 CUSTOM_DOMAIN = "gridfreq.com"
 REQUIRED_DOMAIN_FILES = ("CNAME", "robots.txt", "sitemap.xml", "site.webmanifest")
-OPTIONAL_DOMAIN_FILES = ("404.html",)
+OPTIONAL_DOMAIN_FILES = ("404.html", "LICENSE")
 
 
 def copy_tree(src: Path, dst: Path) -> None:

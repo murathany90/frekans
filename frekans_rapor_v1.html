@@ -4,24 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="light" />
-  <meta name="description" content="Türkiye ve Kıta Avrupası şebeke frekansı verilerini karşılaştıran frekans kalite ve analiz platformu." />
+  <meta name="description" content="GridFreq, Türkiye ve Kıta Avrupası şebeke frekansı verilerini karşılaştıran bağımsız frekans kalite ve analiz platformudur." />
   <link rel="canonical" href="https://gridfreq.com/">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://gridfreq.com/">
   <meta property="og:site_name" content="GridFreq">
-  <meta property="og:title" content="GridFreq">
-  <meta property="og:description" content="Türkiye ve Kıta Avrupası şebeke frekansı verilerini karşılaştıran frekans kalite ve analiz platformu.">
+  <meta property="og:title" content="GridFreq | Türkiye ve Kıta Avrupası Şebeke Frekansı Analiz Platformu">
+  <meta property="og:description" content="Türkiye ve Kıta Avrupası şebeke frekansı verilerini karşılaştırın; veri kalitesi, frekans davranışı ve analiz raporlarını GridFreq ile inceleyin.">
   <meta property="og:image" content="https://gridfreq.com/assets/brand/gridfreq-social-card.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="GridFreq">
-  <meta name="twitter:description" content="Türkiye ve Kıta Avrupası şebeke frekansı verilerini karşılaştıran frekans kalite ve analiz platformu.">
+  <meta name="twitter:title" content="GridFreq | Türkiye ve Kıta Avrupası Şebeke Frekansı Analiz Platformu">
+  <meta name="twitter:description" content="Türkiye ve Kıta Avrupası şebeke frekansı verilerini karşılaştırın; veri kalitesi, frekans davranışı ve analiz raporlarını GridFreq ile inceleyin.">
   <meta name="twitter:image" content="https://gridfreq.com/assets/brand/gridfreq-social-card.png">
   <link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="assets/brand/favicon.ico" sizes="any">
   <link rel="icon" href="assets/brand/favicon-32x32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
   <link rel="manifest" href="site.webmanifest">
-  <title>GridFreq – Şebeke Frekansı</title>
+  <title>GridFreq – Türkiye ve Kıta Avrupası Şebeke Frekansı Analiz Platformu</title>
 
   <!-- CSV ayrıştırma Web Worker içinde akış tabanlı ve satır satır yapılır. -->
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
@@ -390,6 +390,32 @@
 
     .source-links a { color: var(--blue); font-weight: 800; text-decoration: none; }
     .source-links a:hover { text-decoration: underline; }
+
+    .about-legal-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 14px;
+      min-width: 0;
+    }
+
+    .about-legal-card h4 {
+      margin: 0 0 6px;
+      color: var(--navy);
+      font-size: .95rem;
+    }
+
+    .about-legal-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .about-legal-card a {
+      color: var(--blue);
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
 
     .progress-wrap { margin-top: 12px; display: none; }
     .progress-wrap.visible { display: block; }
@@ -1779,7 +1805,7 @@
             <label for="analysisSourceSelect" data-i18n="analysisSourceLabel">Kaynak</label>
             <select id="analysisSourceSelect">
               <option value="tr" data-i18n="sourceTr">Türkiye</option>
-              <option value="de" data-i18n="sourceDe">ENTSO-E (Almanya)</option>
+              <option value="de" data-i18n="sourceDe">Kıta Avrupası – Netztransparenz</option>
               <option value="both" data-i18n="sourceBoth">Türkiye + ENTSO-E</option>
               <option value="diff" data-i18n="sourceDiff">Türkiye - ENTSO-E</option>
               <option value="common" data-i18n="sourceCommon">Ortak bileşen</option>
@@ -1787,7 +1813,7 @@
             </select>
             <select id="oscSourceSelect" class="sr-only" aria-hidden="true" tabindex="-1">
               <option value="tr" selected>Türkiye</option>
-              <option value="de">ENTSO-E (Almanya)</option>
+              <option value="de">Kıta Avrupası – Netztransparenz</option>
               <option value="both">Türkiye + ENTSO-E</option>
               <option value="diff">Türkiye - ENTSO-E</option>
               <option value="common">Ortak bileşen</option>
@@ -1910,6 +1936,7 @@
           </table>
         </div>
       </div>
+
     </section>
 
     <!-- SEKME 3: RAPORLAR -->
@@ -1957,7 +1984,7 @@
           <div class="card">
             <div class="section-title">
               <div>
-                <h3 data-i18n="sourceDe">ENTSO-E (Almanya)</h3>
+                <h3 data-i18n="sourceDe">Kıta Avrupası – Netztransparenz</h3>
               </div>
               <span class="tag" data-i18n="monthlyCsv">Aylık CSV</span>
             </div>
@@ -2068,8 +2095,8 @@
             <h3 data-i18n="settingsAlignmentTitle">Zaman Eşleştirme</h3>
             <div class="field"><label for="setAlignment" data-i18n="defaultMethodLabel">Varsayılan yöntem</label><select id="setAlignment"><option value="utcAuto" data-i18n="utcAuto">UTC – otomatik</option><option value="sameLocal" data-i18n="sameLocal">Aynı yerel saat</option><option value="manual" data-i18n="manualOption">Manuel</option></select></div>
             <div class="field"><label for="teiasUtcOffset" data-i18n="teiasUtcOffsetLabel">Türkiye UTC ofseti</label><input id="teiasUtcOffset" type="number" step="0.5" value="3" /></div>
-            <div class="field"><label for="deWinterOffset" data-i18n="deWinterOffsetLabel">ENTSO-E (Almanya) kış UTC ofseti</label><input id="deWinterOffset" type="number" step="0.5" value="1" /></div>
-            <div class="field"><label for="deSummerOffset" data-i18n="deSummerOffsetLabel">ENTSO-E (Almanya) yaz UTC ofseti</label><input id="deSummerOffset" type="number" step="0.5" value="2" /></div>
+            <div class="field"><label for="deWinterOffset" data-i18n="deWinterOffsetLabel">Kıta Avrupası kış UTC ofseti</label><input id="deWinterOffset" type="number" step="0.5" value="1" /></div>
+            <div class="field"><label for="deSummerOffset" data-i18n="deSummerOffsetLabel">Kıta Avrupası yaz UTC ofseti</label><input id="deSummerOffset" type="number" step="0.5" value="2" /></div>
             <div class="field"><label for="manualOffsetSetting" data-i18n="manualOffsetSettingLabel">Manuel TR→DE farkı (saat)</label><input id="manualOffsetSetting" type="number" step="0.5" value="1" /></div>
           </div>
 
@@ -2090,6 +2117,41 @@
             <div class="field"><label for="chartStep" data-i18n="chartStepLabel">Osilasyon grafik adımı (sn)</label><input id="chartStep" type="number" min="1" max="30" step="1" value="5" /></div>
             <div class="field"><label for="diffAxisMin" data-i18n="diffAxisMinLabel">Fark alt limit (mHz)</label><input id="diffAxisMin" type="number" min="-200" max="0" step="1" value="-20" /></div>
             <div class="field"><label for="diffAxisMax" data-i18n="diffAxisMaxLabel">Fark üst limit (mHz)</label><input id="diffAxisMax" type="number" min="0" max="200" step="1" value="20" /></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="aboutLegalSection">
+        <div class="section-title">
+          <div>
+            <h3 data-i18n="aboutLegalTitle">Hakkında / İletişim / Yasal Bilgilendirme</h3>
+            <p data-i18n="aboutLegalSubtitle">GridFreq, Türkiye ve Kıta Avrupası şebeke frekansı verilerini karşılaştırmak için hazırlanmış bağımsız bir analiz uygulamasıdır.</p>
+          </div>
+        </div>
+        <div class="grid-3">
+          <div class="about-legal-card">
+            <h4 data-i18n="aboutLegalPurposeTitle">Proje amacı</h4>
+            <p data-i18n="aboutLegalPurpose">Şebeke frekansı davranışını, veri kalitesini ve analiz raporlarını tek bir statik web arayüzünde incelemeyi kolaylaştırır.</p>
+          </div>
+          <div class="about-legal-card">
+            <h4 data-i18n="aboutLegalContactTitle">İletişim</h4>
+            <p><span data-i18n="aboutLegalContact">Geliştirici iletişimi ve geri bildirim için GitHub Issues kullanılabilir:</span> <a href="https://github.com/murathany90/frekans/issues" target="_blank" rel="noopener noreferrer">GridFreq Issues</a></p>
+          </div>
+          <div class="about-legal-card">
+            <h4 data-i18n="aboutLegalDisclaimerTitle">Bağımsız proje</h4>
+            <p data-i18n="aboutLegalDisclaimer">GridFreq; TEİAŞ, ENTSO-E, Netztransparenz veya ilgili TSO'ların resmi hizmeti değildir.</p>
+          </div>
+          <div class="about-legal-card">
+            <h4 data-i18n="aboutLegalSourcesTitle">Veri kaynakları</h4>
+            <p data-i18n="aboutLegalSources">Türkiye verisi TEİAŞ kaynaklarından, Kıta Avrupası frekansı Netztransparenz üzerinden yayımlanan resmi kaynaklardan türetilir.</p>
+          </div>
+          <div class="about-legal-card">
+            <h4 data-i18n="aboutLegalLicenseTitle">Lisans</h4>
+            <p><span data-i18n="aboutLegalLicense">Uygulama kodu MIT lisansı altındadır; bu lisans veri kaynaklarının kullanım haklarını kapsamaz.</span> <a href="LICENSE" target="_blank" rel="noopener noreferrer">LICENSE</a></p>
+          </div>
+          <div class="about-legal-card">
+            <h4 data-i18n="aboutLegalVersionTitle">Sürüm</h4>
+            <p><span data-i18n="aboutLegalVersion">Uygulama sürümü:</span> <strong>2026.07.15-public</strong></p>
           </div>
         </div>
       </div>
@@ -5065,7 +5127,13 @@
           $('filterDropdown')?.classList.add('hidden');
         }
       });
-      window.addEventListener('scroll', hideAppTooltip, { passive: true });
+      window.addEventListener('scroll', () => {
+        if (appTooltipTarget && document.activeElement === appTooltipTarget) {
+          positionAppTooltip(appTooltipTarget);
+          return;
+        }
+        hideAppTooltip();
+      }, { passive: true });
       window.addEventListener('resize', hideAppTooltip);
     }
 
@@ -7058,8 +7126,8 @@
         settingsAlignmentTitle: 'Zaman Eşleştirme',
         defaultMethodLabel: 'Varsayılan yöntem',
         teiasUtcOffsetLabel: 'Türkiye UTC ofseti',
-        deWinterOffsetLabel: 'ENTSO-E (Almanya) kış UTC ofseti',
-        deSummerOffsetLabel: 'ENTSO-E (Almanya) yaz UTC ofseti',
+        deWinterOffsetLabel: 'Kıta Avrupası kış UTC ofseti',
+        deSummerOffsetLabel: 'Kıta Avrupası yaz UTC ofseti',
         manualOffsetSettingLabel: 'Manuel TR→DE farkı (saat)',
         settingsQualityTitle: 'Veri Kalitesi',
         nominalFreqLabel: 'Nominal frekans (Hz)',
@@ -7076,6 +7144,20 @@
         chartStepLabel: 'Osilasyon grafik adımı (sn)',
         diffAxisMinLabel: 'Fark alt limit (mHz)',
         diffAxisMaxLabel: 'Fark üst limit (mHz)',
+        aboutLegalTitle: 'Hakkında / İletişim / Yasal Bilgilendirme',
+        aboutLegalSubtitle: 'GridFreq, Türkiye ve Kıta Avrupası şebeke frekansı verilerini karşılaştırmak için hazırlanmış bağımsız bir analiz uygulamasıdır.',
+        aboutLegalPurposeTitle: 'Proje amacı',
+        aboutLegalPurpose: 'Şebeke frekansı davranışını, veri kalitesini ve analiz raporlarını tek bir statik web arayüzünde incelemeyi kolaylaştırır.',
+        aboutLegalContactTitle: 'İletişim',
+        aboutLegalContact: 'Geliştirici iletişimi ve geri bildirim için GitHub Issues kullanılabilir:',
+        aboutLegalDisclaimerTitle: 'Bağımsız proje',
+        aboutLegalDisclaimer: "GridFreq; TEİAŞ, ENTSO-E, Netztransparenz veya ilgili TSO'ların resmi hizmeti değildir.",
+        aboutLegalSourcesTitle: 'Veri kaynakları',
+        aboutLegalSources: 'Türkiye verisi TEİAŞ kaynaklarından, Kıta Avrupası frekansı Netztransparenz üzerinden yayımlanan resmi kaynaklardan türetilir.',
+        aboutLegalLicenseTitle: 'Lisans',
+        aboutLegalLicense: 'Uygulama kodu MIT lisansı altındadır; bu lisans veri kaynaklarının kullanım haklarını kapsamaz.',
+        aboutLegalVersionTitle: 'Sürüm',
+        aboutLegalVersion: 'Uygulama sürümü:',
         // Calendar
         months: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'],
         dayHeaders: ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'],
@@ -7110,7 +7192,7 @@
         tagCheck: 'Kontrol',
         // Source labels
         sourceTr: 'Türkiye',
-        sourceDe: 'ENTSO-E (Almanya)',
+        sourceDe: 'Kıta Avrupası – Netztransparenz',
         sourceTrShort: 'TR',
         sourceDeShort: 'ENTSO-E',
         // Matrix metric labels
@@ -7145,10 +7227,10 @@
         chartDescDetail: '{label} görünümünde saniyelik çözünürlük kullanılır ve {count} veri noktası çizilir.',
         // Alignment descriptions
         alignDescSameLocal: 'Aynı yerel saat karşılaştırması seçildi.',
-        alignDescManual: 'Manuel eşleştirme seçildi; ENTSO-E (Almanya) yerel saati = Türkiye yerel saati − {delta} saat.',
-        alignDescUtcAuto: 'UTC otomatik eşleştirme seçildi; Türkiye UTC{teias}, ENTSO-E (Almanya) UTC{de}, fark {delta} saat.',
+        alignDescManual: 'Manuel eşleştirme seçildi; Kıta Avrupası yerel saati = Türkiye yerel saati − {delta} saat.',
+        alignDescUtcAuto: 'UTC otomatik eşleştirme seçildi; Türkiye UTC{teias}, Kıta Avrupası UTC{de}, fark {delta} saat.',
         alignDescDefault: 'Zaman eşleştirme bilgisi veri ve tarih seçildiğinde gösterilecektir.',
-        alignInfo: '{desc} Türkiye {trDate} 00:00:00 kaydı, ENTSO-E (Almanya) {deDate} {deTime} kaydıyla eşleştirilir.',
+        alignInfo: '{desc} Türkiye {trDate} 00:00:00 kaydı, Kıta Avrupası {deDate} {deTime} kaydıyla eşleştirilir.',
         // Various messages
         noDateSelected: 'Lütfen Türkiye veya ENTSO-E verisi bulunan bir gün seçin.',
         autoDataLoading: '{date} otomatik verisi yükleniyor.',
@@ -7365,8 +7447,8 @@
         settingsAlignmentTitle: 'Time Alignment',
         defaultMethodLabel: 'Default method',
         teiasUtcOffsetLabel: 'Türkiye UTC offset',
-        deWinterOffsetLabel: 'ENTSO-E (Germany) winter UTC offset',
-        deSummerOffsetLabel: 'ENTSO-E (Germany) summer UTC offset',
+        deWinterOffsetLabel: 'Continental Europe winter UTC offset',
+        deSummerOffsetLabel: 'Continental Europe summer UTC offset',
         manualOffsetSettingLabel: 'Manual TR→DE offset (hours)',
         settingsQualityTitle: 'Data Quality',
         nominalFreqLabel: 'Nominal frequency (Hz)',
@@ -7383,6 +7465,20 @@
         chartStepLabel: 'Oscillation chart step (sec)',
         diffAxisMinLabel: 'Diff lower limit (mHz)',
         diffAxisMaxLabel: 'Diff upper limit (mHz)',
+        aboutLegalTitle: 'About / Contact / Legal Notice',
+        aboutLegalSubtitle: 'GridFreq is an independent analytics application for comparing Türkiye and Continental Europe grid frequency data.',
+        aboutLegalPurposeTitle: 'Project purpose',
+        aboutLegalPurpose: 'It helps review grid frequency behavior, data quality, and analysis reports in a static web interface.',
+        aboutLegalContactTitle: 'Contact',
+        aboutLegalContact: 'For developer contact and feedback, use GitHub Issues:',
+        aboutLegalDisclaimerTitle: 'Independent project',
+        aboutLegalDisclaimer: 'GridFreq is not an official service of TEİAŞ, ENTSO-E, Netztransparenz, or related TSOs.',
+        aboutLegalSourcesTitle: 'Data sources',
+        aboutLegalSources: 'Türkiye data is derived from TEİAŞ sources; Continental Europe frequency is derived from official data published through Netztransparenz.',
+        aboutLegalLicenseTitle: 'License',
+        aboutLegalLicense: 'Application code is licensed under MIT; this license does not cover data-source usage rights.',
+        aboutLegalVersionTitle: 'Version',
+        aboutLegalVersion: 'Application version:',
         // Calendar
         months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         dayHeaders: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
@@ -7417,7 +7513,7 @@
         tagCheck: 'Check',
         // Source labels
         sourceTr: 'Türkiye',
-        sourceDe: 'ENTSO-E (Germany)',
+        sourceDe: 'Continental Europe – Netztransparenz',
         sourceTrShort: 'TR',
         sourceDeShort: 'ENTSO-E',
         // Matrix metric labels
@@ -7452,10 +7548,10 @@
         chartDescDetail: '{label} view uses second-resolution with {count} data points plotted.',
         // Alignment descriptions
         alignDescSameLocal: 'Same local time comparison selected.',
-        alignDescManual: 'Manual alignment selected; ENTSO-E (Germany) local time = Türkiye local time − {delta} hours.',
-        alignDescUtcAuto: 'UTC auto alignment selected; Türkiye UTC{teias}, ENTSO-E (Germany) UTC{de}, delta {delta} hours.',
+        alignDescManual: 'Manual alignment selected; Continental Europe local time = Türkiye local time − {delta} hours.',
+        alignDescUtcAuto: 'UTC auto alignment selected; Türkiye UTC{teias}, Continental Europe UTC{de}, delta {delta} hours.',
         alignDescDefault: 'Alignment info will be shown when data and date are selected.',
-        alignInfo: '{desc} Türkiye {trDate} 00:00:00 record aligns with ENTSO-E (Germany) {deDate} {deTime} record.',
+        alignInfo: '{desc} Türkiye {trDate} 00:00:00 record aligns with Continental Europe {deDate} {deTime} record.',
         // Various messages
         noDateSelected: 'Please select a date with Türkiye or ENTSO-E data.',
         autoDataLoading: 'Loading auto data for {date}.',

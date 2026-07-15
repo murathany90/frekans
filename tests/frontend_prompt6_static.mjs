@@ -11,7 +11,8 @@ function mustContain(text, label = text) {
 }
 
 for (const marker of [
-  "Şebeke Frekansı",
+  "GridFreq",
+  "Türkiye ve Kıta Avrupası Şebeke Frekansı Analiz Platformu",
   "Grid Frequency",
   "analysisInfoToggle",
   "analysisInfoPanel",
@@ -19,8 +20,8 @@ for (const marker of [
   "analysisInfoStatus",
   "analysisInfoSampling",
   "sourceHealthSummary",
-  "ENTSO-E (Almanya)",
-  "ENTSO-E (Germany)",
+  "Kıta Avrupası – Netztransparenz",
+  "Continental Europe – Netztransparenz",
   "Son ENTSO-E verisi",
   "Latest ENTSO-E data"
 ]) {
@@ -68,7 +69,7 @@ if (!/CNAME/.test(buildSite)) {
   throw new Error("build_site.py must copy CNAME into dist for GitHub Pages custom domain publishing.");
 }
 
-for (const pathTrigger of ['- "CNAME"', '- "robots.txt"', '- "sitemap.xml"', '- "404.html"']) {
+for (const pathTrigger of ['- "CNAME"', '- "LICENSE"', '- "robots.txt"', '- "sitemap.xml"', '- "404.html"']) {
   if (!deployWorkflow.includes(pathTrigger)) {
     throw new Error(`Deploy workflow must trigger on ${pathTrigger}.`);
   }
@@ -79,9 +80,9 @@ for (const marker of [
   '<meta property="og:type" content="website">',
   '<meta property="og:url" content="https://gridfreq.com/">',
   '<meta property="og:site_name" content="GridFreq">',
-  '<meta property="og:title" content="GridFreq">',
+  '<meta property="og:title" content="GridFreq | Türkiye ve Kıta Avrupası Şebeke Frekansı Analiz Platformu">',
   '<meta name="twitter:card" content="summary_large_image">',
-  '<meta name="twitter:title" content="GridFreq">'
+  '<meta name="twitter:title" content="GridFreq | Türkiye ve Kıta Avrupası Şebeke Frekansı Analiz Platformu">'
 ]) {
   if (!html.includes(marker)) {
     throw new Error(`Missing custom-domain SEO marker: ${marker}`);
