@@ -142,7 +142,7 @@ try {
     }
 
     const kpiLabels = layout.kpiCards.map(card => card.label);
-    const expectedKpis = ["Turkey Mean", "ENTSO-E Mean", "Turkey Mean |Δf|", "ENTSO-E Mean |Δf|"];
+    const expectedKpis = ["Türkiye Mean", "ENTSO-E Mean", "Türkiye Mean |Δf|", "ENTSO-E Mean |Δf|"];
     if (kpiLabels.join("|") !== expectedKpis.join("|")) {
       throw new Error(`Mobile KPI cards must only show the four mean cards at ${width}px: ${JSON.stringify(layout.kpiCards)}`);
     }
@@ -160,8 +160,16 @@ try {
     if (githubLinks !== 0 || /GridFreq GitHub repository|GridFreq GitHub deposu/i.test(modalText || "")) {
       throw new Error("Data sources modal must not list the GridFreq GitHub repository as an official source link.");
     }
+    if (/\bTurkey\b/.test(modalText || "")) {
+      throw new Error(`English data sources modal must use Türkiye, not Turkey: ${modalText}`);
+    }
     await page.click("#dataSourcesCloseBtn");
     await page.waitForFunction(() => document.querySelector("#dataSourcesModal")?.classList.contains("hidden"));
+
+    const visibleText = await page.locator("body").evaluate(node => node.innerText);
+    if (/\bTurkey\b/.test(visibleText)) {
+      throw new Error(`English mobile UI must use Türkiye, not Turkey at ${width}px.`);
+    }
 
     await page.click("#resetZoomBtn");
     await page.waitForSelector("#frequencyChart");

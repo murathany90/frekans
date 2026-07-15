@@ -472,6 +472,45 @@
     .kpi .label { color: var(--muted); font-size: .74rem; font-weight: 800; text-transform: uppercase; letter-spacing: .035em; }
     .kpi .value { color: var(--navy); font-size: 1.28rem; font-weight: 850; margin-top: 7px; }
     .kpi .sub { color: var(--muted); font-size: .72rem; margin-top: 3px; }
+    .kpi[data-tooltip] {
+      position: relative;
+      cursor: help;
+      outline-offset: 2px;
+    }
+    .kpi[data-tooltip]:hover::after,
+    .kpi[data-tooltip]:focus-visible::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      z-index: 80;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      width: min(280px, calc(100vw - 32px));
+      transform: translateX(-50%);
+      padding: 9px 11px;
+      border-radius: 8px;
+      background: #0b1220;
+      color: #f8fafc;
+      box-shadow: 0 10px 26px rgba(8, 21, 35, .28);
+      white-space: normal;
+      overflow-wrap: anywhere;
+      text-align: left;
+      font-size: .76rem;
+      font-weight: 650;
+      line-height: 1.35;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .kpi[data-tooltip]:hover::before,
+    .kpi[data-tooltip]:focus-visible::before {
+      content: "";
+      position: absolute;
+      z-index: 81;
+      left: 50%;
+      bottom: calc(100% + 2px);
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: #0b1220;
+    }
 
     .chart {
       width: 100%;
@@ -666,6 +705,31 @@
       background: var(--cyan) !important;
       color: #fff;
       outline: none;
+    }
+    .hour-matrix [data-hour-tooltip],
+    .hour-heat-cell[data-hour-tooltip] {
+      position: relative;
+    }
+    .hour-matrix-tooltip {
+      position: fixed;
+      z-index: 1400;
+      max-width: min(340px, calc(100vw - 24px));
+      padding: 9px 11px;
+      border-radius: 8px;
+      background: #0b1220;
+      color: #f8fafc;
+      box-shadow: 0 12px 30px rgba(8, 21, 35, .32);
+      font-size: .78rem;
+      font-weight: 700;
+      line-height: 1.35;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      pointer-events: none;
+    }
+    .hour-matrix-tooltip.hidden { display: none; }
+    .hour-tooltip-active {
+      outline: 2px solid rgba(34, 211, 238, .65) !important;
+      outline-offset: -2px;
     }
     .metric-name {
       position: relative;
@@ -1145,6 +1209,18 @@
       font-size: .84rem;
       line-height: 1.4;
     }
+    .data-source-card.compact {
+      display: grid;
+      align-content: start;
+      gap: 8px;
+    }
+    .data-source-card.compact h3,
+    .data-source-card.compact .card-subtitle {
+      margin-bottom: 0;
+    }
+    .data-source-card.compact dl {
+      margin-top: 2px;
+    }
 
     .data-source-card dl,
     .data-status-card dl {
@@ -1517,6 +1593,7 @@
           </div>
         </div>
         <div id="hourBlocks" class="hour-matrix-shell"></div>
+        <div id="hourMatrixTooltip" class="hour-matrix-tooltip hidden" role="tooltip"></div>
       </div>
 
       <div class="panel">
@@ -1555,46 +1632,62 @@
           </section>
 
           <section class="data-sources-section data-sources-grid" aria-label="Veri kaynağı kartları">
-            <article class="data-source-card" id="dataSourcesTrCard">
+            <article class="data-source-card compact" id="dataSourcesTrCard">
               <span class="tag good" data-i18n="dataSourcesTrBadge">TEİAŞ · 50 Hz</span>
               <h3 data-i18n="dataSourcesTrTitle">Türkiye Şebeke Frekansı</h3>
               <p class="card-subtitle" data-i18n="dataSourcesTrSubtitle">Türkiye elektrik sistemi frekans zaman serisi.</p>
               <dl>
                 <dt data-i18n="dataSourcesInstitution">Kurum</dt><dd>Türkiye Elektrik İletim A.Ş. (TEİAŞ)</dd>
-                <dt data-i18n="dataSourcesSystem">Sistem</dt><dd data-i18n="dataSourcesTrSystem">Türkiye elektrik sistemi</dd>
-                <dt data-i18n="dataSourcesNominal">Nominal frekans</dt><dd>50 Hz</dd>
-                <dt data-i18n="dataSourcesType">Veri türü</dt><dd data-i18n="dataSourcesTimeSeries">Şebeke frekansı zaman serisi</dd>
-                <dt data-i18n="dataSourcesTimezone">Yerel zaman dilimi</dt><dd id="dataSourcesTrTimezone">Europe/Istanbul</dd>
                 <dt data-i18n="dataSourcesResolution">Uygulamadaki çözünürlük</dt><dd id="dataSourcesTrResolution">—</dd>
                 <dt data-i18n="dataSourcesMethod">Güncelleme yöntemi</dt><dd id="dataSourcesTrMethod">—</dd>
                 <dt data-i18n="dataSourcesLatestDate">Son mevcut veri tarihi</dt><dd id="dataSourcesTrLatest">—</dd>
-                <dt data-i18n="dataSourcesLastCheck">Son başarılı güncelleme zamanı</dt><dd id="dataSourcesTrLastCheck">—</dd>
-                <dt data-i18n="dataSourcesDelay">Veri gecikmesi</dt><dd id="dataSourcesTrDelay">—</dd>
                 <dt data-i18n="dataSourcesStatus">Veri durumu</dt><dd id="dataSourcesTrStatus">—</dd>
               </dl>
             </article>
 
-            <article class="data-source-card" id="dataSourcesEuCard">
+            <article class="data-source-card compact" id="dataSourcesEuCard">
               <span class="tag good" data-i18n="dataSourcesEuBadge">Netztransparenz · Continental Europe · 50 Hz</span>
               <h3 data-i18n="dataSourcesEuTitle">Kıta Avrupası Şebeke Frekansı</h3>
               <p class="card-subtitle" data-i18n="dataSourcesEuSubtitle">Kıta Avrupası – Netztransparenz</p>
-              <p data-i18n="dataSourcesEuDescription">Bu veri, Almanya’daki dört iletim sistemi işletmecisinin ortak veri portalı olan Netztransparenz üzerinden yayımlanan Kıta Avrupası senkron bölgesi şebeke frekansıdır.</p>
               <dl>
                 <dt data-i18n="dataSourcesPortal">Kaynak portal</dt><dd>Netztransparenz</dd>
-                <dt data-i18n="dataSourcesTsos">İlgili TSO’lar</dt><dd>50Hertz Transmission, Amprion, TenneT TSO, TransnetBW</dd>
                 <dt data-i18n="dataSourcesArea">Senkron bölge</dt><dd data-i18n="dataSourcesEuArea">Continental Europe / Kıta Avrupası</dd>
-                <dt data-i18n="dataSourcesNominal">Nominal frekans</dt><dd>50 Hz</dd>
-                <dt data-i18n="dataSourcesType">Veri türü</dt><dd data-i18n="dataSourcesEuType">Saniyelik/yüksek çözünürlüklü frekans zaman serisi</dd>
                 <dt data-i18n="dataSourcesMethod">Kaynak yöntemi</dt><dd id="dataSourcesEuMethod">—</dd>
-                <dt data-i18n="dataSourcesSourceTimezone">Kaynak zaman dilimi</dt><dd id="dataSourcesEuTimezone">Europe/Berlin</dd>
                 <dt data-i18n="dataSourcesLatestDate">Son mevcut veri tarihi</dt><dd id="dataSourcesEuLatest">—</dd>
-                <dt data-i18n="dataSourcesLastCheck">Son başarılı güncelleme zamanı</dt><dd id="dataSourcesEuLastCheck">—</dd>
-                <dt data-i18n="dataSourcesPublicationDelay">Yayın gecikmesi</dt><dd id="dataSourcesEuDelay">—</dd>
                 <dt data-i18n="dataSourcesStatus">Veri durumu</dt><dd id="dataSourcesEuStatus">—</dd>
               </dl>
-              <p class="data-sources-note" data-i18n="dataSourcesEuCritical">Doğrudan ENTSO-E Transparency API’sinden alınmamaktadır. Netztransparenz, Alman TSO’larının ortak resmî portalıdır. Gösterilen seri yalnızca Almanya’ya özgü yerel bir frekans değil, Kıta Avrupası senkron bölgesinin ortak sistem frekansını temsil eder.</p>
             </article>
           </section>
+
+          <details class="data-sources-section" id="dataSourcesSourceDetails">
+            <summary data-i18n="dataSourcesDetailsTitle">Kaynak ayrıntıları</summary>
+            <div class="data-sources-grid">
+              <article class="data-source-card">
+                <h3 data-i18n="dataSourcesTrTitle">Türkiye Şebeke Frekansı</h3>
+                <dl>
+                  <dt data-i18n="dataSourcesSystem">Sistem</dt><dd data-i18n="dataSourcesTrSystem">Türkiye elektrik sistemi</dd>
+                  <dt data-i18n="dataSourcesNominal">Nominal frekans</dt><dd>50 Hz</dd>
+                  <dt data-i18n="dataSourcesType">Veri türü</dt><dd data-i18n="dataSourcesTimeSeries">Şebeke frekansı zaman serisi</dd>
+                  <dt data-i18n="dataSourcesTimezone">Yerel zaman dilimi</dt><dd id="dataSourcesTrTimezone">Europe/Istanbul</dd>
+                  <dt data-i18n="dataSourcesLastCheck">Son başarılı güncelleme zamanı</dt><dd id="dataSourcesTrLastCheck">—</dd>
+                  <dt data-i18n="dataSourcesDelay">Veri gecikmesi</dt><dd id="dataSourcesTrDelay">—</dd>
+                </dl>
+              </article>
+              <article class="data-source-card">
+                <h3 data-i18n="dataSourcesEuTitle">Kıta Avrupası Şebeke Frekansı</h3>
+                <p data-i18n="dataSourcesEuDescription">Bu veri, Almanya’daki dört iletim sistemi işletmecisinin ortak veri portalı olan Netztransparenz üzerinden yayımlanan Kıta Avrupası senkron bölgesi şebeke frekansıdır.</p>
+                <dl>
+                  <dt data-i18n="dataSourcesTsos">İlgili TSO’lar</dt><dd>50Hertz Transmission, Amprion, TenneT TSO, TransnetBW</dd>
+                  <dt data-i18n="dataSourcesNominal">Nominal frekans</dt><dd>50 Hz</dd>
+                  <dt data-i18n="dataSourcesType">Veri türü</dt><dd data-i18n="dataSourcesEuType">Saniyelik/yüksek çözünürlüklü frekans zaman serisi</dd>
+                  <dt data-i18n="dataSourcesSourceTimezone">Kaynak zaman dilimi</dt><dd id="dataSourcesEuTimezone">Europe/Berlin</dd>
+                  <dt data-i18n="dataSourcesLastCheck">Son başarılı güncelleme zamanı</dt><dd id="dataSourcesEuLastCheck">—</dd>
+                  <dt data-i18n="dataSourcesPublicationDelay">Yayın gecikmesi</dt><dd id="dataSourcesEuDelay">—</dd>
+                </dl>
+                <p class="data-sources-note" data-i18n="dataSourcesEuCritical">Doğrudan ENTSO-E Transparency API’sinden alınmamaktadır. Netztransparenz, Alman TSO’larının ortak resmî portalıdır. Gösterilen seri yalnızca Almanya’ya özgü yerel bir frekans değil, Kıta Avrupası senkron bölgesinin ortak sistem frekansını temsil eder.</p>
+              </article>
+            </div>
+          </details>
 
           <details class="data-sources-section" open>
             <summary data-i18n="dataSourcesTimeTitle">Zaman ve çözünürlük</summary>
@@ -2594,6 +2687,35 @@
         limitationsKey: 'limitTrend'
       }
     };
+    const CHART_SESSION_STORAGE_KEY = 'frequencyChartSessionState';
+
+    function loadChartSessionState() {
+      try {
+        return JSON.parse(sessionStorage.getItem(CHART_SESSION_STORAGE_KEY) || '{}') || {};
+      } catch (_) {
+        return {};
+      }
+    }
+
+    function sanitizeChartLegendSelection(selection) {
+      const defaults = defaultChartLegendSelection();
+      if (!selection || typeof selection !== 'object') return defaults;
+      Object.keys(defaults).forEach(key => {
+        defaults[key] = selection[key] !== false;
+      });
+      return defaults;
+    }
+
+    function sanitizeChartZoomRange(range) {
+      const start = Number(range?.start ?? 0);
+      const end = Number(range?.end ?? 100);
+      if (!Number.isFinite(start) || !Number.isFinite(end)) return { start: 0, end: 100 };
+      const safeStart = Math.min(99.9, Math.max(0, start));
+      const safeEnd = Math.min(100, Math.max(safeStart + 0.1, end));
+      return { start: safeStart, end: safeEnd };
+    }
+
+    const chartSessionState = loadChartSessionState();
     const state = {
       de: new Map(),
       tr: new Map(),
@@ -2646,8 +2768,22 @@
       frequencyChart: null,
       oscillationChart: null,
       chartView: { mode: 'day', start: 0, end: 86400, label: '24 saat • dakikalık' },
+      chartLegendSelection: sanitizeChartLegendSelection(chartSessionState.legendSelection),
+      chartZoomRange: sanitizeChartZoomRange(chartSessionState.zoomRange),
+      chartEventSyncing: false,
       busy: false
     };
+
+    function persistChartSessionState() {
+      try {
+        sessionStorage.setItem(CHART_SESSION_STORAGE_KEY, JSON.stringify({
+          legendSelection: state.chartLegendSelection,
+          zoomRange: state.chartZoomRange
+        }));
+      } catch (_) {
+        // Session storage is best-effort; chart behavior still works in memory.
+      }
+    }
 
     const $ = (id) => document.getElementById(id);
     const fmt = (v, digits = 3) => {
@@ -2830,7 +2966,7 @@
       });
       $('analysisAlignment').addEventListener('change', () => updateUrlState({ alignment: $('analysisAlignment').value }));
       $('oscSourceSelect').addEventListener('change', handleOscillationSourceChange);
-      $('resetZoomBtn').addEventListener('click', showDailyFrequencyChart);
+      $('resetZoomBtn').addEventListener('click', resetDailyChartState);
       bindDatePickerControls('daily');
       bindDatePickerControls('analysis');
       $('copyDailyDateBtn').addEventListener('click', () => {
@@ -2915,18 +3051,60 @@
       updateChartLayerControls();
     }
 
-    function updateChartLayerControls() {
+    function defaultChartLegendSelection() {
+      return { tr: true, de: true, trMin: true, trMax: true, deMin: true, deMax: true, diff: true };
+    }
+
+    function chartLegendNameMap() {
+      return {
+        [t('seriesTr')]: 'tr',
+        [t('seriesDe')]: 'de',
+        [t('seriesTrMin')]: 'trMin',
+        [t('seriesTrMax')]: 'trMax',
+        [t('seriesDeMin')]: 'deMin',
+        [t('seriesDeMax')]: 'deMax',
+        [t('seriesDiff')]: 'diff'
+      };
+    }
+
+    function chartLegendSelectedOption(names) {
+      const nameMap = chartLegendNameMap();
+      return Object.fromEntries(names.map(name => {
+        const key = nameMap[name];
+        return [name, key ? state.chartLegendSelection[key] !== false : true];
+      }));
+    }
+
+    function resetFrequencyZoomState() {
+      state.chartZoomRange = { start: 0, end: 100 };
+    }
+
+    function resetDailyChartState() {
+      state.chartLegendSelection = defaultChartLegendSelection();
+      resetFrequencyZoomState();
+      if ($('showDifference')) $('showDifference').value = 'no';
+      if ($('showMinMaxEnvelope')) $('showMinMaxEnvelope').value = 'no';
+      state.settings.showDifference = 'no';
+      state.settings.showMinMax = 'no';
+      localStorage.setItem('frequencyAppSettings', JSON.stringify(state.settings));
+      persistChartSessionState();
+      updateChartLayerControls({ render: false });
+      showDailyFrequencyChart();
+    }
+
+    function updateChartLayerControls(options = {}) {
       state.settings.showDifference = $('showDifference')?.value || 'no';
       state.settings.showMinMax = $('showMinMaxEnvelope')?.value || 'no';
       document.querySelector('[data-layer="difference"]')?.setAttribute('aria-pressed', String(state.settings.showDifference === 'yes'));
       document.querySelector('[data-layer="minmax"]')?.setAttribute('aria-pressed', String(state.settings.showMinMax === 'yes'));
       localStorage.setItem('frequencyAppSettings', JSON.stringify(state.settings));
-      if (state.current) renderFrequencyChart(state.current);
+      if (options.render !== false && state.current) renderFrequencyChart(state.current);
     }
 
     function resetChartZoom(chartId) {
       const chart = chartId === 'frequencyChart' ? state.frequencyChart : state.oscillationChart;
       if (!chart) return;
+      if (chartId === 'frequencyChart') resetFrequencyZoomState();
       chart.dispatchAction({ type: 'dataZoom', start: 0, end: 100 });
     }
 
@@ -4310,6 +4488,7 @@
         alert(t('noDateSelected'));
         return;
       }
+      const previousChartView = persistedChartView(state.chartView);
       if (!force && state.current?.date === date && requestId === state.dateRequestSequence) {
         renderFrequencyChart(state.current);
         updateDateNavButtons('daily');
@@ -4333,7 +4512,7 @@
       state.analysis.analysisSeries = current.analysisSeries;
       state.events = [];
       state.filteredOscillation = null;
-      state.chartView = { mode: 'day', start: 0, end: 86400, label: t('chartViewTag') };
+      state.chartView = previousChartView;
       const pairedRatio = current.overall.pairedCount / 86400 * 100;
       const alignment = current.alignment;
 
@@ -4483,24 +4662,34 @@
 
     function renderKpis(current) {
       const grid = $('kpiGrid');
-      const kpiLabels = [t('kpiTeiasMean'), t('kpiDeMean'), t('kpiTeiasAbsDev'), t('kpiDeAbsDev'), t('kpiBias'), t('kpiMae'), t('kpiCorrelation'), t('kpiPairedData')];
+      const kpiMeta = [
+        [t('kpiTeiasMean'), t('kpiTeiasMeanHelp')],
+        [t('kpiDeMean'), t('kpiDeMeanHelp')],
+        [t('kpiTeiasAbsDev'), t('kpiTeiasAbsDevHelp')],
+        [t('kpiDeAbsDev'), t('kpiDeAbsDevHelp')],
+        [t('kpiBias'), t('kpiBiasHelp')],
+        [t('kpiMae'), t('kpiMaeHelp')],
+        [t('kpiCorrelation'), t('kpiCorrelationHelp')],
+        [t('kpiPairedData'), t('kpiPairedDataHelp')]
+      ];
+      const renderCard = ([label, value, sub, help]) => `<div class="kpi" tabindex="0" data-tooltip="${escapeHtml(help)}" aria-label="${escapeHtml(`${label}: ${value}. ${help}`)}"><div class="label">${escapeHtml(label)}</div><div class="value">${escapeHtml(value)}</div><div class="sub">${escapeHtml(sub)}</div></div>`;
       if (!current) {
-        grid.innerHTML = Array.from({ length: 8 }, (_, i) => `<div class="kpi"><div class="label">${kpiLabels[i]}</div><div class="value">—</div><div class="sub">${t('kpiReportPending')}</div></div>`).join('');
+        grid.innerHTML = kpiMeta.map(([label, help]) => renderCard([label, '—', t('kpiReportPending'), help])).join('');
         return;
       }
       const s = current.overall;
       const mx = lang === 'en' ? 'Max' : 'Maks';
       const cards = [
-        [t('kpiTeiasMean'), `${fmt(s.meanA)} Hz`, `Min ${fmt(s.minA)} • ${mx} ${fmt(s.maxA)}`],
-        [t('kpiDeMean'), `${fmt(s.meanB)} Hz`, `Min ${fmt(s.minB)} • ${mx} ${fmt(s.maxB)}`],
-        [t('kpiTeiasAbsDev'), `${fmt(s.meanAbsDevA, 1)} mHz`, `${mx} ${fmt(s.maxAbsDevA, 1)} mHz`],
-        [t('kpiDeAbsDev'), `${fmt(s.meanAbsDevB, 1)} mHz`, `${mx} ${fmt(s.maxAbsDevB, 1)} mHz`],
-        [t('kpiBias'), `${fmt(s.biasMhz, 2)} mHz`, `${t('sourceTr')} − ${t('sourceDe')}`],
-        [t('kpiMae'), `${fmt(s.maeMhz, 2)} mHz`, `RMSE ${fmt(s.rmseMhz, 2)} mHz`],
-        [t('kpiCorrelation'), fmt(s.correlation, 4), `${t('kpiPairedData')}`],
-        [t('kpiPairedData'), `${fmt(s.pairedCount / 864, 2)}%`, `${s.pairedCount.toLocaleString(t('localeNumeric'))} ${t('kpiPairedData')}`]
+        [kpiMeta[0][0], `${fmt(s.meanA)} Hz`, `Min ${fmt(s.minA)} • ${mx} ${fmt(s.maxA)}`, kpiMeta[0][1]],
+        [kpiMeta[1][0], `${fmt(s.meanB)} Hz`, `Min ${fmt(s.minB)} • ${mx} ${fmt(s.maxB)}`, kpiMeta[1][1]],
+        [kpiMeta[2][0], `${fmt(s.meanAbsDevA, 1)} mHz`, `${mx} ${fmt(s.maxAbsDevA, 1)} mHz`, kpiMeta[2][1]],
+        [kpiMeta[3][0], `${fmt(s.meanAbsDevB, 1)} mHz`, `${mx} ${fmt(s.maxAbsDevB, 1)} mHz`, kpiMeta[3][1]],
+        [kpiMeta[4][0], `${fmt(s.biasMhz, 2)} mHz`, `${t('sourceTr')} − ${t('sourceDe')}`, kpiMeta[4][1]],
+        [kpiMeta[5][0], `${fmt(s.maeMhz, 2)} mHz`, `RMSE ${fmt(s.rmseMhz, 2)} mHz`, kpiMeta[5][1]],
+        [kpiMeta[6][0], fmt(s.correlation, 4), `${t('kpiPairedData')}`, kpiMeta[6][1]],
+        [kpiMeta[7][0], `${fmt(s.pairedCount / 864, 2)}%`, `${s.pairedCount.toLocaleString(t('localeNumeric'))} ${t('kpiPairedData')}`, kpiMeta[7][1]]
       ];
-      grid.innerHTML = cards.map(c => `<div class="kpi"><div class="label">${c[0]}</div><div class="value">${c[1]}</div><div class="sub">${c[2]}</div></div>`).join('');
+      grid.innerHTML = cards.map(renderCard).join('');
     }
 
     function renderFrequencyChart(current, requestedView = state.chartView) {
@@ -4550,7 +4739,16 @@
       const axisMin = detailMode ? view.start : 0;
       const axisMax = detailMode ? Math.max(view.start + 1, view.end - 1) : 86399;
       const labelInterval = detailMode && (view.end - view.start) <= 900 ? 60 : detailMode ? 300 : 7200;
+      const legendData = [
+        t('seriesTr'),
+        t('seriesDe'),
+        ...(showMinMax ? [t('seriesTrMin'), t('seriesTrMax'), t('seriesDeMin'), t('seriesDeMax')] : []),
+        ...(showDiff ? [t('seriesDiff')] : [])
+      ];
+      const zoomStart = clamp(Number(state.chartZoomRange?.start ?? 0), 0, 100);
+      const zoomEnd = clamp(Number(state.chartZoomRange?.end ?? 100), zoomStart + 0.1, 100);
 
+      state.chartEventSyncing = true;
       state.frequencyChart.setOption({
         animation: false,
         color: ['#176b9c', '#222222', '#c83c3c'],
@@ -4568,12 +4766,7 @@
             return `<strong>${secondToTime(second)}</strong><br>${lines}`;
           }
         },
-        legend: { top: 8, data: [
-          t('seriesTr'),
-          t('seriesDe'),
-          ...(showMinMax ? [t('seriesTrMin'), t('seriesTrMax'), t('seriesDeMin'), t('seriesDeMax')] : []),
-          ...(showDiff ? [t('seriesDiff')] : [])
-        ] },
+        legend: { top: 8, data: legendData, selected: chartLegendSelectedOption(legendData) },
         grid: { left: 62, right: showDiff ? 68 : 28, top: 54, bottom: 72 },
         xAxis: {
           type: 'value', min: axisMin, max: axisMax, boundaryGap: false,
@@ -4592,7 +4785,7 @@
           { type: 'value', name: t('yAxisFreq'), scale: true, min: fixed ? state.settings.graphMin : null, max: fixed ? state.settings.graphMax : null, axisLabel: { formatter: v => v.toFixed(3) }, splitLine: { lineStyle: { color: '#e5edf2' } } },
           { type: 'value', name: t('yAxisDiff'), show: showDiff, axisLabel: { formatter: v => v.toFixed(0) }, min: state.settings.diffAxisMin, max: state.settings.diffAxisMax }
         ],
-        dataZoom: [{ type: 'inside', filterMode: 'none' }, { type: 'slider', filterMode: 'none', height: 22, bottom: 18, start: 0, end: 100 }],
+        dataZoom: [{ type: 'inside', filterMode: 'none', start: zoomStart, end: zoomEnd }, { type: 'slider', filterMode: 'none', height: 22, bottom: 18, start: zoomStart, end: zoomEnd }],
         series: [
           { name: t('seriesTr'), type: 'line', data: tr, symbol: 'none', connectNulls: false, sampling: detailMode ? undefined : 'lttb', progressive: 6000, lineStyle: { width: detailMode ? 1.2 : 1.5 } },
           { name: t('seriesDe'), type: 'line', data: de, symbol: 'none', connectNulls: false, sampling: detailMode ? undefined : 'lttb', progressive: 6000, lineStyle: { width: detailMode ? 1.2 : 1.5 } },
@@ -4605,6 +4798,7 @@
           ...(showDiff ? [{ name: t('seriesDiff'), type: 'line', yAxisIndex: 1, data: diff, symbol: 'none', connectNulls: false, sampling: detailMode ? undefined : 'lttb', lineStyle: { width: 1, type: 'dashed' } }] : [])
         ]
       }, true);
+      state.chartEventSyncing = false;
 
       updateChartViewTag(view);
       bindFrequencyZoomHandler();
@@ -4627,6 +4821,20 @@
       renderFrequencyChart(state.current, { mode: 'day', start: 0, end: 86400, label: t('chartViewTag') });
     }
 
+    function persistedChartView(view) {
+      if (!view || !Number.isFinite(Number(view.start)) || !Number.isFinite(Number(view.end))) {
+        return { mode: 'day', start: 0, end: 86400, label: t('chartViewTag') };
+      }
+      const start = clamp(Math.floor(Number(view.start)), 0, 86399);
+      const end = clamp(Math.ceil(Number(view.end)), start + 1, 86400);
+      return {
+        mode: view.mode || 'day',
+        start,
+        end,
+        label: view.mode === 'day' ? t('chartViewTag') : (view.label || `${secondToTime(start).slice(0,5)}–${secondToTime(end).slice(0,5)}`)
+      };
+    }
+
     function showFrequencyInterval(start, end, mode, label) {
       if (!state.current) return;
       const cacheKey = `${state.current.date}:${start}:${end}`;
@@ -4644,11 +4852,29 @@
     function bindFrequencyZoomHandler() {
       if (!state.frequencyChart || state.zoomHandlerBound) return;
       state.zoomHandlerBound = true;
+      const syncLegendSelection = event => {
+        if (state.chartEventSyncing) return;
+        const nameMap = chartLegendNameMap();
+        if (event.name && nameMap[event.name]) {
+          if (event.type === 'legendunselected') state.chartLegendSelection[nameMap[event.name]] = false;
+          else if (event.type === 'legendselected') state.chartLegendSelection[nameMap[event.name]] = true;
+        }
+        Object.entries(event.selected || {}).forEach(([name, selected]) => {
+          const key = nameMap[name];
+          if (key) state.chartLegendSelection[key] = Boolean(selected);
+        });
+        persistChartSessionState();
+      };
       state.frequencyChart.on('dataZoom', event => {
-        if (!state.current || state.zoomSwitching || state.chartView?.mode !== 'day') return;
+        if (!state.current || state.chartEventSyncing) return;
         const batch = event.batch?.[0] || event;
         const startPct = Number(batch.start ?? 0);
         const endPct = Number(batch.end ?? 100);
+        if (Number.isFinite(startPct) && Number.isFinite(endPct)) {
+          state.chartZoomRange = { start: clamp(startPct, 0, 100), end: clamp(endPct, 0, 100) };
+          persistChartSessionState();
+        }
+        if (state.zoomSwitching || state.chartView?.mode !== 'day') return;
         const start = Math.max(0, Math.floor(86400 * startPct / 100));
         const end = Math.min(86400, Math.ceil(86400 * endPct / 100));
         const hours = (end - start) / 3600;
@@ -4658,6 +4884,9 @@
           setTimeout(() => { state.zoomSwitching = false; }, 250);
         }
       });
+      state.frequencyChart.on('legendselectchanged', syncLegendSelection);
+      state.frequencyChart.on('legendselected', syncLegendSelection);
+      state.frequencyChart.on('legendunselected', syncLegendSelection);
     }
 
     function renderQuarterHeatmap(current) {
@@ -4685,6 +4914,49 @@
       });
     }
 
+    function hourRangeLabel(hour) {
+      return `${String(hour).padStart(2,'0')}:00–${String((hour + 1) % 24).padStart(2,'0')}:00`;
+    }
+
+    function showHourMatrixTooltip(target, text) {
+      const tooltip = $('hourMatrixTooltip');
+      if (!tooltip || !target || !text) return;
+      tooltip.textContent = text;
+      tooltip.classList.remove('hidden');
+      target.classList.add('hour-tooltip-active');
+      target.setAttribute('aria-describedby', 'hourMatrixTooltip');
+      const rect = target.getBoundingClientRect();
+      const tip = tooltip.getBoundingClientRect();
+      const top = Math.max(8, rect.top - tip.height - 10);
+      const left = clamp(rect.left + rect.width / 2 - tip.width / 2, 8, window.innerWidth - tip.width - 8);
+      tooltip.style.top = `${top}px`;
+      tooltip.style.left = `${left}px`;
+    }
+
+    function hideHourMatrixTooltip(target) {
+      const tooltip = $('hourMatrixTooltip');
+      if (!tooltip) return;
+      tooltip.classList.add('hidden');
+      tooltip.textContent = '';
+      tooltip.removeAttribute('style');
+      document.querySelectorAll('.hour-tooltip-active').forEach(el => {
+        el.classList.remove('hour-tooltip-active');
+        el.removeAttribute('aria-describedby');
+      });
+      target?.classList?.remove('hour-tooltip-active');
+    }
+
+    function bindHourMatrixTooltips(root) {
+      root.querySelectorAll('[data-hour-tooltip]').forEach(el => {
+        const text = el.dataset.hourTooltip;
+        el.addEventListener('mouseenter', () => showHourMatrixTooltip(el, text));
+        el.addEventListener('focus', () => showHourMatrixTooltip(el, text));
+        el.addEventListener('pointerdown', () => showHourMatrixTooltip(el, text));
+        el.addEventListener('mouseleave', () => hideHourMatrixTooltip(el));
+        el.addEventListener('blur', () => hideHourMatrixTooltip(el));
+      });
+    }
+
     function renderHourBlocks(current) {
       const root = $('hourBlocks');
       if (!current) {
@@ -4705,13 +4977,19 @@
         [t('metricCorr'), 'correlation', 'corr', '']
       ];
 
-      const head = `<tr><th>${t('hourBlockMetric')}</th>${Array.from({ length: 24 }, (_, hour) => `<th class="hour-header" tabindex="0" data-hour="${hour}" title="${t('hourBlockTooltip', { hour: String(hour).padStart(2,'0'), nextHour: String((hour + 1) % 24).padStart(2,'0') })}">${String(hour).padStart(2, '0')}</th>`).join('')}</tr>`;
+      const head = `<tr><th>${t('hourBlockMetric')}</th>${Array.from({ length: 24 }, (_, hour) => {
+        const tooltip = t('hourBlockTooltip', { hour: String(hour).padStart(2,'0'), nextHour: String((hour + 1) % 24).padStart(2,'0') });
+        return `<th class="hour-header" tabindex="0" data-hour="${hour}" data-hour-tooltip="${escapeHtml(tooltip)}" aria-label="${escapeHtml(tooltip)}">${String(hour).padStart(2, '0')}</th>`;
+      }).join('')}</tr>`;
       const rows = metrics.map(([label, key, type]) => {
-        const cells = current.hourly.map(row => {
+        const cells = current.hourly.map((row, hour) => {
           const value = row[key];
           const background = metricColor(value, type);
           const digits = key === 'correlation' ? 3 : key.includes('Mhz') ? 2 : 3;
-          return `<td style="background:${background}" title="${label}: ${fmt(value, digits)}">${fmt(value, digits)}</td>`;
+          const valueText = fmt(value, digits);
+          const unit = key === 'correlation' ? t('unitlessUnit') : key.includes('Mhz') ? 'mHz' : 'Hz';
+          const tooltip = `${hourRangeLabel(hour)} • ${label}: ${valueText} ${unit}`;
+          return `<td tabindex="0" style="background:${background}" data-hour-tooltip="${escapeHtml(tooltip)}" aria-label="${escapeHtml(tooltip)}">${valueText}</td>`;
         }).join('');
         return `<tr><td class="metric-name" tabindex="0">${label}</td>${cells}</tr>`;
       }).join('');
@@ -4733,7 +5011,8 @@
       const heat = current.hourly.map((row, hour) => {
         const background = heatColor(row.maeMhz, 0, maxMae, false);
         const cls = worst.includes(hour) ? 'hour-heat-cell worst' : 'hour-heat-cell';
-        return `<button type="button" class="${cls}" data-mobile-hour="${hour}" style="background:${background}" title="${t('hourBlockTooltip', { hour: String(hour).padStart(2,'0'), nextHour: String((hour + 1) % 24).padStart(2,'0') })}">${String(hour).padStart(2, '0')}</button>`;
+        const tooltip = `${t('hourBlockTooltip', { hour: String(hour).padStart(2,'0'), nextHour: String((hour + 1) % 24).padStart(2,'0') })} • MAE ${fmt(row.maeMhz, 2)} mHz`;
+        return `<button type="button" class="${cls}" data-mobile-hour="${hour}" data-hour-tooltip="${escapeHtml(tooltip)}" aria-label="${escapeHtml(tooltip)}" style="background:${background}">${String(hour).padStart(2, '0')}</button>`;
       }).join('');
       root.innerHTML = `
         <div class="desktop-hour-view"><table class="hour-matrix" aria-label="${t('hourBlockLabel')}"><thead>${head}</thead><tbody>${rows}</tbody></table></div>
@@ -4751,6 +5030,7 @@
           showDailyFrequencyChart
         );
       });
+      bindHourMatrixTooltips(root);
       $('mobileHourSelect')?.addEventListener('change', event => {
         root.dataset.selectedHour = event.target.value;
         renderHourBlocks(current);
@@ -6462,6 +6742,14 @@
         kpiCorrelation: 'Korelasyon',
         kpiPairedData: 'Ortak Veri',
         kpiReportPending: 'Rapor bekleniyor',
+        kpiTeiasMeanHelp: 'Türkiye frekans serisinin günlük ortalaması. Birim: Hz.',
+        kpiDeMeanHelp: 'ENTSO-E frekans serisinin günlük ortalaması. Birim: Hz.',
+        kpiTeiasAbsDevHelp: 'Türkiye serisinin 50 Hz nominal değerden ortalama mutlak sapması. Birim: mHz.',
+        kpiDeAbsDevHelp: 'ENTSO-E serisinin 50 Hz nominal değerden ortalama mutlak sapması. Birim: mHz.',
+        kpiBiasHelp: 'Eşlenmiş örneklerde Türkiye eksi ENTSO-E ortalama farkı. Birim: mHz.',
+        kpiMaeHelp: 'İki seri arasındaki ortalama mutlak hata. Birim: mHz.',
+        kpiCorrelationHelp: 'Eşlenmiş örneklerin doğrusal korelasyonu. Birimsiz katsayı.',
+        kpiPairedDataHelp: 'Aynı saniyede iki kaynakta da geçerli veri bulunan örnek oranı. Birim: yüzde.',
         // Status tags
         tagComplete: 'Tam',
         tagPartial: 'Kısmi',
@@ -6489,6 +6777,7 @@
         metricMae: 'MAE',
         metricRmse: 'RMSE',
         metricCorr: 'Korel.',
+        unitlessUnit: 'birimsiz',
         // Oscillation chart labels
         oscFilteredName: '{source} eşik üstü {f1}–{f2} Hz bileşeni',
         oscTrReal: 'Türkiye gerçek frekansı',
@@ -6655,7 +6944,7 @@
         singleDoubleHintQuarter: 'Select a quarter-hour.',
         sectionOscillation: 'Analysis & Reports',
         oscSourceLabel: 'Analysis source',
-        teias: 'Turkey',
+        teias: 'Türkiye',
         netz: 'ENTSO-E',
         bandMinLabel: 'Lower band (Hz)',
         bandMaxLabel: 'Upper band (Hz)',
@@ -6678,8 +6967,8 @@
         oscThRms: 'RMS',
         oscThDominant: 'Dominant freq.',
         oscThWindow: 'Window',
-        oscThSourceMean: 'Turkey mean',
-        oscThSourceRange: 'Turkey min–max',
+        oscThSourceMean: 'Türkiye mean',
+        oscThSourceRange: 'Türkiye min–max',
         oscThClass: 'Classification',
         oscNoAnalysis: 'No oscillation analysis performed yet.',
         sectionDataLoad: 'Data Loading',
@@ -6718,7 +7007,7 @@
         saveSettingsBtn: 'Save Settings',
         settingsAlignmentTitle: 'Time Alignment',
         defaultMethodLabel: 'Default method',
-        teiasUtcOffsetLabel: 'Turkey UTC offset',
+        teiasUtcOffsetLabel: 'Türkiye UTC offset',
         deWinterOffsetLabel: 'ENTSO-E (Germany) winter UTC offset',
         deSummerOffsetLabel: 'ENTSO-E (Germany) summer UTC offset',
         manualOffsetSettingLabel: 'Manual TR→DE offset (hours)',
@@ -6741,15 +7030,23 @@
         months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         dayHeaders: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
         // KPI
-        kpiTeiasMean: 'Turkey Mean',
+        kpiTeiasMean: 'Türkiye Mean',
         kpiDeMean: 'ENTSO-E Mean',
-        kpiTeiasAbsDev: 'Turkey Mean |Δf|',
+        kpiTeiasAbsDev: 'Türkiye Mean |Δf|',
         kpiDeAbsDev: 'ENTSO-E Mean |Δf|',
         kpiBias: 'Bias',
         kpiMae: 'MAE',
         kpiCorrelation: 'Correlation',
         kpiPairedData: 'Paired Data',
         kpiReportPending: 'Report pending',
+        kpiTeiasMeanHelp: 'Daily mean of the Türkiye frequency series. Unit: Hz.',
+        kpiDeMeanHelp: 'Daily mean of the ENTSO-E frequency series. Unit: Hz.',
+        kpiTeiasAbsDevHelp: 'Mean absolute deviation of the Türkiye series from nominal 50 Hz. Unit: mHz.',
+        kpiDeAbsDevHelp: 'Mean absolute deviation of the ENTSO-E series from nominal 50 Hz. Unit: mHz.',
+        kpiBiasHelp: 'Average paired-sample difference: Türkiye minus ENTSO-E. Unit: mHz.',
+        kpiMaeHelp: 'Mean absolute error between the two paired series. Unit: mHz.',
+        kpiCorrelationHelp: 'Linear correlation of paired samples. Unitless coefficient.',
+        kpiPairedDataHelp: 'Share of seconds with valid samples in both sources. Unit: percent.',
         // Status tags
         tagComplete: 'Complete',
         tagPartial: 'Partial',
@@ -6762,14 +7059,14 @@
         tagNone: 'N/A',
         tagCheck: 'Check',
         // Source labels
-        sourceTr: 'Turkey',
+        sourceTr: 'Türkiye',
         sourceDe: 'ENTSO-E (Germany)',
         sourceTrShort: 'TR',
         sourceDeShort: 'ENTSO-E',
         // Matrix metric labels
-        metricMeanTr: 'Turkey Mean',
-        metricMinTr: 'Turkey Min',
-        metricMaxTr: 'Turkey Max',
+        metricMeanTr: 'Türkiye Mean',
+        metricMinTr: 'Türkiye Min',
+        metricMaxTr: 'Türkiye Max',
         metricMeanDe: 'DE Mean',
         metricMinDe: 'DE Min',
         metricMaxDe: 'DE Max',
@@ -6777,9 +7074,10 @@
         metricMae: 'MAE',
         metricRmse: 'RMSE',
         metricCorr: 'Corr.',
+        unitlessUnit: 'unitless',
         // Oscillation chart labels
         oscFilteredName: '{source} bandpass {f1}–{f2} Hz component',
-        oscTrReal: 'Turkey actual frequency',
+        oscTrReal: 'Türkiye actual frequency',
         oscDeReal: 'ENTSO-E actual frequency',
         oscLegendHint: 'Disabled by default, click to show',
         // Chart descriptions
@@ -6787,17 +7085,17 @@
         chartDescDetail: '{label} view uses second-resolution with {count} data points plotted.',
         // Alignment descriptions
         alignDescSameLocal: 'Same local time comparison selected.',
-        alignDescManual: 'Manual alignment selected; ENTSO-E (Germany) local time = Turkey local time − {delta} hours.',
-        alignDescUtcAuto: 'UTC auto alignment selected; Turkey UTC{teias}, ENTSO-E (Germany) UTC{de}, delta {delta} hours.',
+        alignDescManual: 'Manual alignment selected; ENTSO-E (Germany) local time = Türkiye local time − {delta} hours.',
+        alignDescUtcAuto: 'UTC auto alignment selected; Türkiye UTC{teias}, ENTSO-E (Germany) UTC{de}, delta {delta} hours.',
         alignDescDefault: 'Alignment info will be shown when data and date are selected.',
-        alignInfo: '{desc} Turkey {trDate} 00:00:00 record aligns with ENTSO-E (Germany) {deDate} {deTime} record.',
+        alignInfo: '{desc} Türkiye {trDate} 00:00:00 record aligns with ENTSO-E (Germany) {deDate} {deTime} record.',
         // Various messages
-        noDateSelected: 'Please select a date with Turkey or ENTSO-E data.',
+        noDateSelected: 'Please select a date with Türkiye or ENTSO-E data.',
         autoDataLoading: 'Loading auto data for {date}.',
-        autoDataNoDe: '{date} Turkey data loaded; matching ENTSO-E day not found.',
-        autoDataNoTr: 'No Turkey auto data for {date}.',
-        autoDataNoTrDeOnly: 'No Turkey data for {date}; ENTSO-E data is shown as a single-source day.',
-        autoDataNoAny: 'No Turkey or ENTSO-E auto data for {date}.',
+        autoDataNoDe: '{date} Türkiye data loaded; matching ENTSO-E day not found.',
+        autoDataNoTr: 'No Türkiye auto data for {date}.',
+        autoDataNoTrDeOnly: 'No Türkiye data for {date}; ENTSO-E data is shown as a single-source day.',
+        autoDataNoAny: 'No Türkiye or ENTSO-E auto data for {date}.',
         autoDataReady: 'Auto data catalog ready. Latest active day: {date}.',
         autoDataSelected: 'Auto data mode selected.',
         manualDataSelected: 'Manual CSV mode selected.',
@@ -6812,7 +7110,7 @@
         parsingProgress: '{file}: %{pct} • {rows} rows processed',
         parsingError: 'File parse error: {msg}',
         parsingDone: '{days} day(s) successfully loaded into memory.',
-        parsingSourceLoaded: '{source} data loaded. Total {deCount} ENTSO-E days and {trCount} Turkey days available.',
+        parsingSourceLoaded: '{source} data loaded. Total {deCount} ENTSO-E days and {trCount} Türkiye days available.',
         parseReading: 'Reading file…',
         parseBusy: 'Another file is being processed. Please wait for completion.',
         // Report messages
@@ -6825,7 +7123,7 @@
         autoDataCatalog: 'Checking static data catalog.',
         autoDataCatalogError: 'Auto catalog could not be read: {error}',
         autoDataManifestDate: 'Manifest generated at {date}.',
-        autoDataNoTeias: 'Static catalog has no active Turkey days.',
+        autoDataNoTeias: 'Static catalog has no active Türkiye days.',
         autoTeiasDays: '{count} active days',
         autoTeiasMeta: '{range}; {excluded} excluded days',
         autoDeDays: '{count} days',
@@ -6848,7 +7146,7 @@
         netzStatus_download_failed: 'Download failed',
         netzStatus_parser_failed: 'Parser failed',
         netzStatus_validation_failed: 'Validation failed',
-        autoNoTeiasDays: 'No active Turkey days.',
+        autoNoTeiasDays: 'No active Türkiye days.',
         autoStatusDays: '{count} unpublished days; last check {date}',
         autoNoStatus: 'No status file.',
         // Event empty
@@ -6871,13 +7169,13 @@
         yAxisDiff: 'Difference (mHz)',
         yAxisBand: 'Band component (mHz)',
         yAxisReal: 'Actual frequencies (Hz)',
-        xAxisOsc: 'Turkey local time axis',
+        xAxisOsc: 'Türkiye local time axis',
         // Chart series
-        seriesTr: 'Turkey',
+        seriesTr: 'Türkiye',
         seriesDe: 'ENTSO-E',
         seriesDiff: 'Difference',
         // Tooltip
-        tooltipTr: 'Turkey',
+        tooltipTr: 'Türkiye',
         tooltipDe: 'ENTSO-E',
         tooltipDiff: 'Difference',
         tooltipDiffUnit: ' mHz',
@@ -6901,7 +7199,7 @@
         // Count tags
         findingsCount: '{count} findings',
         // Data source links
-        sourceTeiasLink: 'Turkey',
+        sourceTeiasLink: 'Türkiye',
         sourceNetzLink: 'ENTSO-E / Netztransparenz',
         // Second prefixes for toLocaleString
         localeNumeric: 'en-US'
@@ -7065,6 +7363,7 @@
         dataSourcesEuBadge: 'Netztransparenz · Continental Europe · 50 Hz',
         dataSourcesEuTitle: 'Kıta Avrupası Şebeke Frekansı',
         dataSourcesEuSubtitle: 'Kıta Avrupası – Netztransparenz',
+        dataSourcesDetailsTitle: 'Kaynak ayrıntıları',
         dataSourcesEuDescription: 'Bu veri, Almanya’daki dört iletim sistemi işletmecisinin ortak veri portalı olan Netztransparenz üzerinden yayımlanan Kıta Avrupası senkron bölgesi şebeke frekansıdır.',
         dataSourcesEuCritical: 'Doğrudan ENTSO-E Transparency API’sinden alınmamaktadır. Netztransparenz, Alman TSO’larının ortak resmî portalıdır. Gösterilen seri yalnızca Almanya’ya özgü yerel bir frekans değil, Kıta Avrupası senkron bölgesinin ortak sistem frekansını temsil eder.',
         dataSourcesInstitution: 'Kurum',
@@ -7230,7 +7529,7 @@
         analysisGroupRocof: 'RoCoF',
         analysisGroupSpectral: 'Spectral Analysis',
         analysisGroupOscillation: 'Oscillation Analysis',
-        analysisGroupJoint: 'Turkey-ENTSO-E Joint Analysis',
+        analysisGroupJoint: 'Türkiye-ENTSO-E Joint Analysis',
         analysisGroupTrend: 'Long-Term Analysis',
         analysisQuality: 'Data coverage',
         analysisStats: 'Basic statistics',
@@ -7246,11 +7545,11 @@
         analysisDone: 'Analysis complete.',
         analysisCanceled: 'Analysis canceled.',
         analysisError: 'Analysis could not be completed.',
-        analysisNoCommonDate: 'Common Turkey-ENTSO-E data is insufficient for the selected date.',
+        analysisNoCommonDate: 'Common Türkiye-ENTSO-E data is insufficient for the selected date.',
         analysisCoreMissing: 'Analysis core could not be loaded.',
         analysisNoSeries: 'No valid series found for the selected source.',
-        sourceBoth: 'Turkey + ENTSO-E',
-        sourceDiff: 'Turkey - ENTSO-E',
+        sourceBoth: 'Türkiye + ENTSO-E',
+        sourceDiff: 'Türkiye - ENTSO-E',
         sourceCommon: 'Common mode',
         sourceDifferential: 'Differential component',
         sourceBothShort: 'TR+DE',
@@ -7259,7 +7558,7 @@
         sourceDifferentialShort: 'Differential',
         sourceCommonFrequency: 'Common-mode frequency',
         sourceDiffFrequency: 'Differential frequency',
-        coverageTrLatest: 'Latest Turkey data',
+        coverageTrLatest: 'Latest Türkiye data',
         coverageDeLatest: 'Latest ENTSO-E data',
         coverageCommonLatest: 'Latest common day',
         coverageViewLabel: 'View',
@@ -7267,7 +7566,7 @@
         reportDateLabelShort: 'Date',
         analysisCompatibilityOk: '{analysis} is available for {source}.',
         analysisDisabledPairedHint: 'Cross-correlation and coherence require two sources.',
-        analysisNeedsBothSources: 'This analysis requires two paired series; choose Turkey + ENTSO-E as the source.',
+        analysisNeedsBothSources: 'This analysis requires two paired series; choose Türkiye + ENTSO-E as the source.',
         analysisSourceNotAllowed: '{analysis} is not meaningful for {source}; the option is disabled by the source rule.',
         analysisResolutionNotAllowed: 'Resolution/Nyquist mismatch: use {allowed} for {analysis}, not {resolution}.',
         analysisBandNyquistError: 'Nyquist limit exceeded: upper band {max} Hz, Nyquist for {resolution} is {nyquist} Hz.',
@@ -7295,7 +7594,7 @@
         analysisOscillationTitle: 'Oscillation Candidate Findings',
         analysisOscillationDesc: 'Candidate oscillation intervals are listed from the band-pass component.',
         analysisCrossCorrelationTitle: 'Cross-Correlation Summary',
-        analysisCrossCorrelationDesc: 'Delayed similarity between Turkey and ENTSO-E is measured.',
+        analysisCrossCorrelationDesc: 'Delayed similarity between Türkiye and ENTSO-E is measured.',
         analysisCoherenceTitle: 'Coherence and Phase Summary',
         analysisCoherenceDesc: 'Frequency-based common movement and phase difference are inspected for paired series.',
         analysisTrendTitle: 'Long-Term Trend Summary',
@@ -7345,6 +7644,7 @@
         dataSourcesEuBadge: 'Netztransparenz · Continental Europe · 50 Hz',
         dataSourcesEuTitle: 'Continental Europe Grid Frequency',
         dataSourcesEuSubtitle: 'Continental Europe – Netztransparenz',
+        dataSourcesDetailsTitle: 'Source details',
         dataSourcesEuDescription: 'This data is the Continental Europe synchronous area grid frequency published through Netztransparenz, the joint data portal of the four German Transmission System Operators.',
         dataSourcesEuCritical: 'It is not taken directly from the standard ENTSO-E Transparency API. Netztransparenz is the joint official portal of the German TSOs. The displayed series is not a Germany-only local frequency; it represents the common system frequency of the Continental Europe synchronous area.',
         dataSourcesInstitution: 'Institution',
@@ -7426,7 +7726,7 @@
         methodRocof: 'RoCoF is computed from adjacent second-level frequency differences in Hz/s.',
         methodPsd: 'Welch PSD summarizes the dominant low-frequency component and noise floor within the day.',
         methodSpectrogram: 'The spectrogram tracks dominant frequency changes across 10-minute windows.',
-        methodCrossCorrelation: 'Cross-correlation searches for the strongest delayed similarity between Turkey and ENTSO-E.',
+        methodCrossCorrelation: 'Cross-correlation searches for the strongest delayed similarity between Türkiye and ENTSO-E.',
         methodCoherence: 'Coherence and phase estimate shared motion at the selected frequency.',
         methodEvents: 'Event analysis extracts intervals where deviation from nominal frequency exceeds the threshold.',
         methodTrend: 'The trend view summarizes hourly and daily error metrics.',
@@ -7464,8 +7764,8 @@
         downloadPngLabel: 'Download chart as PNG',
         fullscreenLabel: 'Fullscreen',
         resetZoomLabel: 'Reset zoom',
-        seriesTrMin: 'Turkey min',
-        seriesTrMax: 'Turkey max',
+        seriesTrMin: 'Türkiye min',
+        seriesTrMax: 'Türkiye max',
         seriesDeMin: 'ENTSO-E min',
         seriesDeMax: 'ENTSO-E max'
       }
