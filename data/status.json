@@ -1,5 +1,5 @@
 {
-  "updatedAtUtc": "2026-07-15T16:44:00Z",
+  "updatedAtUtc": "2026-07-15T16:49:15Z",
   "lastWorkflowResult": "success",
   "lastSuccessfulTeiasCheckUtc": "2026-07-15T16:44:00Z",
   "lastSuccessfulTeiasDataDate": "2026-07-11",
@@ -30,13 +30,13 @@
   ],
   "lastError": null,
   "netztransparenz": {
-    "lastRunAt": "2026-07-15T09:26:07Z",
-    "lastSuccessfulRunAt": "2026-07-15T09:26:07Z",
+    "lastRunAt": "2026-07-15T16:49:15Z",
+    "lastSuccessfulRunAt": "2026-07-15T16:49:15Z",
     "lastFailedRunAt": null,
     "lastSuccessfulDataDate": "2026-07-14",
     "lastAttemptedDataDate": "2026-07-15",
     "latestPublishedDate": "2026-07-14",
-    "status": "success",
+    "status": "not_yet_published",
     "sourceMethod": "official_zip",
     "missingDates": [],
     "notYetPublishedDates": [
