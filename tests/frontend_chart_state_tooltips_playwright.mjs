@@ -124,7 +124,9 @@ try {
       }
     }
 
-    await page.hover("#kpiGrid .kpi:nth-child(6)");
+    const maeCard = page.locator("#kpiGrid .kpi", { hasText: "MAE" }).first();
+    await maeCard.scrollIntoViewIfNeeded();
+    await maeCard.focus();
     await page.waitForSelector("#appTooltip:not(.hidden)");
     const appTooltip = await page.locator("#appTooltip").evaluate(node => {
       const rect = node.getBoundingClientRect();
