@@ -56,6 +56,19 @@ if (!html.includes("Kıta Avrupası – Netztransparenz") || /ENTSO-E \(Almanya\
   throw new Error("HTML source labels should use Kıta Avrupası – Netztransparenz instead of ENTSO-E (Almanya).");
 }
 
+const aboutSection = html.slice(html.indexOf('id="aboutLegalSection"'), html.indexOf("</section>", html.indexOf('id="aboutLegalSection"')));
+for (const marker of [
+  'href="mailto:murathan.yeniceli@gmail.com"',
+  'murathan.yeniceli@gmail.com',
+  'href="https://www.linkedin.com/in/murathan-yeniceli-906044192"',
+  'LinkedIn'
+]) {
+  if (!aboutSection.includes(marker)) throw new Error(`About contact card missing marker: ${marker}`);
+}
+if (/GridFreq Issues|github\.com\/murathany90\/frekans\/issues|GitHub Issues/.test(aboutSection)) {
+  throw new Error("About contact card must use email and LinkedIn instead of GitHub Issues.");
+}
+
 if (!buildSite.includes("LICENSE")) throw new Error("build_site.py must copy LICENSE into dist.");
 for (const marker of ['- "LICENSE"', "node tests/frontend_public_sharing_static.mjs"]) {
   if (!deployWorkflow.includes(marker) && !frontendWorkflow.includes(marker)) {
