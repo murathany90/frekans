@@ -45,7 +45,7 @@ if (!/allowedSources:\s*\[\s*'tr'\s*,\s*'de'\s*,\s*'both'/.test(html)) {
 }
 
 if (!/allowedSources:\s*\[\s*'both'\s*\][\s\S]{0,180}crossCorrelation/.test(html) && !/crossCorrelation[\s\S]{0,220}allowedSources:\s*\[\s*'both'\s*\]/.test(html)) {
-  throw new Error("Cross-correlation must only be available for Turkey + ENTSO-E.");
+  throw new Error("Cross-correlation must only be available for Türkiye + Continental Europe.");
 }
 
 if (!/allowedResolutions:\s*\[\s*'1s'\s*\][\s\S]{0,420}spectrogram/.test(html) && !/spectrogram[\s\S]{0,520}allowedResolutions:\s*\[\s*'1s'\s*\]/.test(html)) {

@@ -73,7 +73,7 @@ try {
     await page.click('.hour-header[data-hour="12"]');
     await page.waitForFunction(() => /3\.600|3,600/.test(document.querySelector("#coverageSummary .coverage-item .value")?.textContent || ""));
     let state = await chartState(page);
-    if (state.legendSelected["Türkiye"] !== false || state.legendSelected["ENTSO-E"] === false) {
+    if (state.legendSelected["Türkiye"] !== false || state.legendSelected["Continental Europe"] === false) {
       throw new Error(`Legend selection must survive hour view render: ${JSON.stringify(state)}`);
     }
 
@@ -92,7 +92,7 @@ try {
     await page.waitForSelector("#frequencyChart canvas");
     await page.waitForSelector("#kpiGrid .kpi");
     state = await chartState(page);
-    if (state.legendSelected["Türkiye"] !== false || state.legendSelected["ENTSO-E"] === false) {
+    if (state.legendSelected["Türkiye"] !== false || state.legendSelected["Continental Europe"] === false) {
       throw new Error(`Legend selection must survive a session reload: ${JSON.stringify(state)}`);
     }
     if (Math.abs(Number(state.dataZoom.start) - 20) > 1 || Math.abs(Number(state.dataZoom.end) - 60) > 1) {
@@ -102,7 +102,7 @@ try {
     await page.click("#resetZoomBtn");
     await page.waitForFunction(() => /24h|24 saat/i.test(document.querySelector("#coverageSummary .coverage-item .value")?.textContent || ""));
     state = await chartState(page);
-    if (state.legendSelected["Türkiye"] === false || state.legendSelected["ENTSO-E"] === false || state.diffPressed !== "false" || state.minmaxPressed !== "false") {
+    if (state.legendSelected["Türkiye"] === false || state.legendSelected["Continental Europe"] === false || state.diffPressed !== "false" || state.minmaxPressed !== "false") {
       throw new Error(`Reset must restore default chart layers: ${JSON.stringify(state)}`);
     }
     if (Math.abs(Number(state.dataZoom.start || 0)) > 1 || Math.abs(Number(state.dataZoom.end || 100) - 100) > 1) {

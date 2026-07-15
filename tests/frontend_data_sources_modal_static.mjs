@@ -22,7 +22,7 @@ const requiredMarkers = [
   'loadDataSourceStatus',
   'updateDataSourceModalLanguage',
   'trapModalFocus',
-  'Kıta Avrupası – Netztransparenz',
+  'Kıta Avrupası · Netztransparenz',
   'Doğrudan ENTSO-E Transparency API’sinden alınmamaktadır',
   '50Hertz Transmission',
   'Amprion',

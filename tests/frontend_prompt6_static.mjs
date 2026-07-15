@@ -20,10 +20,10 @@ for (const marker of [
   "analysisInfoStatus",
   "analysisInfoSampling",
   "sourceHealthSummary",
-  "Kıta Avrupası – Netztransparenz",
-  "Continental Europe – Netztransparenz",
-  "Son ENTSO-E verisi",
-  "Latest ENTSO-E data"
+  "Kıta Avrupası · Netztransparenz",
+  "Continental Europe · Netztransparenz",
+  "Son Kıta Avrupası verisi",
+  "Latest Continental Europe data"
 ]) {
   mustContain(marker);
 }

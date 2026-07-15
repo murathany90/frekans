@@ -9,7 +9,7 @@ for (const snippet of [
   "autoNetzStatus",
   "autoNetzSourceMethod",
   "autoNetzMissingDates",
-  "ENTSO-E latest",
+  "Continental Europe latest",
   "Source: {method}",
   "status.netztransparenz",
 ]) {

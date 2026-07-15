@@ -1568,7 +1568,7 @@
                 </select>
               </div>
               <div class="filter-row">
-                <label for="manualOffsetGraph" data-i18n="manualOffsetGraphLabel">TR→DE saat farkı</label>
+                <label for="manualOffsetGraph" data-i18n="manualOffsetGraphLabel">Türkiye–Kıta Avrupası saat farkı</label>
                 <input id="manualOffsetGraph" type="number" min="-12" max="12" step="0.5" value="1" />
               </div>
               <div class="filter-row">
@@ -1681,9 +1681,9 @@
             </article>
 
             <article class="data-source-card compact" id="dataSourcesEuCard">
-              <span class="tag good" data-i18n="dataSourcesEuBadge">Netztransparenz · Continental Europe · 50 Hz</span>
-              <h3 data-i18n="dataSourcesEuTitle">Kıta Avrupası Şebeke Frekansı</h3>
-              <p class="card-subtitle" data-i18n="dataSourcesEuSubtitle">Kıta Avrupası – Netztransparenz</p>
+              <span class="tag good" data-i18n="dataSourcesEuBadge">Netztransparenz · 50 Hz</span>
+              <h3 data-i18n="dataSourcesEuTitle">Kıta Avrupası Şebeke Frekansı · Netztransparenz</h3>
+              <p class="card-subtitle" data-i18n="dataSourcesEuSubtitle">Kıta Avrupası · Netztransparenz</p>
               <dl>
                 <dt data-i18n="dataSourcesPortal">Kaynak portal</dt><dd>Netztransparenz</dd>
                 <dt data-i18n="dataSourcesArea">Senkron bölge</dt><dd data-i18n="dataSourcesEuArea">Continental Europe / Kıta Avrupası</dd>
@@ -1805,19 +1805,19 @@
             <label for="analysisSourceSelect" data-i18n="analysisSourceLabel">Kaynak</label>
             <select id="analysisSourceSelect">
               <option value="tr" data-i18n="sourceTr">Türkiye</option>
-              <option value="de" data-i18n="sourceDe">Kıta Avrupası – Netztransparenz</option>
-              <option value="both" data-i18n="sourceBoth">Türkiye + ENTSO-E</option>
-              <option value="diff" data-i18n="sourceDiff">Türkiye - ENTSO-E</option>
+              <option value="de" data-i18n="sourceDe">Kıta Avrupası</option>
+              <option value="both" data-i18n="sourceBoth">Türkiye + Kıta Avrupası</option>
+              <option value="diff" data-i18n="sourceDiff">Türkiye − Kıta Avrupası</option>
               <option value="common" data-i18n="sourceCommon">Ortak bileşen</option>
-              <option value="differential" data-i18n="sourceDifferential">Diferansiyel bileşen</option>
+              <option value="differential" data-i18n="sourceDifferential">Fark bileşeni</option>
             </select>
             <select id="oscSourceSelect" class="sr-only" aria-hidden="true" tabindex="-1">
               <option value="tr" selected>Türkiye</option>
-              <option value="de">Kıta Avrupası – Netztransparenz</option>
-              <option value="both">Türkiye + ENTSO-E</option>
-              <option value="diff">Türkiye - ENTSO-E</option>
+              <option value="de">Kıta Avrupası</option>
+              <option value="both">Türkiye + Kıta Avrupası</option>
+              <option value="diff">Türkiye − Kıta Avrupası</option>
               <option value="common">Ortak bileşen</option>
-              <option value="differential">Diferansiyel bileşen</option>
+              <option value="differential">Fark bileşeni</option>
             </select>
           </div>
           <div class="field">
@@ -1842,7 +1842,7 @@
               <optgroup label="Osilasyon Analizi" data-i18n-label="analysisGroupOscillation">
                 <option value="oscillation" data-i18n="analysisOscillation">Osilasyon adayı</option>
               </optgroup>
-              <optgroup label="Türkiye-ENTSO-E Ortak Analizi" data-i18n-label="analysisGroupJoint">
+              <optgroup label="Türkiye–Kıta Avrupası Ortak Analizi" data-i18n-label="analysisGroupJoint">
                 <option value="crossCorrelation" data-i18n="analysisCrossCorrelation">Çapraz korelasyon</option>
                 <option value="coherence" data-i18n="analysisCoherence">Koherens ve faz</option>
               </optgroup>
@@ -1984,12 +1984,12 @@
           <div class="card">
             <div class="section-title">
               <div>
-                <h3 data-i18n="sourceDe">Kıta Avrupası – Netztransparenz</h3>
+                <h3 data-i18n="sourceDeStandard">Kıta Avrupası · Netztransparenz</h3>
               </div>
               <span class="tag" data-i18n="monthlyCsv">Aylık CSV</span>
             </div>
             <label class="drop-zone" id="deDrop" for="deFiles">
-              <span class="drop-icon">DE</span>
+              <span class="drop-icon">CE</span>
               <strong data-i18n="netzDropTitle">CSV dosyasını seçin veya sürükleyin</strong>
               <small data-i18n="netzDropExample">Örnek: Frequenz_20260601_20260630.csv</small>
             </label>
@@ -2039,7 +2039,7 @@
             <div class="sub" id="autoTeiasMeta" data-i18n="autoTeiasMetaDefault">Manifest bekleniyor.</div>
           </div>
           <div class="auto-data-card">
-            <div class="label" data-i18n="netz">ENTSO-E</div>
+            <div class="label" data-i18n="netz">Kıta Avrupası</div>
             <div class="value" id="autoDeValue">-</div>
             <div class="sub" id="autoDeMeta" data-i18n="autoDeMetaDefault">Manifest bekleniyor.</div>
             <div class="sub" id="autoNetzStatus">-</div>
@@ -2054,7 +2054,7 @@
         </div>
         <div class="source-links">
           <a href="https://www.teias.gov.tr/gunluk-frekans-bilgisi" target="_blank" rel="noopener" data-i18n="sourceTeiasLink">Türkiye</a>
-          <a href="https://www.netztransparenz.de/de-de/Regelenergie/Daten-Regelreserve/Sek%C3%BCndliche-Daten" target="_blank" rel="noopener" data-i18n="sourceNetzLink">ENTSO-E / Netztransparenz</a>
+          <a href="https://www.netztransparenz.de/de-de/Regelenergie/Daten-Regelreserve/Sek%C3%BCndliche-Daten" target="_blank" rel="noopener" data-i18n="sourceNetzLink">Netztransparenz</a>
         </div>
         <div id="sourceHealthSummary" class="source-health-summary source-health-summary-compact" aria-live="polite"></div>
       </div>
@@ -2097,7 +2097,7 @@
             <div class="field"><label for="teiasUtcOffset" data-i18n="teiasUtcOffsetLabel">Türkiye UTC ofseti</label><input id="teiasUtcOffset" type="number" step="0.5" value="3" /></div>
             <div class="field"><label for="deWinterOffset" data-i18n="deWinterOffsetLabel">Kıta Avrupası kış UTC ofseti</label><input id="deWinterOffset" type="number" step="0.5" value="1" /></div>
             <div class="field"><label for="deSummerOffset" data-i18n="deSummerOffsetLabel">Kıta Avrupası yaz UTC ofseti</label><input id="deSummerOffset" type="number" step="0.5" value="2" /></div>
-            <div class="field"><label for="manualOffsetSetting" data-i18n="manualOffsetSettingLabel">Manuel TR→DE farkı (saat)</label><input id="manualOffsetSetting" type="number" step="0.5" value="1" /></div>
+            <div class="field"><label for="manualOffsetSetting" data-i18n="manualOffsetSettingLabel">Türkiye–Kıta Avrupası saat farkı</label><input id="manualOffsetSetting" type="number" step="0.5" value="1" /></div>
           </div>
 
           <div class="card settings-card">
@@ -2614,6 +2614,49 @@
     const AUTO_DATA_BASE = './data/';
     const AUTO_SOURCE_TO_STATE = { teias: 'tr', netztransparenz: 'de' };
     const STATE_TO_AUTO_SOURCE = { tr: 'teias', de: 'netztransparenz' };
+    const UI_SOURCE_TO_CATALOG = { tr: 'teias', de: 'netztransparenz', teias: 'teias', netztransparenz: 'netztransparenz' };
+    const DEFAULT_SOURCE_CATALOG = {
+      schemaVersion: 1,
+      sources: {
+        teias: {
+          provider: 'TEİAŞ',
+          systemCode: 'TR',
+          labels: {
+            tr: {
+              short: 'Türkiye',
+              standard: 'Türkiye · TEİAŞ',
+              long: 'Türkiye Şebeke Frekansı · TEİAŞ',
+              report: 'Türkiye (TEİAŞ)'
+            },
+            en: {
+              short: 'Türkiye',
+              standard: 'Türkiye · TEİAŞ',
+              long: 'Türkiye Grid Frequency · TEİAŞ',
+              report: 'Türkiye (TEİAŞ)'
+            }
+          }
+        },
+        netztransparenz: {
+          provider: 'Netztransparenz',
+          systemCode: 'CE',
+          labels: {
+            tr: {
+              short: 'Kıta Avrupası',
+              standard: 'Kıta Avrupası · Netztransparenz',
+              long: 'Kıta Avrupası Şebeke Frekansı · Netztransparenz',
+              report: 'Kıta Avrupası (Netztransparenz)'
+            },
+            en: {
+              short: 'Continental Europe',
+              standard: 'Continental Europe · Netztransparenz',
+              long: 'Continental Europe Grid Frequency · Netztransparenz',
+              report: 'Continental Europe (Netztransparenz)'
+            }
+          }
+        }
+      }
+    };
+    let sourceCatalog = DEFAULT_SOURCE_CATALOG;
     const MAX_ANALYSIS_DAY_CONCURRENCY = 3;
     const RESOLUTION_SECONDS = { '1s': 1, '10s': 10, '1m': 60, '1h': 3600 };
     const ANALYSIS_BASE_PARAMS = ['date', 'resolution', 'alignment'];
@@ -2939,6 +2982,67 @@
     };
     const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
 
+    function mergeSourceCatalog(catalog) {
+      const merged = JSON.parse(JSON.stringify(DEFAULT_SOURCE_CATALOG));
+      Object.entries(catalog?.sources || {}).forEach(([sourceId, source]) => {
+        if (!merged.sources[sourceId]) merged.sources[sourceId] = { labels: {} };
+        merged.sources[sourceId] = {
+          ...merged.sources[sourceId],
+          ...source,
+          labels: {
+            ...(merged.sources[sourceId].labels || {}),
+            ...(source.labels || {})
+          }
+        };
+        ['tr', 'en'].forEach(language => {
+          merged.sources[sourceId].labels[language] = {
+            ...(DEFAULT_SOURCE_CATALOG.sources[sourceId]?.labels?.[language] || {}),
+            ...(source.labels?.[language] || {})
+          };
+        });
+      });
+      return merged;
+    }
+
+    function catalogSourceId(sourceId) {
+      return UI_SOURCE_TO_CATALOG[sourceId] || sourceId;
+    }
+
+    function getSourceLabel(sourceId, context = 'short', language = lang) {
+      const id = catalogSourceId(sourceId);
+      const safeContext = ['short', 'standard', 'long', 'report'].includes(context) ? context : 'short';
+      const source = sourceCatalog?.sources?.[id] || DEFAULT_SOURCE_CATALOG.sources[id];
+      return source?.labels?.[language]?.[safeContext]
+        || source?.labels?.tr?.[safeContext]
+        || source?.labels?.[language]?.short
+        || source?.labels?.tr?.short
+        || String(sourceId || '');
+    }
+
+    async function loadSourceCatalog() {
+      try {
+        sourceCatalog = mergeSourceCatalog(await fetchJson('sources.json'));
+      } catch {
+        sourceCatalog = DEFAULT_SOURCE_CATALOG;
+      }
+      applySourceLabelTranslations();
+      applyTranslations();
+      renderCoverageSummary();
+      renderSourceHealthSummary();
+      updateAutoDataPanel();
+      updateInventory();
+      updateAnalysisAvailability();
+      renderDataSourceStatus();
+      if (state.current) {
+        renderKpis(state.current);
+        renderFrequencyChart(state.current);
+        renderHourBlocks(state.current);
+        renderQuarterHeatmap(state.current);
+        updateAlignmentInfo();
+        renderReportPreview();
+      }
+    }
+
     function singleSeriesStats(series, start, end, nominal = 50) {
       let count = 0, sum = 0, min = Infinity, max = -Infinity, absDev = 0;
       for (let i = start; i < end; i++) {
@@ -3004,6 +3108,7 @@
       lang = initialLanguage();
       state.settings.locale = lang;
       document.documentElement.setAttribute('data-current-lang', lang);
+      applySourceLabelTranslations();
       $('langToggle').textContent = t('langToggle');
       applyTranslations();
       applyUrlState();
@@ -3018,6 +3123,7 @@
       updateAnalysisAvailability();
       renderReportPreview();
       checkLibraries();
+      loadSourceCatalog();
       loadAutoDataCatalog();
     }
 
@@ -4582,7 +4688,7 @@
 
       if (hasTrDay) {
         for (let s = 0; s < 86400; s++) {
-          // Almanya yerel zamanı = TEİAŞ yerel zamanı - fark
+          // Kıta Avrupası yerel zamanı = TEİAŞ yerel zamanı - fark
           const target = shiftSecondLabel(s, -deltaSeconds, date);
           const day = state.de.get(target.date);
           if (!day) continue;
@@ -5338,22 +5444,19 @@
       updateUrlState({ source: value });
     }
 
-    function sourceLabel(source) {
-      if (source === 'de') return t('sourceDe');
-      if (source === 'both') return t('sourceBoth');
-      if (source === 'diff') return t('sourceDiff');
+    function sourceLabel(source, context = 'short') {
+      const tr = getSourceLabel('teias', context);
+      const de = getSourceLabel('netztransparenz', context);
+      if (source === 'de') return de;
+      if (source === 'both') return `${tr} + ${de}`;
+      if (source === 'diff') return `${tr} − ${de}`;
       if (source === 'common') return t('sourceCommon');
       if (source === 'differential') return t('sourceDifferential');
-      return t('sourceTr');
+      return tr;
     }
 
     function sourceShortLabel(source) {
-      if (source === 'de') return t('sourceDeShort');
-      if (source === 'both') return t('sourceBothShort');
-      if (source === 'diff') return t('sourceDiffShort');
-      if (source === 'common') return t('sourceCommonShort');
-      if (source === 'differential') return t('sourceDifferentialShort');
-      return t('sourceTrShort');
+      return sourceLabel(source, 'short');
     }
 
     function analysisDefinition(type = $('analysisTypeSelect')?.value || 'stats') {
@@ -6476,7 +6579,7 @@
           bandHz: [Number($('bandMin').value), Number($('bandMax').value)]
         },
         sampling,
-        sources: [sourceLabel(source)],
+        sources: [sourceLabel(source, 'report')],
         dataFiles: [current?.date].filter(Boolean)
       };
     }
@@ -7040,7 +7143,7 @@
         dateSelectLabel: 'Tarih Seçimi',
         calToggleText: 'Tarih seçin',
         alignmentLabel: 'Zaman eşleştirme',
-        manualOffsetGraphLabel: 'TR→DE saat farkı',
+        manualOffsetGraphLabel: 'Türkiye–Kıta Avrupası saat farkı',
         diffLabel: 'Grafikte fark',
         diffShow: 'Göster',
         diffHide: 'Gizle',
@@ -7064,7 +7167,7 @@
         sectionOscillation: 'Analiz ve Raporlamalar',
         oscSourceLabel: 'Analiz kaynağı',
         teias: 'Türkiye',
-        netz: 'ENTSO-E',
+        netz: 'Kıta Avrupası',
         bandMinLabel: 'Alt bant (Hz)',
         bandMaxLabel: 'Üst bant (Hz)',
         oscThresholdLabel: 'Genlik eşiği (mHz)',
@@ -7129,7 +7232,7 @@
         teiasUtcOffsetLabel: 'Türkiye UTC ofseti',
         deWinterOffsetLabel: 'Kıta Avrupası kış UTC ofseti',
         deSummerOffsetLabel: 'Kıta Avrupası yaz UTC ofseti',
-        manualOffsetSettingLabel: 'Manuel TR→DE farkı (saat)',
+        manualOffsetSettingLabel: 'Türkiye–Kıta Avrupası saat farkı',
         settingsQualityTitle: 'Veri Kalitesi',
         nominalFreqLabel: 'Nominal frekans (Hz)',
         validMinLabel: 'Geçerli alt sınır (Hz)',
@@ -7165,19 +7268,19 @@
         dayHeaders: ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'],
         // KPI
         kpiTeiasMean: 'Türkiye Ortalama',
-        kpiDeMean: 'ENTSO-E Ortalama',
+        kpiDeMean: 'Kıta Avrupası Ortalama',
         kpiTeiasAbsDev: 'Türkiye Ort. |Δf|',
-        kpiDeAbsDev: 'ENTSO-E Ort. |Δf|',
+        kpiDeAbsDev: 'Kıta Avrupası Ort. |Δf|',
         kpiBias: 'Bias',
         kpiMae: 'MAE',
         kpiCorrelation: 'Korelasyon',
         kpiPairedData: 'Ortak Veri',
         kpiReportPending: 'Rapor bekleniyor',
         kpiTeiasMeanHelp: 'Türkiye günlük ortalaması. Birim: Hz.',
-        kpiDeMeanHelp: 'ENTSO-E günlük ortalaması. Birim: Hz.',
+        kpiDeMeanHelp: 'Kıta Avrupası günlük ortalaması. Birim: Hz.',
         kpiTeiasAbsDevHelp: 'Türkiye 50 Hz mutlak sapması. Birim: mHz.',
-        kpiDeAbsDevHelp: 'ENTSO-E 50 Hz mutlak sapması. Birim: mHz.',
-        kpiBiasHelp: 'Türkiye eksi ENTSO-E ortalama farkı. Birim: mHz.',
+        kpiDeAbsDevHelp: 'Kıta Avrupası 50 Hz mutlak sapması. Birim: mHz.',
+        kpiBiasHelp: 'Türkiye eksi Kıta Avrupası ortalama farkı. Birim: mHz.',
         kpiMaeHelp: 'İki seri arasındaki ortalama mutlak hata. Birim: mHz.',
         kpiCorrelationHelp: 'Eşlenmiş örneklerin doğrusal ilişkisi. Birimsiz.',
         kpiPairedDataHelp: 'İki kaynakta da geçerli saniye oranı. Birim: yüzde.',
@@ -7194,16 +7297,16 @@
         tagCheck: 'Kontrol',
         // Source labels
         sourceTr: 'Türkiye',
-        sourceDe: 'Kıta Avrupası – Netztransparenz',
+        sourceDe: 'Kıta Avrupası · Netztransparenz',
         sourceTrShort: 'TR',
-        sourceDeShort: 'ENTSO-E',
+        sourceDeShort: 'Kıta Avrupası',
         // Matrix metric labels
         metricMeanTr: 'Türkiye Ort.',
         metricMinTr: 'Türkiye Min',
         metricMaxTr: 'Türkiye Maks',
-        metricMeanDe: 'ENTSO-E Ort.',
-        metricMinDe: 'ENTSO-E Min',
-        metricMaxDe: 'ENTSO-E Maks',
+        metricMeanDe: 'Kıta Avrupası Ort.',
+        metricMinDe: 'Kıta Avrupası Min',
+        metricMaxDe: 'Kıta Avrupası Maks',
         metricBias: 'Bias',
         metricMae: 'MAE',
         metricRmse: 'RMSE',
@@ -7211,10 +7314,10 @@
         metricMeanTrHelp: 'Türkiye saatlik ortalama frekansı. Birim: Hz.',
         metricMinTrHelp: 'Türkiye saat içindeki en düşük frekans. Birim: Hz.',
         metricMaxTrHelp: 'Türkiye saat içindeki en yüksek frekans. Birim: Hz.',
-        metricMeanDeHelp: 'ENTSO-E saatlik ortalama frekansı. Birim: Hz.',
-        metricMinDeHelp: 'ENTSO-E saat içindeki en düşük frekans. Birim: Hz.',
-        metricMaxDeHelp: 'ENTSO-E saat içindeki en yüksek frekans. Birim: Hz.',
-        metricBiasHelp: 'Saatlik ortalama fark: Türkiye eksi ENTSO-E. Birim: mHz.',
+        metricMeanDeHelp: 'Kıta Avrupası saatlik ortalama frekansı. Birim: Hz.',
+        metricMinDeHelp: 'Kıta Avrupası saat içindeki en düşük frekans. Birim: Hz.',
+        metricMaxDeHelp: 'Kıta Avrupası saat içindeki en yüksek frekans. Birim: Hz.',
+        metricBiasHelp: 'Saatlik ortalama fark: Türkiye eksi Kıta Avrupası. Birim: mHz.',
         metricMaeHelp: 'Saatlik ortalama mutlak fark. Birim: mHz.',
         metricRmseHelp: 'Saatlik RMS farkı. Birim: mHz.',
         metricCorrHelp: 'Saatlik eşlenmiş örneklerin korelasyonu. Birimsiz.',
@@ -7222,7 +7325,7 @@
         // Oscillation chart labels
         oscFilteredName: '{source} eşik üstü {f1}–{f2} Hz bileşeni',
         oscTrReal: 'Türkiye gerçek frekansı',
-        oscDeReal: 'ENTSO-E gerçek frekansı',
+        oscDeReal: 'Kıta Avrupası gerçek frekansı',
         oscLegendHint: 'Varsayılan pasif, göstermek için tıklayın',
         // Chart descriptions
         chartDescDay: 'Günlük görünümde 86.400 örnek dakikalık ortalamaya indirgenir; istatistikler saniyelik ortak kayıtlardan hesaplanır.',
@@ -7234,12 +7337,12 @@
         alignDescDefault: 'Zaman eşleştirme bilgisi veri ve tarih seçildiğinde gösterilecektir.',
         alignInfo: '{desc} Türkiye {trDate} 00:00:00 kaydı, Kıta Avrupası {deDate} {deTime} kaydıyla eşleştirilir.',
         // Various messages
-        noDateSelected: 'Lütfen Türkiye veya ENTSO-E verisi bulunan bir gün seçin.',
+        noDateSelected: 'Lütfen Türkiye veya Kıta Avrupası verisi bulunan bir gün seçin.',
         autoDataLoading: '{date} otomatik verisi yükleniyor.',
-        autoDataNoDe: '{date} Türkiye verisi yüklendi; eşleşen ENTSO-E günü bulunamadı.',
+        autoDataNoDe: '{date} Türkiye verisi yüklendi; eşleşen Kıta Avrupası günü bulunamadı.',
         autoDataNoTr: '{date} için Türkiye otomatik verisi yok.',
-        autoDataNoTrDeOnly: '{date} için Türkiye verisi yok; ENTSO-E verisi tekil olarak gösteriliyor.',
-        autoDataNoAny: '{date} için Türkiye veya ENTSO-E otomatik verisi yok.',
+        autoDataNoTrDeOnly: '{date} için Türkiye verisi yok; Kıta Avrupası verisi tekil olarak gösteriliyor.',
+        autoDataNoAny: '{date} için Türkiye veya Kıta Avrupası otomatik verisi yok.',
         autoDataReady: 'Otomatik veri kataloğu hazır. Son aktif gün: {date}.',
         autoDataSelected: 'Otomatik veri modu seçildi.',
         manualDataSelected: 'Manuel CSV modu seçildi.',
@@ -7254,7 +7357,7 @@
         parsingProgress: '{file}: %{pct} • {rows} satır işlendi',
         parsingError: 'Dosya ayrıştırma hatası: {msg}',
         parsingDone: '{days} günlük veri başarıyla belleğe alındı.',
-        parsingSourceLoaded: '{source} verisi yüklendi. Toplam {deCount} ENTSO-E günü ve {trCount} Türkiye günü mevcut.',
+        parsingSourceLoaded: '{source} verisi yüklendi. Toplam {deCount} Kıta Avrupası günü ve {trCount} Türkiye günü mevcut.',
         parseReading: 'Dosya okunuyor…',
         parseBusy: 'Başka bir dosya işleniyor. Lütfen işlemin tamamlanmasını bekleyin.',
         // Report messages
@@ -7272,9 +7375,9 @@
         autoTeiasMeta: '{range}; dışlanan {excluded} gün',
         autoDeDays: '{count} gün',
         autoDeMeta: '{range}; Kaynak: {method}',
-        autoNoDeMeta: 'ENTSO-E otomatik kaynak doğrulanmadı.',
+        autoNoDeMeta: 'Kıta Avrupası otomatik kaynak doğrulanmadı.',
         autoNetzStatus: 'Otomatik güncelleme: {status}; son çalışma {run}',
-        autoNetzSourceMethod: 'ENTSO-E son veri: {date}; Kaynak: {method}',
+        autoNetzSourceMethod: 'Kıta Avrupası son veri: {date}; Kaynak: {method}',
         autoNetzMissingDates: 'Eksik gün: {count}',
         netAutoTitle: 'Otomatik güncelleme',
         netManualTitle: 'Manuel aylık yükleme',
@@ -7316,11 +7419,11 @@
         xAxisOsc: 'Türkiye yerel zaman ekseni',
         // Chart series
         seriesTr: 'Türkiye',
-        seriesDe: 'ENTSO-E',
+        seriesDe: 'Kıta Avrupası',
         seriesDiff: 'Fark',
         // Tooltip
         tooltipTr: 'Türkiye',
-        tooltipDe: 'ENTSO-E',
+        tooltipDe: 'Kıta Avrupası',
         tooltipDiff: 'Fark',
         tooltipDiffUnit: ' mHz',
         tooltipFreqUnit: ' Hz',
@@ -7344,7 +7447,7 @@
         findingsCount: '{count} bulgu',
         // Data source links
         sourceTeiasLink: 'Türkiye',
-        sourceNetzLink: 'ENTSO-E / Netztransparenz',
+        sourceNetzLink: 'Netztransparenz',
         // Seconds to time
         timeSecondTo: '{time}',
         displayDate: '{time}',
@@ -7362,7 +7465,7 @@
         dateSelectLabel: 'Date Selection',
         calToggleText: 'Select date',
         alignmentLabel: 'Time Alignment',
-        manualOffsetGraphLabel: 'TR→DE hour offset',
+        manualOffsetGraphLabel: 'Türkiye–Continental Europe hour offset',
         diffLabel: 'Show difference',
         diffShow: 'Show',
         diffHide: 'Hide',
@@ -7386,7 +7489,7 @@
         sectionOscillation: 'Analysis & Reports',
         oscSourceLabel: 'Analysis source',
         teias: 'Türkiye',
-        netz: 'ENTSO-E',
+        netz: 'Continental Europe',
         bandMinLabel: 'Lower band (Hz)',
         bandMaxLabel: 'Upper band (Hz)',
         oscThresholdLabel: 'Amplitude threshold (mHz)',
@@ -7451,7 +7554,7 @@
         teiasUtcOffsetLabel: 'Türkiye UTC offset',
         deWinterOffsetLabel: 'Continental Europe winter UTC offset',
         deSummerOffsetLabel: 'Continental Europe summer UTC offset',
-        manualOffsetSettingLabel: 'Manual TR→DE offset (hours)',
+        manualOffsetSettingLabel: 'Türkiye–Continental Europe hour offset',
         settingsQualityTitle: 'Data Quality',
         nominalFreqLabel: 'Nominal frequency (Hz)',
         validMinLabel: 'Valid lower limit (Hz)',
@@ -7487,19 +7590,19 @@
         dayHeaders: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
         // KPI
         kpiTeiasMean: 'Türkiye Mean',
-        kpiDeMean: 'ENTSO-E Mean',
+        kpiDeMean: 'Continental Europe Mean',
         kpiTeiasAbsDev: 'Türkiye Mean |Δf|',
-        kpiDeAbsDev: 'ENTSO-E Mean |Δf|',
+        kpiDeAbsDev: 'Continental Europe Mean |Δf|',
         kpiBias: 'Bias',
         kpiMae: 'MAE',
         kpiCorrelation: 'Correlation',
         kpiPairedData: 'Paired Data',
         kpiReportPending: 'Report pending',
         kpiTeiasMeanHelp: 'Türkiye daily mean. Unit: Hz.',
-        kpiDeMeanHelp: 'ENTSO-E daily mean. Unit: Hz.',
+        kpiDeMeanHelp: 'Continental Europe daily mean. Unit: Hz.',
         kpiTeiasAbsDevHelp: 'Türkiye absolute 50 Hz deviation. Unit: mHz.',
-        kpiDeAbsDevHelp: 'ENTSO-E absolute 50 Hz deviation. Unit: mHz.',
-        kpiBiasHelp: 'Türkiye minus ENTSO-E mean difference. Unit: mHz.',
+        kpiDeAbsDevHelp: 'Continental Europe absolute 50 Hz deviation. Unit: mHz.',
+        kpiBiasHelp: 'Türkiye minus Continental Europe mean difference. Unit: mHz.',
         kpiMaeHelp: 'Mean absolute error between series. Unit: mHz.',
         kpiCorrelationHelp: 'Linear relation of paired samples. Unitless.',
         kpiPairedDataHelp: 'Seconds valid in both sources. Unit: percent.',
@@ -7516,16 +7619,16 @@
         tagCheck: 'Check',
         // Source labels
         sourceTr: 'Türkiye',
-        sourceDe: 'Continental Europe – Netztransparenz',
+        sourceDe: 'Continental Europe · Netztransparenz',
         sourceTrShort: 'TR',
-        sourceDeShort: 'ENTSO-E',
+        sourceDeShort: 'Continental Europe',
         // Matrix metric labels
         metricMeanTr: 'Türkiye Mean',
         metricMinTr: 'Türkiye Min',
         metricMaxTr: 'Türkiye Max',
-        metricMeanDe: 'DE Mean',
-        metricMinDe: 'DE Min',
-        metricMaxDe: 'DE Max',
+        metricMeanDe: 'Continental Europe Mean',
+        metricMinDe: 'Continental Europe Min',
+        metricMaxDe: 'Continental Europe Max',
         metricBias: 'Bias',
         metricMae: 'MAE',
         metricRmse: 'RMSE',
@@ -7533,10 +7636,10 @@
         metricMeanTrHelp: 'Türkiye hourly mean frequency. Unit: Hz.',
         metricMinTrHelp: 'Türkiye hourly minimum frequency. Unit: Hz.',
         metricMaxTrHelp: 'Türkiye hourly maximum frequency. Unit: Hz.',
-        metricMeanDeHelp: 'ENTSO-E hourly mean frequency. Unit: Hz.',
-        metricMinDeHelp: 'ENTSO-E hourly minimum frequency. Unit: Hz.',
-        metricMaxDeHelp: 'ENTSO-E hourly maximum frequency. Unit: Hz.',
-        metricBiasHelp: 'Hourly mean difference: Türkiye minus ENTSO-E. Unit: mHz.',
+        metricMeanDeHelp: 'Continental Europe hourly mean frequency. Unit: Hz.',
+        metricMinDeHelp: 'Continental Europe hourly minimum frequency. Unit: Hz.',
+        metricMaxDeHelp: 'Continental Europe hourly maximum frequency. Unit: Hz.',
+        metricBiasHelp: 'Hourly mean difference: Türkiye minus Continental Europe. Unit: mHz.',
         metricMaeHelp: 'Hourly mean absolute difference. Unit: mHz.',
         metricRmseHelp: 'Hourly RMS difference. Unit: mHz.',
         metricCorrHelp: 'Hourly correlation of paired samples. Unitless.',
@@ -7544,7 +7647,7 @@
         // Oscillation chart labels
         oscFilteredName: '{source} bandpass {f1}–{f2} Hz component',
         oscTrReal: 'Türkiye actual frequency',
-        oscDeReal: 'ENTSO-E actual frequency',
+        oscDeReal: 'Continental Europe actual frequency',
         oscLegendHint: 'Disabled by default, click to show',
         // Chart descriptions
         chartDescDay: 'Daily view downsamples 86,400 samples to minute averages; statistics computed from second-paired records.',
@@ -7556,12 +7659,12 @@
         alignDescDefault: 'Alignment info will be shown when data and date are selected.',
         alignInfo: '{desc} Türkiye {trDate} 00:00:00 record aligns with Continental Europe {deDate} {deTime} record.',
         // Various messages
-        noDateSelected: 'Please select a date with Türkiye or ENTSO-E data.',
+        noDateSelected: 'Please select a date with Türkiye or Continental Europe data.',
         autoDataLoading: 'Loading auto data for {date}.',
-        autoDataNoDe: '{date} Türkiye data loaded; matching ENTSO-E day not found.',
+        autoDataNoDe: '{date} Türkiye data loaded; matching Continental Europe day not found.',
         autoDataNoTr: 'No Türkiye auto data for {date}.',
-        autoDataNoTrDeOnly: 'No Türkiye data for {date}; ENTSO-E data is shown as a single-source day.',
-        autoDataNoAny: 'No Türkiye or ENTSO-E auto data for {date}.',
+        autoDataNoTrDeOnly: 'No Türkiye data for {date}; Continental Europe data is shown as a single-source day.',
+        autoDataNoAny: 'No Türkiye or Continental Europe auto data for {date}.',
         autoDataReady: 'Auto data catalog ready. Latest active day: {date}.',
         autoDataSelected: 'Auto data mode selected.',
         manualDataSelected: 'Manual CSV mode selected.',
@@ -7576,7 +7679,7 @@
         parsingProgress: '{file}: %{pct} • {rows} rows processed',
         parsingError: 'File parse error: {msg}',
         parsingDone: '{days} day(s) successfully loaded into memory.',
-        parsingSourceLoaded: '{source} data loaded. Total {deCount} ENTSO-E days and {trCount} Türkiye days available.',
+        parsingSourceLoaded: '{source} data loaded. Total {deCount} Continental Europe days and {trCount} Türkiye days available.',
         parseReading: 'Reading file…',
         parseBusy: 'Another file is being processed. Please wait for completion.',
         // Report messages
@@ -7594,9 +7697,9 @@
         autoTeiasMeta: '{range}; {excluded} excluded days',
         autoDeDays: '{count} days',
         autoDeMeta: '{range}; Source: {method}',
-        autoNoDeMeta: 'ENTSO-E auto source not verified.',
+        autoNoDeMeta: 'Continental Europe auto source not verified.',
         autoNetzStatus: 'Automatic update: {status}; last run {run}',
-        autoNetzSourceMethod: 'ENTSO-E latest: {date}; Source: {method}',
+        autoNetzSourceMethod: 'Continental Europe latest: {date}; Source: {method}',
         autoNetzMissingDates: 'Missing days: {count}',
         netAutoTitle: 'Automatic update',
         netManualTitle: 'Manual monthly import',
@@ -7638,11 +7741,11 @@
         xAxisOsc: 'Türkiye local time axis',
         // Chart series
         seriesTr: 'Türkiye',
-        seriesDe: 'ENTSO-E',
+        seriesDe: 'Continental Europe',
         seriesDiff: 'Difference',
         // Tooltip
         tooltipTr: 'Türkiye',
-        tooltipDe: 'ENTSO-E',
+        tooltipDe: 'Continental Europe',
         tooltipDiff: 'Difference',
         tooltipDiffUnit: ' mHz',
         tooltipFreqUnit: ' Hz',
@@ -7666,7 +7769,7 @@
         findingsCount: '{count} findings',
         // Data source links
         sourceTeiasLink: 'Türkiye',
-        sourceNetzLink: 'ENTSO-E / Netztransparenz',
+        sourceNetzLink: 'Netztransparenz',
         // Second prefixes for toLocaleString
         localeNumeric: 'en-US'
       }
@@ -7714,7 +7817,7 @@
         analysisGroupRocof: 'RoCoF',
         analysisGroupSpectral: 'Spektral Analiz',
         analysisGroupOscillation: 'Osilasyon Analizi',
-        analysisGroupJoint: 'Türkiye-ENTSO-E Ortak Analizi',
+        analysisGroupJoint: 'Türkiye–Kıta Avrupası Ortak Analizi',
         analysisGroupTrend: 'Uzun Dönem Analizi',
         analysisQuality: 'Veri kapsama',
         analysisStats: 'Temel istatistikler',
@@ -7730,28 +7833,28 @@
         analysisDone: 'Analiz tamamlandı.',
         analysisCanceled: 'Analiz iptal edildi.',
         analysisError: 'Analiz tamamlanamadı.',
-        analysisNoCommonDate: 'Seçilen tarih için ortak Türkiye-ENTSO-E verisi yetersiz.',
+        analysisNoCommonDate: 'Seçilen tarih için ortak Türkiye–Kıta Avrupası verisi yetersiz.',
         analysisCoreMissing: 'Analiz çekirdeği yüklenemedi.',
         analysisNoSeries: 'Seçilen kaynak için geçerli seri bulunamadı.',
-        sourceBoth: 'Türkiye + ENTSO-E',
-        sourceDiff: 'Türkiye - ENTSO-E',
+        sourceBoth: 'Türkiye + Kıta Avrupası',
+        sourceDiff: 'Türkiye − Kıta Avrupası',
         sourceCommon: 'Ortak mod',
-        sourceDifferential: 'Diferansiyel bileşen',
-        sourceBothShort: 'TR+DE',
-        sourceDiffShort: 'TR-DE',
+        sourceDifferential: 'Fark bileşeni',
+        sourceBothShort: 'Türkiye + Kıta Avrupası',
+        sourceDiffShort: 'Türkiye − Kıta Avrupası',
         sourceCommonShort: 'Ortak',
-        sourceDifferentialShort: 'Diferansiyel',
+        sourceDifferentialShort: 'Fark',
         sourceCommonFrequency: 'Ortak mod frekansı',
-        sourceDiffFrequency: 'Diferansiyel frekans',
+        sourceDiffFrequency: 'Fark frekansı',
         coverageTrLatest: 'Son Türkiye verisi',
-        coverageDeLatest: 'Son ENTSO-E verisi',
+        coverageDeLatest: 'Son Kıta Avrupası verisi',
         coverageCommonLatest: 'Son ortak gün',
         coverageViewLabel: 'Görünüm',
         coverageReportDateLabel: 'Rapor tarihi',
         reportDateLabelShort: 'Tarih',
         analysisCompatibilityOk: '{source} kaynağı için {analysis} analizi kullanılabilir.',
         analysisDisabledPairedHint: 'Çapraz korelasyon ve koherens için iki kaynak gerekir.',
-        analysisNeedsBothSources: 'Bu analiz iki eşlenmiş seri gerektirir; kaynak olarak Türkiye + ENTSO-E seçilmelidir.',
+        analysisNeedsBothSources: 'Bu analiz iki eşlenmiş seri gerektirir; kaynak olarak Türkiye + Kıta Avrupası seçilmelidir.',
         analysisSourceNotAllowed: '{analysis} analizi {source} kaynağıyla anlamlı değildir; seçenek kaynak kuralı nedeniyle pasifleştirildi.',
         analysisResolutionNotAllowed: 'Çözünürlük/Nyquist uyumsuz: {analysis} için {resolution} yerine {allowed} kullanılmalıdır.',
         analysisBandNyquistError: 'Nyquist sınırı aşıldı: üst bant {max} Hz, {resolution} için Nyquist {nyquist} Hz.',
@@ -7779,7 +7882,7 @@
         analysisOscillationTitle: 'Osilasyon Adayı Bulguları',
         analysisOscillationDesc: 'Band geçiren bileşen üzerinden aday osilasyon aralıkları listelenir.',
         analysisCrossCorrelationTitle: 'Çapraz Korelasyon Özeti',
-        analysisCrossCorrelationDesc: 'Türkiye ve ENTSO-E serileri arasındaki gecikmeli benzerlik ölçülür.',
+        analysisCrossCorrelationDesc: 'Türkiye ve Kıta Avrupası serileri arasındaki gecikmeli benzerlik ölçülür.',
         analysisCoherenceTitle: 'Koherens ve Faz Özeti',
         analysisCoherenceDesc: 'Eşlenmiş serilerde frekans bazlı ortak hareket ve faz farkı incelenir.',
         analysisTrendTitle: 'Uzun Dönem Trend Özeti',
@@ -7828,7 +7931,7 @@
         dataSourcesTrSubtitle: 'Türkiye elektrik sistemi frekans zaman serisi.',
         dataSourcesEuBadge: 'Netztransparenz · Continental Europe · 50 Hz',
         dataSourcesEuTitle: 'Kıta Avrupası Şebeke Frekansı',
-        dataSourcesEuSubtitle: 'Kıta Avrupası – Netztransparenz',
+        dataSourcesEuSubtitle: 'Kıta Avrupası · Netztransparenz',
         dataSourcesDetailsTitle: 'Kaynak ayrıntıları',
         dataSourcesEuDescription: 'Bu veri, Almanya’daki dört iletim sistemi işletmecisinin ortak veri portalı olan Netztransparenz üzerinden yayımlanan Kıta Avrupası senkron bölgesi şebeke frekansıdır.',
         dataSourcesEuCritical: 'Doğrudan ENTSO-E Transparency API’sinden alınmamaktadır. Netztransparenz, Alman TSO’larının ortak resmî portalıdır. Gösterilen seri yalnızca Almanya’ya özgü yerel bir frekans değil, Kıta Avrupası senkron bölgesinin ortak sistem frekansını temsil eder.',
@@ -7911,7 +8014,7 @@
         methodRocof: 'RoCoF ardışık saniyelik frekans farklarından Hz/s cinsinden hesaplanır.',
         methodPsd: 'Welch PSD, gün içindeki baskın düşük frekanslı bileşeni ve gürültü tabanını özetler.',
         methodSpectrogram: 'Spektrogram, 10 dakikalık pencerelerde baskın frekansın zamanla değişimini gösterir.',
-        methodCrossCorrelation: 'Çapraz korelasyon, Türkiye ve ENTSO-E serileri arasındaki en güçlü gecikmeli benzerliği arar.',
+        methodCrossCorrelation: 'Çapraz korelasyon, Türkiye ve Kıta Avrupası serileri arasındaki en güçlü gecikmeli benzerliği arar.',
         methodCoherence: 'Koherens ve faz, seçilen frekansta ortak hareketin tutarlılığını tahmin eder.',
         methodEvents: 'Olay analizi, nominal frekanstan sapmanın eşik üstünde kaldığı aralıkları çıkarır.',
         methodTrend: 'Trend görünümü saatlik/günlük hata ölçülerini özetler.',
@@ -7951,8 +8054,8 @@
         resetZoomLabel: 'Yakınlaştırmayı sıfırla',
         seriesTrMin: 'Türkiye min',
         seriesTrMax: 'Türkiye maks',
-        seriesDeMin: 'ENTSO-E min',
-        seriesDeMax: 'ENTSO-E maks'
+        seriesDeMin: 'Kıta Avrupası min',
+        seriesDeMax: 'Kıta Avrupası maks'
       },
       en: {
         langToggle: 'TR | EN',
@@ -7995,7 +8098,7 @@
         analysisGroupRocof: 'RoCoF',
         analysisGroupSpectral: 'Spectral Analysis',
         analysisGroupOscillation: 'Oscillation Analysis',
-        analysisGroupJoint: 'Türkiye-ENTSO-E Joint Analysis',
+        analysisGroupJoint: 'Türkiye–Continental Europe Joint Analysis',
         analysisGroupTrend: 'Long-Term Analysis',
         analysisQuality: 'Data coverage',
         analysisStats: 'Basic statistics',
@@ -8011,28 +8114,28 @@
         analysisDone: 'Analysis complete.',
         analysisCanceled: 'Analysis canceled.',
         analysisError: 'Analysis could not be completed.',
-        analysisNoCommonDate: 'Common Türkiye-ENTSO-E data is insufficient for the selected date.',
+        analysisNoCommonDate: 'Common Türkiye–Continental Europe data is insufficient for the selected date.',
         analysisCoreMissing: 'Analysis core could not be loaded.',
         analysisNoSeries: 'No valid series found for the selected source.',
-        sourceBoth: 'Türkiye + ENTSO-E',
-        sourceDiff: 'Türkiye - ENTSO-E',
+        sourceBoth: 'Türkiye + Continental Europe',
+        sourceDiff: 'Türkiye − Continental Europe',
         sourceCommon: 'Common mode',
-        sourceDifferential: 'Differential component',
-        sourceBothShort: 'TR+DE',
-        sourceDiffShort: 'TR-DE',
+        sourceDifferential: 'Difference component',
+        sourceBothShort: 'Türkiye + Continental Europe',
+        sourceDiffShort: 'Türkiye − Continental Europe',
         sourceCommonShort: 'Common',
-        sourceDifferentialShort: 'Differential',
+        sourceDifferentialShort: 'Difference',
         sourceCommonFrequency: 'Common-mode frequency',
-        sourceDiffFrequency: 'Differential frequency',
+        sourceDiffFrequency: 'Difference frequency',
         coverageTrLatest: 'Latest Türkiye data',
-        coverageDeLatest: 'Latest ENTSO-E data',
+        coverageDeLatest: 'Latest Continental Europe data',
         coverageCommonLatest: 'Latest common day',
         coverageViewLabel: 'View',
         coverageReportDateLabel: 'Report date',
         reportDateLabelShort: 'Date',
         analysisCompatibilityOk: '{analysis} is available for {source}.',
         analysisDisabledPairedHint: 'Cross-correlation and coherence require two sources.',
-        analysisNeedsBothSources: 'This analysis requires two paired series; choose Türkiye + ENTSO-E as the source.',
+        analysisNeedsBothSources: 'This analysis requires two paired series; choose Türkiye + Continental Europe as the source.',
         analysisSourceNotAllowed: '{analysis} is not meaningful for {source}; the option is disabled by the source rule.',
         analysisResolutionNotAllowed: 'Resolution/Nyquist mismatch: use {allowed} for {analysis}, not {resolution}.',
         analysisBandNyquistError: 'Nyquist limit exceeded: upper band {max} Hz, Nyquist for {resolution} is {nyquist} Hz.',
@@ -8060,7 +8163,7 @@
         analysisOscillationTitle: 'Oscillation Candidate Findings',
         analysisOscillationDesc: 'Candidate oscillation intervals are listed from the band-pass component.',
         analysisCrossCorrelationTitle: 'Cross-Correlation Summary',
-        analysisCrossCorrelationDesc: 'Delayed similarity between Türkiye and ENTSO-E is measured.',
+        analysisCrossCorrelationDesc: 'Delayed similarity between Türkiye and Continental Europe is measured.',
         analysisCoherenceTitle: 'Coherence and Phase Summary',
         analysisCoherenceDesc: 'Frequency-based common movement and phase difference are inspected for paired series.',
         analysisTrendTitle: 'Long-Term Trend Summary',
@@ -8109,7 +8212,7 @@
         dataSourcesTrSubtitle: 'Frequency time series for the Türkiye power system.',
         dataSourcesEuBadge: 'Netztransparenz · Continental Europe · 50 Hz',
         dataSourcesEuTitle: 'Continental Europe Grid Frequency',
-        dataSourcesEuSubtitle: 'Continental Europe – Netztransparenz',
+        dataSourcesEuSubtitle: 'Continental Europe · Netztransparenz',
         dataSourcesDetailsTitle: 'Source details',
         dataSourcesEuDescription: 'This data is the Continental Europe synchronous area grid frequency published through Netztransparenz, the joint data portal of the four German Transmission System Operators.',
         dataSourcesEuCritical: 'It is not taken directly from the standard ENTSO-E Transparency API. Netztransparenz is the joint official portal of the German TSOs. The displayed series is not a Germany-only local frequency; it represents the common system frequency of the Continental Europe synchronous area.',
@@ -8192,7 +8295,7 @@
         methodRocof: 'RoCoF is computed from adjacent second-level frequency differences in Hz/s.',
         methodPsd: 'Welch PSD summarizes the dominant low-frequency component and noise floor within the day.',
         methodSpectrogram: 'The spectrogram tracks dominant frequency changes across 10-minute windows.',
-        methodCrossCorrelation: 'Cross-correlation searches for the strongest delayed similarity between Türkiye and ENTSO-E.',
+        methodCrossCorrelation: 'Cross-correlation searches for the strongest delayed similarity between Türkiye and Continental Europe.',
         methodCoherence: 'Coherence and phase estimate shared motion at the selected frequency.',
         methodEvents: 'Event analysis extracts intervals where deviation from nominal frequency exceeds the threshold.',
         methodTrend: 'The trend view summarizes hourly and daily error metrics.',
@@ -8232,8 +8335,8 @@
         resetZoomLabel: 'Reset zoom',
         seriesTrMin: 'Türkiye min',
         seriesTrMax: 'Türkiye max',
-        seriesDeMin: 'ENTSO-E min',
-        seriesDeMax: 'ENTSO-E max'
+        seriesDeMin: 'Continental Europe min',
+        seriesDeMax: 'Continental Europe max'
       }
     };
 
@@ -8242,6 +8345,143 @@
     const scientificInterpretationMarkers = "Ortak mod gostergesi | Common-mode indicator | Koherent osilasyon adayi | Coherent oscillation candidate";
 
     let lang = 'tr';
+
+    function applySourceLabelTranslations() {
+      const trShort = getSourceLabel('teias', 'short', 'tr');
+      const ceShort = getSourceLabel('netztransparenz', 'short', 'tr');
+      const trStandard = getSourceLabel('teias', 'standard', 'tr');
+      const ceStandard = getSourceLabel('netztransparenz', 'standard', 'tr');
+      const trLong = getSourceLabel('teias', 'long', 'tr');
+      const ceLong = getSourceLabel('netztransparenz', 'long', 'tr');
+      const enTrShort = getSourceLabel('teias', 'short', 'en');
+      const enCeShort = getSourceLabel('netztransparenz', 'short', 'en');
+      const enTrStandard = getSourceLabel('teias', 'standard', 'en');
+      const enCeStandard = getSourceLabel('netztransparenz', 'standard', 'en');
+      const enTrLong = getSourceLabel('teias', 'long', 'en');
+      const enCeLong = getSourceLabel('netztransparenz', 'long', 'en');
+      Object.assign(i18n.tr, {
+        sourceTr: trShort,
+        sourceDe: ceShort,
+        sourceTrStandard: trStandard,
+        sourceDeStandard: ceStandard,
+        sourceTrLong: trLong,
+        sourceDeLong: ceLong,
+        sourceTrShort: trShort,
+        sourceDeShort: ceShort,
+        sourceBoth: `${trShort} + ${ceShort}`,
+        sourceDiff: `${trShort} − ${ceShort}`,
+        sourceCommon: 'Ortak bileşen',
+        sourceDifferential: 'Fark bileşeni',
+        sourceBothShort: `${trShort} + ${ceShort}`,
+        sourceDiffShort: `${trShort} − ${ceShort}`,
+        sourceCommonShort: 'Ortak',
+        sourceDifferentialShort: 'Fark',
+        sourceCommonFrequency: 'Ortak bileşen frekansı',
+        sourceDiffFrequency: 'Fark frekansı',
+        sourceNetzLink: 'Netztransparenz',
+        netz: ceShort,
+        kpiDeMean: `${ceShort} Ortalama`,
+        kpiDeAbsDev: `${ceShort} Ort. |Δf|`,
+        kpiDeMeanHelp: `${ceShort} günlük ortalaması. Birim: Hz.`,
+        kpiDeAbsDevHelp: `${ceShort} 50 Hz mutlak sapması. Birim: mHz.`,
+        kpiBiasHelp: `${trShort} eksi ${ceShort} ortalama farkı. Birim: mHz.`,
+        metricMeanDe: `${ceShort} Ort.`,
+        metricMinDe: `${ceShort} Min`,
+        metricMaxDe: `${ceShort} Maks`,
+        metricMeanDeHelp: `${ceShort} saatlik ortalama frekansı. Birim: Hz.`,
+        metricMinDeHelp: `${ceShort} saat içindeki en düşük frekans. Birim: Hz.`,
+        metricMaxDeHelp: `${ceShort} saat içindeki en yüksek frekans. Birim: Hz.`,
+        metricBiasHelp: `Saatlik ortalama fark: ${trShort} eksi ${ceShort}. Birim: mHz.`,
+        oscDeReal: `${ceShort} gerçek frekansı`,
+        seriesDe: ceShort,
+        seriesDeMin: `${ceShort} min`,
+        seriesDeMax: `${ceShort} maks`,
+        tooltipDe: ceShort,
+        coverageDeLatest: `Son ${ceShort} verisi`,
+        manualOffsetGraphLabel: `${trShort}–${ceShort} saat farkı`,
+        manualOffsetSettingLabel: `${trShort}–${ceShort} saat farkı`,
+        noDateSelected: `Lütfen ${trShort} veya ${ceShort} verisi bulunan bir gün seçin.`,
+        autoDataNoDe: `{date} ${trShort} verisi yüklendi; eşleşen ${ceShort} günü bulunamadı.`,
+        autoDataNoTrDeOnly: `{date} için ${trShort} verisi yok; ${ceShort} verisi tekil olarak gösteriliyor.`,
+        autoDataNoAny: `{date} için ${trShort} veya ${ceShort} otomatik verisi yok.`,
+        parsingSourceLoaded: `{source} verisi yüklendi. Toplam {deCount} ${ceShort} günü ve {trCount} ${trShort} günü mevcut.`,
+        autoNoDeMeta: `${ceShort} otomatik kaynak doğrulanmadı.`,
+        autoNetzSourceMethod: `${ceShort} son veri: {date}; Kaynak: {method}`,
+        analysisGroupJoint: `${trShort}–${ceShort} ortak analizi`,
+        analysisNoCommonDate: `Seçilen tarih için ortak ${trShort}–${ceShort} verisi yetersiz.`,
+        analysisNeedsBothSources: `Bu analiz iki eşlenmiş seri gerektirir; kaynak olarak ${trShort} + ${ceShort} seçilmelidir.`,
+        analysisCrossCorrelationDesc: `${trShort} ve ${ceShort} serileri arasındaki gecikmeli benzerlik ölçülür.`,
+        methodCrossCorrelation: `Çapraz korelasyon, ${trShort} ve ${ceShort} serileri arasındaki en güçlü gecikmeli benzerliği arar.`,
+        dataSourcesTrBadge: 'TEİAŞ · 50 Hz',
+        dataSourcesEuBadge: 'Netztransparenz · 50 Hz',
+        dataSourcesTrTitle: trLong,
+        dataSourcesEuTitle: ceLong,
+        dataSourcesEuSubtitle: ceStandard,
+        dataSourcesTrStatusTitle: trShort,
+        dataSourcesEuStatusTitle: ceShort
+      });
+      Object.assign(i18n.en, {
+        sourceTr: enTrShort,
+        sourceDe: enCeShort,
+        sourceTrStandard: enTrStandard,
+        sourceDeStandard: enCeStandard,
+        sourceTrLong: enTrLong,
+        sourceDeLong: enCeLong,
+        sourceTrShort: enTrShort,
+        sourceDeShort: enCeShort,
+        sourceBoth: `${enTrShort} + ${enCeShort}`,
+        sourceDiff: `${enTrShort} − ${enCeShort}`,
+        sourceCommon: 'Common component',
+        sourceDifferential: 'Difference component',
+        sourceBothShort: `${enTrShort} + ${enCeShort}`,
+        sourceDiffShort: `${enTrShort} − ${enCeShort}`,
+        sourceCommonShort: 'Common',
+        sourceDifferentialShort: 'Difference',
+        sourceCommonFrequency: 'Common-component frequency',
+        sourceDiffFrequency: 'Difference frequency',
+        sourceNetzLink: 'Netztransparenz',
+        netz: enCeShort,
+        kpiDeMean: `${enCeShort} Mean`,
+        kpiDeAbsDev: `${enCeShort} Mean |Δf|`,
+        kpiDeMeanHelp: `${enCeShort} daily mean. Unit: Hz.`,
+        kpiDeAbsDevHelp: `${enCeShort} absolute 50 Hz deviation. Unit: mHz.`,
+        kpiBiasHelp: `${enTrShort} minus ${enCeShort} mean difference. Unit: mHz.`,
+        metricMeanDe: `${enCeShort} Mean`,
+        metricMinDe: `${enCeShort} Min`,
+        metricMaxDe: `${enCeShort} Max`,
+        metricMeanDeHelp: `${enCeShort} hourly mean frequency. Unit: Hz.`,
+        metricMinDeHelp: `${enCeShort} hourly minimum frequency. Unit: Hz.`,
+        metricMaxDeHelp: `${enCeShort} hourly maximum frequency. Unit: Hz.`,
+        metricBiasHelp: `Hourly mean difference: ${enTrShort} minus ${enCeShort}. Unit: mHz.`,
+        oscDeReal: `${enCeShort} actual frequency`,
+        seriesDe: enCeShort,
+        seriesDeMin: `${enCeShort} min`,
+        seriesDeMax: `${enCeShort} max`,
+        tooltipDe: enCeShort,
+        coverageDeLatest: `Latest ${enCeShort} data`,
+        manualOffsetGraphLabel: `${enTrShort}–${enCeShort} hour offset`,
+        manualOffsetSettingLabel: `${enTrShort}–${enCeShort} hour offset`,
+        noDateSelected: `Please select a date with ${enTrShort} or ${enCeShort} data.`,
+        autoDataNoDe: `{date} ${enTrShort} data loaded; matching ${enCeShort} day not found.`,
+        autoDataNoTrDeOnly: `No ${enTrShort} data for {date}; ${enCeShort} data is shown as a single-source day.`,
+        autoDataNoAny: `No ${enTrShort} or ${enCeShort} auto data for {date}.`,
+        parsingSourceLoaded: `{source} data loaded. Total {deCount} ${enCeShort} days and {trCount} ${enTrShort} days available.`,
+        autoNoDeMeta: `${enCeShort} auto source not verified.`,
+        autoNetzSourceMethod: `${enCeShort} latest: {date}; Source: {method}`,
+        analysisGroupJoint: `${enTrShort}–${enCeShort} Joint Analysis`,
+        analysisNoCommonDate: `Common ${enTrShort}–${enCeShort} data is insufficient for the selected date.`,
+        analysisNeedsBothSources: `This analysis requires two paired series; choose ${enTrShort} + ${enCeShort} as the source.`,
+        analysisCrossCorrelationDesc: `Delayed similarity between ${enTrShort} and ${enCeShort} is measured.`,
+        methodCrossCorrelation: `Cross-correlation searches for the strongest delayed similarity between ${enTrShort} and ${enCeShort}.`,
+        dataSourcesTrBadge: 'TEİAŞ · 50 Hz',
+        dataSourcesEuBadge: 'Netztransparenz · 50 Hz',
+        dataSourcesTrTitle: enTrLong,
+        dataSourcesEuTitle: enCeLong,
+        dataSourcesEuSubtitle: enCeStandard,
+        dataSourcesTrStatusTitle: enTrShort,
+        dataSourcesEuStatusTitle: enCeShort
+      });
+    }
 
     function t(key, vars) {
       let val = i18n[lang]?.[key] ?? i18n.tr[key];
@@ -8284,6 +8524,7 @@
       state.settings.locale = newLang;
       localStorage.setItem('frequencyAppSettings', JSON.stringify(state.settings));
       document.documentElement.setAttribute('data-current-lang', newLang);
+      applySourceLabelTranslations();
       $('langToggle').textContent = t('langToggle');
       applyTranslations();
       updateUrlState({ lang: newLang });

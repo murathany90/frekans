@@ -173,7 +173,7 @@ try {
     await page.keyboard.press("Escape");
 
     const kpiLabels = layout.kpiCards.map(card => card.label);
-    const expectedKpis = ["Türkiye Mean", "ENTSO-E Mean", "Türkiye Mean |Δf|", "ENTSO-E Mean |Δf|"];
+    const expectedKpis = ["Türkiye Mean", "Continental Europe Mean", "Türkiye Mean |Δf|", "Continental Europe Mean |Δf|"];
     if (kpiLabels.join("|") !== expectedKpis.join("|")) {
       throw new Error(`Mobile KPI cards must only show the four mean cards at ${width}px: ${JSON.stringify(layout.kpiCards)}`);
     }

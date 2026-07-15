@@ -25,13 +25,13 @@ for (const marker of [
   "## Lisans",
   "MIT lisansı",
   "veri kaynaklarının kullanım haklarını kapsamaz",
-  "Kıta Avrupası – Netztransparenz"
+  "Kıta Avrupası · Netztransparenz"
 ]) {
   if (!readme.includes(marker)) throw new Error(`README missing public-sharing marker: ${marker}`);
 }
 
 if (/ENTSO-E \(Almanya\)|ENTSO-E Almanya/.test(readme)) {
-  throw new Error("README should use Kıta Avrupası – Netztransparenz instead of ENTSO-E (Almanya).");
+  throw new Error("README should use Kıta Avrupası · Netztransparenz instead of ENTSO-E (Almanya).");
 }
 
 for (const marker of [
@@ -52,8 +52,8 @@ for (const marker of [
   if (!html.includes(marker)) throw new Error(`HTML missing public-sharing marker: ${marker}`);
 }
 
-if (!html.includes("Kıta Avrupası – Netztransparenz") || /ENTSO-E \(Almanya\)|ENTSO-E Almanya/.test(html)) {
-  throw new Error("HTML source labels should use Kıta Avrupası – Netztransparenz instead of ENTSO-E (Almanya).");
+if (!html.includes("Kıta Avrupası · Netztransparenz") || /ENTSO-E \(Almanya\)|ENTSO-E Almanya/.test(html)) {
+  throw new Error("HTML source labels should use Kıta Avrupası · Netztransparenz instead of ENTSO-E (Almanya).");
 }
 
 const aboutSection = html.slice(html.indexOf('id="aboutLegalSection"'), html.indexOf("</section>", html.indexOf('id="aboutLegalSection"')));

@@ -2,7 +2,7 @@
 
 Türkiye ve Kıta Avrupası Şebeke Frekansı Analiz Platformu
 
-GridFreq, TEİAŞ Türkiye günlük şebeke frekansı verileri ile Kıta Avrupası – Netztransparenz frekans verilerini aynı statik web uygulamasında inceleyen, karşılaştıran ve analiz eden bir frekans kalite platformudur. GitHub Pages üzerinde çalışır ve ana canlı uygulama adresi `https://gridfreq.com/` olarak yapılandırılmıştır. Tarayıcı doğrudan TEİAŞ veya Netztransparenz sistemlerine bağlanmaz. Otomatik indirme, normalizasyon, kalite kontrolü ve yayınlama işleri GitHub Actions ve yerel Python betikleriyle yapılır.
+GridFreq, TEİAŞ Türkiye günlük şebeke frekansı verileri ile Kıta Avrupası · Netztransparenz frekans verilerini aynı statik web uygulamasında inceleyen, karşılaştıran ve analiz eden bir frekans kalite platformudur. GitHub Pages üzerinde çalışır ve ana canlı uygulama adresi `https://gridfreq.com/` olarak yapılandırılmıştır. Tarayıcı doğrudan TEİAŞ veya Netztransparenz sistemlerine bağlanmaz. Otomatik indirme, normalizasyon, kalite kontrolü ve yayınlama işleri GitHub Actions ve yerel Python betikleriyle yapılır.
 
 ## Kısa Durum
 
@@ -24,7 +24,7 @@ GridFreq, TEİAŞ Türkiye günlük şebeke frekansı verileri ile Kıta Avrupas
 - Netztransparenz son otomatik kaynak: `scripts/fetch_netztransparenz.py`
 - Netztransparenz OAuth istemcisi: `scripts/netztransparenz_client.py`
 
-Mevcut manifest özetinde TEİAŞ ve Netztransparenz günleri ayrı tutulur. Türkiye ve Kıta Avrupası – Netztransparenz günleri birebir aynı takvim aralığında olmak zorunda değildir; uygulama ortak günleri karşılaştırma için, tekil kaynak günlerini ise tek kaynak grafiği ve tek kaynak analizleri için kullanır.
+Mevcut manifest özetinde TEİAŞ ve Netztransparenz günleri ayrı tutulur. Türkiye ve Kıta Avrupası · Netztransparenz günleri birebir aynı takvim aralığında olmak zorunda değildir; uygulama ortak günleri karşılaştırma için, tekil kaynak günlerini ise tek kaynak grafiği ve tek kaynak analizleri için kullanır.
 
 ## Mimari
 
@@ -44,7 +44,7 @@ Uygulama tek HTML dosyası etrafında çalışan statik bir ön yüz ve önceden
 
 ### Günlük
 
-Günlük sekmesi tarih seçimi, zaman hizalama, grafik katmanları ve 24 saatlik frekans grafiği için ana ekrandır. Tarih seçicide Türkiye, Kıta Avrupası – Netztransparenz veya ikisinde birden bulunan günler gösterilir. Gün yalnızca Kıta Avrupası verisine sahipse bu seri tekil olarak çizilir; Türkiye verisi boş kalır. Ortak günlerde Türkiye ve Kıta Avrupası serileri aynı grafik üzerinde karşılaştırılır.
+Günlük sekmesi tarih seçimi, zaman hizalama, grafik katmanları ve 24 saatlik frekans grafiği için ana ekrandır. Tarih seçicide Türkiye, Kıta Avrupası · Netztransparenz veya ikisinde birden bulunan günler gösterilir. Gün yalnızca Kıta Avrupası verisine sahipse bu seri tekil olarak çizilir; Türkiye verisi boş kalır. Ortak günlerde Türkiye ve Kıta Avrupası serileri aynı grafik üzerinde karşılaştırılır.
 
 Günlük sekmesindeki ana kontroller:
 
@@ -53,14 +53,14 @@ Günlük sekmesindeki ana kontroller:
 - Grafik katmanları: Fark katmanı ve Maks/Min zarfı.
 - Yenile: Seçili günü yeniden hesaplar.
 - Grafik sıfırla: Yakınlaştırmayı günlük görünüme döndürür ve katman seçimlerini varsayılan duruma alır.
-- Bilgi: TEİAŞ ve Kıta Avrupası / Netztransparenz kaynaklarını, çözünürlükleri, güncel veri durumunu ve işleme yöntemini açıklayan erişilebilir modal pencereyi açar.
+- Bilgi: Türkiye · TEİAŞ ve Kıta Avrupası · Netztransparenz kaynaklarını, çözünürlükleri, güncel veri durumunu ve işleme yöntemini açıklayan erişilebilir modal pencereyi açar.
 
 Günlük grafik üstünde ilk iki bilgi kartı görünüm bağlamını taşır:
 
 - **Görünüm**: `24 saat • dakikalık`, saatlik yakınlaştırmada ise örneğin `11:00–12:00 • 3.600 saniye`.
 - **Rapor tarihi**: Grafiğin ve rapor bağlamının seçili takvim günü.
 
-Masaüstünde bu kartların yanında son Türkiye verisi, son ENTSO-E verisi ve son ortak gün kartları görünmeye devam eder. Mobilde gereksiz dikey alanı azaltmak için yalnızca **Görünüm** ve **Rapor tarihi** kartları gösterilir; kaynak güncelliği bilgileri **Veri** sekmesindeki sağlık kartlarında ve **Bilgi** penceresinde korunur.
+Masaüstünde bu kartların yanında son Türkiye verisi, son Kıta Avrupası verisi ve son ortak gün kartları görünmeye devam eder. Mobilde gereksiz dikey alanı azaltmak için yalnızca **Görünüm** ve **Rapor tarihi** kartları gösterilir; kaynak güncelliği bilgileri **Veri** sekmesindeki sağlık kartlarında ve **Bilgi** penceresinde korunur.
 
 Mobil Günlük sekmesi 320-430 px genişliklerde iki satırlı kompakt kontrol düzeni kullanır:
 
@@ -69,7 +69,7 @@ Mobil Günlük sekmesi 320-430 px genişliklerde iki satırlı kompakt kontrol d
 
 Bu düzen yatay sayfa kaydırması üretmeden çalışacak şekilde tasarlanmıştır. Dar ekranlarda bazı düğmeler ikon ağırlıklı görünür, ancak erişilebilir adları korunur.
 
-**Veri Kaynakları ve Yöntem** penceresi masaüstünde ortalanmış modal, mobilde ekranı taşırmayan alt sayfa/tam ekran uyumlu görünüm olarak çalışır. Pencere `role="dialog"` ve `aria-modal="true"` kullanır; açıldığında odak pencereye taşınır, Tab odağı içeride kalır, Escape ve kapatma düğmesi ile kapanır, kapanınca odak yeniden **Bilgi** düğmesine döner. İçerik TEİAŞ, Kıta Avrupası - Netztransparenz, zaman/çözünürlük, veri işleme/kalite, teknik not, resmî kaynak bağlantıları ve güncel durum bölümlerine ayrılmıştır. Güncel durum alanı mümkün olduğunda `data/status.json` ve manifest bilgilerinden dinamik üretilir; status dosyası okunamazsa modal çökmeden "Güncel durum bilgisi alınamadı." mesajı gösterir.
+**Veri Kaynakları ve Yöntem** penceresi masaüstünde ortalanmış modal, mobilde ekranı taşırmayan alt sayfa/tam ekran uyumlu görünüm olarak çalışır. Pencere `role="dialog"` ve `aria-modal="true"` kullanır; açıldığında odak pencereye taşınır, Tab odağı içeride kalır, Escape ve kapatma düğmesi ile kapanır, kapanınca odak yeniden **Bilgi** düğmesine döner. İçerik Türkiye · TEİAŞ, Kıta Avrupası · Netztransparenz, zaman/çözünürlük, veri işleme/kalite, teknik not, resmî kaynak bağlantıları ve güncel durum bölümlerine ayrılmıştır. Güncel durum alanı mümkün olduğunda `data/status.json` ve manifest bilgilerinden dinamik üretilir; status dosyası okunamazsa modal çökmeden "Güncel durum bilgisi alınamadı." mesajı gösterir.
 
 Kaynak terminolojisi bilinçli olarak ayrılmıştır. İngilizce arayüzde de ülke adı **Türkiye** olarak kullanılır. Netztransparenz verisi standart ENTSO-E Transparency API'sinden doğrudan alınmış gibi sunulmaz; Alman TSO'larının resmî ortak portalı üzerinden yayımlanan Kıta Avrupası senkron bölgesi frekansı olarak açıklanır. Modal içindeki resmî kaynak bağlantıları TEİAŞ, TEİAŞ günlük frekans sayfası, Netztransparenz saniyelik frekans sayfası ve ENTSO-E resmî sitesiyle sınırlıdır; GridFreq GitHub deposu resmî kaynak bağlantıları arasında gösterilmez.
 
@@ -80,9 +80,9 @@ Analiz sekmesi seçili gün veya tarih aralığı üzerinde bilimsel analizleri 
 Kaynak seçenekleri:
 
 - `Türkiye`: TEİAŞ serisini tek başına analiz eder.
-- `Kıta Avrupası – Netztransparenz`: Netztransparenz serisini tek başına analiz eder.
-- `Türkiye + ENTSO-E`: Ortak veri gerektiren çift kaynak görünümü.
-- `Türkiye - ENTSO-E`: İki kaynak arasındaki fark bileşeni.
+- `Kıta Avrupası · Netztransparenz`: Netztransparenz serisini tek başına analiz eder.
+- `Türkiye + Kıta Avrupası`: Ortak veri gerektiren çift kaynak görünümü.
+- `Türkiye − Kıta Avrupası`: İki kaynak arasındaki fark bileşeni.
 - `Ortak bileşen`: İki serinin ortak mod davranışı.
 - `Diferansiyel bileşen`: Yerel farklılaşma davranışı.
 
@@ -107,9 +107,9 @@ PDF/yazdırma akışı `printReport()` üzerinden yönetilir. Yazdırma sırası
 
 ### Veri
 
-Veri sekmesi otomatik katalog durumu, son TEİAŞ tarihi, son ENTSO-E tarihi, Netztransparenz kaynak yöntemi, kaynak sağlık kartları, eksik gün sayısı ve manuel CSV yükleme alanlarını gösterir. Manuel yükleme halen desteklenir ve tarayıcı belleğinde çalışır.
+Veri sekmesi otomatik katalog durumu, son TEİAŞ tarihi, son Kıta Avrupası tarihi, Netztransparenz kaynak yöntemi, kaynak sağlık kartları, eksik gün sayısı ve manuel CSV yükleme alanlarını gösterir. Manuel yükleme halen desteklenir ve tarayıcı belleğinde çalışır.
 
-Kaynak sağlık kartları artık Günlük grafiğin üstünü kalabalıklaştırmaz; **GitHub Pages Otomatik Veri** paneli içinde yer alır. Türkiye ve ENTSO-E / Netztransparenz için son başarılı kontrol, son mevcut veri, veri gecikmesi, durum, eksik veya henüz yayımlanmamış günler, kaynak yöntemi, kalite skoru ve son hata ayrı ayrı gösterilir. "Workflow başarılı" ile "veri güncel" aynı şey olarak sunulmaz; veri gecikmesi normal yayın gecikmesi, beklenenden uzun gecikme, indirme/doğrulama hatası veya henüz yayımlanmamış durumlarıyla ayrıca belirtilir.
+Kaynak sağlık kartları artık Günlük grafiğin üstünü kalabalıklaştırmaz; **GitHub Pages Otomatik Veri** paneli içinde yer alır. Türkiye · TEİAŞ ve Kıta Avrupası · Netztransparenz için son başarılı kontrol, son mevcut veri, veri gecikmesi, durum, eksik veya henüz yayımlanmamış günler, kaynak yöntemi, kalite skoru ve son hata ayrı ayrı gösterilir. "Workflow başarılı" ile "veri güncel" aynı şey olarak sunulmaz; veri gecikmesi normal yayın gecikmesi, beklenenden uzun gecikme, indirme/doğrulama hatası veya henüz yayımlanmamış durumlarıyla ayrıca belirtilir.
 
 ## Grafik Yapısı
 
@@ -120,14 +120,14 @@ Günlük grafik ECharts ile çizilir. Tam gün görünümünde 86.400 saniyelik 
 Grafik katmanları:
 
 - Türkiye frekansı
-- ENTSO-E frekansı
-- Türkiye - ENTSO-E farkı
+- Kıta Avrupası frekansı
+- Türkiye − Kıta Avrupası farkı
 - Türkiye minimum/maksimum zarfı
-- ENTSO-E minimum/maksimum zarfı
+- Kıta Avrupası minimum/maksimum zarfı
 
 Saatlik matris ve 15 dakikalık heatmap grafiğe bağlıdır. Saat veya çeyrek saat seçildiğinde saniyelik detay görünümü açılır. Çift tıklama günlük görünüme geri döndürür. Grafik araç çubuğu tam ekran, PNG indirme ve yakınlaştırma sıfırlama kontrolleri içerir.
 
-Grafik katman tercihleri oturum boyunca korunur. Kullanıcı efsaneden Türkiye, ENTSO-E veya fark serisini kapattığında; gün değiştirme, günlük/saatlik görünüme geçme, çözünürlük değiştirme veya zaman eksenini yenileme sonrasında aynı katman seçimi korunur. Zoom aralığı da mümkün olduğunda korunur. Bu durum `frequencyChartSessionState` anahtarıyla `sessionStorage` içinde tutulur. **Grafik Sıfırla** düğmesi hem zoom'u tam güne döndürür hem de katmanları tanımlı varsayılan görünüme alır.
+Grafik katman tercihleri oturum boyunca korunur. Kullanıcı efsaneden Türkiye, Kıta Avrupası veya fark serisini kapattığında; gün değiştirme, günlük/saatlik görünüme geçme, çözünürlük değiştirme veya zaman eksenini yenileme sonrasında aynı katman seçimi korunur. Zoom aralığı da mümkün olduğunda korunur. Bu durum `frequencyChartSessionState` anahtarıyla `sessionStorage` içinde tutulur. **Grafik Sıfırla** düğmesi hem zoom'u tam güne döndürür hem de katmanları tanımlı varsayılan görünüme alır.
 
 Grafik ve UI araç ipuçları tek yüksek kontrastlı tooltip sistemiyle gösterilir. `#appTooltip` genel buton, KPI ve metrik açıklamalarını; `#hourMatrixTooltip` saatlik matris hücrelerini gösterir. Tooltipler masaüstünde hover/focus ile, mobilde dokunma/focus ile açılır; ekran kenarlarına göre otomatik konumlanır ve yatay taşma üretmez.
 
@@ -136,15 +136,15 @@ Grafik ve UI araç ipuçları tek yüksek kontrastlı tooltip sistemiyle göster
 Günlük hesap sonrası KPI alanı şu metrikleri gösterir:
 
 - Türkiye ortalaması
-- ENTSO-E ortalaması
+- Kıta Avrupası ortalaması
 - Türkiye ortalama mutlak sapma
-- ENTSO-E ortalama mutlak sapma
+- Kıta Avrupası ortalama mutlak sapma
 - Bias
 - MAE/RMSE
 - Korelasyon
 - Eşlenmiş veri oranı
 
-Her KPI kartında kısa açıklama tooltip'i bulunur. Tooltip metinleri metriğin anlamını ve birimini açıklar; örneğin ortalama değerler Hz, ortalama mutlak sapma ve MAE mHz, korelasyon birimsiz katsayı, ortak veri ise eşlenmiş örnek oranı olarak belirtilir. Mobilde günlük grafik altındaki KPI alanı dört temel kartla sadeleşir: Türkiye ortalaması, ENTSO-E ortalaması, Türkiye ortalama mutlak sapma ve ENTSO-E ortalama mutlak sapma. Bias, MAE/RMSE, korelasyon ve eşlenmiş veri oranı masaüstünde görünür kalır; mobilde bilgi yoğunluğunu azaltmak için gizlenir.
+Her KPI kartında kısa açıklama tooltip'i bulunur. Tooltip metinleri metriğin anlamını ve birimini açıklar; örneğin ortalama değerler Hz, ortalama mutlak sapma ve MAE mHz, korelasyon birimsiz katsayı, ortak veri ise eşlenmiş örnek oranı olarak belirtilir. Mobilde günlük grafik altındaki KPI alanı dört temel kartla sadeleşir: Türkiye ortalaması, Kıta Avrupası ortalaması, Türkiye ortalama mutlak sapma ve Kıta Avrupası ortalama mutlak sapma. Bias, MAE/RMSE, korelasyon ve eşlenmiş veri oranı masaüstünde görünür kalır; mobilde bilgi yoğunluğunu azaltmak için gizlenir.
 
 ### Saatlik istatistik matrisi
 
@@ -194,7 +194,7 @@ Osilasyon adayı analizi bant geçiren FIR filtre, kayan pencere ve mHz eşiklem
 
 ### Çapraz korelasyon
 
-Çapraz korelasyon Türkiye ve ENTSO-E ortak günlerinde çalışır. İki seri arasındaki en iyi gecikme, korelasyon büyüklüğü ve ortak mod göstergesi hesaplanır.
+Çapraz korelasyon Türkiye ve Kıta Avrupası ortak günlerinde çalışır. İki seri arasındaki en iyi gecikme, korelasyon büyüklüğü ve ortak mod göstergesi hesaplanır.
 
 ### Koherens ve faz
 
@@ -375,6 +375,7 @@ node tests/frontend_prompt5_static.mjs
 node tests/frontend_prompt6_static.mjs
 node tests/frontend_brand_static.mjs
 node tests/frontend_public_sharing_static.mjs
+node tests/frontend_source_labels_static.mjs
 node tests/frontend_data_sources_modal_static.mjs
 node tests/frontend_netztransparenz_status_static.mjs
 node tests/readme_documentation_static.mjs

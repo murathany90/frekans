@@ -3,14 +3,46 @@
   "updatedAtUtc": "2026-07-13T00:42:20Z",
   "sources": {
     "teias": {
-      "label": "TEİAŞ Günlük Frekans Bilgisi",
+      "label": "Türkiye · TEİAŞ",
+      "provider": "TEİAŞ",
+      "systemCode": "TR",
+      "labels": {
+        "tr": {
+          "short": "Türkiye",
+          "standard": "Türkiye · TEİAŞ",
+          "long": "Türkiye Şebeke Frekansı · TEİAŞ",
+          "report": "Türkiye (TEİAŞ)"
+        },
+        "en": {
+          "short": "Türkiye",
+          "standard": "Türkiye · TEİAŞ",
+          "long": "Türkiye Grid Frequency · TEİAŞ",
+          "report": "Türkiye (TEİAŞ)"
+        }
+      },
       "sourcePageUrl": "https://www.teias.gov.tr/gunluk-frekans-bilgisi",
       "discoveryMethod": "TEİAŞ web sayfasının kullandığı resmi gallery API yanıtındaki media slug değerleri webim.teias.gov.tr dosya indirme uç noktasına bağlanır.",
       "automation": "daily_lookback_14_days",
       "timezone": "Europe/Istanbul"
     },
     "netztransparenz": {
-      "label": "Netztransparenz Sekündliche Daten",
+      "label": "Kıta Avrupası · Netztransparenz",
+      "provider": "Netztransparenz",
+      "systemCode": "CE",
+      "labels": {
+        "tr": {
+          "short": "Kıta Avrupası",
+          "standard": "Kıta Avrupası · Netztransparenz",
+          "long": "Kıta Avrupası Şebeke Frekansı · Netztransparenz",
+          "report": "Kıta Avrupası (Netztransparenz)"
+        },
+        "en": {
+          "short": "Continental Europe",
+          "standard": "Continental Europe · Netztransparenz",
+          "long": "Continental Europe Grid Frequency · Netztransparenz",
+          "report": "Continental Europe (Netztransparenz)"
+        }
+      },
       "sourcePageUrl": "https://www.netztransparenz.de/de-de/Regelenergie/Daten-Regelreserve/Sek%C3%BCndliche-Daten",
       "discoveryMethod": "2026 için güvenilir statik otomatik indirme bağlantısı doğrulanmadı; manuel aylık CSV import yolu kullanılır.",
       "automation": "manual_monthly_import",

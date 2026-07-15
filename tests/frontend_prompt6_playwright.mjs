@@ -66,7 +66,7 @@ try {
   await page.click("#langToggle");
   await page.waitForFunction(() => document.querySelector(".brand h1")?.textContent?.trim() === "GridFreq");
   const enLabels = await page.$$eval("#analysisSourceSelect option, #coverageSummary .label", items => items.map(item => item.textContent?.trim() || ""));
-  if (!enLabels.some(label => /Continental Europe.*Netztransparenz/.test(label)) && !enLabels.some(label => /Latest ENTSO-E data/.test(label))) {
+  if (!enLabels.some(label => /Continental Europe/.test(label)) && !enLabels.some(label => /Latest Continental Europe data/.test(label))) {
     throw new Error(`English Continental Europe labels are missing: ${JSON.stringify(enLabels)}`);
   }
 
