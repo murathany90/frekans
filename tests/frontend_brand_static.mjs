@@ -96,6 +96,10 @@ for (const marker of [
   if (!html.includes(marker)) throw new Error(`HTML missing GridFreq brand marker: ${marker}`);
 }
 
+if (!/<a\s+class="brand"\s+href="https:\/\/gridfreq\.com\/"[\s\S]*?<img\s+class="brand-logo"[\s\S]*?<h1[\s\S]*?>GridFreq<\/h1>[\s\S]*?<\/a>/.test(html)) {
+  throw new Error("Header logo and GridFreq title must link to https://gridfreq.com/.");
+}
+
 if (!buildSite.includes("site.webmanifest")) {
   throw new Error("build_site.py must copy site.webmanifest into dist.");
 }

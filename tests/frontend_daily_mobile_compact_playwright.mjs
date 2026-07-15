@@ -56,7 +56,8 @@ async function readMobileLayout(page) {
       .filter(visible)
       .map(card => ({
         label: card.querySelector(".label")?.textContent?.trim() || "",
-        value: card.querySelector(".value")?.textContent?.trim() || ""
+        value: card.querySelector(".value")?.textContent?.trim() || "",
+        className: card.className
       }));
     const kpiCards = [...document.querySelectorAll("#kpiGrid .kpi")]
       .filter(visible)
@@ -140,6 +141,36 @@ try {
     if (coverageLabels.join("|") !== "View|Report date") {
       throw new Error(`Mobile coverage cards must only show view and report date at ${width}px: ${JSON.stringify(layout.coverageCards)}`);
     }
+    if (!layout.coverageCards[0]?.className.includes("is-view") || !layout.coverageCards[1]?.className.includes("is-report-date")) {
+      throw new Error(`View and report date cards must have distinct emphasis classes at ${width}px: ${JSON.stringify(layout.coverageCards)}`);
+    }
+
+    await page.click("#filterToggleBtn");
+    await page.waitForSelector("#filterDropdown:not(.hidden)");
+    const filterPanel = await page.locator("#filterDropdown").evaluate(panel => {
+      const rect = panel.getBoundingClientRect();
+      const rowRects = [...panel.querySelectorAll(".filter-row")].map(row => {
+        const box = row.getBoundingClientRect();
+        return { left: box.left, right: box.right, width: box.width };
+      });
+      return {
+        left: Math.round(rect.left),
+        right: Math.round(rect.right),
+        width: Math.round(rect.width),
+        rowRects,
+        overflow: {
+          document: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          body: document.body.scrollWidth - document.body.clientWidth
+        }
+      };
+    });
+    if (filterPanel.left < 8 || filterPanel.right > width - 8 || filterPanel.width > width - 16 || filterPanel.overflow.document > 2 || filterPanel.overflow.body > 2) {
+      throw new Error(`Mobile daily settings panel must stay inside the viewport at ${width}px: ${JSON.stringify(filterPanel)}`);
+    }
+    if (filterPanel.rowRects.some(row => row.left < filterPanel.left - 1 || row.right > filterPanel.right + 1)) {
+      throw new Error(`Mobile daily settings rows must wrap inside the panel at ${width}px: ${JSON.stringify(filterPanel)}`);
+    }
+    await page.keyboard.press("Escape");
 
     const kpiLabels = layout.kpiCards.map(card => card.label);
     const expectedKpis = ["Türkiye Mean", "ENTSO-E Mean", "Türkiye Mean |Δf|", "ENTSO-E Mean |Δf|"];
@@ -152,6 +183,22 @@ try {
     if (layout.kpiCards.some(card => card.right > width + 1 || card.width < 80)) {
       throw new Error(`Mobile KPI cards overflow or become too narrow at ${width}px: ${JSON.stringify(layout.kpiCards)}`);
     }
+
+    await page.focus("#kpiGrid .kpi:nth-child(3)");
+    await page.waitForFunction(() => {
+      const tooltip = document.querySelector("#appTooltip:not(.hidden)");
+      if (!tooltip) return false;
+      const rect = tooltip.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0;
+    });
+    const mobileTooltip = await page.locator("#appTooltip").evaluate(node => {
+      const rect = node.getBoundingClientRect();
+      return { left: rect.left, right: rect.right, width: rect.width, height: rect.height };
+    });
+    if (!mobileTooltip || mobileTooltip.left < 8 || mobileTooltip.right > width - 8 || mobileTooltip.width > width - 16) {
+      throw new Error(`Mobile KPI tooltip must stay inside the viewport at ${width}px: ${JSON.stringify(mobileTooltip)}`);
+    }
+    await page.keyboard.press("Escape");
 
     await page.click("#dataSourcesInfoBtn");
     await page.waitForSelector("#dataSourcesModal:not(.hidden)");

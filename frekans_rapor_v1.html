@@ -91,6 +91,14 @@
       align-items: center;
       gap: 10px;
       min-width: 210px;
+      color: inherit;
+      text-decoration: none;
+      border-radius: 10px;
+    }
+
+    .brand:focus-visible {
+      outline: 3px solid rgba(248,250,252,.95);
+      outline-offset: 4px;
     }
 
     .brand-logo {
@@ -189,6 +197,8 @@
       background: #fff; border: 1px solid var(--line); border-radius: 10px;
       box-shadow: 0 8px 24px rgba(13,47,79,.15);
       padding: 12px; margin-top: 4px; width: 260px;
+      max-width: calc(100vw - 24px);
+      box-sizing: border-box;
     }
     .filter-dropdown.hidden { display: none; }
     .filter-row { margin-bottom: 10px; }
@@ -477,39 +487,8 @@
       cursor: help;
       outline-offset: 2px;
     }
-    .kpi[data-tooltip]:hover::after,
-    .kpi[data-tooltip]:focus-visible::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      z-index: 80;
-      left: 50%;
-      bottom: calc(100% + 8px);
-      width: min(280px, calc(100vw - 32px));
-      transform: translateX(-50%);
-      padding: 9px 11px;
-      border-radius: 8px;
-      background: #0b1220;
-      color: #f8fafc;
-      box-shadow: 0 10px 26px rgba(8, 21, 35, .28);
-      white-space: normal;
-      overflow-wrap: anywhere;
-      text-align: left;
-      font-size: .76rem;
-      font-weight: 650;
-      line-height: 1.35;
-      text-transform: none;
-      letter-spacing: 0;
-    }
-    .kpi[data-tooltip]:hover::before,
-    .kpi[data-tooltip]:focus-visible::before {
-      content: "";
-      position: absolute;
-      z-index: 81;
-      left: 50%;
-      bottom: calc(100% + 2px);
-      transform: translateX(-50%);
-      border: 6px solid transparent;
-      border-top-color: #0b1220;
+    .kpi[data-tooltip]:focus-visible {
+      outline: 2px solid rgba(27, 152, 181, .42);
     }
 
     .chart {
@@ -727,6 +706,30 @@
       pointer-events: none;
     }
     .hour-matrix-tooltip.hidden { display: none; }
+    .app-tooltip {
+      position: fixed;
+      z-index: 5000;
+      width: max-content;
+      max-width: min(290px, calc(100vw - 24px));
+      padding: 9px 11px;
+      border: 1px solid rgba(148, 163, 184, .28);
+      border-radius: 8px;
+      background: #07111f;
+      color: #f8fafc;
+      box-shadow: 0 16px 36px rgba(2, 6, 23, .38);
+      font-size: .76rem;
+      font-weight: 700;
+      line-height: 1.35;
+      text-align: left;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      pointer-events: none;
+    }
+    .app-tooltip.hidden { display: none; }
+    .app-tooltip-target {
+      outline: 2px solid rgba(34, 211, 238, .48);
+      outline-offset: 2px;
+    }
     .hour-tooltip-active {
       outline: 2px solid rgba(34, 211, 238, .65) !important;
       outline-offset: -2px;
@@ -961,6 +964,19 @@
       border-radius: 8px;
       padding: 10px;
       background: #fff;
+    }
+    .coverage-item.is-view,
+    .coverage-item.is-report-date {
+      border-color: rgba(27, 152, 181, .34);
+      background: linear-gradient(180deg, #fbfdff, #f3f9fd);
+    }
+    .coverage-item.is-report-date {
+      border-color: rgba(14, 116, 144, .44);
+      box-shadow: inset 3px 0 0 rgba(27, 152, 181, .45);
+    }
+    .coverage-item.is-report-date .value {
+      color: #082f49;
+      font-size: 1.04rem;
     }
     .coverage-item .label,
     .analysis-result-card .label,
@@ -1354,6 +1370,23 @@
         padding: 8px 0 !important;
         font-size: 1rem !important;
       }
+      #tab-chart #filterDropdown {
+        left: 0;
+        right: auto;
+        width: min(300px, calc(100vw - 32px));
+        max-width: calc(100vw - 32px);
+        max-height: min(70dvh, 520px);
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+      #tab-chart #filterDropdown .filter-row {
+        min-width: 0;
+      }
+      #tab-chart #filterDropdown select,
+      #tab-chart #filterDropdown input {
+        min-width: 0;
+        max-width: 100%;
+      }
       #tab-chart #calculateBtn,
       #tab-chart #resetZoomBtn,
       #tab-chart #dataSourcesInfoBtn {
@@ -1478,13 +1511,13 @@
 <body>
   <header class="app-header">
     <div class="header-row">
-      <div class="brand">
+      <a class="brand" href="https://gridfreq.com/" aria-label="GridFreq ana sayfa">
         <img class="brand-logo" src="assets/brand/favicon.svg" alt="" width="38" height="38" aria-hidden="true">
         <div class="brand-copy">
           <h1 data-i18n="appTitle">GridFreq</h1>
           <p data-i18n="appSubtitle">Türkiye ve Kıta Avrupası Şebeke Frekansı Analiz Platformu</p>
         </div>
-      </div>
+      </a>
       <nav class="tabs" aria-label="Uygulama sekmeleri">
         <button class="tab-button active" data-tab="tab-chart" data-i18n="tabChart">Günlük</button>
         <button class="tab-button" data-tab="tab-oscillation" data-i18n="tabOscillation">Analiz</button>
@@ -1594,6 +1627,7 @@
         </div>
         <div id="hourBlocks" class="hour-matrix-shell"></div>
         <div id="hourMatrixTooltip" class="hour-matrix-tooltip hidden" role="tooltip"></div>
+        <div id="appTooltip" class="app-tooltip hidden" role="tooltip"></div>
       </div>
 
       <div class="panel">
@@ -2855,6 +2889,7 @@
       initWorkers();
       initDropZones();
       initButtons();
+      initAppTooltips();
       applySettingsToForm();
       lang = initialLanguage();
       state.settings.locale = lang;
@@ -3892,12 +3927,12 @@
       const viewLabel = state.chartView?.label || $('chartViewTag')?.textContent || t('chartViewTag');
       const reportDate = state.current?.date || $('dateSelect')?.value || null;
       root.innerHTML = [
-        [t('coverageViewLabel'), viewLabel],
-        [t('coverageReportDateLabel'), reportDate ? displayDate(reportDate) : $('reportDateTag')?.textContent || t('reportDateTag')],
-        [t('coverageTrLatest'), displayDate(trLatest)],
-        [t('coverageDeLatest'), displayDate(deLatest)],
-        [t('coverageCommonLatest'), displayDate(commonLatest)]
-      ].map(([label, value]) => `<div class="coverage-item"><div class="label">${label}</div><div class="value">${value}</div></div>`).join('');
+        [t('coverageViewLabel'), viewLabel, 'is-view'],
+        [t('coverageReportDateLabel'), reportDate ? displayDate(reportDate) : $('reportDateTag')?.textContent || t('reportDateTag'), 'is-report-date'],
+        [t('coverageTrLatest'), displayDate(trLatest), ''],
+        [t('coverageDeLatest'), displayDate(deLatest), ''],
+        [t('coverageCommonLatest'), displayDate(commonLatest), '']
+      ].map(([label, value, className]) => `<div class="coverage-item ${className}"><div class="label">${label}</div><div class="value">${value}</div></div>`).join('');
     }
 
     function latestMapDate(map) {
@@ -4889,6 +4924,109 @@
       state.frequencyChart.on('legendunselected', syncLegendSelection);
     }
 
+    let appTooltipTarget = null;
+    let appTooltipHideTimer = null;
+
+    function appTooltipElement() {
+      return $('appTooltip');
+    }
+
+    function resolveTooltipTarget(start) {
+      return start?.closest?.('[data-tooltip], [data-app-title], [title]');
+    }
+
+    function tooltipTextFor(target) {
+      if (!target) return '';
+      const title = target.getAttribute('title');
+      if (title) {
+        target.dataset.appTitle = title;
+        target.removeAttribute('title');
+      }
+      return target.dataset.tooltip || target.dataset.appTitle || '';
+    }
+
+    function positionAppTooltip(target) {
+      const tooltip = appTooltipElement();
+      if (!tooltip || !target) return;
+      const margin = 8;
+      tooltip.style.visibility = 'hidden';
+      tooltip.classList.remove('hidden');
+      const rect = target.getBoundingClientRect();
+      const tip = tooltip.getBoundingClientRect();
+      const maxLeft = Math.max(margin, window.innerWidth - tip.width - margin);
+      let left = clamp(rect.left + rect.width / 2 - tip.width / 2, margin, maxLeft);
+      let top = rect.top - tip.height - 10;
+      const below = rect.bottom + 10;
+      if (top < margin && below + tip.height <= window.innerHeight - margin) top = below;
+      if (top + tip.height > window.innerHeight - margin) top = Math.max(margin, window.innerHeight - tip.height - margin);
+      tooltip.style.left = `${Math.round(left)}px`;
+      tooltip.style.top = `${Math.round(top)}px`;
+      tooltip.style.visibility = 'visible';
+    }
+
+    function showAppTooltip(target, options = {}) {
+      const tooltip = appTooltipElement();
+      const text = tooltipTextFor(target);
+      if (!tooltip || !target || !text) return;
+      clearTimeout(appTooltipHideTimer);
+      appTooltipTarget?.classList?.remove('app-tooltip-target');
+      appTooltipTarget?.removeAttribute?.('aria-describedby');
+      tooltip.textContent = text;
+      appTooltipTarget = target;
+      target.classList.add('app-tooltip-target');
+      target.setAttribute('aria-describedby', 'appTooltip');
+      positionAppTooltip(target);
+      if (options.autoHide) {
+        appTooltipHideTimer = setTimeout(hideAppTooltip, options.autoHide);
+      }
+    }
+
+    function hideAppTooltip() {
+      clearTimeout(appTooltipHideTimer);
+      const tooltip = appTooltipElement();
+      if (!tooltip) return;
+      tooltip.classList.add('hidden');
+      tooltip.textContent = '';
+      tooltip.removeAttribute('style');
+      appTooltipTarget?.classList?.remove('app-tooltip-target');
+      appTooltipTarget?.removeAttribute?.('aria-describedby');
+      appTooltipTarget = null;
+    }
+
+    function initAppTooltips() {
+      const showFromEvent = event => {
+        const target = resolveTooltipTarget(event.target);
+        if (!target) return;
+        showAppTooltip(target);
+      };
+      document.addEventListener('pointerenter', showFromEvent, true);
+      document.addEventListener('focusin', showFromEvent);
+      document.addEventListener('pointerdown', event => {
+        const target = resolveTooltipTarget(event.target);
+        if (!target) {
+          hideAppTooltip();
+          return;
+        }
+        if (event.pointerType === 'touch' || event.pointerType === 'pen') {
+          showAppTooltip(target, { autoHide: 2600 });
+        }
+      }, true);
+      document.addEventListener('pointerleave', event => {
+        if (resolveTooltipTarget(event.target) === appTooltipTarget) hideAppTooltip();
+      }, true);
+      document.addEventListener('focusout', event => {
+        if (resolveTooltipTarget(event.target) === appTooltipTarget) hideAppTooltip();
+      });
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+          hideAppTooltip();
+          $('filterDropdown')?.classList.add('hidden');
+        }
+      });
+      window.addEventListener('scroll', hideAppTooltip, { passive: true });
+      window.addEventListener('resize', hideAppTooltip);
+    }
+
     function renderQuarterHeatmap(current) {
       const root = $('quarterHeatmap');
       if (!current) {
@@ -4927,7 +5065,9 @@
       target.setAttribute('aria-describedby', 'hourMatrixTooltip');
       const rect = target.getBoundingClientRect();
       const tip = tooltip.getBoundingClientRect();
-      const top = Math.max(8, rect.top - tip.height - 10);
+      let top = rect.top - tip.height - 10;
+      if (top < 8 && rect.bottom + tip.height + 10 <= window.innerHeight - 8) top = rect.bottom + 10;
+      if (top + tip.height > window.innerHeight - 8) top = Math.max(8, window.innerHeight - tip.height - 8);
       const left = clamp(rect.left + rect.width / 2 - tip.width / 2, 8, window.innerWidth - tip.width - 8);
       tooltip.style.top = `${top}px`;
       tooltip.style.left = `${left}px`;
@@ -6742,14 +6882,14 @@
         kpiCorrelation: 'Korelasyon',
         kpiPairedData: 'Ortak Veri',
         kpiReportPending: 'Rapor bekleniyor',
-        kpiTeiasMeanHelp: 'Türkiye frekans serisinin günlük ortalaması. Birim: Hz.',
-        kpiDeMeanHelp: 'ENTSO-E frekans serisinin günlük ortalaması. Birim: Hz.',
-        kpiTeiasAbsDevHelp: 'Türkiye serisinin 50 Hz nominal değerden ortalama mutlak sapması. Birim: mHz.',
-        kpiDeAbsDevHelp: 'ENTSO-E serisinin 50 Hz nominal değerden ortalama mutlak sapması. Birim: mHz.',
-        kpiBiasHelp: 'Eşlenmiş örneklerde Türkiye eksi ENTSO-E ortalama farkı. Birim: mHz.',
+        kpiTeiasMeanHelp: 'Türkiye günlük ortalaması. Birim: Hz.',
+        kpiDeMeanHelp: 'ENTSO-E günlük ortalaması. Birim: Hz.',
+        kpiTeiasAbsDevHelp: 'Türkiye 50 Hz mutlak sapması. Birim: mHz.',
+        kpiDeAbsDevHelp: 'ENTSO-E 50 Hz mutlak sapması. Birim: mHz.',
+        kpiBiasHelp: 'Türkiye eksi ENTSO-E ortalama farkı. Birim: mHz.',
         kpiMaeHelp: 'İki seri arasındaki ortalama mutlak hata. Birim: mHz.',
-        kpiCorrelationHelp: 'Eşlenmiş örneklerin doğrusal korelasyonu. Birimsiz katsayı.',
-        kpiPairedDataHelp: 'Aynı saniyede iki kaynakta da geçerli veri bulunan örnek oranı. Birim: yüzde.',
+        kpiCorrelationHelp: 'Eşlenmiş örneklerin doğrusal ilişkisi. Birimsiz.',
+        kpiPairedDataHelp: 'İki kaynakta da geçerli saniye oranı. Birim: yüzde.',
         // Status tags
         tagComplete: 'Tam',
         tagPartial: 'Kısmi',
@@ -7039,14 +7179,14 @@
         kpiCorrelation: 'Correlation',
         kpiPairedData: 'Paired Data',
         kpiReportPending: 'Report pending',
-        kpiTeiasMeanHelp: 'Daily mean of the Türkiye frequency series. Unit: Hz.',
-        kpiDeMeanHelp: 'Daily mean of the ENTSO-E frequency series. Unit: Hz.',
-        kpiTeiasAbsDevHelp: 'Mean absolute deviation of the Türkiye series from nominal 50 Hz. Unit: mHz.',
-        kpiDeAbsDevHelp: 'Mean absolute deviation of the ENTSO-E series from nominal 50 Hz. Unit: mHz.',
-        kpiBiasHelp: 'Average paired-sample difference: Türkiye minus ENTSO-E. Unit: mHz.',
-        kpiMaeHelp: 'Mean absolute error between the two paired series. Unit: mHz.',
-        kpiCorrelationHelp: 'Linear correlation of paired samples. Unitless coefficient.',
-        kpiPairedDataHelp: 'Share of seconds with valid samples in both sources. Unit: percent.',
+        kpiTeiasMeanHelp: 'Türkiye daily mean. Unit: Hz.',
+        kpiDeMeanHelp: 'ENTSO-E daily mean. Unit: Hz.',
+        kpiTeiasAbsDevHelp: 'Türkiye absolute 50 Hz deviation. Unit: mHz.',
+        kpiDeAbsDevHelp: 'ENTSO-E absolute 50 Hz deviation. Unit: mHz.',
+        kpiBiasHelp: 'Türkiye minus ENTSO-E mean difference. Unit: mHz.',
+        kpiMaeHelp: 'Mean absolute error between series. Unit: mHz.',
+        kpiCorrelationHelp: 'Linear relation of paired samples. Unitless.',
+        kpiPairedDataHelp: 'Seconds valid in both sources. Unit: percent.',
         // Status tags
         tagComplete: 'Complete',
         tagPartial: 'Partial',

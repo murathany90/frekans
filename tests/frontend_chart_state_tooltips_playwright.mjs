@@ -119,6 +119,33 @@ try {
       if (!card?.tooltip || !/Hz|mHz|correlation|ratio|paired|unitless|percent|share/i.test(card.tooltip) || card.tabindex !== "0") {
         throw new Error(`KPI tooltip missing or incomplete for ${label}: ${JSON.stringify(kpiTooltips)}`);
       }
+      if (card.tooltip.length > 96) {
+        throw new Error(`KPI tooltip should stay short for ${label}: ${card.tooltip}`);
+      }
+    }
+
+    await page.hover("#kpiGrid .kpi:nth-child(6)");
+    await page.waitForSelector("#appTooltip:not(.hidden)");
+    const appTooltip = await page.locator("#appTooltip").evaluate(node => {
+      const rect = node.getBoundingClientRect();
+      const style = getComputedStyle(node);
+      return {
+        text: node.textContent || "",
+        left: rect.left,
+        right: rect.right,
+        top: rect.top,
+        width: rect.width,
+        background: style.backgroundColor,
+        color: style.color,
+        zIndex: Number(style.zIndex || 0),
+        pointerEvents: style.pointerEvents
+      };
+    });
+    if (!/MAE|Mean absolute/i.test(appTooltip.text) || appTooltip.left < 8 || appTooltip.right > 1272 || appTooltip.width > 300 || appTooltip.zIndex < 3000 || appTooltip.pointerEvents !== "none") {
+      throw new Error(`Unified app tooltip must be compact, high-layer and inside the viewport: ${JSON.stringify(appTooltip)}`);
+    }
+    if (!/rgb\((0|7|8|9|10|11|12|13|14|15|16)/.test(appTooltip.background) || !/rgb\(24[0-9]|rgb\(25[0-5]/.test(appTooltip.color)) {
+      throw new Error(`Unified app tooltip must use high contrast colors: ${JSON.stringify(appTooltip)}`);
     }
 
     await page.hover('.hour-header[data-hour="12"]');
