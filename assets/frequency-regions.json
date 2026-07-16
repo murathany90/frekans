@@ -50,8 +50,8 @@
           "id": "fcr",
           "labels": {
             "tr": {
-              "name": "FCR",
-              "description": "Birincil frekans kontrolü. Saniyeler içinde otomatik güç tepkisi sağlar."
+              "name": "PFK",
+              "description": "Primer Frekans Kontrolü (PFK). Saniyeler içinde otomatik güç tepkisi sağlar."
             },
             "en": {
               "name": "FCR",
@@ -63,8 +63,8 @@
           "id": "afrr",
           "labels": {
             "tr": {
-              "name": "aFRR",
-              "description": "Otomatik frekans restorasyon rezervi. Dengeyi dakikalar içinde geri taşır."
+              "name": "SFK",
+              "description": "Sekonder Frekans Kontrolü (SFK). Otomatik restorasyonla dengeyi dakikalar içinde geri taşır."
             },
             "en": {
               "name": "aFRR",
@@ -76,8 +76,8 @@
           "id": "mfrr",
           "labels": {
             "tr": {
-              "name": "mFRR",
-              "description": "Manuel frekans restorasyon rezervi. Operatör veya piyasa süreçleriyle devreye alınır."
+              "name": "Tersiyer",
+              "description": "Tersiyer Frekans Kontrolü. Operatör veya piyasa süreçleriyle devreye alınan yedek güç katmanıdır."
             },
             "en": {
               "name": "mFRR",

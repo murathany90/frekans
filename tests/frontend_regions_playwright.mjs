@@ -48,13 +48,29 @@ try {
       title: document.querySelector("#regionsPanelTitle")?.textContent?.trim(),
       subtitle: document.querySelector("#regionsPanelSubtitle")?.textContent?.trim(),
       summary: document.querySelector("#regionsSummaryGrid")?.textContent || "",
-      dailyDisabled: document.querySelector("#regionsDailyBtn")?.disabled
+      dailyDisabled: document.querySelector("#regionsDailyBtn")?.disabled,
+      mapLayout: document.querySelector("#regionsMapHost svg")?.getAttribute("data-map-layout"),
+      cardCount: document.querySelectorAll("#regionsMapHost svg .region-card").length,
+      controlNames: [...document.querySelectorAll("#regionsControlGrid .regions-control-item strong")].map(node => node.textContent?.trim())
     }));
     if (!initial.hash.startsWith("#/regions") || initial.title !== "Türkiye" || !initial.subtitle.includes("TEİAŞ") || initial.dailyDisabled) {
       throw new Error(`Default regions view did not select Türkiye with data: ${JSON.stringify(initial)}`);
     }
+    if (initial.mapLayout !== "card-silhouette" || initial.cardCount < 4) {
+      throw new Error(`Regions map must render the card silhouette layout: ${JSON.stringify(initial)}`);
+    }
+    if (initial.controlNames.join("|") !== "PFK|SFK|Tersiyer") {
+      throw new Error(`Turkish control cards must show PFK/SFK/Tersiyer: ${initial.controlNames.join(", ")}`);
+    }
     if (requests.length > 2) {
       throw new Error(`Regions default view fetched too many daily binaries: ${requests.length}`);
+    }
+
+    await page.click("#langToggle");
+    await page.waitForFunction(() => document.documentElement.dataset.currentLang === "en");
+    const englishControlNames = await page.evaluate(() => [...document.querySelectorAll("#regionsControlGrid .regions-control-item strong")].map(node => node.textContent?.trim()));
+    if (englishControlNames.join("|") !== "FCR|aFRR|mFRR") {
+      throw new Error(`English control cards must keep FCR/aFRR/mFRR: ${englishControlNames.join(", ")}`);
     }
 
     await page.selectOption("#regionsMobileSelect", "nordic|SE");
@@ -79,14 +95,18 @@ try {
     await page.close();
   }
 
-  {
-    const page = await browser.newPage({ viewport: { width: 360, height: 740 }, isMobile: true });
+  for (const width of [320, 360, 390, 430]) {
+    const page = await browser.newPage({ viewport: { width, height: 740 }, isMobile: true });
     await page.goto(appUrl("#/regions?country=TR"), { waitUntil: "networkidle" });
     await waitForRegions(page);
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
-    if (overflow) {
-      await page.screenshot({ path: `${artifactDir}/regions-mobile-overflow.png`, fullPage: true });
-      throw new Error("Frequency regions mobile view must not create horizontal page overflow at 360px.");
+    const mobileState = await page.evaluate(() => ({
+      overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+      mapLayout: document.querySelector("#regionsMapHost svg")?.getAttribute("data-map-layout"),
+      cardCount: document.querySelectorAll("#regionsMapHost svg .region-card").length
+    }));
+    if (mobileState.overflow || mobileState.mapLayout !== "card-silhouette" || mobileState.cardCount < 4) {
+      await page.screenshot({ path: `${artifactDir}/regions-mobile-${width}.png`, fullPage: true });
+      throw new Error(`Frequency regions mobile view failed at ${width}px: ${JSON.stringify(mobileState)}`);
     }
     await page.close();
   }

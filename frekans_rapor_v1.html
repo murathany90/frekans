@@ -396,17 +396,24 @@
     .regions-map-host {
       border: 1px solid #d9e6ee;
       border-radius: 12px;
-      background: #f8fbfd;
+      background: linear-gradient(180deg, #f8fbfd, #eef6fb);
       overflow: hidden;
       min-height: 360px;
       display: grid;
       place-items: center;
+      padding: 10px;
     }
 
     .regions-map-host svg {
       width: 100%;
+      height: auto;
       max-height: 540px;
       display: block;
+    }
+
+    .regions-map-host svg[data-map-layout="card-silhouette"] {
+      max-height: none;
+      border-radius: 10px;
     }
 
     .regions-map-host [data-region-id],
@@ -428,6 +435,10 @@
 
     .regions-map-host .is-selected {
       filter: drop-shadow(0 0 0 rgba(0,0,0,0)) drop-shadow(0 0 11px rgba(245,158,11,.55));
+    }
+
+    .regions-map-host svg[data-map-layout="card-silhouette"] .is-selected {
+      filter: drop-shadow(0 10px 18px rgba(14, 165, 233, .18)) drop-shadow(0 0 8px rgba(245,158,11,.34));
     }
 
     .regions-panel-card h2 {
@@ -1832,7 +1843,7 @@
         <div class="section-title">
           <div>
             <h3 data-i18n="regionsControlTitle">Kontrol katmanları</h3>
-            <p data-i18n="regionsControlDesc">FCR, aFRR ve mFRR terimleri bölgesel frekans kontrolünü yorumlamak için kısa bağlam sağlar.</p>
+            <p data-i18n="regionsControlDesc">PFK, SFK ve Tersiyer terimleri bölgesel frekans kontrolünü yorumlamak için kısa bağlam sağlar.</p>
           </div>
         </div>
         <div id="regionsControlGrid" class="regions-control-grid"></div>
@@ -3682,7 +3693,7 @@
       const grid = $('regionsControlGrid');
       if (!grid) return;
       const layers = region?.controlLayers?.length ? region.controlLayers : [
-        { labels: { tr: { name: 'FCR', description: t('regionsControlFallback') }, en: { name: 'FCR', description: t('regionsControlFallback') } } }
+        { labels: { tr: { name: 'PFK', description: t('regionsControlFallback') }, en: { name: 'FCR', description: t('regionsControlFallback') } } }
       ];
       grid.innerHTML = layers.map(layer => {
         const label = layer.labels?.[lang] || layer.labels?.tr || {};
@@ -9374,7 +9385,7 @@
       regionsPeriodMonth: 'Son ay',
       regionsPeriodCustom: 'Özel dönem',
       regionsControlTitle: 'Kontrol katmanları',
-      regionsControlDesc: 'FCR, aFRR ve mFRR terimleri bölgesel frekans kontrolünü yorumlamak için kısa bağlam sağlar.',
+      regionsControlDesc: 'PFK, SFK ve Tersiyer terimleri bölgesel frekans kontrolünü yorumlamak için kısa bağlam sağlar.',
       regionsMethodTitle: 'Yöntem ve sınırlamalar',
       regionsSourcesTitle: 'Resmî kaynaklar',
       regionsSelectedSystem: 'Seçili sistem',

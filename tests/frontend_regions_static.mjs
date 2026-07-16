@@ -51,8 +51,49 @@ if (countries.countries.TR.sourceId !== "teias" || countries.countries.EE.region
   throw new Error("Country catalog must preserve internal source keys and Baltic region mapping.");
 }
 
-if (!svg.includes('data-region-id="continental-europe"') || !svg.includes('data-country-code="TR"')) {
+if (!svg.includes('data-map-layout="card-silhouette"') || !svg.includes('class="region-card"')) {
+  throw new Error("Frequency regions SVG must use the card silhouette map layout.");
+}
+
+for (const regionId of ["continental-europe", "nordic", "great-britain", "ireland"]) {
+  if (!svg.includes(`data-region-id="${regionId}"`)) {
+    throw new Error(`Frequency regions SVG missing interactive card for ${regionId}.`);
+  }
+}
+
+for (const countryCode of ["TR", "EE", "LV", "LT"]) {
+  if (!svg.includes(`data-country-code="${countryCode}"`)) {
+    throw new Error(`Frequency regions SVG missing country marker for ${countryCode}.`);
+  }
+}
+
+if (!svg.includes('data-country-code="TR"')) {
   throw new Error("Frequency regions SVG must expose interactive region and country markers.");
+}
+
+if (svg.includes("map-pulse")) {
+  throw new Error("Frequency regions SVG must not keep the old abstract pulse/blob map.");
+}
+
+const controlLayerNamesTr = ce.controlLayers.map(layer => layer.labels?.tr?.name);
+const controlLayerNamesEn = ce.controlLayers.map(layer => layer.labels?.en?.name);
+if (controlLayerNamesTr.join("|") !== "PFK|SFK|Tersiyer") {
+  throw new Error(`Turkish control layers must be PFK, SFK, Tersiyer: ${controlLayerNamesTr.join(", ")}`);
+}
+if (controlLayerNamesEn.join("|") !== "FCR|aFRR|mFRR") {
+  throw new Error(`English control layers must remain FCR, aFRR, mFRR: ${controlLayerNamesEn.join(", ")}`);
+}
+const controlLayerDescriptionsTr = ce.controlLayers.map(layer => layer.labels?.tr?.description || "").join("\n");
+for (const term of ["Primer Frekans Kontrol", "Sekonder Frekans Kontrol", "Tersiyer Frekans Kontrol"]) {
+  if (!controlLayerDescriptionsTr.includes(term)) {
+    throw new Error(`Turkish control layer descriptions must include ${term}.`);
+  }
+}
+if (html.includes("FCR, aFRR ve mFRR")) {
+  throw new Error("Turkish regions UI copy must not keep FCR, aFRR ve mFRR.");
+}
+if (!html.includes("PFK, SFK ve Tersiyer")) {
+  throw new Error("Turkish regions UI copy must mention PFK, SFK ve Tersiyer.");
 }
 
 if (/gridradar|mapbox|leaflet|google maps/i.test(`${html}\n${svg}`)) {
