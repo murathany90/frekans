@@ -12,6 +12,7 @@ GridFreq, TEİAŞ Türkiye günlük şebeke frekansı verileri ile Kıta Avrupas
 - Eski GitHub Pages adresi: `https://murathany90.github.io/frekans/` yalnızca platform/fallback adresidir.
 - Yayın girişi: `index.html`
 - Marka ve ikon paketi: `assets/brand/`
+- Frekans bölgeleri görünümü: `assets/frequency-regions.json`, `assets/frequency-countries.json`, `assets/frequency-regions-map.svg`, `assets/frequency-regions.mjs`
 - Web uygulaması manifesti: `site.webmanifest`
 - Ana başlık bağlantısı: üst bardaki GridFreq ikon ve yazısı `https://gridfreq.com/` adresine gider.
 - SEO ve alan adı dosyaları: `CNAME`, `robots.txt`, `sitemap.xml`, `404.html`
@@ -35,12 +36,36 @@ Uygulama tek HTML dosyası etrafında çalışan statik bir ön yüz ve önceden
 - `assets/analysis-worker.mjs`: Ağır analizlerin Web Worker üzerinde çalıştırılması.
 - `assets/echarts.min.js`: CDN erişimi yoksa kullanılan yerel ECharts yedeği.
 - `assets/brand/`: GridFreq SVG logo, favicon, mobil ikonlar ve sosyal paylaşım kartı.
+- `assets/frequency-regions.json`: Frekans bölgesi kataloğu; Kıta Avrupası, Nordik, Büyük Britanya ve İrlanda senkron bölgelerini, nominal frekans bilgisini, izleme bandını ve kaynak referanslarını tanımlar.
+- `assets/frequency-countries.json`: Bölge içindeki ülke etiketleri ve uygulama kaynak eşleşmeleri. Dahili kaynak anahtarları `teias` ve `netztransparenz` olarak korunur.
+- `assets/frequency-regions-map.svg`: Dış harita kütüphanesi kullanmadan gösterilen sade, etkileşimli SVG frekans bölgeleri haritası.
+- `assets/frequency-regions.mjs`: Elektriksel zaman sapması hesabı için küçük yardımcı modül.
 - `site.webmanifest`: Mobil ana ekrana ekleme ve PWA ikon tanımları.
 - `scripts/normalize_frequency.py`: Günlük frekans paketini üretir, int16 binary yazar, dakika/saat özetlerini oluşturur ve manifestleri üretir.
 - `scripts/build_site.py`: GitHub Pages için `dist/` klasörünü oluşturur.
 - `scripts/validate_frequency.py`: Veri boyutu, manifest tutarlılığı ve kalite uyarılarını kontrol eder.
 
 ## Uygulama Sekmeleri ve Kullanım Akışı
+
+### Frekans Bölgeleri
+
+Frekans Bölgeleri sekmesi artık varsayılan ilk ekrandır. Hash route karşılığı `#/regions?country=TR` biçimindedir. Bu görünüm, Avrupa’daki temel 50 Hz senkron frekans bölgelerini bilgilendirici SVG harita üzerinde gösterir ve ölçüm verisi bulunan Türkiye · TEİAŞ ile Kıta Avrupası · Netztransparenz kaynaklarını uygulamanın günlük veri kataloğuna bağlar.
+
+Görünümde seçilebilen ana bölgeler:
+
+- Türkiye · Kıta Avrupası: TEİAŞ günlük frekans verisiyle günlük grafik ve analizlere bağlanır.
+- Kıta Avrupası: Netztransparenz üzerinden yayımlanan Kıta Avrupası senkron bölgesi frekans serisini temsil eder.
+- Nordik, Büyük Britanya ve İrlanda: Haritada teknik bağlam için gösterilir; uygulamada otomatik ölçüm verisi olmadığı için günlük grafik ve analiz düğmeleri devre dışıdır.
+
+Bölge paneli seçili sistem, veri kaynağı, son veri tarihi, manifest aralığı, nominal frekans, izleme bandı ve zaman dilimi bilgilerini özetler. Kıta Avrupası kataloğu Baltık ülkelerinin 9 Şubat 2025 sonrası Kıta Avrupası senkron bölgesiyle senkron çalıştığını bilgi amaçlı gösterir. Harita ve mobil seçim listesi aynı merkezi katalogdan üretilir; GridRadar, Mapbox, Leaflet veya başka bir harita SDK’sı kullanılmaz.
+
+Elektriksel zaman sapması kartı mevcut optimize günlük `.frequency.i16` dosyalarından hesaplanır. Hesaplama `∫(f − 50 Hz) / 50 Hz dt` yaklaşımını kullanır; eksik veya geçersiz örnekler gerçek veri gibi doldurulmaz ve kapsama oranına yansıtılır. Varsayılan hesap son mevcut gün içindir; son ay seçimi aynı ay içindeki mevcut günlük dosyaları kullanır. Özel dönem için Analiz sekmesindeki tarih aralığı araçları kullanılmalıdır.
+
+Frekans Bölgeleri sekmesindeki hızlı düğmeler:
+
+- **Günlük grafiği aç**: Ölçüm verisi olan seçili sistemin son mevcut gününe gider.
+- **Analize git**: Seçili kaynağı Analiz sekmesine taşır ve temel istatistik analizi için tarih alanını doldurur.
+- **Veri durumuna git**: Veri sekmesindeki otomatik veri ve kaynak sağlık kartlarına geçer.
 
 ### Günlük
 
@@ -376,11 +401,14 @@ node tests/frontend_prompt6_static.mjs
 node tests/frontend_brand_static.mjs
 node tests/frontend_public_sharing_static.mjs
 node tests/frontend_source_labels_static.mjs
+node tests/frontend_regions_static.mjs
+node tests/frontend_hash_routing_static.mjs
 node tests/frontend_data_sources_modal_static.mjs
 node tests/frontend_netztransparenz_status_static.mjs
 node tests/readme_documentation_static.mjs
 node tests/workflow_static_smoke.mjs
 node tests/netztransparenz_workflow_static.mjs
+node tests/frequency_regions_time_deviation.mjs
 node tests/synthetic_signal_analysis.mjs
 node tests/spectral_methods.mjs
 python scripts/validate_frequency.py
@@ -400,9 +428,11 @@ node tests/frontend_prompt6_playwright.mjs
 node tests/frontend_data_sources_modal_playwright.mjs
 node tests/frontend_daily_mobile_compact_playwright.mjs
 node tests/frontend_chart_state_tooltips_playwright.mjs
+node tests/frontend_hash_routing_playwright.mjs
+node tests/frontend_regions_playwright.mjs
 ```
 
-Test kapsamı parser, timezone hizalama, int16 encode/decode, manifest üretimi, otomatik workflow statikleri, Netztransparenz OAuth istemci davranışı, analiz çekirdeği, grafik UI kontrolleri ve README dokümantasyon kapsamını içerir. Ek frontend testleri GridFreq marka varlıklarını, custom domain build çıktısını, veri kaynakları modalının erişilebilir davranışını, 320-430 px mobil günlük düzeni, tooltip taşma kontrolünü, saatlik metrik açıklamalarını, grafik katman/zoom durumunun korunmasını ve Grafik Sıfırla davranışını denetler.
+Test kapsamı parser, timezone hizalama, int16 encode/decode, manifest üretimi, otomatik workflow statikleri, Netztransparenz OAuth istemci davranışı, analiz çekirdeği, grafik UI kontrolleri ve README dokümantasyon kapsamını içerir. Ek frontend testleri GridFreq marka varlıklarını, custom domain build çıktısını, veri kaynakları modalının erişilebilir davranışını, Frekans Bölgeleri harita/katalog entegrasyonunu, elektriksel zaman sapması hesabını, hash routing davranışını, 320-430 px mobil günlük düzeni, tooltip taşma kontrolünü, saatlik metrik açıklamalarını, grafik katman/zoom durumunun korunmasını ve Grafik Sıfırla davranışını denetler.
 
 ## Repo Boyutu ve Yayın Sınırı
 

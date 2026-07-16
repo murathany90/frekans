@@ -119,11 +119,22 @@ try {
 
   {
     const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-    await page.goto(appUrl("#/unknown/x"), { waitUntil: "networkidle" });
-    await page.waitForFunction(() => window.location.hash.startsWith("#/daily"));
+    await page.goto(appUrl("#/regions?country=TR"), { waitUntil: "networkidle" });
+    await page.waitForFunction(() => document.querySelector(".tab-button.active")?.dataset.tab === "tab-regions");
     const state = await currentRouteState(page);
-    if (state.activeTab !== "tab-chart") {
-      throw new Error(`Invalid route must normalize to daily: ${JSON.stringify(state)}`);
+    if (state.activeTab !== "tab-regions" || !state.hash.startsWith("#/regions")) {
+      throw new Error(`Regions route did not activate regions tab: ${JSON.stringify(state)}`);
+    }
+    await page.close();
+  }
+
+  {
+    const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    await page.goto(appUrl("#/unknown/x"), { waitUntil: "networkidle" });
+    await page.waitForFunction(() => window.location.hash.startsWith("#/regions"));
+    const state = await currentRouteState(page);
+    if (state.activeTab !== "tab-regions") {
+      throw new Error(`Invalid route must normalize to regions: ${JSON.stringify(state)}`);
     }
     await page.close();
   }

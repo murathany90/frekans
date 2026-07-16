@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "updatedAtUtc": "2026-07-16T00:00:00Z",
+  "countries": {
+    "TR": {
+      "regionId": "continental-europe",
+      "sourceId": "teias",
+      "timezone": "Europe/Istanbul",
+      "labels": {
+        "tr": {
+          "short": "Türkiye",
+          "standard": "Türkiye · TEİAŞ",
+          "long": "Türkiye Şebeke Frekansı · TEİAŞ"
+        },
+        "en": {
+          "short": "Türkiye",
+          "standard": "Türkiye · TEİAŞ",
+          "long": "Türkiye Grid Frequency · TEİAŞ"
+        }
+      }
+    },
+    "EE": {
+      "regionId": "continental-europe",
+      "sourceId": null,
+      "timezone": "Europe/Tallinn",
+      "labels": {
+        "tr": {
+          "short": "Estonya",
+          "standard": "Estonya · Kıta Avrupası",
+          "long": "Estonya · Kıta Avrupası Senkron Bölgesi"
+        },
+        "en": {
+          "short": "Estonia",
+          "standard": "Estonia · Continental Europe",
+          "long": "Estonia · Continental Europe Synchronous Area"
+        }
+      }
+    },
+    "LV": {
+      "regionId": "continental-europe",
+      "sourceId": null,
+      "timezone": "Europe/Riga",
+      "labels": {
+        "tr": {
+          "short": "Letonya",
+          "standard": "Letonya · Kıta Avrupası",
+          "long": "Letonya · Kıta Avrupası Senkron Bölgesi"
+        },
+        "en": {
+          "short": "Latvia",
+          "standard": "Latvia · Continental Europe",
+          "long": "Latvia · Continental Europe Synchronous Area"
+        }
+      }
+    },
+    "LT": {
+      "regionId": "continental-europe",
+      "sourceId": null,
+      "timezone": "Europe/Vilnius",
+      "labels": {
+        "tr": {
+          "short": "Litvanya",
+          "standard": "Litvanya · Kıta Avrupası",
+          "long": "Litvanya · Kıta Avrupası Senkron Bölgesi"
+        },
+        "en": {
+          "short": "Lithuania",
+          "standard": "Lithuania · Continental Europe",
+          "long": "Lithuania · Continental Europe Synchronous Area"
+        }
+      }
+    },
+    "NO": {
+      "regionId": "nordic",
+      "sourceId": null,
+      "timezone": "Europe/Oslo",
+      "labels": {
+        "tr": { "short": "Norveç", "standard": "Norveç · Nordik", "long": "Norveç · Nordik Senkron Bölgesi" },
+        "en": { "short": "Norway", "standard": "Norway · Nordic", "long": "Norway · Nordic Synchronous Area" }
+      }
+    },
+    "SE": {
+      "regionId": "nordic",
+      "sourceId": null,
+      "timezone": "Europe/Stockholm",
+      "labels": {
+        "tr": { "short": "İsveç", "standard": "İsveç · Nordik", "long": "İsveç · Nordik Senkron Bölgesi" },
+        "en": { "short": "Sweden", "standard": "Sweden · Nordic", "long": "Sweden · Nordic Synchronous Area" }
+      }
+    },
+    "FI": {
+      "regionId": "nordic",
+      "sourceId": null,
+      "timezone": "Europe/Helsinki",
+      "labels": {
+        "tr": { "short": "Finlandiya", "standard": "Finlandiya · Nordik", "long": "Finlandiya · Nordik Senkron Bölgesi" },
+        "en": { "short": "Finland", "standard": "Finland · Nordic", "long": "Finland · Nordic Synchronous Area" }
+      }
+    },
+    "DK": {
+      "regionId": "nordic",
+      "sourceId": null,
+      "timezone": "Europe/Copenhagen",
+      "labels": {
+        "tr": { "short": "Danimarka", "standard": "Danimarka · Nordik", "long": "Danimarka · Nordik Senkron Bölgesi" },
+        "en": { "short": "Denmark", "standard": "Denmark · Nordic", "long": "Denmark · Nordic Synchronous Area" }
+      }
+    },
+    "GB": {
+      "regionId": "great-britain",
+      "sourceId": null,
+      "timezone": "Europe/London",
+      "labels": {
+        "tr": { "short": "Büyük Britanya", "standard": "Büyük Britanya", "long": "Büyük Britanya Senkron Bölgesi" },
+        "en": { "short": "Great Britain", "standard": "Great Britain", "long": "Great Britain Synchronous Area" }
+      }
+    },
+    "IE": {
+      "regionId": "ireland",
+      "sourceId": null,
+      "timezone": "Europe/Dublin",
+      "labels": {
+        "tr": { "short": "İrlanda", "standard": "İrlanda", "long": "İrlanda Senkron Bölgesi" },
+        "en": { "short": "Ireland", "standard": "Ireland", "long": "Ireland Synchronous Area" }
+      }
+    }
+  }
+}

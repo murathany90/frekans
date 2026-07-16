@@ -16,6 +16,7 @@ mkdirSync(artifactDir, { recursive: true });
 function appUrl() {
   const url = new URL(baseUrl);
   url.searchParams.set("lang", "en");
+  url.hash = "#/daily";
   return url.href;
 }
 

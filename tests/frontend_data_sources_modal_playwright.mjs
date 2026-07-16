@@ -24,7 +24,9 @@ async function openPage(viewport, routeStatusFailure = false) {
   if (routeStatusFailure) {
     await page.route("**/data/status.json", route => route.abort("failed"));
   }
-  await page.goto(url, { waitUntil: "domcontentloaded" });
+  const dailyUrl = new URL(url);
+  dailyUrl.hash = "#/daily";
+  await page.goto(dailyUrl.href, { waitUntil: "domcontentloaded" });
   await page.waitForSelector("#dataSourcesInfoBtn", { state: "visible" });
   await page.waitForFunction(() => Boolean(document.querySelector("#dateSelect")?.value), { timeout: 30000 });
   return { browser, page, consoleErrors };

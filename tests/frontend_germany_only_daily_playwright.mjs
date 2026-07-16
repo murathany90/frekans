@@ -10,7 +10,7 @@ try {
 }
 
 const baseUrl = process.env.APP_URL || "http://127.0.0.1:8080/frekans_rapor_v1.html";
-const targetDate = process.env.GERMANY_ONLY_DATE || "2026-07-12";
+const targetDate = process.env.GERMANY_ONLY_DATE || "2026-07-15";
 const artifactDir = process.env.PLAYWRIGHT_ARTIFACT_DIR || "playwright-artifacts";
 mkdirSync(artifactDir, { recursive: true });
 

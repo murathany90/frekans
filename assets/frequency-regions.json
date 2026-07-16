@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 1,
+  "updatedAtUtc": "2026-07-16T00:00:00Z",
+  "defaultRegionId": "continental-europe",
+  "defaultCountryCode": "TR",
+  "regions": [
+    {
+      "id": "continental-europe",
+      "type": "synchronous-area",
+      "nominalFrequencyHz": 50,
+      "frequencyQualityRangeHz": {
+        "min": 49.95,
+        "max": 50.05,
+        "label": "49.95-50.05 Hz",
+        "usage": "monitoring-quality-band"
+      },
+      "hasMeasurementData": true,
+      "defaultCountryCode": "TR",
+      "dataSourceId": "netztransparenz",
+      "countryDataSources": {
+        "TR": "teias"
+      },
+      "countries": ["TR", "EE", "LV", "LT"],
+      "tags": {
+        "tr": ["50 Hz", "Senkron bölge", "Gerçek ölçüm verisi"],
+        "en": ["50 Hz", "Synchronous area", "Measured data"]
+      },
+      "labels": {
+        "tr": {
+          "short": "Kıta Avrupası",
+          "standard": "Kıta Avrupası Senkron Bölgesi",
+          "long": "Kıta Avrupası Senkron Bölgesi · 50 Hz",
+          "subtitle": "Türkiye ve Kıta Avrupası ölçümleri bu uygulamada aynı frekans standardı üzerinde karşılaştırılır.",
+          "description": "Kıta Avrupası bölgesi 50 Hz nominal frekansta çalışır. Türkiye için TEİAŞ verisi, Kıta Avrupası referansı için Netztransparenz verisi kullanılır.",
+          "dataNote": "Türkiye seçildiğinde TEİAŞ günlük frekans verisi, bölge geneli seçildiğinde Netztransparenz Kıta Avrupası frekans serisi kullanılır.",
+          "noDataNote": ""
+        },
+        "en": {
+          "short": "Continental Europe",
+          "standard": "Continental Europe Synchronous Area",
+          "long": "Continental Europe Synchronous Area · 50 Hz",
+          "subtitle": "Türkiye and Continental Europe measurements are compared on the same nominal frequency basis.",
+          "description": "The Continental Europe area operates at 50 Hz nominal frequency. GridFreq uses TEİAŞ data for Türkiye and Netztransparenz data for the Continental Europe reference series.",
+          "dataNote": "Selecting Türkiye uses TEİAŞ daily frequency data; selecting the region reference uses the Netztransparenz Continental Europe frequency series.",
+          "noDataNote": ""
+        }
+      },
+      "controlLayers": [
+        {
+          "id": "fcr",
+          "labels": {
+            "tr": {
+              "name": "FCR",
+              "description": "Birincil frekans kontrolü. Saniyeler içinde otomatik güç tepkisi sağlar."
+            },
+            "en": {
+              "name": "FCR",
+              "description": "Frequency Containment Reserve. Automatic primary response within seconds."
+            }
+          }
+        },
+        {
+          "id": "afrr",
+          "labels": {
+            "tr": {
+              "name": "aFRR",
+              "description": "Otomatik frekans restorasyon rezervi. Dengeyi dakikalar içinde geri taşır."
+            },
+            "en": {
+              "name": "aFRR",
+              "description": "Automatic Frequency Restoration Reserve. Restores balance over minutes."
+            }
+          }
+        },
+        {
+          "id": "mfrr",
+          "labels": {
+            "tr": {
+              "name": "mFRR",
+              "description": "Manuel frekans restorasyon rezervi. Operatör veya piyasa süreçleriyle devreye alınır."
+            },
+            "en": {
+              "name": "mFRR",
+              "description": "Manual Frequency Restoration Reserve. Activated through operator or market processes."
+            }
+          }
+        }
+      ],
+      "references": [
+        {
+          "title": "ENTSO-E System Operations Reports",
+          "url": "https://www.entsoe.eu/publications/system-operations-reports/"
+        },
+        {
+          "title": "ENTSO-E Baltic synchronization announcement",
+          "url": "https://www.entsoe.eu/news/2025/02/09/entso-e-confirms-successful-synchronization-of-the-continental-european-electricity-system-with-the-systems-of-the-baltic-countries/"
+        },
+        {
+          "title": "Netztransparenz second-by-second frequency data",
+          "url": "https://www.netztransparenz.de/de-de/Regelenergie/Daten-Regelreserve/Sek%C3%BCndliche-Daten"
+        }
+      ]
+    },
+    {
+      "id": "nordic",
+      "type": "synchronous-area",
+      "nominalFrequencyHz": 50,
+      "frequencyQualityRangeHz": null,
+      "hasMeasurementData": false,
+      "defaultCountryCode": "SE",
+      "dataSourceId": null,
+      "countries": ["NO", "SE", "FI", "DK"],
+      "tags": {
+        "tr": ["50 Hz", "Senkron bölge", "Veri yok"],
+        "en": ["50 Hz", "Synchronous area", "No data"]
+      },
+      "labels": {
+        "tr": {
+          "short": "Nordik",
+          "standard": "Nordik Senkron Bölgesi",
+          "long": "Nordik Senkron Bölgesi · 50 Hz",
+          "subtitle": "Bu bölge haritada bilgilendirme için gösterilir.",
+          "description": "Nordik bölge ayrı bir senkron alan olarak çalışır. GridFreq şu anda bu bölge için otomatik frekans verisi yayımlamaz.",
+          "dataNote": "",
+          "noDataNote": "Bu bölge için uygulamada henüz ölçüm verisi yoktur."
+        },
+        "en": {
+          "short": "Nordic",
+          "standard": "Nordic Synchronous Area",
+          "long": "Nordic Synchronous Area · 50 Hz",
+          "subtitle": "This area is shown for context on the frequency regions map.",
+          "description": "The Nordic area operates as a separate synchronous area. GridFreq does not currently publish automatic frequency measurements for this region.",
+          "dataNote": "",
+          "noDataNote": "No measurement data is available in the application for this region yet."
+        }
+      },
+      "controlLayers": [],
+      "references": [
+        {
+          "title": "ENTSO-E System Operations Reports",
+          "url": "https://www.entsoe.eu/publications/system-operations-reports/"
+        }
+      ]
+    },
+    {
+      "id": "great-britain",
+      "type": "synchronous-area",
+      "nominalFrequencyHz": 50,
+      "frequencyQualityRangeHz": null,
+      "hasMeasurementData": false,
+      "defaultCountryCode": "GB",
+      "dataSourceId": null,
+      "countries": ["GB"],
+      "tags": {
+        "tr": ["50 Hz", "Ada sistemi", "Veri yok"],
+        "en": ["50 Hz", "Islanded system", "No data"]
+      },
+      "labels": {
+        "tr": {
+          "short": "Büyük Britanya",
+          "standard": "Büyük Britanya Senkron Bölgesi",
+          "long": "Büyük Britanya Senkron Bölgesi · 50 Hz",
+          "subtitle": "Kıta Avrupası ile HVDC bağlantıları vardır ancak aynı frekansla senkron çalışmaz.",
+          "description": "Büyük Britanya sistemi frekans açısından Kıta Avrupası'ndan ayrıdır. GridFreq bu bölge için veri yayımlamaz.",
+          "dataNote": "",
+          "noDataNote": "Bu bölge için uygulamada henüz ölçüm verisi yoktur."
+        },
+        "en": {
+          "short": "Great Britain",
+          "standard": "Great Britain Synchronous Area",
+          "long": "Great Britain Synchronous Area · 50 Hz",
+          "subtitle": "It is connected to Continental Europe by HVDC links but does not share the same synchronous frequency.",
+          "description": "The Great Britain system is frequency-separated from Continental Europe. GridFreq does not publish data for this region.",
+          "dataNote": "",
+          "noDataNote": "No measurement data is available in the application for this region yet."
+        }
+      },
+      "controlLayers": [],
+      "references": [
+        {
+          "title": "National Grid ESO frequency guidance",
+          "url": "https://www.nationalgrideso.com/"
+        }
+      ]
+    },
+    {
+      "id": "ireland",
+      "type": "synchronous-area",
+      "nominalFrequencyHz": 50,
+      "frequencyQualityRangeHz": null,
+      "hasMeasurementData": false,
+      "defaultCountryCode": "IE",
+      "dataSourceId": null,
+      "countries": ["IE"],
+      "tags": {
+        "tr": ["50 Hz", "Ada sistemi", "Veri yok"],
+        "en": ["50 Hz", "Islanded system", "No data"]
+      },
+      "labels": {
+        "tr": {
+          "short": "İrlanda",
+          "standard": "İrlanda Senkron Bölgesi",
+          "long": "İrlanda Senkron Bölgesi · 50 Hz",
+          "subtitle": "İrlanda sistemi ayrı bir frekans bölgesi olarak izlenir.",
+          "description": "İrlanda adası elektrik sistemi kendi senkron frekans alanına sahiptir. GridFreq bu bölge için veri yayımlamaz.",
+          "dataNote": "",
+          "noDataNote": "Bu bölge için uygulamada henüz ölçüm verisi yoktur."
+        },
+        "en": {
+          "short": "Ireland",
+          "standard": "Ireland Synchronous Area",
+          "long": "Ireland Synchronous Area · 50 Hz",
+          "subtitle": "The Ireland system is monitored as a separate frequency area.",
+          "description": "The island of Ireland has its own synchronous frequency area. GridFreq does not publish data for this region.",
+          "dataNote": "",
+          "noDataNote": "No measurement data is available in the application for this region yet."
+        }
+      },
+      "controlLayers": [],
+      "references": [
+        {
+          "title": "EirGrid",
+          "url": "https://www.eirgrid.ie/"
+        }
+      ]
+    }
+  ]
+}

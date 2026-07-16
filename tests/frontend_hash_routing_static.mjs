@@ -12,6 +12,7 @@ const requiredMarkers = [
   "routeResolutionAlias",
   "isApplyingRoute",
   "hashchange",
+  "#/regions",
   "#/daily",
   "#/analysis",
   "#/reports",

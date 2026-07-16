@@ -32,6 +32,7 @@
     }
   </script>
   <script type="module" src="assets/analysis-core.mjs"></script>
+  <script type="module" src="assets/frequency-regions.mjs"></script>
 
   <style>
     :root {
@@ -147,14 +148,14 @@
 
     .tabs {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       background: rgba(255,255,255,.12);
       border: 1px solid rgba(255,255,255,.2);
       border-radius: 10px;
       padding: 3px;
       gap: 3px;
       flex: 1;
-      max-width: 500px;
+      max-width: 650px;
     }
 
     .tab-button {
@@ -343,6 +344,218 @@
     .btn-light { background: rgba(255,255,255,.13); color: #fff; border-color: rgba(255,255,255,.3); }
 
     .button-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+    .regions-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(300px, .92fr);
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .regions-map-card,
+    .regions-panel-card,
+    .regions-info-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 14px;
+      min-width: 0;
+    }
+
+    .regions-map-card {
+      background: linear-gradient(180deg, #fbfdff, #eef6fb);
+      overflow: hidden;
+    }
+
+    .regions-map-toolbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .regions-map-toolbar label {
+      color: var(--muted);
+      font-weight: 800;
+      font-size: .82rem;
+    }
+
+    .regions-map-toolbar select {
+      min-height: 38px;
+      border: 1px solid #cbd9e3;
+      border-radius: 8px;
+      padding: 7px 10px;
+      background: #fff;
+      color: var(--ink);
+      font-weight: 750;
+      min-width: min(260px, 100%);
+    }
+
+    .regions-map-host {
+      border: 1px solid #d9e6ee;
+      border-radius: 12px;
+      background: #f8fbfd;
+      overflow: hidden;
+      min-height: 360px;
+      display: grid;
+      place-items: center;
+    }
+
+    .regions-map-host svg {
+      width: 100%;
+      max-height: 540px;
+      display: block;
+    }
+
+    .regions-map-host [data-region-id],
+    .regions-map-host [data-country-code] {
+      cursor: pointer;
+      transition: opacity .16s ease, filter .16s ease, transform .16s ease;
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+
+    .regions-map-host [data-region-id]:hover,
+    .regions-map-host [data-region-id]:focus,
+    .regions-map-host [data-country-code]:hover,
+    .regions-map-host [data-country-code]:focus {
+      opacity: 1;
+      filter: saturate(1.18) brightness(1.03);
+      outline: none;
+    }
+
+    .regions-map-host .is-selected {
+      filter: drop-shadow(0 0 0 rgba(0,0,0,0)) drop-shadow(0 0 11px rgba(245,158,11,.55));
+    }
+
+    .regions-panel-card h2 {
+      margin: 0;
+      color: var(--navy);
+      font-size: clamp(1.25rem, 2.4vw, 2rem);
+      line-height: 1.12;
+    }
+
+    .regions-panel-card p {
+      color: var(--muted);
+      margin: 7px 0 0;
+    }
+
+    .regions-tags,
+    .regions-actions,
+    .regions-periods {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .regions-actions .btn {
+      flex: 1 1 140px;
+    }
+
+    .regions-periods .btn {
+      min-height: 34px;
+      padding: 6px 10px;
+      font-size: .8rem;
+    }
+
+    .regions-periods .btn.active {
+      background: var(--navy);
+      color: #fff;
+      border-color: var(--navy);
+    }
+
+    .regions-summary-grid,
+    .regions-tech-grid,
+    .regions-control-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .regions-summary-item,
+    .regions-tech-item,
+    .regions-control-item {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 11px;
+      background: #fbfdff;
+      min-width: 0;
+    }
+
+    .regions-summary-item .label,
+    .regions-tech-item .label,
+    .regions-control-item .label {
+      color: var(--muted);
+      font-size: .74rem;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: .02em;
+    }
+
+    .regions-summary-item .value,
+    .regions-tech-item .value {
+      margin-top: 4px;
+      color: var(--navy);
+      font-size: 1.02rem;
+      font-weight: 900;
+      overflow-wrap: anywhere;
+    }
+
+    .regions-control-item strong {
+      display: block;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+
+    .regions-control-item p {
+      margin: 0;
+      color: #345064;
+      font-size: .84rem;
+      line-height: 1.4;
+    }
+
+    .regions-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .regions-detail-grid details {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      padding: 10px 12px;
+    }
+
+    .regions-detail-grid summary {
+      cursor: pointer;
+      color: var(--navy);
+      font-weight: 850;
+    }
+
+    .regions-detail-grid p,
+    .regions-detail-grid li {
+      color: #345064;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .regions-reference-list {
+      margin: 8px 0 0;
+      padding-left: 18px;
+    }
+
+    .regions-reference-list a {
+      color: var(--navy);
+      font-weight: 750;
+      overflow-wrap: anywhere;
+    }
 
     .auto-data-grid {
       display: grid;
@@ -1322,7 +1535,7 @@
       .brand { min-width: 0; }
       .brand-logo { width: 34px; height: 34px; }
       .brand p { display: none; }
-      .tabs { grid-template-columns: 1fr 1fr; max-width: none; }
+      .tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: none; }
       .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
       .auto-data-grid { grid-template-columns: 1fr; }
       .source-health-summary,
@@ -1469,6 +1682,15 @@
       .data-sources-links { grid-template-columns: 1fr; }
       .data-source-card dl,
       .data-status-card dl { grid-template-columns: 1fr; gap: 4px; }
+      .regions-hero,
+      .regions-detail-grid { grid-template-columns: 1fr; }
+      .regions-map-host { min-height: 260px; }
+      .regions-map-toolbar { align-items: stretch; }
+      .regions-map-toolbar select { width: 100%; }
+      .regions-summary-grid,
+      .regions-tech-grid,
+      .regions-control-grid { grid-template-columns: 1fr; gap: 8px; }
+      .regions-actions .btn { flex-basis: calc(50% - 8px); min-width: 0; }
       body { overflow-x: hidden; }
     }
 
@@ -1478,6 +1700,14 @@
       .data-sources-header h2 { font-size: 1.04rem; }
       .data-sources-header p { font-size: .8rem; }
       .quarter-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .tab-button { padding: 6px 4px; font-size: .72rem; }
+      .regions-map-card,
+      .regions-panel-card,
+      .regions-info-card { padding: 10px; }
+      .regions-map-host { min-height: 220px; }
+      .regions-actions .btn { flex-basis: 100%; }
+      .regions-periods .btn { flex: 1 1 calc(50% - 7px); min-width: 0; }
     }
 
     @media (prefers-reduced-motion: no-preference) {
@@ -1520,7 +1750,8 @@
         </div>
       </a>
       <nav class="tabs" aria-label="Uygulama sekmeleri">
-        <button class="tab-button active" data-tab="tab-chart" data-i18n="tabChart">Günlük</button>
+        <button class="tab-button active" data-tab="tab-regions" data-i18n="tabRegions">Frekans Bölgeleri</button>
+        <button class="tab-button" data-tab="tab-chart" data-i18n="tabChart">Günlük</button>
         <button class="tab-button" data-tab="tab-oscillation" data-i18n="tabOscillation">Analiz</button>
         <button class="tab-button" data-tab="tab-reports" data-i18n="tabReports">Raporlar</button>
         <button class="tab-button" data-tab="tab-settings" data-i18n="tabSettings">Veri</button>
@@ -1532,8 +1763,98 @@
   </header>
 
   <main>
-    <!-- SEKME 1: GÜNLÜK FREKANS -->
-    <section id="tab-chart" class="tab-panel active">
+    <!-- SEKME 1: FREKANS BÖLGELERİ -->
+    <section id="tab-regions" class="tab-panel active">
+      <div class="panel">
+        <div class="section-title">
+          <div>
+            <h2 id="regionsTitle" data-i18n="regionsTitle">Frekans Bölgeleri</h2>
+            <p data-i18n="regionsIntro">Avrupa’daki 50 Hz senkron frekans bölgelerini, Türkiye ve Kıta Avrupası ölçüm verileriyle birlikte inceleyin.</p>
+          </div>
+          <span class="tag good" id="regionsDefaultTag" data-i18n="regionsDefaultTag">Varsayılan: Türkiye</span>
+        </div>
+        <div class="regions-hero">
+          <div class="regions-map-card">
+            <div class="regions-map-toolbar">
+              <label for="regionsMobileSelect" data-i18n="regionsSelectLabel">Bölge seçimi</label>
+              <select id="regionsMobileSelect" aria-label="Frekans bölgesi seçimi">
+                <option value="continental-europe|TR">Türkiye · Kıta Avrupası</option>
+                <option value="continental-europe|CE">Kıta Avrupası</option>
+                <option value="nordic|SE">Nordik</option>
+                <option value="great-britain|GB">Büyük Britanya</option>
+                <option value="ireland|IE">İrlanda</option>
+              </select>
+            </div>
+            <div id="regionsMapHost" class="regions-map-host" aria-live="polite">
+              <span class="tag" data-i18n="regionsMapLoading">Harita yükleniyor</span>
+            </div>
+          </div>
+          <aside class="regions-panel-card" aria-live="polite">
+            <div class="regions-tags" id="regionsTagList"></div>
+            <h2 id="regionsPanelTitle">Türkiye</h2>
+            <p id="regionsPanelSubtitle">Türkiye · TEİAŞ</p>
+            <p id="regionsPanelDescription">Türkiye elektrik sistemi frekans ölçümü.</p>
+            <div class="regions-summary-grid" id="regionsSummaryGrid"></div>
+            <div class="regions-actions">
+              <button class="btn btn-primary" id="regionsDailyBtn" type="button" data-i18n="regionsOpenDaily">Günlük grafiği aç</button>
+              <button class="btn btn-secondary" id="regionsAnalysisBtn" type="button" data-i18n="regionsOpenAnalysis">Analize git</button>
+              <button class="btn btn-secondary" id="regionsDataBtn" type="button" data-i18n="regionsOpenData">Veri durumuna git</button>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="section-title">
+          <div>
+            <h3 data-i18n="regionsTechTitle">Teknik özet</h3>
+            <p data-i18n="regionsTechDesc">Nominal frekans, izleme bandı, elektriksel zaman sapması ve kaynak durumu seçili bölgeye göre güncellenir.</p>
+          </div>
+        </div>
+        <div class="regions-tech-grid" id="regionsTechCards"></div>
+        <div class="regions-info-card" style="margin-top:12px">
+          <div class="section-title" style="margin-bottom:0">
+            <div>
+              <h3 data-i18n="regionsTimeDeviationTitle">Elektriksel zaman sapması</h3>
+              <p data-i18n="regionsTimeDeviationDesc">Sapma, ∫(f − 50 Hz) / 50 Hz dt yaklaşımıyla hesaplanır; eksik örnekler gerçek veri gibi doldurulmaz.</p>
+            </div>
+            <div class="regions-periods" role="group" aria-label="Zaman sapması dönemi">
+              <button class="btn btn-secondary active" type="button" data-region-period="latest-day" data-i18n="regionsPeriodLatest">Son gün</button>
+              <button class="btn btn-secondary" type="button" data-region-period="latest-month" data-i18n="regionsPeriodMonth">Son ay</button>
+              <button class="btn btn-secondary" type="button" data-region-period="custom" data-i18n="regionsPeriodCustom">Özel dönem</button>
+            </div>
+          </div>
+          <div id="regionsTimeDeviationStatus" class="status-banner muted" style="margin-top:10px" data-i18n="regionsTimeDeviationLoading">Zaman sapması hesaplanıyor.</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="section-title">
+          <div>
+            <h3 data-i18n="regionsControlTitle">Kontrol katmanları</h3>
+            <p data-i18n="regionsControlDesc">FCR, aFRR ve mFRR terimleri bölgesel frekans kontrolünü yorumlamak için kısa bağlam sağlar.</p>
+          </div>
+        </div>
+        <div id="regionsControlGrid" class="regions-control-grid"></div>
+      </div>
+
+      <div class="panel">
+        <div class="regions-detail-grid">
+          <details open>
+            <summary data-i18n="regionsMethodTitle">Yöntem ve sınırlamalar</summary>
+            <p id="regionsMethodText"></p>
+          </details>
+          <details>
+            <summary data-i18n="regionsSourcesTitle">Resmî kaynaklar</summary>
+            <ul id="regionsReferenceList" class="regions-reference-list"></ul>
+          </details>
+        </div>
+        <div id="regionsStatusLive" class="sr-only" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- SEKME GÜNLÜK FREKANS -->
+    <section id="tab-chart" class="tab-panel">
       <div class="panel no-print" style="padding-bottom:0">
         <div class="control-bar">
           <div class="field date-picker-shell" data-date-picker="daily" style="position:relative">
@@ -2804,17 +3125,40 @@
     };
     const CHART_SESSION_STORAGE_KEY = 'frequencyChartSessionState';
     const ROUTE_TAB_TO_PATH = {
+      'tab-regions': 'regions',
       'tab-chart': 'daily',
       'tab-oscillation': 'analysis',
       'tab-reports': 'reports',
       'tab-settings': 'data'
     };
     const ROUTE_PATH_TO_TAB = {
+      regions: 'tab-regions',
       daily: 'tab-chart',
       analysis: 'tab-oscillation',
       reports: 'tab-reports',
       data: 'tab-settings'
     };
+    const REGION_ROUTE_ALIASES = {
+      ce: 'continental-europe',
+      continental: 'continental-europe',
+      'continental-europe': 'continental-europe',
+      europe: 'continental-europe',
+      turkiye: 'continental-europe',
+      türkiye: 'continental-europe',
+      tr: 'continental-europe',
+      nordic: 'nordic',
+      nordik: 'nordic',
+      greatbritain: 'great-britain',
+      'great-britain': 'great-britain',
+      gb: 'great-britain',
+      ireland: 'ireland',
+      irlanda: 'ireland',
+      ie: 'ireland'
+    };
+    const REGION_DEFAULT_ID = 'continental-europe';
+    const REGION_DEFAULT_COUNTRY = 'TR';
+    const REGION_DEFAULT_PERIOD = 'latest-day';
+    const REGION_PERIODS = ['latest-day', 'latest-month', 'custom'];
     const ROUTE_SOURCE_TO_SLUG = {
       tr: 'turkiye',
       de: 'entsoe',
@@ -2918,6 +3262,18 @@
       dataSourcesModal: {
         previousFocus: null,
         statusLoadFailed: false
+      },
+      regions: {
+        configsLoaded: false,
+        regionsCatalog: null,
+        countriesCatalog: null,
+        selectedRegionId: REGION_DEFAULT_ID,
+        selectedCountryCode: REGION_DEFAULT_COUNTRY,
+        timeDeviationPeriod: REGION_DEFAULT_PERIOD,
+        timeDeviationCache: new Map(),
+        latestSummaryCache: new Map(),
+        requestSequence: 0,
+        svgLoaded: false
       },
       settings: loadSettings(),
       calendarDate: new Date(),
@@ -3033,6 +3389,7 @@
       updateInventory();
       updateAnalysisAvailability();
       renderDataSourceStatus();
+      renderRegionsView();
       if (state.current) {
         renderKpis(state.current);
         renderFrequencyChart(state.current);
@@ -3041,6 +3398,459 @@
         updateAlignmentInfo();
         renderReportPreview();
       }
+    }
+
+    function fallbackRegionsCatalog() {
+      return {
+        defaultRegionId: REGION_DEFAULT_ID,
+        defaultCountryCode: REGION_DEFAULT_COUNTRY,
+        regions: [{
+          id: REGION_DEFAULT_ID,
+          nominalFrequencyHz: 50,
+          frequencyQualityRangeHz: { min: 49.95, max: 50.05, label: '49.95-50.05 Hz' },
+          hasMeasurementData: true,
+          defaultCountryCode: REGION_DEFAULT_COUNTRY,
+          dataSourceId: 'netztransparenz',
+          countryDataSources: { TR: 'teias' },
+          countries: ['TR'],
+          tags: { tr: ['50 Hz', 'Senkron bölge'], en: ['50 Hz', 'Synchronous area'] },
+          labels: {
+            tr: {
+              short: 'Kıta Avrupası',
+              standard: 'Kıta Avrupası Senkron Bölgesi',
+              long: 'Kıta Avrupası Senkron Bölgesi · 50 Hz',
+              subtitle: 'Türkiye ve Kıta Avrupası ölçümleri aynı nominal frekans üzerinde karşılaştırılır.',
+              description: 'Türkiye için TEİAŞ verisi, Kıta Avrupası referansı için Netztransparenz verisi kullanılır.',
+              noDataNote: ''
+            },
+            en: {
+              short: 'Continental Europe',
+              standard: 'Continental Europe Synchronous Area',
+              long: 'Continental Europe Synchronous Area · 50 Hz',
+              subtitle: 'Türkiye and Continental Europe measurements are compared on the same nominal frequency basis.',
+              description: 'GridFreq uses TEİAŞ data for Türkiye and Netztransparenz data for the Continental Europe reference series.',
+              noDataNote: ''
+            }
+          },
+          controlLayers: [],
+          references: []
+        }]
+      };
+    }
+
+    function fallbackCountriesCatalog() {
+      return {
+        countries: {
+          TR: {
+            regionId: REGION_DEFAULT_ID,
+            sourceId: 'teias',
+            timezone: 'Europe/Istanbul',
+            labels: {
+              tr: { short: 'Türkiye', standard: 'Türkiye · TEİAŞ', long: 'Türkiye Şebeke Frekansı · TEİAŞ' },
+              en: { short: 'Türkiye', standard: 'Türkiye · TEİAŞ', long: 'Türkiye Grid Frequency · TEİAŞ' }
+            }
+          }
+        }
+      };
+    }
+
+    async function fetchAssetJson(path) {
+      const response = await fetch(new URL(path, document.baseURI), { cache: 'no-store' });
+      if (!response.ok) throw new Error(`${path} HTTP ${response.status}`);
+      return response.json();
+    }
+
+    async function loadRegionsCatalog({ force = false } = {}) {
+      if (state.regions.configsLoaded && !force) return;
+      try {
+        const [regionsCatalog, countriesCatalog] = await Promise.all([
+          fetchAssetJson('assets/frequency-regions.json'),
+          fetchAssetJson('assets/frequency-countries.json')
+        ]);
+        state.regions.regionsCatalog = regionsCatalog;
+        state.regions.countriesCatalog = countriesCatalog;
+      } catch (error) {
+        state.regions.regionsCatalog = fallbackRegionsCatalog();
+        state.regions.countriesCatalog = fallbackCountriesCatalog();
+        const live = $('regionsStatusLive');
+        if (live) live.textContent = t('regionsConfigFallback');
+      }
+      state.regions.configsLoaded = true;
+      renderRegionsView();
+    }
+
+    function regionList() {
+      return state.regions.regionsCatalog?.regions || fallbackRegionsCatalog().regions;
+    }
+
+    function normalizeRegionId(value) {
+      const token = normalizeRouteToken(value);
+      return REGION_ROUTE_ALIASES[token] || token || REGION_DEFAULT_ID;
+    }
+
+    function findRegion(regionId = state.regions.selectedRegionId) {
+      const normalized = normalizeRegionId(regionId);
+      return regionList().find(region => region.id === normalized) || regionList()[0];
+    }
+
+    function countryCatalogEntry(countryCode = state.regions.selectedCountryCode) {
+      const code = String(countryCode || '').toUpperCase();
+      return state.regions.countriesCatalog?.countries?.[code] || fallbackCountriesCatalog().countries[code] || null;
+    }
+
+    function regionLabel(region, context = 'short') {
+      return region?.labels?.[lang]?.[context] || region?.labels?.tr?.[context] || region?.id || '—';
+    }
+
+    function countryRegionLabel(countryCode, context = 'standard') {
+      const country = countryCatalogEntry(countryCode);
+      return country?.labels?.[lang]?.[context] || country?.labels?.tr?.[context] || countryCode || '—';
+    }
+
+    function selectedRegionSource(region = findRegion(), countryCode = state.regions.selectedCountryCode) {
+      const normalizedCountry = String(countryCode || '').toUpperCase();
+      const countrySource = countryCatalogEntry(normalizedCountry)?.sourceId;
+      if (countrySource) return countrySource;
+      if (normalizedCountry === 'TR') return 'teias';
+      return region?.dataSourceId || null;
+    }
+
+    function sourceUiKeyFromAutoSource(sourceId) {
+      return sourceId === 'teias' ? 'tr' : sourceId === 'netztransparenz' ? 'de' : 'both';
+    }
+
+    function sourceLatestDate(sourceId) {
+      const source = state.auto.manifest?.sources?.[sourceId];
+      if (!source) return null;
+      if (sourceId === 'teias') return state.auto.status?.lastSuccessfulTeiasDataDate || source.latestDate || null;
+      if (sourceId === 'netztransparenz') return state.auto.status?.netztransparenz?.lastSuccessfulDataDate || source.latestDate || null;
+      return source.latestDate || null;
+    }
+
+    function renderRegionsSelectOptions() {
+      const select = $('regionsMobileSelect');
+      if (!select) return;
+      const options = [];
+      regionList().forEach(region => {
+        const countries = region.countries?.length ? region.countries : [region.defaultCountryCode || ''];
+        if (region.id === REGION_DEFAULT_ID) {
+          options.push({ value: `${region.id}|TR`, label: countryRegionLabel('TR', 'standard') });
+          options.push({ value: `${region.id}|CE`, label: regionLabel(region, 'standard') });
+        } else {
+          const code = region.defaultCountryCode || countries[0] || '';
+          options.push({ value: `${region.id}|${code}`, label: regionLabel(region, 'standard') });
+        }
+      });
+      select.innerHTML = options.map(option => `<option value="${escapeHtml(option.value)}">${escapeHtml(option.label)}</option>`).join('');
+      const selected = `${state.regions.selectedRegionId}|${state.regions.selectedCountryCode}`;
+      const fallback = state.regions.selectedRegionId === REGION_DEFAULT_ID && state.regions.selectedCountryCode !== 'TR'
+        ? `${REGION_DEFAULT_ID}|CE`
+        : selected;
+      select.value = options.some(option => option.value === fallback) ? fallback : options[0]?.value || '';
+    }
+
+    async function renderRegionsMap() {
+      const host = $('regionsMapHost');
+      if (!host || state.regions.svgLoaded) {
+        updateRegionsMapSelection();
+        return;
+      }
+      try {
+        const response = await fetch(new URL('assets/frequency-regions-map.svg', document.baseURI), { cache: 'no-store' });
+        if (!response.ok) throw new Error(`frequency-regions-map.svg HTTP ${response.status}`);
+        host.innerHTML = await response.text();
+        state.regions.svgLoaded = true;
+        bindRegionsMapInteractions();
+      } catch {
+        host.innerHTML = `<div class="empty-state">${escapeHtml(t('regionsMapUnavailable'))}</div>`;
+      }
+      updateRegionsMapSelection();
+    }
+
+    function bindRegionsMapInteractions() {
+      const host = $('regionsMapHost');
+      if (!host) return;
+      host.querySelectorAll('[data-region-id], [data-country-code]').forEach(node => {
+        if (node.dataset.regionBound === 'true') return;
+        node.dataset.regionBound = 'true';
+        const activate = () => {
+          const regionId = node.dataset.regionId || REGION_DEFAULT_ID;
+          const countryCode = node.dataset.countryCode || (regionId === REGION_DEFAULT_ID ? 'CE' : '');
+          selectFrequencyRegion(regionId, countryCode || null, { pushHistory: true });
+        };
+        node.addEventListener('click', event => {
+          event.stopPropagation();
+          activate();
+        });
+        node.addEventListener('keydown', event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            activate();
+          }
+        });
+        if (!node.hasAttribute('tabindex')) node.setAttribute('tabindex', '0');
+      });
+    }
+
+    function updateRegionsMapSelection() {
+      const host = $('regionsMapHost');
+      if (!host) return;
+      const cssEscape = value => window.CSS?.escape ? window.CSS.escape(value) : String(value).replace(/["\\]/g, '\\$&');
+      host.querySelectorAll('.is-selected').forEach(node => node.classList.remove('is-selected'));
+      const regionSelector = `[data-region-id="${cssEscape(state.regions.selectedRegionId)}"]`;
+      host.querySelectorAll(regionSelector).forEach(node => node.classList.add('is-selected'));
+      if (state.regions.selectedCountryCode) {
+        const countrySelector = `[data-country-code="${cssEscape(state.regions.selectedCountryCode)}"]`;
+        host.querySelectorAll(countrySelector).forEach(node => node.classList.add('is-selected'));
+      }
+    }
+
+    function selectFrequencyRegion(regionId, countryCode = null, { pushHistory = true } = {}) {
+      const region = findRegion(regionId);
+      const safeCountry = String(countryCode || region.defaultCountryCode || '').toUpperCase();
+      state.regions.selectedRegionId = region?.id || REGION_DEFAULT_ID;
+      state.regions.selectedCountryCode = safeCountry === 'CE' ? 'CE' : safeCountry;
+      renderRegionsView();
+      if (pushHistory) updateRoute({
+        path: 'regions',
+        region: state.regions.selectedRegionId,
+        country: state.regions.selectedCountryCode,
+        period: state.regions.timeDeviationPeriod
+      }, { mode: 'push' });
+    }
+
+    function applyRegionsRoute(route) {
+      const regionId = normalizeRegionId(route?.region || route?.params?.get('region') || REGION_DEFAULT_ID);
+      const region = findRegion(regionId);
+      const country = String(route?.country || route?.params?.get('country') || region?.defaultCountryCode || REGION_DEFAULT_COUNTRY).toUpperCase();
+      const period = REGION_PERIODS.includes(route?.period || route?.params?.get('period'))
+        ? (route?.period || route?.params?.get('period'))
+        : REGION_DEFAULT_PERIOD;
+      state.regions.selectedRegionId = region?.id || REGION_DEFAULT_ID;
+      state.regions.selectedCountryCode = country;
+      state.regions.timeDeviationPeriod = period;
+      renderRegionsView();
+    }
+
+    function regionStatusText(sourceId, latestDate) {
+      if (!sourceId) return t('regionsNoDataStatus');
+      if (!latestDate) return t('regionsNoDateStatus');
+      return t('regionsDataAvailable', { date: displayDate(latestDate) });
+    }
+
+    function renderRegionSummaryCards(region, sourceId, latestDate) {
+      const grid = $('regionsSummaryGrid');
+      if (!grid) return;
+      const sourceLabel = sourceId ? getSourceLabel(sourceId, 'standard') : t('regionsNoSource');
+      const cards = [
+        [t('regionsSelectedSystem'), state.regions.selectedCountryCode === 'CE' ? regionLabel(region, 'standard') : countryRegionLabel(state.regions.selectedCountryCode, 'standard')],
+        [t('regionsDataSource'), sourceLabel],
+        [t('regionsLatestData'), latestDate ? displayDate(latestDate) : t('tagNone')],
+        [t('regionsDataStatus'), regionStatusText(sourceId, latestDate)]
+      ];
+      grid.innerHTML = cards.map(([label, value]) => `
+        <div class="regions-summary-item">
+          <div class="label">${escapeHtml(label)}</div>
+          <div class="value">${escapeHtml(value)}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderRegionTechCards(region, sourceId, latestDate) {
+      const grid = $('regionsTechCards');
+      if (!grid) return;
+      const range = region?.frequencyQualityRangeHz?.label || t('regionsRangeUnavailable');
+      const sourceInfo = sourceId ? state.auto.manifest?.sources?.[sourceId] : null;
+      const timezone = state.regions.selectedCountryCode !== 'CE'
+        ? countryCatalogEntry(state.regions.selectedCountryCode)?.timezone
+        : sourceInfo?.timezone;
+      const cards = [
+        [t('regionsNominalFrequency'), `${fmt(region?.nominalFrequencyHz || 50, 0)} Hz`],
+        [t('regionsQualityBand'), range],
+        [t('regionsTimezone'), timezone || t('statusUnknown')],
+        [t('regionsManifestRange'), sourceInfo?.firstDate && sourceInfo?.latestDate ? `${displayDate(sourceInfo.firstDate)} – ${displayDate(sourceInfo.latestDate)}` : t('tagNone')]
+      ];
+      grid.innerHTML = cards.map(([label, value]) => `
+        <div class="regions-tech-item">
+          <div class="label">${escapeHtml(label)}</div>
+          <div class="value">${escapeHtml(value)}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderRegionControlCards(region) {
+      const grid = $('regionsControlGrid');
+      if (!grid) return;
+      const layers = region?.controlLayers?.length ? region.controlLayers : [
+        { labels: { tr: { name: 'FCR', description: t('regionsControlFallback') }, en: { name: 'FCR', description: t('regionsControlFallback') } } }
+      ];
+      grid.innerHTML = layers.map(layer => {
+        const label = layer.labels?.[lang] || layer.labels?.tr || {};
+        return `
+          <article class="regions-control-item">
+            <strong>${escapeHtml(label.name || layer.id || '—')}</strong>
+            <p>${escapeHtml(label.description || '')}</p>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function renderRegionReferences(region) {
+      const list = $('regionsReferenceList');
+      if (!list) return;
+      const references = region?.references || [];
+      list.innerHTML = references.length
+        ? references.map(ref => `<li><a href="${escapeHtml(ref.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(ref.title)}</a></li>`).join('')
+        : `<li>${escapeHtml(t('regionsNoReferences'))}</li>`;
+    }
+
+    function renderRegionsView() {
+      if (!$('tab-regions')) return;
+      const region = findRegion();
+      const sourceId = selectedRegionSource(region);
+      const latestDate = sourceLatestDate(sourceId);
+      const isCountryMeasurement = region?.id === REGION_DEFAULT_ID && state.regions.selectedCountryCode !== 'CE';
+      const countryLabel = isCountryMeasurement
+        ? countryRegionLabel(state.regions.selectedCountryCode, 'standard')
+        : state.regions.selectedCountryCode === 'CE'
+        ? regionLabel(region, 'standard')
+        : regionLabel(region, 'standard');
+      const panelTitle = isCountryMeasurement ? countryRegionLabel(state.regions.selectedCountryCode, 'short') : regionLabel(region, 'short');
+      $('regionsPanelTitle').textContent = panelTitle;
+      $('regionsPanelSubtitle').textContent = countryLabel;
+      $('regionsPanelDescription').textContent = regionLabel(region, region?.hasMeasurementData ? 'description' : 'noDataNote') || regionLabel(region, 'description');
+      const tags = region?.tags?.[lang] || region?.tags?.tr || [];
+      $('regionsTagList').innerHTML = tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('');
+      renderRegionsSelectOptions();
+      renderRegionsMap();
+      renderRegionSummaryCards(region, sourceId, latestDate);
+      renderRegionTechCards(region, sourceId, latestDate);
+      renderRegionControlCards(region);
+      renderRegionReferences(region);
+      $('regionsMethodText').textContent = region?.hasMeasurementData
+        ? t('regionsMethodMeasured')
+        : t('regionsMethodNoData');
+      document.querySelectorAll('[data-region-period]').forEach(button => {
+        button.classList.toggle('active', button.dataset.regionPeriod === state.regions.timeDeviationPeriod);
+      });
+      const hasData = Boolean(sourceId && latestDate);
+      ['regionsDailyBtn', 'regionsAnalysisBtn'].forEach(id => {
+        const button = $(id);
+        if (button) button.disabled = !hasData;
+      });
+      updateRegionsMapSelection();
+      updateRegionsTimeDeviation();
+    }
+
+    async function loadRegionsSeriesForPeriod(sourceId, latestDate, period) {
+      if (!sourceId || !latestDate) return { dates: [], series: [] };
+      if (period !== 'latest-month') {
+        await loadAutoDay(sourceId, latestDate);
+        const target = sourceId === 'teias' ? state.tr : state.de;
+        return { dates: [latestDate], series: [target.get(latestDate)] };
+      }
+      const source = state.auto.manifest?.sources?.[sourceId];
+      const month = latestDate.slice(0, 7);
+      const dates = (source?.availableDates || []).filter(date => date.startsWith(month)).slice(-31);
+      const series = [];
+      for (const date of dates) {
+        await loadAutoDay(sourceId, date);
+        const target = sourceId === 'teias' ? state.tr : state.de;
+        if (target.has(date)) series.push(target.get(date));
+      }
+      return { dates, series };
+    }
+
+    async function updateRegionsTimeDeviation() {
+      const status = $('regionsTimeDeviationStatus');
+      if (!status) return;
+      const sequence = ++state.regions.requestSequence;
+      const region = findRegion();
+      const sourceId = selectedRegionSource(region);
+      const latestDate = sourceLatestDate(sourceId);
+      if (!sourceId || !latestDate || !region?.hasMeasurementData) {
+        status.className = 'status-banner muted';
+        status.textContent = t('regionsTimeDeviationNoData');
+        return;
+      }
+      if (state.regions.timeDeviationPeriod === 'custom') {
+        status.className = 'status-banner warn';
+        status.textContent = t('regionsCustomPeriodHint');
+        return;
+      }
+      const cacheKey = `${sourceId}:${latestDate}:${state.regions.timeDeviationPeriod}`;
+      const cached = state.regions.timeDeviationCache.get(cacheKey);
+      if (cached) {
+        renderRegionsTimeDeviationResult(cached);
+        return;
+      }
+      status.className = 'status-banner muted';
+      status.textContent = t('regionsTimeDeviationLoading');
+      try {
+        const periodData = await loadRegionsSeriesForPeriod(sourceId, latestDate, state.regions.timeDeviationPeriod);
+        if (sequence !== state.regions.requestSequence) return;
+        const samples = [];
+        periodData.series.forEach(series => {
+          if (!series) return;
+          for (let i = 0; i < series.length; i++) samples.push(series[i]);
+        });
+        const calculator = window.GridFreqRegions?.calculateElectricalTimeDeviation;
+        const formatter = window.GridFreqRegions?.formatSignedSeconds;
+        if (!calculator || !formatter) throw new Error('GridFreqRegions module is unavailable');
+        const result = calculator(samples, { nominalFrequencyHz: region.nominalFrequencyHz || 50, sampleIntervalSeconds: 1 });
+        const rendered = { result, dates: periodData.dates, sourceId };
+        state.regions.timeDeviationCache.set(cacheKey, rendered);
+        renderRegionsTimeDeviationResult(rendered);
+      } catch (error) {
+        if (sequence !== state.regions.requestSequence) return;
+        status.className = 'status-banner warn';
+        status.textContent = t('regionsTimeDeviationError', { error: error?.message || String(error) });
+      }
+    }
+
+    function renderRegionsTimeDeviationResult(payload) {
+      const status = $('regionsTimeDeviationStatus');
+      if (!status) return;
+      const result = payload?.result;
+      const value = window.GridFreqRegions?.formatSignedSeconds(result?.seconds);
+      const coverage = `${fmt((result?.coverageRatio || 0) * 100, 2)}%`;
+      const range = payload?.dates?.length > 1
+        ? `${displayDate(payload.dates[0])} – ${displayDate(payload.dates.at(-1))}`
+        : displayDate(payload?.dates?.[0]);
+      status.className = result?.confidence === 'high' ? 'status-banner success' : 'status-banner warn';
+      status.textContent = t('regionsTimeDeviationResult', {
+        value,
+        range,
+        coverage,
+        source: getSourceLabel(payload.sourceId, 'standard')
+      });
+    }
+
+    function openSelectedRegionDaily() {
+      const region = findRegion();
+      const sourceId = selectedRegionSource(region);
+      const latestDate = sourceLatestDate(sourceId);
+      if (!latestDate) return;
+      activateTab('tab-chart', false);
+      selectDate(latestDate, { pushHistory: false, immediate: true });
+      updateRoute({ path: 'daily', date: latestDate }, { mode: 'push' });
+    }
+
+    function openSelectedRegionAnalysis() {
+      const region = findRegion();
+      const sourceId = selectedRegionSource(region);
+      const latestDate = sourceLatestDate(sourceId);
+      if (!latestDate) return;
+      const source = sourceUiKeyFromAutoSource(sourceId);
+      if ($('analysisSourceSelect')?.querySelector(`option[value="${source}"]`)) {
+        $('analysisSourceSelect').value = source;
+        syncAnalysisSource('analysis');
+      }
+      if ($('analysisDateSelect')) $('analysisDateSelect').value = latestDate;
+      if ($('analysisTypeSelect')) $('analysisTypeSelect').value = 'stats';
+      updateAnalysisAvailability();
+      activateTab('tab-oscillation', false);
+      updateRoute({ path: 'analysis', analysis: 'stats', source, date: latestDate }, { mode: 'push' });
     }
 
     function singleSeriesStats(series, start, end, nominal = 50) {
@@ -3124,6 +3934,7 @@
       renderReportPreview();
       checkLibraries();
       loadSourceCatalog();
+      loadRegionsCatalog();
       loadAutoDataCatalog();
     }
 
@@ -3142,6 +3953,10 @@
       btn.classList.add('active');
       panel.classList.add('active');
       if (syncUrl) updateRoute({ path: routePathForTab(tabId) }, { mode: 'push' });
+      if (tabId === 'tab-regions') renderRegionsView();
+      if (tabId === 'tab-chart' && $('dateSelect')?.value && (!state.current || state.current.date !== $('dateSelect').value)) {
+        selectDate($('dateSelect').value, { pushHistory: false, immediate: true });
+      }
       setTimeout(() => {
         state.frequencyChart?.resize();
         state.oscillationChart?.resize();
@@ -3234,6 +4049,27 @@
       $('reportExportJsonBtn').addEventListener('click', exportAnalysisJson);
       $('reportExportCsvBtn').addEventListener('click', exportAnalysisCsv);
       $('reportPrintBtn').addEventListener('click', printReport);
+      $('regionsMobileSelect').addEventListener('change', event => {
+        const [regionId, countryCode] = String(event.target.value || '').split('|');
+        selectFrequencyRegion(regionId, countryCode, { pushHistory: true });
+      });
+      document.querySelectorAll('[data-region-period]').forEach(button => {
+        button.addEventListener('click', () => {
+          state.regions.timeDeviationPeriod = REGION_PERIODS.includes(button.dataset.regionPeriod)
+            ? button.dataset.regionPeriod
+            : REGION_DEFAULT_PERIOD;
+          renderRegionsView();
+          updateRoute({
+            path: 'regions',
+            region: state.regions.selectedRegionId,
+            country: state.regions.selectedCountryCode,
+            period: state.regions.timeDeviationPeriod
+          }, { mode: 'push' });
+        });
+      });
+      $('regionsDailyBtn').addEventListener('click', openSelectedRegionDaily);
+      $('regionsAnalysisBtn').addEventListener('click', openSelectedRegionAnalysis);
+      $('regionsDataBtn').addEventListener('click', () => activateTab('tab-settings', true));
 
       $('filterToggleBtn').addEventListener('click', (e) => { e.stopPropagation(); $('filterDropdown').classList.toggle('hidden'); });
       document.addEventListener('click', (e) => { if (!$('filterDropdown').classList.contains('hidden') && !$('filterToggleBtn').contains(e.target) && !$('filterDropdown').contains(e.target)) $('filterDropdown').classList.add('hidden'); });
@@ -3715,7 +4551,12 @@
             : current && reportDates.includes(current)
               ? current
               : latest;
-          if (initial && (!state.current || state.current.date !== initial)) {
+          if (initial) {
+            setPickerDate('daily', initial);
+            if (!$('analysisDateSelect').value) setPickerDate('analysis', initial);
+          }
+          const currentRoute = parseHashRoute({ normalizeInvalid: false });
+          if (currentRoute.path === 'daily' && initial && (!state.current || state.current.date !== initial)) {
             selectDate(initial, { pushHistory: false, immediate: true });
           }
         }
@@ -3782,6 +4623,7 @@
         : t('autoNoStatus');
       renderCoverageSummary();
       renderSourceHealthSummary();
+      renderRegionsView();
       renderDataSourceStatus();
       syncAnalysisDateDefaults();
     }
@@ -4497,7 +5339,7 @@
         setPickerDate('daily', selected);
         renderCalendar();
         updateAlignmentInfo();
-        if (!state.current || state.current.date !== selected) {
+        if (currentRoutePath() === 'daily' && (!state.current || state.current.date !== selected)) {
           queueDailyDateChange(selected, { pushHistory: false, immediate: true });
         }
       } else {
@@ -4745,8 +5587,9 @@
         current = await prepareDailyContext(date, null, { signal });
       } catch (error) {
         if (error?.name === 'AbortError') throw error;
+        if (requestId !== state.dateRequestSequence) return null;
         setBanner('loadStatus', t('autoDataError', { error: error?.message || error }), 'error');
-        alert(t('autoDataError', { error: error?.message || error }));
+        if (force) alert(t('autoDataError', { error: error?.message || error }));
         return;
       }
       if (requestId !== state.dateRequestSequence) return null;
@@ -6879,11 +7722,11 @@
     }
 
     function routePathForTab(tabId) {
-      return ROUTE_TAB_TO_PATH[tabId] || 'daily';
+      return ROUTE_TAB_TO_PATH[tabId] || 'regions';
     }
 
     function tabForRoutePath(path) {
-      return ROUTE_PATH_TO_TAB[path] || 'tab-chart';
+      return ROUTE_PATH_TO_TAB[path] || 'tab-regions';
     }
 
     function normalizeRouteQueryParams(params) {
@@ -6926,15 +7769,22 @@
       const legacyTabPath = params.get('tab') ? routePathForTab(params.get('tab').startsWith?.('tab-') ? params.get('tab') : `tab-${params.get('tab')}`) : '';
       const path = normalizeRouteToken(segments[0] || legacyTabPath);
       let route = {
-        path: 'daily',
-        tabId: 'tab-chart',
+        path: 'regions',
+        tabId: 'tab-regions',
         date: params.get('date') || null,
         analysis: routeAnalysisAlias(params.get('analysis')),
+        region: normalizeRegionId(params.get('region') || REGION_DEFAULT_ID),
+        country: (params.get('country') || REGION_DEFAULT_COUNTRY).toUpperCase(),
+        period: REGION_PERIODS.includes(params.get('period')) ? params.get('period') : REGION_DEFAULT_PERIOD,
         params,
         invalid: false,
         empty: !rawHash
       };
-      if (path === 'daily' || !path) {
+      if (path === 'regions' || !path) {
+        route.path = 'regions';
+        route.tabId = 'tab-regions';
+        if (segments[1]) route.region = normalizeRegionId(segments[1]);
+      } else if (path === 'daily') {
         route.path = 'daily';
         route.tabId = 'tab-chart';
         if (segments[1]) route.date = segments[1];
@@ -6953,6 +7803,9 @@
       }
       if (route.date) route.params.set('date', route.date);
       if (route.analysis) route.params.set('analysis', route.analysis);
+      if (route.region) route.params.set('region', route.region);
+      if (route.country) route.params.set('country', route.country);
+      if (route.period) route.params.set('period', route.period);
       return route;
     }
 
@@ -6971,7 +7824,7 @@
     }
 
     function currentRoutePath() {
-      const active = document.querySelector('.tab-button.active')?.dataset.tab || 'tab-chart';
+      const active = document.querySelector('.tab-button.active')?.dataset.tab || 'tab-regions';
       return routePathForTab(active);
     }
 
@@ -6981,11 +7834,19 @@
       const normalizedPath = path === 'chart' ? 'daily' : path === 'oscillation' ? 'analysis' : path;
       const analysis = routeAnalysisAlias(patch.analysis ?? $('analysisTypeSelect')?.value) || 'stats';
       const dailyDate = patch.date ?? $('dateSelect')?.value;
-      let hashPath = '#/daily';
+      let hashPath = '#/regions';
+      const regionId = normalizeRegionId(patch.region ?? state.regions.selectedRegionId ?? REGION_DEFAULT_ID);
+      const countryCode = String(patch.country ?? state.regions.selectedCountryCode ?? REGION_DEFAULT_COUNTRY).toUpperCase();
+      const period = REGION_PERIODS.includes(patch.period ?? state.regions.timeDeviationPeriod)
+        ? (patch.period ?? state.regions.timeDeviationPeriod)
+        : REGION_DEFAULT_PERIOD;
+      if (normalizedPath === 'regions' && regionId && regionId !== REGION_DEFAULT_ID) {
+        hashPath = `#/regions/${encodeURIComponent(regionId)}`;
+      }
       if (normalizedPath === 'analysis') hashPath = `#/analysis/${encodeURIComponent(analysis)}`;
       else if (normalizedPath === 'reports') hashPath = '#/reports';
       else if (normalizedPath === 'data') hashPath = '#/data';
-      else if (dailyDate) hashPath = `#/daily/${encodeURIComponent(dailyDate)}`;
+      else if (normalizedPath === 'daily' && dailyDate) hashPath = `#/daily/${encodeURIComponent(dailyDate)}`;
 
       const source = routeSourceAlias(patch.source ?? getAnalysisSource()) || getAnalysisSource();
       const resolution = routeResolutionAlias(patch.resolution ?? $('analysisResolution')?.value) || $('analysisResolution')?.value;
@@ -6997,12 +7858,17 @@
         alignment: patch.alignment ?? $('analysisAlignment')?.value,
         mode: patch.mode ?? $('analysisDateMode')?.value,
         start: patch.start ?? $('analysisStartDate')?.value,
-        end: patch.end ?? $('analysisEndDate')?.value
+        end: patch.end ?? $('analysisEndDate')?.value,
+        country: countryCode,
+        period
       };
       if (routeParams.lang === 'tr') delete routeParams.lang;
+      if (routeParams.period === REGION_DEFAULT_PERIOD) delete routeParams.period;
       const queryKeys = normalizedPath === 'analysis'
         ? ['lang', 'date', 'source', 'resolution', 'alignment', 'mode', 'start', 'end']
-        : ['lang'];
+        : normalizedPath === 'regions'
+          ? ['lang', 'country', 'period']
+          : ['lang'];
       const query = serializeRouteQuery(routeParams, queryKeys);
       return `${hashPath}${query ? `?${query}` : ''}`;
     }
@@ -7026,9 +7892,9 @@
       state.routing.isApplyingRoute = true;
       try {
         if (route.invalid) {
-          activateTab('tab-chart');
-          if (window.history?.replaceState) window.history.replaceState(null, '', `${window.location.pathname}#/daily`);
-          else window.location.hash = '#/daily';
+          activateTab('tab-regions');
+          if (window.history?.replaceState) window.history.replaceState(null, '', `${window.location.pathname}#/regions?country=TR`);
+          else window.location.hash = '#/regions?country=TR';
           return;
         }
         const theme = route.params.get('theme');
@@ -7041,6 +7907,8 @@
         const mode = route.params.get('mode');
         const start = route.params.get('start');
         const end = route.params.get('end');
+        const country = route.params.get('country');
+        const period = route.params.get('period');
         if (theme) document.documentElement.setAttribute('data-theme', theme);
         if (routeLang && routeLang !== lang) setLanguage(routeLang);
         if (date) {
@@ -7068,6 +7936,9 @@
         if (start) $('analysisStartDate').value = start;
         if (end) $('analysisEndDate').value = end;
         updateAnalysisAvailability();
+        if (route.path === 'regions') {
+          applyRegionsRoute({ ...route, country, period });
+        }
         activateTab(route.tabId || tabForRoutePath(route.path));
         const dates = reportDatesForCurrentMode();
         if (route.path === 'daily' && date && dates.includes(date)) {
@@ -8483,6 +9354,100 @@
       });
     }
 
+    Object.assign(i18n.tr, {
+      tabRegions: 'Frekans Bölgeleri',
+      regionsTitle: 'Frekans Bölgeleri',
+      regionsIntro: 'Avrupa’daki 50 Hz senkron frekans bölgelerini, Türkiye ve Kıta Avrupası ölçüm verileriyle birlikte inceleyin.',
+      regionsDefaultTag: 'Varsayılan: Türkiye',
+      regionsSelectLabel: 'Bölge seçimi',
+      regionsMapLoading: 'Harita yükleniyor',
+      regionsMapUnavailable: 'Frekans bölgeleri haritası yüklenemedi.',
+      regionsConfigFallback: 'Bölge katalogları yüklenemedi; yedek katalog gösteriliyor.',
+      regionsOpenDaily: 'Günlük grafiği aç',
+      regionsOpenAnalysis: 'Analize git',
+      regionsOpenData: 'Veri durumuna git',
+      regionsTechTitle: 'Teknik özet',
+      regionsTechDesc: 'Nominal frekans, izleme bandı, elektriksel zaman sapması ve kaynak durumu seçili bölgeye göre güncellenir.',
+      regionsTimeDeviationTitle: 'Elektriksel zaman sapması',
+      regionsTimeDeviationDesc: 'Sapma, ∫(f − 50 Hz) / 50 Hz dt yaklaşımıyla hesaplanır; eksik örnekler gerçek veri gibi doldurulmaz.',
+      regionsPeriodLatest: 'Son gün',
+      regionsPeriodMonth: 'Son ay',
+      regionsPeriodCustom: 'Özel dönem',
+      regionsControlTitle: 'Kontrol katmanları',
+      regionsControlDesc: 'FCR, aFRR ve mFRR terimleri bölgesel frekans kontrolünü yorumlamak için kısa bağlam sağlar.',
+      regionsMethodTitle: 'Yöntem ve sınırlamalar',
+      regionsSourcesTitle: 'Resmî kaynaklar',
+      regionsSelectedSystem: 'Seçili sistem',
+      regionsDataSource: 'Veri kaynağı',
+      regionsLatestData: 'Son veri',
+      regionsDataStatus: 'Durum',
+      regionsNoDataStatus: 'Uygulamada veri yok',
+      regionsNoDateStatus: 'Veri tarihi yok',
+      regionsDataAvailable: '{date} için veri var',
+      regionsNoSource: 'Kaynak yok',
+      regionsNominalFrequency: 'Nominal frekans',
+      regionsQualityBand: 'İzleme bandı',
+      regionsTimezone: 'Zaman dilimi',
+      regionsManifestRange: 'Manifest aralığı',
+      regionsRangeUnavailable: 'Bölgeye özel bant yok',
+      regionsControlFallback: 'Bu bölge için ayrıntılı kontrol katmanı açıklaması eklenmedi.',
+      regionsNoReferences: 'Kaynak bağlantısı tanımlı değil.',
+      regionsMethodMeasured: 'Bu görünüm, mevcut optimize günlük frekans dosyalarını ve manifest bilgisini kullanır. Bölge kartları bilgilendirici, zaman sapması ise seçili kaynak verisinden hesaplanır.',
+      regionsMethodNoData: 'Bu bölge haritada bağlam için gösterilir. Uygulamada bu bölgeye ait otomatik ölçüm verisi olmadığı için günlük grafik ve analiz düğmeleri kapalıdır.',
+      regionsTimeDeviationLoading: 'Zaman sapması hesaplanıyor.',
+      regionsTimeDeviationNoData: 'Bu bölge için hesaplanabilir frekans verisi yok.',
+      regionsCustomPeriodHint: 'Özel dönem hesabı için Analiz sekmesindeki tarih aralığı araçlarını kullanın.',
+      regionsTimeDeviationError: 'Zaman sapması hesaplanamadı: {error}',
+      regionsTimeDeviationResult: '{source} · {range} · elektriksel zaman sapması {value} · kapsama {coverage}'
+    });
+
+    Object.assign(i18n.en, {
+      tabRegions: 'Frequency Regions',
+      regionsTitle: 'Frequency Regions',
+      regionsIntro: 'Explore European 50 Hz synchronous frequency regions together with Türkiye and Continental Europe measurement data.',
+      regionsDefaultTag: 'Default: Türkiye',
+      regionsSelectLabel: 'Region selection',
+      regionsMapLoading: 'Loading map',
+      regionsMapUnavailable: 'Frequency regions map could not be loaded.',
+      regionsConfigFallback: 'Region catalogs could not be loaded; fallback catalog is displayed.',
+      regionsOpenDaily: 'Open daily chart',
+      regionsOpenAnalysis: 'Go to analysis',
+      regionsOpenData: 'Go to data status',
+      regionsTechTitle: 'Technical summary',
+      regionsTechDesc: 'Nominal frequency, monitoring band, electrical time deviation, and source status update with the selected region.',
+      regionsTimeDeviationTitle: 'Electrical time deviation',
+      regionsTimeDeviationDesc: 'Deviation is calculated with the ∫(f − 50 Hz) / 50 Hz dt approximation; missing samples are not invented as real data.',
+      regionsPeriodLatest: 'Latest day',
+      regionsPeriodMonth: 'Latest month',
+      regionsPeriodCustom: 'Custom period',
+      regionsControlTitle: 'Control layers',
+      regionsControlDesc: 'FCR, aFRR, and mFRR provide short context for regional frequency control.',
+      regionsMethodTitle: 'Method and limitations',
+      regionsSourcesTitle: 'Official sources',
+      regionsSelectedSystem: 'Selected system',
+      regionsDataSource: 'Data source',
+      regionsLatestData: 'Latest data',
+      regionsDataStatus: 'Status',
+      regionsNoDataStatus: 'No app data',
+      regionsNoDateStatus: 'No data date',
+      regionsDataAvailable: 'Data available for {date}',
+      regionsNoSource: 'No source',
+      regionsNominalFrequency: 'Nominal frequency',
+      regionsQualityBand: 'Monitoring band',
+      regionsTimezone: 'Time zone',
+      regionsManifestRange: 'Manifest range',
+      regionsRangeUnavailable: 'No region-specific band',
+      regionsControlFallback: 'Detailed control-layer notes are not configured for this region.',
+      regionsNoReferences: 'No source link is configured.',
+      regionsMethodMeasured: 'This view uses the existing optimized daily frequency files and manifest metadata. Region cards are informational; time deviation is calculated from the selected source data.',
+      regionsMethodNoData: 'This region is shown for map context. Daily chart and analysis buttons are disabled because the application has no automatic measurement data for it.',
+      regionsTimeDeviationLoading: 'Calculating time deviation.',
+      regionsTimeDeviationNoData: 'No frequency data is available for this region.',
+      regionsCustomPeriodHint: 'Use the Analysis tab date-range tools for custom-period calculations.',
+      regionsTimeDeviationError: 'Time deviation could not be calculated: {error}',
+      regionsTimeDeviationResult: '{source} · {range} · electrical time deviation {value} · coverage {coverage}'
+    });
+
     function t(key, vars) {
       let val = i18n[lang]?.[key] ?? i18n.tr[key];
       if (val === undefined) return key;
@@ -8545,6 +9510,7 @@
       renderCoverageSummary();
       renderReportPreview();
       renderDataSourceStatus();
+      renderRegionsView();
     }
 
   </script>
