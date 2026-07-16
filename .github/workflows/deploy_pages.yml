@@ -18,6 +18,10 @@ on:
       - "tests/**"
       - ".github/workflows/deploy_pages.yml"
   workflow_dispatch:
+  workflow_run:
+    workflows: ["TEIAS Daily Frequency Update", "Netztransparenz Daily Frequency Update"]
+    types: [completed]
+    branches: [main]
 
 permissions:
   contents: read
@@ -30,6 +34,7 @@ concurrency:
 
 jobs:
   build:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

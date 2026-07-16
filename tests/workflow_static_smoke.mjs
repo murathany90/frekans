@@ -1,6 +1,7 @@
 import { readFileSync, existsSync } from "node:fs";
 
 const dailyWorkflow = readFileSync(".github/workflows/teias_daily_update.yml", "utf8");
+const deployWorkflow = readFileSync(".github/workflows/deploy_pages.yml", "utf8");
 
 const requiredDailySnippets = [
   'cron: "15 7,9,12,15 * * *"',
@@ -30,6 +31,17 @@ if (/TEIAS daily update failed: \$\{new Date\(\)\.toISOString\(\)\}/.test(dailyW
 
 if (!existsSync(".github/workflows/frontend_tests.yml")) {
   throw new Error("Missing mandatory frontend Playwright workflow.");
+}
+
+for (const snippet of [
+  "workflow_run:",
+  'workflows: ["TEIAS Daily Frequency Update", "Netztransparenz Daily Frequency Update"]',
+  "types: [completed]",
+  "github.event.workflow_run.conclusion == 'success'",
+]) {
+  if (!deployWorkflow.includes(snippet)) {
+    throw new Error(`Deploy workflow must publish successful automated data updates: ${snippet}`);
+  }
 }
 
 const frontendWorkflow = readFileSync(".github/workflows/frontend_tests.yml", "utf8");
