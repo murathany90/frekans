@@ -398,7 +398,7 @@
       border-radius: 12px;
       background: linear-gradient(180deg, #f8fbfd, #eef6fb);
       overflow: hidden;
-      min-height: 360px;
+      min-height: 285px;
       display: grid;
       place-items: center;
       padding: 10px;
@@ -411,7 +411,7 @@
       display: block;
     }
 
-    .regions-map-host svg[data-map-layout="card-silhouette"] {
+    .regions-map-host svg[data-map-layout="png-silhouette-cards"] {
       max-height: none;
       border-radius: 10px;
     }
@@ -437,7 +437,7 @@
       filter: drop-shadow(0 0 0 rgba(0,0,0,0)) drop-shadow(0 0 11px rgba(245,158,11,.55));
     }
 
-    .regions-map-host svg[data-map-layout="card-silhouette"] .is-selected {
+    .regions-map-host svg[data-map-layout="png-silhouette-cards"] .is-selected {
       filter: drop-shadow(0 10px 18px rgba(14, 165, 233, .18)) drop-shadow(0 0 8px rgba(245,158,11,.34));
     }
 
@@ -1695,7 +1695,7 @@
       .data-status-card dl { grid-template-columns: 1fr; gap: 4px; }
       .regions-hero,
       .regions-detail-grid { grid-template-columns: 1fr; }
-      .regions-map-host { min-height: 260px; }
+      .regions-map-host { min-height: 190px; }
       .regions-map-toolbar { align-items: stretch; }
       .regions-map-toolbar select { width: 100%; }
       .regions-summary-grid,
@@ -1716,7 +1716,7 @@
       .regions-map-card,
       .regions-panel-card,
       .regions-info-card { padding: 10px; }
-      .regions-map-host { min-height: 220px; }
+      .regions-map-host { min-height: 150px; }
       .regions-actions .btn { flex-basis: 100%; }
       .regions-periods .btn { flex: 1 1 calc(50% - 7px); min-width: 0; }
     }
@@ -1793,7 +1793,6 @@
                 <option value="continental-europe|CE">Kıta Avrupası</option>
                 <option value="nordic|SE">Nordik</option>
                 <option value="great-britain|GB">Büyük Britanya</option>
-                <option value="ireland|IE">İrlanda</option>
               </select>
             </div>
             <div id="regionsMapHost" class="regions-map-host" aria-live="polite">
@@ -3161,10 +3160,7 @@
       nordik: 'nordic',
       greatbritain: 'great-britain',
       'great-britain': 'great-britain',
-      gb: 'great-britain',
-      ireland: 'ireland',
-      irlanda: 'ireland',
-      ie: 'ireland'
+      gb: 'great-britain'
     };
     const REGION_DEFAULT_ID = 'continental-europe';
     const REGION_DEFAULT_COUNTRY = 'TR';

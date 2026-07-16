@@ -182,47 +182,6 @@
           "url": "https://www.nationalgrideso.com/"
         }
       ]
-    },
-    {
-      "id": "ireland",
-      "type": "synchronous-area",
-      "nominalFrequencyHz": 50,
-      "frequencyQualityRangeHz": null,
-      "hasMeasurementData": false,
-      "defaultCountryCode": "IE",
-      "dataSourceId": null,
-      "countries": ["IE"],
-      "tags": {
-        "tr": ["50 Hz", "Ada sistemi", "Veri yok"],
-        "en": ["50 Hz", "Islanded system", "No data"]
-      },
-      "labels": {
-        "tr": {
-          "short": "İrlanda",
-          "standard": "İrlanda Senkron Bölgesi",
-          "long": "İrlanda Senkron Bölgesi · 50 Hz",
-          "subtitle": "İrlanda sistemi ayrı bir frekans bölgesi olarak izlenir.",
-          "description": "İrlanda adası elektrik sistemi kendi senkron frekans alanına sahiptir. GridFreq bu bölge için veri yayımlamaz.",
-          "dataNote": "",
-          "noDataNote": "Bu bölge için uygulamada henüz ölçüm verisi yoktur."
-        },
-        "en": {
-          "short": "Ireland",
-          "standard": "Ireland Synchronous Area",
-          "long": "Ireland Synchronous Area · 50 Hz",
-          "subtitle": "The Ireland system is monitored as a separate frequency area.",
-          "description": "The island of Ireland has its own synchronous frequency area. GridFreq does not publish data for this region.",
-          "dataNote": "",
-          "noDataNote": "No measurement data is available in the application for this region yet."
-        }
-      },
-      "controlLayers": [],
-      "references": [
-        {
-          "title": "EirGrid",
-          "url": "https://www.eirgrid.ie/"
-        }
-      ]
     }
   ]
 }

@@ -1,20 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 500" role="img" aria-labelledby="frequencyRegionsMapTitle frequencyRegionsMapDesc" data-map-layout="card-silhouette">
-  <title id="frequencyRegionsMapTitle">Frequency regions card map</title>
-  <desc id="frequencyRegionsMapDesc">Interactive card map of selected European 50 Hz synchronous frequency regions.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 340" role="img" aria-labelledby="frequencyRegionsMapTitle frequencyRegionsMapDesc" data-map-layout="png-silhouette-cards">
+  <title id="frequencyRegionsMapTitle">Frequency regions silhouette cards</title>
+  <desc id="frequencyRegionsMapDesc">Interactive card map of Great Britain, Continental Europe with Türkiye highlighted, and Nordic 50 Hz frequency regions.</desc>
   <defs>
     <linearGradient id="regionCardBackground" x1="0" x2="1" y1="0" y2="1">
       <stop offset="0" stop-color="#FFFFFF"/>
-      <stop offset="1" stop-color="#F4FAFD"/>
-    </linearGradient>
-    <linearGradient id="selectedRegionGradient" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0" stop-color="#22D3EE" stop-opacity="0.86"/>
-      <stop offset="1" stop-color="#3B82F6" stop-opacity="0.84"/>
+      <stop offset="1" stop-color="#F3F9FD"/>
     </linearGradient>
     <filter id="regionCardShadow" x="-10%" y="-12%" width="120%" height="128%">
-      <feDropShadow dx="0" dy="10" stdDeviation="13" flood-color="#0B1220" flood-opacity="0.10"/>
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#0B1220" flood-opacity="0.12"/>
     </filter>
-    <filter id="regionMarkerGlow" x="-120%" y="-120%" width="340%" height="340%">
-      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#F59E0B" flood-opacity="0.55"/>
+    <filter id="labelShadow" x="-20%" y="-50%" width="140%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-color="#FFFFFF" flood-opacity="0.95"/>
+    </filter>
+    <filter id="turkiyeGlow" x="-90%" y="-90%" width="280%" height="280%">
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#EF4444" flood-opacity="0.55"/>
     </filter>
     <style>
       .map-bg { fill: #F8FAFC; }
@@ -29,133 +28,123 @@
       .region-card:focus .card-frame,
       .region-card.is-selected .card-frame {
         stroke: #22D3EE;
-        stroke-width: 2.2;
+        stroke-width: 2.4;
       }
       .region-grid {
-        stroke: #DCE8F0;
+        stroke: #DBE9F1;
         stroke-width: 1;
-        opacity: .72;
+        opacity: .76;
       }
       .region-shape {
-        fill: #DDE3EA;
-        opacity: .98;
+        opacity: .94;
+      }
+      .region-shape-ce {
+        opacity: .90;
       }
       .region-card:hover .region-shape,
       .region-card:focus .region-shape,
       .region-card.is-selected .region-shape {
-        fill: url(#selectedRegionGradient);
+        opacity: 1;
       }
       .region-label {
         fill: #0B2F55;
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        font-size: 20px;
-        font-weight: 850;
+        font-size: 22px;
+        font-weight: 900;
         letter-spacing: 0;
+        filter: url(#labelShadow);
       }
       .region-subtitle {
-        fill: #5F7185;
+        fill: #556C80;
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         font-size: 10.5px;
-        font-weight: 760;
-        letter-spacing: .03em;
+        font-weight: 850;
+        letter-spacing: .035em;
+        filter: url(#labelShadow);
       }
       .country-marker { outline: none; }
-      .country-marker-dot {
+      .turkiye-highlight {
+        filter: url(#turkiyeGlow);
+        stroke: #FFFFFF;
+        stroke-width: 4;
+      }
+      .country-marker:hover .turkiye-highlight,
+      .country-marker:focus .turkiye-highlight,
+      .country-marker.is-selected .turkiye-highlight {
+        stroke: #0B1220;
+      }
+      .country-label {
+        fill: #FFFFFF;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 10px;
+        font-weight: 950;
+        letter-spacing: .02em;
+      }
+      .baltic-marker {
         fill: #F59E0B;
         stroke: #FFFFFF;
         stroke-width: 3;
-        filter: url(#regionMarkerGlow);
-      }
-      .country-marker-teias .country-marker-dot {
-        fill: #0F766E;
-        stroke-width: 4;
-      }
-      .country-marker:hover .country-marker-dot,
-      .country-marker:focus .country-marker-dot,
-      .country-marker.is-selected .country-marker-dot {
-        stroke: #0B1220;
-      }
-      .marker-label {
-        fill: #0B2F55;
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        font-size: 9px;
-        font-weight: 850;
       }
     </style>
   </defs>
 
-  <rect class="map-bg" x="0" y="0" width="760" height="500" rx="28"/>
+  <rect class="map-bg" x="0" y="0" width="960" height="340" rx="28"/>
 
   <g class="region-card" data-region-id="great-britain" tabindex="0" aria-label="Great Britain synchronous frequency area">
-    <rect class="card-frame" x="24" y="26" width="340" height="208" rx="16"/>
+    <rect class="card-frame" x="24" y="34" width="280" height="276" rx="16"/>
     <g class="region-grid">
-      <path d="M58 72H330"/>
-      <path d="M58 130H330"/>
-      <path d="M58 188H330"/>
-      <path d="M112 54V212"/>
-      <path d="M194 54V212"/>
-      <path d="M276 54V212"/>
+      <path d="M54 86H274"/>
+      <path d="M54 152H274"/>
+      <path d="M54 218H274"/>
+      <path d="M108 64V282"/>
+      <path d="M164 64V282"/>
+      <path d="M220 64V282"/>
     </g>
-    <path class="region-shape" d="M190 64c20-10 45-2 56 17 12 21 5 49-14 64-14 11-17 28-6 43 10 14 3 31-14 37-22 8-48-7-57-31-6-15-20-25-36-30-18-5-29-21-26-38 4-18 21-28 40-25 24 4 38-14 57-37Z"/>
-    <text class="region-label" x="194" y="146" text-anchor="middle">Büyük Britanya</text>
-    <text class="region-subtitle" x="194" y="166" text-anchor="middle">ISLANDED 50 HZ</text>
+    <image class="region-shape" href="assets/frequency-regions/gb-silhouette.png" x="91" y="58" width="146" height="192" preserveAspectRatio="xMidYMid meet"/>
+    <text class="region-label" x="164" y="165" text-anchor="middle">Büyük Britanya</text>
+    <text class="region-subtitle" x="164" y="185" text-anchor="middle">ISLANDED 50 HZ</text>
   </g>
 
-  <g class="region-card" data-region-id="continental-europe" tabindex="0" aria-label="Continental Europe synchronous frequency area">
-    <rect class="card-frame" x="396" y="26" width="340" height="208" rx="16"/>
+  <g class="region-card" data-region-id="continental-europe" tabindex="0" aria-label="Continental Europe synchronous frequency area with Türkiye highlighted">
+    <rect class="card-frame" x="340" y="34" width="280" height="276" rx="16"/>
     <g class="region-grid">
-      <path d="M430 72H702"/>
-      <path d="M430 130H702"/>
-      <path d="M430 188H702"/>
-      <path d="M484 54V212"/>
-      <path d="M566 54V212"/>
-      <path d="M648 54V212"/>
+      <path d="M370 86H590"/>
+      <path d="M370 152H590"/>
+      <path d="M370 218H590"/>
+      <path d="M424 64V282"/>
+      <path d="M480 64V282"/>
+      <path d="M536 64V282"/>
     </g>
-    <path class="region-shape" d="M492 91c24-20 61-21 90-7 22 11 44 10 70 1 35-12 66 6 76 36 10 31-11 58-45 63-23 4-35 18-39 40-5 25-31 41-59 35-25-5-37-25-34-48 3-22-11-35-37-37-29-3-47-22-44-45 3-18-8-30-29-36-14-4-12-12 21-18 11-2 20-8 30-16Z"/>
-    <text class="region-label" x="566" y="146" text-anchor="middle">Kıta Avrupası</text>
-    <text class="region-subtitle" x="566" y="166" text-anchor="middle">SYNCHRONOUS 50 HZ</text>
-    <g class="country-marker country-marker-teias" data-country-code="TR" tabindex="0" aria-label="Türkiye TEİAŞ frequency data marker">
-      <ellipse class="country-marker-dot" cx="642" cy="196" rx="20" ry="13"/>
-      <text class="marker-label" x="642" y="200" text-anchor="middle">TR</text>
+    <image class="region-shape region-shape-ce" href="assets/frequency-regions/ce-silhouette.png" x="354" y="92" width="252" height="158" preserveAspectRatio="xMidYMid meet"/>
+    <text class="region-label" x="480" y="165" text-anchor="middle">Kıta Avrupası</text>
+    <text class="region-subtitle" x="480" y="185" text-anchor="middle">SYNCHRONOUS 50 HZ</text>
+    <g class="country-marker" data-country-code="TR" tabindex="0" aria-label="Türkiye TEİAŞ frequency data marker">
+      <ellipse class="turkiye-highlight" cx="546" cy="224" rx="25" ry="14" fill="#EF4444"/>
+      <text class="country-label" x="546" y="228" text-anchor="middle">TR</text>
     </g>
-    <g class="country-marker" data-country-code="EE" tabindex="0" aria-label="Estonia synchronized with Continental Europe">
-      <circle class="country-marker-dot" cx="624" cy="94" r="8"/>
+    <g data-country-code="EE" tabindex="0" aria-label="Estonia synchronized with Continental Europe">
+      <circle class="baltic-marker" cx="518" cy="104" r="7"/>
     </g>
-    <g class="country-marker" data-country-code="LV" tabindex="0" aria-label="Latvia synchronized with Continental Europe">
-      <circle class="country-marker-dot" cx="619" cy="113" r="8"/>
+    <g data-country-code="LV" tabindex="0" aria-label="Latvia synchronized with Continental Europe">
+      <circle class="baltic-marker" cx="513" cy="121" r="7"/>
     </g>
-    <g class="country-marker" data-country-code="LT" tabindex="0" aria-label="Lithuania synchronized with Continental Europe">
-      <circle class="country-marker-dot" cx="612" cy="132" r="8"/>
+    <g data-country-code="LT" tabindex="0" aria-label="Lithuania synchronized with Continental Europe">
+      <circle class="baltic-marker" cx="507" cy="138" r="7"/>
     </g>
   </g>
 
   <g class="region-card" data-region-id="nordic" tabindex="0" aria-label="Nordic synchronous frequency area">
-    <rect class="card-frame" x="24" y="266" width="340" height="208" rx="16"/>
+    <rect class="card-frame" x="656" y="34" width="280" height="276" rx="16"/>
     <g class="region-grid">
-      <path d="M58 312H330"/>
-      <path d="M58 370H330"/>
-      <path d="M58 428H330"/>
-      <path d="M112 294V452"/>
-      <path d="M194 294V452"/>
-      <path d="M276 294V452"/>
+      <path d="M686 86H906"/>
+      <path d="M686 152H906"/>
+      <path d="M686 218H906"/>
+      <path d="M740 64V282"/>
+      <path d="M796 64V282"/>
+      <path d="M852 64V282"/>
     </g>
-    <path class="region-shape" d="M174 302c28-18 70-13 94 11 20 20 23 51 8 77-13 22-16 42-5 59 8 13 2 27-14 34-22 9-51-1-63-24-10-19-28-29-53-30-26-2-45-16-48-37-3-22 15-39 43-40 23-1 36-13 37-34 0-7 1-12 1-16Z"/>
-    <text class="region-label" x="194" y="386" text-anchor="middle">Nordik</text>
-    <text class="region-subtitle" x="194" y="406" text-anchor="middle">SYNCHRONOUS 50 HZ</text>
-  </g>
-
-  <g class="region-card" data-region-id="ireland" tabindex="0" aria-label="Ireland synchronous frequency area">
-    <rect class="card-frame" x="396" y="266" width="340" height="208" rx="16"/>
-    <g class="region-grid">
-      <path d="M430 312H702"/>
-      <path d="M430 370H702"/>
-      <path d="M430 428H702"/>
-      <path d="M484 294V452"/>
-      <path d="M566 294V452"/>
-      <path d="M648 294V452"/>
-    </g>
-    <path class="region-shape" d="M562 323c18-13 43-12 58 3 15 14 14 37-1 50-11 10-13 24-5 36 8 12 1 27-15 32-22 6-48-12-55-35-4-13-13-22-25-28-13-6-19-20-13-33 7-15 36-6 56-25Z"/>
-    <text class="region-label" x="566" y="386" text-anchor="middle">İrlanda</text>
-    <text class="region-subtitle" x="566" y="406" text-anchor="middle">ISLANDED 50 HZ</text>
+    <image class="region-shape" href="assets/frequency-regions/nordic-silhouette.png" x="720" y="54" width="154" height="204" preserveAspectRatio="xMidYMid meet"/>
+    <text class="region-label" x="796" y="165" text-anchor="middle">Nordik</text>
+    <text class="region-subtitle" x="796" y="185" text-anchor="middle">SYNCHRONOUS 50 HZ</text>
   </g>
 </svg>

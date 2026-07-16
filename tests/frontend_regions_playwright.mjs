@@ -51,12 +51,14 @@ try {
       dailyDisabled: document.querySelector("#regionsDailyBtn")?.disabled,
       mapLayout: document.querySelector("#regionsMapHost svg")?.getAttribute("data-map-layout"),
       cardCount: document.querySelectorAll("#regionsMapHost svg .region-card").length,
+      hasIrelandCard: Boolean(document.querySelector('#regionsMapHost svg [data-region-id="ireland"]')),
+      turkeyHighlightFill: document.querySelector("#regionsMapHost svg .turkiye-highlight")?.getAttribute("fill"),
       controlNames: [...document.querySelectorAll("#regionsControlGrid .regions-control-item strong")].map(node => node.textContent?.trim())
     }));
     if (!initial.hash.startsWith("#/regions") || initial.title !== "Türkiye" || !initial.subtitle.includes("TEİAŞ") || initial.dailyDisabled) {
       throw new Error(`Default regions view did not select Türkiye with data: ${JSON.stringify(initial)}`);
     }
-    if (initial.mapLayout !== "card-silhouette" || initial.cardCount < 4) {
+    if (initial.mapLayout !== "png-silhouette-cards" || initial.cardCount !== 3 || initial.hasIrelandCard || initial.turkeyHighlightFill !== "#EF4444") {
       throw new Error(`Regions map must render the card silhouette layout: ${JSON.stringify(initial)}`);
     }
     if (initial.controlNames.join("|") !== "PFK|SFK|Tersiyer") {
@@ -102,9 +104,11 @@ try {
     const mobileState = await page.evaluate(() => ({
       overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
       mapLayout: document.querySelector("#regionsMapHost svg")?.getAttribute("data-map-layout"),
-      cardCount: document.querySelectorAll("#regionsMapHost svg .region-card").length
+      cardCount: document.querySelectorAll("#regionsMapHost svg .region-card").length,
+      hasIrelandCard: Boolean(document.querySelector('#regionsMapHost svg [data-region-id="ireland"]')),
+      turkeyHighlightFill: document.querySelector("#regionsMapHost svg .turkiye-highlight")?.getAttribute("fill")
     }));
-    if (mobileState.overflow || mobileState.mapLayout !== "card-silhouette" || mobileState.cardCount < 4) {
+    if (mobileState.overflow || mobileState.mapLayout !== "png-silhouette-cards" || mobileState.cardCount !== 3 || mobileState.hasIrelandCard || mobileState.turkeyHighlightFill !== "#EF4444") {
       await page.screenshot({ path: `${artifactDir}/regions-mobile-${width}.png`, fullPage: true });
       throw new Error(`Frequency regions mobile view failed at ${width}px: ${JSON.stringify(mobileState)}`);
     }

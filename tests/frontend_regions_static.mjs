@@ -29,7 +29,10 @@ for (const path of [
   "assets/frequency-regions.json",
   "assets/frequency-countries.json",
   "assets/frequency-regions-map.svg",
-  "assets/frequency-regions.mjs"
+  "assets/frequency-regions.mjs",
+  "assets/frequency-regions/ce-silhouette.png",
+  "assets/frequency-regions/gb-silhouette.png",
+  "assets/frequency-regions/nordic-silhouette.png"
 ]) {
   if (!existsSync(path)) throw new Error(`Frequency regions asset missing: ${path}`);
 }
@@ -51,14 +54,32 @@ if (countries.countries.TR.sourceId !== "teias" || countries.countries.EE.region
   throw new Error("Country catalog must preserve internal source keys and Baltic region mapping.");
 }
 
-if (!svg.includes('data-map-layout="card-silhouette"') || !svg.includes('class="region-card"')) {
+if (!svg.includes('data-map-layout="png-silhouette-cards"') || !svg.includes('class="region-card"')) {
   throw new Error("Frequency regions SVG must use the card silhouette map layout.");
 }
 
-for (const regionId of ["continental-europe", "nordic", "great-britain", "ireland"]) {
+for (const regionId of ["continental-europe", "nordic", "great-britain"]) {
   if (!svg.includes(`data-region-id="${regionId}"`)) {
     throw new Error(`Frequency regions SVG missing interactive card for ${regionId}.`);
   }
+}
+
+if (svg.includes('data-region-id="ireland"') || svg.includes("İrlanda") || svg.includes("Ireland")) {
+  throw new Error("Frequency regions SVG must not render Ireland as a separate card.");
+}
+
+for (const imageHref of [
+  "assets/frequency-regions/ce-silhouette.png",
+  "assets/frequency-regions/gb-silhouette.png",
+  "assets/frequency-regions/nordic-silhouette.png"
+]) {
+  if (!svg.includes(imageHref)) {
+    throw new Error(`Frequency regions SVG must use silhouette asset ${imageHref}.`);
+  }
+}
+
+if (!svg.includes('class="region-shape region-shape-ce"') || !svg.includes('class="turkiye-highlight"') || !svg.includes('fill="#EF4444"')) {
+  throw new Error("Continental Europe card must be blue with a red TÃ¼rkiye highlight.");
 }
 
 for (const countryCode of ["TR", "EE", "LV", "LT"]) {
@@ -94,6 +115,10 @@ if (html.includes("FCR, aFRR ve mFRR")) {
 }
 if (!html.includes("PFK, SFK ve Tersiyer")) {
   throw new Error("Turkish regions UI copy must mention PFK, SFK ve Tersiyer.");
+}
+
+if (html.includes('<option value="ireland|IE"') || /ireland:\s*['"]ireland['"]/.test(html) || /irlanda:\s*['"]ireland['"]/.test(html)) {
+  throw new Error("Ireland must be removed from visible regions routing and selector UI.");
 }
 
 if (/gridradar|mapbox|leaflet|google maps/i.test(`${html}\n${svg}`)) {
