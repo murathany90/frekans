@@ -411,7 +411,7 @@
       display: block;
     }
 
-    .regions-map-host svg[data-map-layout="png-silhouette-cards"] {
+    .regions-map-host svg[data-map-layout="continental-europe-focus"] {
       max-height: none;
       border-radius: 10px;
     }
@@ -437,7 +437,7 @@
       filter: drop-shadow(0 0 0 rgba(0,0,0,0)) drop-shadow(0 0 11px rgba(245,158,11,.55));
     }
 
-    .regions-map-host svg[data-map-layout="png-silhouette-cards"] .is-selected {
+    .regions-map-host svg[data-map-layout="continental-europe-focus"] .is-selected {
       filter: drop-shadow(0 10px 18px rgba(14, 165, 233, .18)) drop-shadow(0 0 8px rgba(245,158,11,.34));
     }
 
@@ -1789,10 +1789,8 @@
             <div class="regions-map-toolbar">
               <label for="regionsMobileSelect" data-i18n="regionsSelectLabel">Bölge seçimi</label>
               <select id="regionsMobileSelect" aria-label="Frekans bölgesi seçimi">
-                <option value="continental-europe|TR">Türkiye · Kıta Avrupası</option>
-                <option value="continental-europe|CE">Kıta Avrupası</option>
-                <option value="nordic|SE">Nordik</option>
-                <option value="great-britain|GB">Büyük Britanya</option>
+                <option value="continental-europe|TR">Türkiye · TEİAŞ</option>
+                <option value="continental-europe|CE">Kıta Avrupası Senkron Bölgesi</option>
               </select>
             </div>
             <div id="regionsMapHost" class="regions-map-host" aria-live="polite">
@@ -3155,12 +3153,7 @@
       europe: 'continental-europe',
       turkiye: 'continental-europe',
       türkiye: 'continental-europe',
-      tr: 'continental-europe',
-      nordic: 'nordic',
-      nordik: 'nordic',
-      greatbritain: 'great-britain',
-      'great-britain': 'great-britain',
-      gb: 'great-britain'
+      tr: 'continental-europe'
     };
     const REGION_DEFAULT_ID = 'continental-europe';
     const REGION_DEFAULT_COUNTRY = 'TR';
@@ -3505,6 +3498,14 @@
       return state.regions.countriesCatalog?.countries?.[code] || fallbackCountriesCatalog().countries[code] || null;
     }
 
+    function normalizeRegionCountry(region, countryCode) {
+      const requested = String(countryCode || region?.defaultCountryCode || REGION_DEFAULT_COUNTRY).toUpperCase();
+      if (requested === 'CE') return 'CE';
+      const validCountries = new Set(region?.countries || []);
+      if (validCountries.has(requested)) return requested;
+      return region?.defaultCountryCode || REGION_DEFAULT_COUNTRY;
+    }
+
     function regionLabel(region, context = 'short') {
       return region?.labels?.[lang]?.[context] || region?.labels?.tr?.[context] || region?.id || '—';
     }
@@ -3559,6 +3560,7 @@
     async function renderRegionsMap() {
       const host = $('regionsMapHost');
       if (!host || state.regions.svgLoaded) {
+        updateRegionsMapLanguage();
         updateRegionsMapSelection();
         return;
       }
@@ -3568,10 +3570,29 @@
         host.innerHTML = await response.text();
         state.regions.svgLoaded = true;
         bindRegionsMapInteractions();
+        updateRegionsMapLanguage();
       } catch {
         host.innerHTML = `<div class="empty-state">${escapeHtml(t('regionsMapUnavailable'))}</div>`;
       }
+      updateRegionsMapLanguage();
       updateRegionsMapSelection();
+    }
+
+    function updateRegionsMapLanguage() {
+      const host = $('regionsMapHost');
+      if (!host) return;
+      const labelKey = lang === 'en' ? 'labelEn' : 'labelTr';
+      const fallbackLabelKey = lang === 'en' ? 'labelTr' : 'labelEn';
+      host.querySelectorAll('[data-label-tr], [data-label-en]').forEach(node => {
+        const value = node.dataset[labelKey] || node.dataset[fallbackLabelKey];
+        if (value) node.textContent = value;
+      });
+      const ariaKey = lang === 'en' ? 'ariaEn' : 'ariaTr';
+      const fallbackAriaKey = lang === 'en' ? 'ariaTr' : 'ariaEn';
+      host.querySelectorAll('[data-aria-tr], [data-aria-en]').forEach(node => {
+        const value = node.dataset[ariaKey] || node.dataset[fallbackAriaKey];
+        if (value) node.setAttribute('aria-label', value);
+      });
     }
 
     function bindRegionsMapInteractions() {
@@ -3614,7 +3635,7 @@
 
     function selectFrequencyRegion(regionId, countryCode = null, { pushHistory = true } = {}) {
       const region = findRegion(regionId);
-      const safeCountry = String(countryCode || region.defaultCountryCode || '').toUpperCase();
+      const safeCountry = normalizeRegionCountry(region, countryCode);
       state.regions.selectedRegionId = region?.id || REGION_DEFAULT_ID;
       state.regions.selectedCountryCode = safeCountry === 'CE' ? 'CE' : safeCountry;
       renderRegionsView();
@@ -3629,7 +3650,7 @@
     function applyRegionsRoute(route) {
       const regionId = normalizeRegionId(route?.region || route?.params?.get('region') || REGION_DEFAULT_ID);
       const region = findRegion(regionId);
-      const country = String(route?.country || route?.params?.get('country') || region?.defaultCountryCode || REGION_DEFAULT_COUNTRY).toUpperCase();
+      const country = normalizeRegionCountry(region, route?.country || route?.params?.get('country'));
       const period = REGION_PERIODS.includes(route?.period || route?.params?.get('period'))
         ? (route?.period || route?.params?.get('period'))
         : REGION_DEFAULT_PERIOD;

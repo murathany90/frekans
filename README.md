@@ -36,9 +36,9 @@ Uygulama tek HTML dosyası etrafında çalışan statik bir ön yüz ve önceden
 - `assets/analysis-worker.mjs`: Ağır analizlerin Web Worker üzerinde çalıştırılması.
 - `assets/echarts.min.js`: CDN erişimi yoksa kullanılan yerel ECharts yedeği.
 - `assets/brand/`: GridFreq SVG logo, favicon, mobil ikonlar ve sosyal paylaşım kartı.
-- `assets/frequency-regions.json`: Frekans bölgesi kataloğu; Kıta Avrupası, Nordik ve Büyük Britanya senkron bölgelerini, nominal frekans bilgisini, izleme bandını ve kaynak referanslarını tanımlar.
+- `assets/frequency-regions.json`: Frekans bölgesi kataloğu; Kıta Avrupası senkron bölgesini, nominal frekans bilgisini, izleme bandını ve kaynak referanslarını tanımlar.
 - `assets/frequency-countries.json`: Bölge içindeki ülke etiketleri ve uygulama kaynak eşleşmeleri. Dahili kaynak anahtarları `teias` ve `netztransparenz` olarak korunur.
-- `assets/frequency-regions-map.svg`: Dış harita kütüphanesi kullanmadan, PNG siluet assetleriyle gösterilen üç kartlı etkileşimli SVG frekans bölgeleri haritası.
+- `assets/frequency-regions-map.svg`: Dış harita kütüphanesi kullanmadan, yüksek çözünürlüklü Kıta Avrupası PNG silüetiyle gösterilen tek odaklı etkileşimli SVG frekans bölgesi haritası.
 - `assets/frequency-regions.mjs`: Elektriksel zaman sapması hesabı için küçük yardımcı modül.
 - `site.webmanifest`: Mobil ana ekrana ekleme ve PWA ikon tanımları.
 - `scripts/normalize_frequency.py`: Günlük frekans paketini üretir, int16 binary yazar, dakika/saat özetlerini oluşturur ve manifestleri üretir.
@@ -49,15 +49,14 @@ Uygulama tek HTML dosyası etrafında çalışan statik bir ön yüz ve önceden
 
 ### Frekans Bölgeleri
 
-Frekans Bölgeleri sekmesi artık varsayılan ilk ekrandır. Hash route karşılığı `#/regions?country=TR` biçimindedir. Bu görünüm, Avrupa’daki temel 50 Hz senkron frekans bölgelerini üç kartlı PNG siluet SVG harita üzerinde gösterir ve ölçüm verisi bulunan Türkiye · TEİAŞ ile Kıta Avrupası · Netztransparenz kaynaklarını uygulamanın günlük veri kataloğuna bağlar. Kıta Avrupası kartı mavi bölge siluetiyle, Türkiye ise kırmızı TEİAŞ vurgusuyla gösterilir.
+Frekans Bölgeleri sekmesi artık varsayılan ilk ekrandır. Hash route karşılığı `#/regions?country=TR` biçimindedir. Bu görünüm, Kıta Avrupası 50 Hz senkron frekans bölgesini yüksek çözünürlüklü PNG silüet tabanlı tek SVG harita üzerinde gösterir ve ölçüm verisi bulunan Türkiye · TEİAŞ ile Kıta Avrupası · Netztransparenz kaynaklarını uygulamanın günlük veri kataloğuna bağlar. Kıta Avrupası mavi/turkuaz bölge silüetiyle, Türkiye ise kırmızı TEİAŞ vurgusuyla gösterilir.
 
-Görünümde seçilebilen ana bölgeler:
+Görünümde seçilebilen kaynak bağlamları:
 
-- Türkiye · Kıta Avrupası: TEİAŞ günlük frekans verisiyle günlük grafik ve analizlere bağlanır.
+- Türkiye · TEİAŞ: TEİAŞ günlük frekans verisiyle günlük grafik ve analizlere bağlanır.
 - Kıta Avrupası: Netztransparenz üzerinden yayımlanan Kıta Avrupası senkron bölgesi frekans serisini temsil eder.
-- Nordik ve Büyük Britanya: Haritada teknik bağlam için gösterilir; uygulamada otomatik ölçüm verisi olmadığı için günlük grafik ve analiz düğmeleri devre dışıdır.
 
-Bölge paneli seçili sistem, veri kaynağı, son veri tarihi, manifest aralığı, nominal frekans, izleme bandı ve zaman dilimi bilgilerini özetler. Kıta Avrupası kataloğu Baltık ülkelerinin 9 Şubat 2025 sonrası Kıta Avrupası senkron bölgesiyle senkron çalıştığını bilgi amaçlı gösterir. Harita ve mobil seçim listesi aynı merkezi katalogdan üretilir; GridRadar, Mapbox, Leaflet veya başka bir harita SDK’sı kullanılmaz. Türkçe kontrol katmanı kartlarında FCR, aFRR ve mFRR yerine sırasıyla **PFK**, **SFK** ve **Tersiyer** terminolojisi kullanılır; İngilizce arayüzde uluslararası FCR, aFRR ve mFRR adları korunur.
+Bölge paneli seçili sistem, veri kaynağı, son veri tarihi, manifest aralığı, nominal frekans, izleme bandı ve zaman dilimi bilgilerini özetler. Kıta Avrupası kataloğu Baltık ülkelerinin 9 Şubat 2025 sonrası Kıta Avrupası senkron bölgesiyle senkron çalıştığını bilgi amaçlı gösterir. Harita ve mobil seçim listesi aynı merkezi katalogdan üretilir; GridRadar, Mapbox, Leaflet veya başka bir harita SDK’sı kullanılmaz. SVG haritasındaki başlık ve açıklama metinleri Türkçe/İngilizce dil değişiminde güncellenir. Türkçe kontrol katmanı kartlarında FCR, aFRR ve mFRR yerine sırasıyla **PFK**, **SFK** ve **Tersiyer** terminolojisi kullanılır; İngilizce arayüzde uluslararası FCR, aFRR ve mFRR adları korunur.
 
 Elektriksel zaman sapması kartı mevcut optimize günlük `.frequency.i16` dosyalarından hesaplanır. Hesaplama `∫(f − 50 Hz) / 50 Hz dt` yaklaşımını kullanır; eksik veya geçersiz örnekler gerçek veri gibi doldurulmaz ve kapsama oranına yansıtılır. Varsayılan hesap son mevcut gün içindir; son ay seçimi aynı ay içindeki mevcut günlük dosyaları kullanır. Özel dönem için Analiz sekmesindeki tarih aralığı araçları kullanılmalıdır.
 

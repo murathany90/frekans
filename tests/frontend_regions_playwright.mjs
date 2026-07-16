@@ -25,6 +25,25 @@ async function waitForRegions(page) {
   await page.waitForSelector("#regionsMapHost svg", { timeout: 30000 });
 }
 
+async function readRegionState(page) {
+  return page.evaluate(() => ({
+    hash: window.location.hash,
+    title: document.querySelector("#regionsPanelTitle")?.textContent?.trim(),
+    subtitle: document.querySelector("#regionsPanelSubtitle")?.textContent?.trim(),
+    dailyDisabled: document.querySelector("#regionsDailyBtn")?.disabled,
+    analysisDisabled: document.querySelector("#regionsAnalysisBtn")?.disabled,
+    mapLayout: document.querySelector("#regionsMapHost svg")?.getAttribute("data-map-layout"),
+    focusCount: document.querySelectorAll("#regionsMapHost svg .region-focus").length,
+    cardCount: document.querySelectorAll("#regionsMapHost svg .region-card").length,
+    hasRemovedRegion: Boolean(document.querySelector('#regionsMapHost svg [data-region-id="nordic"], #regionsMapHost svg [data-region-id="great-britain"], #regionsMapHost svg [data-region-id="ireland"]')),
+    turkeyHighlightFill: document.querySelector("#regionsMapHost svg .turkiye-highlight")?.getAttribute("fill"),
+    mapTitle: document.querySelector('#regionsMapHost svg [data-map-label="title"]')?.textContent?.trim(),
+    selectValues: [...document.querySelectorAll("#regionsMobileSelect option")].map(option => option.value),
+    selectLabels: [...document.querySelectorAll("#regionsMobileSelect option")].map(option => option.textContent?.trim()),
+    controlNames: [...document.querySelectorAll("#regionsControlGrid .regions-control-item strong")].map(node => node.textContent?.trim())
+  }));
+}
+
 const browser = await chromium.launch({ headless: true });
 
 try {
@@ -43,23 +62,22 @@ try {
     await page.goto(appUrl(""), { waitUntil: "networkidle" });
     await waitForRegions(page);
     await page.waitForFunction(() => window.location.hash.startsWith("#/regions"));
-    const initial = await page.evaluate(() => ({
-      hash: window.location.hash,
-      title: document.querySelector("#regionsPanelTitle")?.textContent?.trim(),
-      subtitle: document.querySelector("#regionsPanelSubtitle")?.textContent?.trim(),
-      summary: document.querySelector("#regionsSummaryGrid")?.textContent || "",
-      dailyDisabled: document.querySelector("#regionsDailyBtn")?.disabled,
-      mapLayout: document.querySelector("#regionsMapHost svg")?.getAttribute("data-map-layout"),
-      cardCount: document.querySelectorAll("#regionsMapHost svg .region-card").length,
-      hasIrelandCard: Boolean(document.querySelector('#regionsMapHost svg [data-region-id="ireland"]')),
-      turkeyHighlightFill: document.querySelector("#regionsMapHost svg .turkiye-highlight")?.getAttribute("fill"),
-      controlNames: [...document.querySelectorAll("#regionsControlGrid .regions-control-item strong")].map(node => node.textContent?.trim())
-    }));
+    const initial = await readRegionState(page);
     if (!initial.hash.startsWith("#/regions") || initial.title !== "Türkiye" || !initial.subtitle.includes("TEİAŞ") || initial.dailyDisabled) {
       throw new Error(`Default regions view did not select Türkiye with data: ${JSON.stringify(initial)}`);
     }
-    if (initial.mapLayout !== "png-silhouette-cards" || initial.cardCount !== 3 || initial.hasIrelandCard || initial.turkeyHighlightFill !== "#EF4444") {
-      throw new Error(`Regions map must render the card silhouette layout: ${JSON.stringify(initial)}`);
+    if (
+      initial.mapLayout !== "continental-europe-focus" ||
+      initial.focusCount !== 1 ||
+      initial.cardCount !== 0 ||
+      initial.hasRemovedRegion ||
+      initial.turkeyHighlightFill !== "#EF4444" ||
+      initial.mapTitle !== "Kıta Avrupası"
+    ) {
+      throw new Error(`Regions map must render the single Continental Europe focus layout: ${JSON.stringify(initial)}`);
+    }
+    if (initial.selectValues.join("|") !== "continental-europe|TR|continental-europe|CE") {
+      throw new Error(`Regions selector must only expose Türkiye and Continental Europe: ${JSON.stringify(initial.selectValues)}`);
     }
     if (initial.controlNames.join("|") !== "PFK|SFK|Tersiyer") {
       throw new Error(`Turkish control cards must show PFK/SFK/Tersiyer: ${initial.controlNames.join(", ")}`);
@@ -70,21 +88,29 @@ try {
 
     await page.click("#langToggle");
     await page.waitForFunction(() => document.documentElement.dataset.currentLang === "en");
-    const englishControlNames = await page.evaluate(() => [...document.querySelectorAll("#regionsControlGrid .regions-control-item strong")].map(node => node.textContent?.trim()));
-    if (englishControlNames.join("|") !== "FCR|aFRR|mFRR") {
-      throw new Error(`English control cards must keep FCR/aFRR/mFRR: ${englishControlNames.join(", ")}`);
+    const english = await readRegionState(page);
+    if (english.mapTitle !== "Continental Europe") {
+      throw new Error(`Regions SVG text must switch to English: ${JSON.stringify(english)}`);
+    }
+    if (english.controlNames.join("|") !== "FCR|aFRR|mFRR") {
+      throw new Error(`English control cards must keep FCR/aFRR/mFRR: ${english.controlNames.join(", ")}`);
+    }
+    if (!english.selectLabels.some(label => label === "Continental Europe Synchronous Area")) {
+      throw new Error(`English selector must include Continental Europe label: ${JSON.stringify(english.selectLabels)}`);
     }
 
-    await page.selectOption("#regionsMobileSelect", "nordic|SE");
-    await page.waitForFunction(() => window.location.hash.startsWith("#/regions/nordic"));
-    const nordic = await page.evaluate(() => ({
-      title: document.querySelector("#regionsPanelTitle")?.textContent?.trim(),
-      dailyDisabled: document.querySelector("#regionsDailyBtn")?.disabled,
-      analysisDisabled: document.querySelector("#regionsAnalysisBtn")?.disabled,
-      status: document.querySelector("#regionsTimeDeviationStatus")?.textContent || ""
-    }));
-    if (!/Nordik|Nordic/.test(nordic.title) || !nordic.dailyDisabled || !nordic.analysisDisabled) {
-      throw new Error(`No-data region should disable daily and analysis buttons: ${JSON.stringify(nordic)}`);
+    await page.goto(appUrl("#/regions/nordic?country=SE"), { waitUntil: "networkidle" });
+    await waitForRegions(page);
+    const oldNordic = await readRegionState(page);
+    if (oldNordic.hasRemovedRegion || /Nordic|Nordik/.test(oldNordic.title || "") || oldNordic.dailyDisabled) {
+      throw new Error(`Removed Nordic route should fall back to data-backed Continental Europe view: ${JSON.stringify(oldNordic)}`);
+    }
+
+    await page.goto(appUrl("#/regions/great-britain?country=GB"), { waitUntil: "networkidle" });
+    await waitForRegions(page);
+    const oldGb = await readRegionState(page);
+    if (oldGb.hasRemovedRegion || /Great Britain|Büyük Britanya/.test(oldGb.title || "") || oldGb.analysisDisabled) {
+      throw new Error(`Removed Great Britain route should fall back to data-backed Continental Europe view: ${JSON.stringify(oldGb)}`);
     }
 
     await page.selectOption("#regionsMobileSelect", "continental-europe|TR");
@@ -104,11 +130,21 @@ try {
     const mobileState = await page.evaluate(() => ({
       overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
       mapLayout: document.querySelector("#regionsMapHost svg")?.getAttribute("data-map-layout"),
+      focusCount: document.querySelectorAll("#regionsMapHost svg .region-focus").length,
       cardCount: document.querySelectorAll("#regionsMapHost svg .region-card").length,
-      hasIrelandCard: Boolean(document.querySelector('#regionsMapHost svg [data-region-id="ireland"]')),
-      turkeyHighlightFill: document.querySelector("#regionsMapHost svg .turkiye-highlight")?.getAttribute("fill")
+      hasRemovedRegion: Boolean(document.querySelector('#regionsMapHost svg [data-region-id="nordic"], #regionsMapHost svg [data-region-id="great-britain"], #regionsMapHost svg [data-region-id="ireland"]')),
+      turkeyHighlightFill: document.querySelector("#regionsMapHost svg .turkiye-highlight")?.getAttribute("fill"),
+      mapTitle: document.querySelector('#regionsMapHost svg [data-map-label="title"]')?.textContent?.trim()
     }));
-    if (mobileState.overflow || mobileState.mapLayout !== "png-silhouette-cards" || mobileState.cardCount !== 3 || mobileState.hasIrelandCard || mobileState.turkeyHighlightFill !== "#EF4444") {
+    if (
+      mobileState.overflow ||
+      mobileState.mapLayout !== "continental-europe-focus" ||
+      mobileState.focusCount !== 1 ||
+      mobileState.cardCount !== 0 ||
+      mobileState.hasRemovedRegion ||
+      mobileState.turkeyHighlightFill !== "#EF4444" ||
+      mobileState.mapTitle !== "Kıta Avrupası"
+    ) {
       await page.screenshot({ path: `${artifactDir}/regions-mobile-${width}.png`, fullPage: true });
       throw new Error(`Frequency regions mobile view failed at ${width}px: ${JSON.stringify(mobileState)}`);
     }
