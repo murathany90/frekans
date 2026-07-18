@@ -1,0 +1,21 @@
+{
+  "name": "gridfreq-live-frequency-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit",
+    "wrangler:types": "wrangler types",
+    "dev": "wrangler dev",
+    "deploy:dry-run": "wrangler deploy --dry-run",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260717.1",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10",
+    "wrangler": "^4.112.0"
+  }
+}

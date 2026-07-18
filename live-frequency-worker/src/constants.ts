@@ -1,0 +1,10 @@
+export const OBJECT_NAME = "continental-europe";
+export const GRIDRADAR_METRIC = "frequency-ucte-median-1s";
+export const NOMINAL_FREQUENCY_HZ = 50;
+export const ENCODING_SCALE = 10000;
+export const CHUNK_SECONDS = 900;
+export const CHUNK_MILLISECONDS = CHUNK_SECONDS * 1000;
+export const RETENTION_SECONDS = 86400;
+export const POLL_INTERVAL_SECONDS = 60;
+export const MAX_RAW_RANGE_SECONDS = 3600;
+export const SOURCE_DELAY_SECONDS = 900;

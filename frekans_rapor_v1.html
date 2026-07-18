@@ -21,6 +21,7 @@
   <link rel="icon" href="assets/brand/favicon-32x32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
   <link rel="manifest" href="site.webmanifest">
+  <link rel="stylesheet" href="assets/live-frequency.css">
   <title>GridFreq – Türkiye ve Kıta Avrupası Şebeke Frekansı Analiz Platformu</title>
 
   <!-- CSV ayrıştırma Web Worker içinde akış tabanlı ve satır satır yapılır. -->
@@ -33,6 +34,12 @@
   </script>
   <script type="module" src="assets/analysis-core.mjs"></script>
   <script type="module" src="assets/frequency-regions.mjs"></script>
+  <script>
+    window.GRIDFREQ_CONFIG = Object.freeze({
+      liveApiBaseUrl: "https://gridfreq-live-frequency.murathan-yeniceli.workers.dev"
+    });
+  </script>
+  <script type="module" src="assets/live-frequency.js"></script>
 
   <style>
     :root {
@@ -148,14 +155,14 @@
 
     .tabs {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       background: rgba(255,255,255,.12);
       border: 1px solid rgba(255,255,255,.2);
       border-radius: 10px;
       padding: 3px;
       gap: 3px;
       flex: 1;
-      max-width: 650px;
+      max-width: 780px;
     }
 
     .tab-button {
@@ -1762,6 +1769,7 @@
       </a>
       <nav class="tabs" aria-label="Uygulama sekmeleri">
         <button class="tab-button active" data-tab="tab-regions" data-i18n="tabRegions">Frekans Bölgeleri</button>
+        <button class="tab-button" data-tab="tab-live-frequency" data-route="#/live-frequency" data-i18n="tabLiveFrequency">Canlı Frekans</button>
         <button class="tab-button" data-tab="tab-chart" data-i18n="tabChart">Günlük</button>
         <button class="tab-button" data-tab="tab-oscillation" data-i18n="tabOscillation">Analiz</button>
         <button class="tab-button" data-tab="tab-reports" data-i18n="tabReports">Raporlar</button>
@@ -1858,6 +1866,50 @@
           </details>
         </div>
         <div id="regionsStatusLive" class="sr-only" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- SEKME: CANLI FREKANS -->
+    <section id="tab-live-frequency" class="tab-panel">
+      <div class="panel">
+        <div class="section-title">
+          <div>
+            <h2>Kıta Avrupası Canlı Frekansı</h2>
+            <p>GridRadar API · 1 saniye kaynak çözünürlüğü · yaklaşık 15 dakika gecikmeli</p>
+          </div>
+          <span class="tag good">Son erişilebilir frekans</span>
+        </div>
+        <div id="liveFrequencyStatus" class="status-banner muted" aria-live="polite">Canlı frekans modülü hazırlanıyor.</div>
+        <div id="liveFrequencyBufferNotice" class="status-banner warn live-frequency-buffer-notice" aria-live="polite" hidden></div>
+        <div id="liveFrequencyKpis" class="live-frequency-kpi-grid" aria-live="polite"></div>
+      </div>
+
+      <div class="panel">
+        <div class="section-title">
+          <div>
+            <h3>Son 24 saat frekans eğrisi</h3>
+            <p>Dakikalık ortalama, minimum-maksimum zarfı ve nominal 50.000 Hz referansı.</p>
+          </div>
+          <div id="liveFrequencyRangeControls" class="live-frequency-ranges" role="group" aria-label="Canlı frekans zaman aralığı">
+            <button class="btn btn-secondary" type="button" data-live-range="900">Son 15 dakika</button>
+            <button class="btn btn-secondary" type="button" data-live-range="3600">Son 1 saat</button>
+            <button class="btn btn-secondary" type="button" data-live-range="21600">Son 6 saat</button>
+            <button class="btn btn-secondary active" type="button" data-live-range="86400">Son 24 saat</button>
+          </div>
+        </div>
+        <div class="chart-wrapper live-frequency-chart-wrapper">
+          <div id="liveFrequencyChart" class="chart" role="img" aria-label="Yaklaşık 15 dakika gecikmeli Kıta Avrupası frekans grafiği"></div>
+        </div>
+      </div>
+
+      <div class="panel live-frequency-source">
+        <div class="section-title">
+          <div>
+            <h3>Kaynak ve sınırlamalar</h3>
+            <p>Kaynak: GridRadar · Metrik: frequency-ucte-median-1s · ölçüm gecikmesi yaklaşık 15 dakika.</p>
+          </div>
+        </div>
+        <p>Bu görünüm gerçek zamanlı değil; GridRadar tarafından erişilebilir son ölçümleri güvenli Worker API üzerinden gösterir. GridRadar tokenı tarayıcıya gönderilmez.</p>
       </div>
     </section>
 
@@ -3134,6 +3186,7 @@
     const CHART_SESSION_STORAGE_KEY = 'frequencyChartSessionState';
     const ROUTE_TAB_TO_PATH = {
       'tab-regions': 'regions',
+      'tab-live-frequency': 'live-frequency',
       'tab-chart': 'daily',
       'tab-oscillation': 'analysis',
       'tab-reports': 'reports',
@@ -3141,6 +3194,7 @@
     };
     const ROUTE_PATH_TO_TAB = {
       regions: 'tab-regions',
+      'live-frequency': 'tab-live-frequency',
       daily: 'tab-chart',
       analysis: 'tab-oscillation',
       reports: 'tab-reports',
@@ -3981,6 +4035,7 @@
       btn.classList.add('active');
       panel.classList.add('active');
       if (syncUrl) updateRoute({ path: routePathForTab(tabId) }, { mode: 'push' });
+      window.dispatchEvent(new CustomEvent('gridfreq:tabchange', { detail: { tabId } }));
       if (tabId === 'tab-regions') renderRegionsView();
       if (tabId === 'tab-chart' && $('dateSelect')?.value && (!state.current || state.current.date !== $('dateSelect').value)) {
         selectDate($('dateSelect').value, { pushHistory: false, immediate: true });
@@ -7816,6 +7871,9 @@
         route.path = 'daily';
         route.tabId = 'tab-chart';
         if (segments[1]) route.date = segments[1];
+      } else if (path === 'live-frequency') {
+        route.path = 'live-frequency';
+        route.tabId = 'tab-live-frequency';
       } else if (path === 'analysis') {
         route.path = 'analysis';
         route.tabId = 'tab-oscillation';
@@ -7871,7 +7929,8 @@
       if (normalizedPath === 'regions' && regionId && regionId !== REGION_DEFAULT_ID) {
         hashPath = `#/regions/${encodeURIComponent(regionId)}`;
       }
-      if (normalizedPath === 'analysis') hashPath = `#/analysis/${encodeURIComponent(analysis)}`;
+      if (normalizedPath === 'live-frequency') hashPath = '#/live-frequency';
+      else if (normalizedPath === 'analysis') hashPath = `#/analysis/${encodeURIComponent(analysis)}`;
       else if (normalizedPath === 'reports') hashPath = '#/reports';
       else if (normalizedPath === 'data') hashPath = '#/data';
       else if (normalizedPath === 'daily' && dailyDate) hashPath = `#/daily/${encodeURIComponent(dailyDate)}`;
@@ -9384,6 +9443,7 @@
 
     Object.assign(i18n.tr, {
       tabRegions: 'Frekans Bölgeleri',
+      tabLiveFrequency: 'Canlı Frekans',
       regionsTitle: 'Frekans Bölgeleri',
       regionsIntro: 'Avrupa’daki 50 Hz senkron frekans bölgelerini, Türkiye ve Kıta Avrupası ölçüm verileriyle birlikte inceleyin.',
       regionsDefaultTag: 'Varsayılan: Türkiye',
@@ -9431,6 +9491,7 @@
 
     Object.assign(i18n.en, {
       tabRegions: 'Frequency Regions',
+      tabLiveFrequency: 'Live Frequency',
       regionsTitle: 'Frequency Regions',
       regionsIntro: 'Explore European 50 Hz synchronous frequency regions together with Türkiye and Continental Europe measurement data.',
       regionsDefaultTag: 'Default: Türkiye',
