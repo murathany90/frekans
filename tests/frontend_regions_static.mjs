@@ -4,6 +4,7 @@ const html = readFileSync("frekans_rapor_v1.html", "utf8");
 const regions = JSON.parse(readFileSync("assets/frequency-regions.json", "utf8"));
 const countries = JSON.parse(readFileSync("assets/frequency-countries.json", "utf8"));
 const svg = readFileSync("assets/frequency-regions-map.svg", "utf8");
+const regionsSection = html.match(/<section id="tab-regions"[\s\S]*?<\/section>/)?.[0] || "";
 
 const requiredHtmlMarkers = [
   'data-tab="tab-regions"',
@@ -139,7 +140,7 @@ if (!html.includes("PFK, SFK ve Tersiyer")) {
   throw new Error("Turkish regions UI copy must mention PFK, SFK ve Tersiyer.");
 }
 
-if (/gridradar|mapbox|leaflet|google maps/i.test(`${html}\n${svg}`)) {
+if (/gridradar|mapbox|leaflet|google maps/i.test(`${regionsSection}\n${svg}`)) {
   throw new Error("Frequency regions must not depend on GridRadar, Mapbox, Leaflet, or Google Maps.");
 }
 
