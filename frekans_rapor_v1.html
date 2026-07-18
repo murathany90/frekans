@@ -1874,10 +1874,10 @@
       <div class="panel">
         <div class="section-title">
           <div>
-            <h2>Kıta Avrupası Canlı Frekansı</h2>
-            <p>Kıta Avrupası · GridRadar · yaklaşık 15 dakika gecikmeli</p>
+            <h2 id="liveFrequencyTitle">Kıta Avrupası Canlı Frekansı</h2>
+            <p id="liveFrequencySubtitle">Kıta Avrupası · GridRadar · yaklaşık 15 dakika gecikmeli</p>
           </div>
-          <span class="tag good">GridRadar</span>
+          <span class="tag good" id="liveFrequencySourceTag">GridRadar</span>
         </div>
         <div id="liveFrequencyStatus" class="status-banner muted" aria-live="polite">Canlı frekans modülü hazırlanıyor.</div>
         <div id="liveFrequencyBufferNotice" class="status-banner warn live-frequency-buffer-notice" aria-live="polite" hidden></div>
@@ -1887,13 +1887,20 @@
       <div class="panel">
         <div class="section-title">
           <div>
-            <h3>Seçili zaman aralığı frekans eğrisi</h3>
-            <p>60 saniyelik özet ortalama, maksimum ve minimum değerler; nominal 50.000 Hz referans çizgisiyle gösterilir.</p>
+            <h3 id="liveFrequencyChartTitle">Son 1 Saat</h3>
+            <p id="liveFrequencyChartSubtitle">1 saat görünümünde saniyelik seri; 6/24 saat görünümünde 60 saniyelik özet kullanılır.</p>
           </div>
-          <div id="liveFrequencyRangeControls" class="live-frequency-ranges" role="group" aria-label="Canlı frekans zaman aralığı">
-            <button class="btn btn-secondary active" type="button" data-live-range="3600">Son 1 saat</button>
-            <button class="btn btn-secondary" type="button" data-live-range="21600">Son 6 saat</button>
-            <button class="btn btn-secondary" type="button" data-live-range="86400">Son 24 saat</button>
+          <div class="live-frequency-chart-controls">
+            <div id="liveFrequencyRangeControls" class="live-frequency-ranges" role="group" aria-label="Canlı frekans zaman aralığı">
+              <button class="btn btn-secondary active" type="button" data-live-range="3600">Son 1 saat</button>
+              <button class="btn btn-secondary" type="button" data-live-range="21600">Son 6 saat</button>
+              <button class="btn btn-secondary" type="button" data-live-range="86400">Son 24 saat</button>
+            </div>
+            <div id="liveFrequencyHourNav" class="live-frequency-hour-nav" hidden>
+              <button class="btn btn-secondary" id="liveFrequencyPrevHour" type="button" aria-label="Önceki saat">◀</button>
+              <span id="liveFrequencyWindowLabel" class="live-frequency-window-label"></span>
+              <button class="btn btn-secondary" id="liveFrequencyNextHour" type="button" aria-label="Sonraki saat">▶</button>
+            </div>
           </div>
         </div>
         <div class="chart-wrapper live-frequency-chart-wrapper">
@@ -1904,34 +1911,29 @@
       <div class="panel live-frequency-source">
         <div class="section-title">
           <div>
-            <h3>Veri Kaynağı</h3>
-            <p>Kıta Avrupası frekans verisi GridRadar tarafından sağlanmaktadır.</p>
+            <h3 id="liveFrequencySourceTitle">Veri Kaynağı</h3>
+            <p id="liveFrequencySourceSplit">Tarihsel/Günlük Kıta Avrupası verisi: Netztransparenz · Canlı/gecikmeli Kıta Avrupası verisi: GridRadar</p>
           </div>
         </div>
-        <div class="live-frequency-source-grid">
+        <div class="live-frequency-source-grid live-frequency-source-grid-compact">
           <a class="live-frequency-provider" href="https://gridradar.net/en/mains-frequency" target="_blank" rel="noopener noreferrer" aria-label="GridRadar resmi frekans sayfası">
             <img class="live-frequency-provider-logo" src="assets/gridradar/gridradar-logo.svg" alt="GridRadar">
-            <strong>Veri Kaynağı: GridRadar</strong>
-            <span>Kıta Avrupası frekans verisi GridRadar tarafından sağlanmaktadır.</span>
+            <strong id="liveFrequencyProviderName">GridRadar</strong>
+            <span id="liveFrequencyProviderMeta">1 s çözünürlük · ~15 dk gecikme</span>
           </a>
-          <dl class="live-frequency-source-facts">
-            <dt>Metrik</dt>
-            <dd><code>frequency-ucte-median-1s</code></dd>
-            <dt>Kaynak çözünürlüğü</dt>
-            <dd>Kaynak çözünürlüğü: 1 saniye</dd>
-            <dt>Veri gecikmesi</dt>
-            <dd>Veri gecikmesi: yaklaşık 15 dakika</dd>
-            <dt>Resmi site</dt>
-            <dd><a href="https://gridradar.net/en" target="_blank" rel="noopener noreferrer">GridRadar resmi sitesi</a></dd>
-          </dl>
-        </div>
-        <div class="live-frequency-source-split" aria-label="Kıta Avrupası veri kaynakları ayrımı">
-          <p>Tarihsel/Günlük Kıta Avrupası verisi: Netztransparenz</p>
-          <p>Canlı/gecikmeli Kıta Avrupası verisi: GridRadar</p>
+          <div class="live-frequency-source-meta">
+            <p><code>frequency-ucte-median-1s</code></p>
+            <div class="live-frequency-source-links">
+              <a id="liveFrequencyOfficialLink" href="https://gridradar.net/en/mains-frequency" target="_blank" rel="noopener noreferrer">GridRadar frekans sayfası</a>
+              <a id="liveFrequencyCommercialLink" href="https://gridradar.net/en" target="_blank" rel="noopener noreferrer">Ticari veya profesyonel veri erişimi için GridRadar ile iletişime geçin.</a>
+            </div>
+          </div>
         </div>
         <div class="live-frequency-usage-notice">
-          <p>Bu sayfada gösterilen Kıta Avrupası frekans verileri GridRadar tarafından sağlanmaktadır. Veriler yalnızca kişisel, ticari olmayan ve fonlanmamış akademik araştırma amaçlarıyla görüntülenmek üzere sunulmaktadır. Ticari veya profesyonel kullanım, şirket içi analiz, danışmanlık, ücretli ürün ve hizmetler veya fonlanan araştırma projelerinde kullanım için GridRadar’dan önceden uygun kullanım izni alınmalıdır.</p>
-          <p><a href="https://gridradar.net/en" target="_blank" rel="noopener noreferrer">Ticari veya profesyonel veri erişimi için GridRadar ile iletişime geçin.</a></p>
+          <details id="liveFrequencySourceTerms" class="live-frequency-source-terms">
+            <summary id="liveFrequencyTermsSummary">Veri kullanım koşulları</summary>
+            <p id="liveFrequencyTermsText">Bu sayfada gösterilen Kıta Avrupası frekans verileri GridRadar tarafından sağlanmaktadır. Veriler yalnızca kişisel, ticari olmayan ve fonlanmamış akademik araştırma amaçlarıyla görüntülenmek üzere sunulmaktadır. Ticari veya profesyonel kullanım, şirket içi analiz, danışmanlık, ücretli ürün ve hizmetler veya fonlanan araştırma projelerinde kullanım için GridRadar’dan önceden uygun kullanım izni alınmalıdır.</p>
+          </details>
         </div>
       </div>
     </section>
