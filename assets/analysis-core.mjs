@@ -35,64 +35,206 @@ export function createSyntheticSignal({
   return { timestamps, values };
 }
 
-export function analyzeDataQuality(timestamps, values, { expectedIntervalSeconds = 1 } = {}) {
+export function analyzeDataQuality(timestamps, values, {
+  expectedIntervalSeconds = 1,
+  startSecond = null,
+  endSecond = null,
+  validMinHz = 49,
+  validMaxHz = 51,
+  stuckThresholdSeconds = 5
+} = {}) {
   const n = values?.length || 0;
-  let validCount = 0;
-  let invalidCount = 0;
-  let duplicateTimestampCount = 0;
-  let longestGapSeconds = 0;
-  let currentGap = 0;
-  let stuckSeconds = 0;
-  let currentStuck = 0;
-  let jumpCount = 0;
-  const seen = new Set();
-  const intervals = [];
-  let previousTimestamp = null;
-  let previousValue = null;
+  const intervalSeconds = Math.max(1e-9, Number(expectedIntervalSeconds) || 1);
+  const hasTimestamps = timestamps && timestamps.length;
+  const finiteTimestamps = [];
   for (let i = 0; i < n; i += 1) {
-    const ts = Number(timestamps?.[i] ?? i * expectedIntervalSeconds);
-    if (seen.has(ts)) duplicateTimestampCount += 1;
-    seen.add(ts);
-    if (previousTimestamp !== null) intervals.push(ts - previousTimestamp);
-    previousTimestamp = ts;
+    const ts = Number(hasTimestamps ? timestamps[i] : i * intervalSeconds);
+    if (Number.isFinite(ts)) finiteTimestamps.push(ts);
+  }
+  const firstTimestamp = finiteTimestamps.length ? Math.min(...finiteTimestamps) : null;
+  const lastTimestamp = finiteTimestamps.length ? Math.max(...finiteTimestamps) : null;
+  const hasExplicitStart = startSecond !== null && startSecond !== undefined && Number.isFinite(Number(startSecond));
+  const hasExplicitEnd = endSecond !== null && endSecond !== undefined && Number.isFinite(Number(endSecond));
+  const windowStart = hasExplicitStart ? Number(startSecond) : (firstTimestamp ?? 0);
+  const windowEnd = hasExplicitEnd
+    ? Number(endSecond)
+    : (lastTimestamp !== null ? lastTimestamp + intervalSeconds : windowStart);
+  const expectedCount = Math.max(0, Math.round((windowEnd - windowStart) / intervalSeconds));
+  const canonicalValues = new Array(expectedCount).fill(null);
+  const observedMask = new Array(expectedCount).fill(false);
+  const validMask = new Array(expectedCount).fill(false);
+  const invalidMask = new Array(expectedCount).fill(false);
+  const duplicateMask = new Array(expectedCount).fill(false);
+  const stuckMask = new Array(expectedCount).fill(false);
+  const intervals = [];
+  const duplicateEvents = [];
+  let duplicateTimestampCount = 0;
+  let invalidCount = 0;
+  let rawValidSampleCount = 0;
+  let jumpCount = 0;
+  let previousInputTimestamp = null;
+  let previousInputValue = null;
 
-    const value = values[i];
-    if (Number.isFinite(value)) {
-      validCount += 1;
-      longestGapSeconds = Math.max(longestGapSeconds, currentGap * expectedIntervalSeconds);
-      currentGap = 0;
-      if (previousValue !== null && Number.isFinite(previousValue)) {
-        if (Math.abs(value - previousValue) > 0.08) jumpCount += 1;
-        currentStuck = Math.abs(value - previousValue) < 1e-9 ? currentStuck + expectedIntervalSeconds : 0;
-        stuckSeconds = Math.max(stuckSeconds, currentStuck);
+  for (let i = 0; i < n; i += 1) {
+    const ts = Number(hasTimestamps ? timestamps[i] : windowStart + i * intervalSeconds);
+    if (!Number.isFinite(ts)) continue;
+    if (previousInputTimestamp !== null) intervals.push(ts - previousInputTimestamp);
+    previousInputTimestamp = ts;
+    const index = Math.round((ts - windowStart) / intervalSeconds);
+    const canonicalSecond = windowStart + index * intervalSeconds;
+    if (index < 0 || index >= expectedCount || Math.abs(ts - canonicalSecond) > intervalSeconds / 2) continue;
+
+    const value = Number(values[i]);
+    const finiteValue = Number.isFinite(value);
+    const validValue = finiteValue && value >= validMinHz && value <= validMaxHz;
+    const duplicate = observedMask[index];
+    if (duplicate) {
+      duplicateTimestampCount += 1;
+      duplicateMask[index] = true;
+      duplicateEvents.push({
+        type: "duplicate",
+        startSecond: canonicalSecond,
+        endSecond: canonicalSecond + intervalSeconds,
+        durationSeconds: intervalSeconds,
+        classification: "Duplicate Timestamp"
+      });
+    }
+    if (finiteValue) {
+      observedMask[index] = true;
+      if (previousInputValue !== null && Number.isFinite(previousInputValue) && Math.abs(value - previousInputValue) > 0.08) jumpCount += 1;
+      previousInputValue = value;
+    }
+    if (validValue) {
+      rawValidSampleCount += 1;
+      if (!validMask[index]) {
+        canonicalValues[index] = value;
+        validMask[index] = true;
       }
-      previousValue = value;
-    } else {
+    } else if (finiteValue) {
       invalidCount += 1;
-      currentGap += 1;
+      invalidMask[index] = true;
     }
   }
-  longestGapSeconds = Math.max(longestGapSeconds, currentGap * expectedIntervalSeconds);
-  const expectedCount = n ? Math.round(((timestamps?.[n - 1] ?? n - 1) - (timestamps?.[0] ?? 0)) / expectedIntervalSeconds) + 1 : 0;
-  const missingCount = Math.max(0, expectedCount - validCount);
-  const coverageRatio = expectedCount ? validCount / expectedCount : 0;
+
+  const missingEvents = collectMaskEvents(observedMask.map(item => !item), windowStart, intervalSeconds, "missing", "Missing Data");
+  const invalidEvents = collectMaskEvents(invalidMask, windowStart, intervalSeconds, "invalid", "Invalid Value");
+  const gapEventCount = missingEvents.length;
+  const missingCount = missingEvents.reduce((sum, event) => sum + Math.round(event.durationSeconds / intervalSeconds), 0);
+  const longestGapSeconds = missingEvents.reduce((max, event) => Math.max(max, event.durationSeconds), 0);
+
+  const stuckEvents = [];
+  const stuckThreshold = Math.max(intervalSeconds, Number(stuckThresholdSeconds) || 5);
+  let runStart = -1;
+  let runValue = null;
+  for (let i = 0; i <= expectedCount; i += 1) {
+    const value = i < expectedCount && validMask[i] ? canonicalValues[i] : null;
+    const continues = i < expectedCount && runStart >= 0 && value !== null && Math.abs(value - runValue) < 1e-9;
+    if (continues) continue;
+    if (runStart >= 0) {
+      const durationSeconds = (i - runStart) * intervalSeconds;
+      if (durationSeconds >= stuckThreshold) {
+        for (let j = runStart; j < i; j += 1) stuckMask[j] = true;
+        stuckEvents.push({
+          type: "stuck",
+          startSecond: windowStart + runStart * intervalSeconds,
+          endSecond: windowStart + i * intervalSeconds,
+          durationSeconds,
+          value: runValue,
+          classification: "Bad Quality - Stuck Value"
+        });
+      }
+    }
+    if (i < expectedCount && value !== null) {
+      runStart = i;
+      runValue = value;
+    } else {
+      runStart = -1;
+      runValue = null;
+    }
+  }
+
+  const uniqueObservedCount = observedMask.reduce((sum, item) => sum + (item ? 1 : 0), 0);
+  const uniqueValidCount = validMask.reduce((sum, item) => sum + (item ? 1 : 0), 0);
+  const goodMask = validMask.map((valid, index) => Boolean(valid && !invalidMask[index] && !duplicateMask[index] && !stuckMask[index]));
+  const goodQualityCount = goodMask.reduce((sum, item) => sum + (item ? 1 : 0), 0);
+  const coverageRatio = expectedCount ? Math.min(1, uniqueValidCount / expectedCount) : 0;
+  const goodQualityRatio = expectedCount ? Math.min(1, goodQualityCount / expectedCount) : 0;
+  const totalStuckSeconds = stuckEvents.reduce((sum, event) => sum + event.durationSeconds, 0);
+  const longestStuckSeconds = stuckEvents.reduce((max, event) => Math.max(max, event.durationSeconds), 0);
+  const qualityEvents = [...missingEvents, ...invalidEvents, ...duplicateEvents, ...stuckEvents]
+    .sort((a, b) => a.startSecond - b.startSecond || a.endSecond - b.endSecond);
+
   return {
     expectedCount,
     actualCount: n,
-    validCount,
+    observedCount: uniqueObservedCount,
+    validCount: uniqueValidCount,
+    rawValidSampleCount,
+    uniqueValidCount,
+    goodQualityCount,
     coverageRatio,
+    goodQualityRatio,
     missingCount,
     duplicateTimestampCount,
     invalidCount,
     longestGapSeconds,
-    shortGapCount: invalidCount && longestGapSeconds < 30 ? 1 : 0,
-    stuckSeconds,
+    gapEventCount,
+    shortGapCount: gapEventCount,
+    stuckValueEventCount: stuckEvents.length,
+    totalStuckSeconds,
+    longestStuckSeconds,
+    stuckSeconds: longestStuckSeconds,
     jumpCount,
-    firstTimestamp: n ? timestamps?.[0] ?? 0 : null,
-    lastTimestamp: n ? timestamps?.[n - 1] ?? n - 1 : null,
+    firstTimestamp,
+    lastTimestamp,
+    startSecond: windowStart,
+    endSecond: windowEnd,
+    durationSeconds: Math.max(0, windowEnd - windowStart),
     medianIntervalSeconds: percentile(intervals, 0.5),
-    intervalStdSeconds: standardDeviation(intervals)
+    intervalStdSeconds: standardDeviation(intervals),
+    missingEvents,
+    invalidEvents,
+    duplicateEvents,
+    stuckEvents,
+    qualityEvents,
+    canonical: {
+      startSecond: windowStart,
+      endSecond: windowEnd,
+      intervalSeconds,
+      values: canonicalValues
+    },
+    masks: {
+      observed: observedMask,
+      valid: validMask,
+      invalid: invalidMask,
+      duplicate: duplicateMask,
+      stuck: stuckMask,
+      good: goodMask,
+      missing: observedMask.map(item => !item)
+    }
   };
+}
+
+function collectMaskEvents(mask, startSecond, intervalSeconds, type, classification) {
+  const events = [];
+  let runStart = -1;
+  for (let i = 0; i <= mask.length; i += 1) {
+    if (i < mask.length && mask[i]) {
+      if (runStart < 0) runStart = i;
+      continue;
+    }
+    if (runStart >= 0) {
+      events.push({
+        type,
+        startSecond: startSecond + runStart * intervalSeconds,
+        endSecond: startSecond + i * intervalSeconds,
+        durationSeconds: (i - runStart) * intervalSeconds,
+        classification
+      });
+      runStart = -1;
+    }
+  }
+  return events;
 }
 
 export function computeBasicStats(values, {

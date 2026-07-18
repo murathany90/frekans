@@ -757,6 +757,7 @@
     }
 
     .chart.tall { height: 510px; }
+    .chart.quality-chart { height: 620px; }
 
     .chart-wrapper {
       position: relative;
@@ -1260,6 +1261,8 @@
     .sr-only {
       position: absolute;
       width: 1px;
+      min-width: 0;
+      max-width: 1px;
       height: 1px;
       padding: 0;
       margin: -1px;
@@ -2988,6 +2991,7 @@
       nominalFrequency: 50,
       validMin: 49,
       validMax: 51,
+      stuckValueSeconds: 5,
       maxGapSeconds: 2,
       minPairedRatio: 90,
       graphScale: 'auto',
@@ -5844,6 +5848,7 @@
 
     function renderOscillationEmpty() {
       updateOscillationSourceUi();
+      $('analysisMainChart')?.classList.remove('quality-chart');
       setAnalysisTableHeader(analysisDefinition('oscillation').tableColumns);
       if ($('analysisTableTitle')) $('analysisTableTitle').textContent = t(analysisDefinition('oscillation').titleKey);
       if ($('analysisTableDescription')) $('analysisTableDescription').textContent = t(analysisDefinition('oscillation').descriptionKey);
@@ -6396,14 +6401,13 @@
     }
 
     function sourceLabel(source, context = 'short') {
-      const tr = getSourceLabel('teias', context);
-      const de = getSourceLabel('netztransparenz', context);
-      if (source === 'de') return de;
-      if (source === 'both') return `${tr} + ${de}`;
-      if (source === 'diff') return `${tr} − ${de}`;
-      if (source === 'common') return t('sourceCommon');
-      if (source === 'differential') return t('sourceDifferential');
-      return tr;
+      const suffix = context === 'short' ? 'Short' : '';
+      if (source === 'de') return t(`sourceCe${suffix}`);
+      if (source === 'both') return t(`sourceBoth${suffix}`);
+      if (source === 'diff') return t(`sourceDiff${suffix}`);
+      if (source === 'common') return t(`sourceCommon${suffix}`);
+      if (source === 'differential') return t(`sourceDifferential${suffix}`);
+      return t(`sourceTr${suffix}`);
     }
 
     function sourceShortLabel(source) {
@@ -6880,6 +6884,15 @@
       setBanner('analysisStatus', t('analysisRunning'), 'warn');
       let delegatedToWorker = false;
       try {
+        if (type === 'quality' && dateList.length > 1) {
+          const result = await computeQualityRangeResult(source, dateList);
+          state.analysis.lastResult = result;
+          renderAnalysisResult(result);
+          renderReportPreview();
+          updateUrlState({ date, source, analysis: type, tab: 'oscillation' });
+          setBanner('analysisStatus', t('analysisDone'), 'success');
+          return;
+        }
         if (type === 'trend' && dateList.length > 1) {
           const result = await computeTrendRangeResult(source, dateList);
           state.analysis.lastResult = result;
@@ -6894,10 +6907,12 @@
         state.analysis.rawSeries = current.rawSeries;
         state.analysis.displaySeries = current.displaySeries;
         state.analysis.analysisSeries = current.analysisSeries;
-        const analysisInput = prepareAnalysisInput(type, source, current, validation);
+        const analysisInput = type === 'quality'
+          ? prepareQualityAnalysisInput(source, current)
+          : prepareAnalysisInput(type, source, current, validation);
         state.analysis.sampling = analysisInput.sampling;
         updateAnalysisSamplingInfo(analysisInput.sampling);
-        if (requiresPairedSource(source, type) && current.overall.pairedCount < 1800) {
+        if (type !== 'quality' && requiresPairedSource(source, type) && current.overall.pairedCount < 1800) {
           throw new Error(t('analysisNoCommonDate'));
         }
         updateOscillationSourceUi();
@@ -7130,39 +7145,436 @@
       };
     }
 
+    function prepareQualityAnalysisInput(source, current) {
+      const bounds = analysisWindowBounds();
+      const primary = source === 'de'
+        ? analysisWindowSeries(current.rawSeries.de)
+        : analysisWindowSeries(current.rawSeries.tr);
+      const sampling = buildSamplingMetadata(primary, 1, 'raw-canonical');
+      sampling.totalSamples = Math.max(0, bounds.end - bounds.start);
+      sampling.validSamples = finiteValues(primary).length;
+      sampling.missingRatio = sampling.totalSamples ? 1 - sampling.validSamples / sampling.totalSamples : 0;
+      sampling.requestedResolution = $('analysisResolution')?.value || 'auto';
+      sampling.resolution = '1s';
+      return {
+        type: 'quality',
+        source,
+        resolution: '1s',
+        intervalSeconds: 1,
+        method: 'raw-canonical',
+        series: primary,
+        bounds,
+        sampling
+      };
+    }
+
+    function qualityAnalysisOptions(bounds) {
+      return {
+        expectedIntervalSeconds: 1,
+        startSecond: bounds.start,
+        endSecond: bounds.end,
+        validMinHz: state.settings.validMin,
+        validMaxHz: state.settings.validMax,
+        stuckThresholdSeconds: Number(state.settings.stuckValueSeconds || 5)
+      };
+    }
+
+    function analyzeRawQuality(series, bounds) {
+      const core = window.FrequencyAnalysisCore;
+      return core.analyzeDataQuality(null, series, qualityAnalysisOptions(bounds));
+    }
+
+    function numberText(value) {
+      return Number(value || 0).toLocaleString(t('localeNumeric'));
+    }
+
+    function countRatioText(count, expected) {
+      return `${numberText(count)} (${percent(expected ? count / expected : 0)})`;
+    }
+
+    function qualityDateTime(date, second) {
+      return `${displayDate(date)} ${secondToTime(second).slice(0, 5)}`;
+    }
+
+    function pairedGoodCount(a, b) {
+      const length = Math.min(a?.masks?.good?.length || 0, b?.masks?.good?.length || 0);
+      let count = 0;
+      for (let i = 0; i < length; i += 1) {
+        if (a.masks.good[i] && b.masks.good[i]) count += 1;
+      }
+      return count;
+    }
+
+    function pairedValidCount(a, b) {
+      const length = Math.min(a?.masks?.valid?.length || 0, b?.masks?.valid?.length || 0);
+      let count = 0;
+      for (let i = 0; i < length; i += 1) {
+        if (a.masks.valid[i] && b.masks.valid[i]) count += 1;
+      }
+      return count;
+    }
+
+    function pairedObservedCount(a, b) {
+      const length = Math.min(a?.masks?.observed?.length || 0, b?.masks?.observed?.length || 0);
+      let count = 0;
+      for (let i = 0; i < length; i += 1) {
+        if (a.masks.observed[i] && b.masks.observed[i]) count += 1;
+      }
+      return count;
+    }
+
+    function combinedDualQuality(trQuality, ceQuality) {
+      const expectedCount = Math.min(trQuality.expectedCount, ceQuality.expectedCount);
+      const validCount = pairedValidCount(trQuality, ceQuality);
+      const goodQualityCount = pairedGoodCount(trQuality, ceQuality);
+      const observedCount = pairedObservedCount(trQuality, ceQuality);
+      const events = [...trQuality.qualityEvents, ...ceQuality.qualityEvents]
+        .sort((a, b) => a.startSecond - b.startSecond || a.endSecond - b.endSecond);
+      return {
+        expectedCount,
+        actualCount: trQuality.actualCount + ceQuality.actualCount,
+        observedCount,
+        validCount,
+        uniqueValidCount: validCount,
+        goodQualityCount,
+        coverageRatio: expectedCount ? Math.min(1, validCount / expectedCount) : 0,
+        goodQualityRatio: expectedCount ? Math.min(1, goodQualityCount / expectedCount) : 0,
+        missingCount: Math.max(0, expectedCount - observedCount),
+        invalidCount: trQuality.invalidCount + ceQuality.invalidCount,
+        duplicateTimestampCount: trQuality.duplicateTimestampCount + ceQuality.duplicateTimestampCount,
+        gapEventCount: trQuality.gapEventCount + ceQuality.gapEventCount,
+        longestGapSeconds: Math.max(trQuality.longestGapSeconds, ceQuality.longestGapSeconds),
+        stuckValueEventCount: trQuality.stuckValueEventCount + ceQuality.stuckValueEventCount,
+        totalStuckSeconds: trQuality.totalStuckSeconds + ceQuality.totalStuckSeconds,
+        longestStuckSeconds: Math.max(trQuality.longestStuckSeconds, ceQuality.longestStuckSeconds),
+        startSecond: trQuality.startSecond,
+        endSecond: trQuality.endSecond,
+        durationSeconds: trQuality.durationSeconds,
+        qualityEvents: events,
+        trQuality,
+        ceQuality
+      };
+    }
+
+    function buildQualityFrequencySummary(quality, name, options = {}) {
+      const bucketSeconds = quality.durationSeconds >= 6 * 3600 ? 900 : 60;
+      const bucketSize = Math.max(1, Math.round(bucketSeconds / (quality.canonical.intervalSeconds || 1)));
+      const avgData = [];
+      const minData = [];
+      const maxData = [];
+      for (let start = 0; start < quality.canonical.values.length; start += bucketSize) {
+        const end = Math.min(quality.canonical.values.length, start + bucketSize);
+        let min = Infinity;
+        let max = -Infinity;
+        let sum = 0;
+        let count = 0;
+        for (let i = start; i < end; i += 1) {
+          if (!quality.masks.valid[i]) continue;
+          const value = quality.canonical.values[i];
+          if (!Number.isFinite(value)) continue;
+          min = Math.min(min, value);
+          max = Math.max(max, value);
+          sum += value;
+          count += 1;
+        }
+        const second = quality.startSecond + (start + (end - start) / 2) * (quality.canonical.intervalSeconds || 1);
+        avgData.push([second, count ? Number((sum / count).toFixed(6)) : null]);
+        minData.push([second, count ? Number(min.toFixed(6)) : null]);
+        maxData.push([second, count ? Number(max.toFixed(6)) : null]);
+      }
+      return {
+        name,
+        avgData,
+        minData,
+        maxData,
+        bucketSeconds,
+        color: options.color || '#101820',
+        showMinMax: options.showMinMax !== false
+      };
+    }
+
+    function buildQualityHeatmap(quality, date, dayIndex = 0, offsetSeconds = 0) {
+      const bucketSeconds = 900;
+      const bucketSize = Math.max(1, Math.round(bucketSeconds / (quality.canonical?.intervalSeconds || 1)));
+      const cells = [];
+      const labels = [];
+      for (let start = 0, slot = 0; start < quality.expectedCount; start += bucketSize, slot += 1) {
+        const end = Math.min(quality.expectedCount, start + bucketSize);
+        let good = 0;
+        for (let i = start; i < end; i += 1) if (quality.masks.good?.[i]) good += 1;
+        const expected = Math.max(1, end - start);
+        const localStartSecond = quality.startSecond + start;
+        const localEndSecond = quality.startSecond + end;
+        const startSecond = offsetSeconds + localStartSecond;
+        const endSecond = offsetSeconds + localEndSecond;
+        const label = `${displayDate(date)} ${secondToTime(localStartSecond).slice(0, 5)}-${secondToTime(localEndSecond).slice(0, 5)}`;
+        labels.push(label);
+        cells.push({
+          slot,
+          dayIndex,
+          startSecond,
+          endSecond,
+          label,
+          date,
+          goodQualityRatio: good / expected
+        });
+      }
+      return { bucketSeconds, labels, days: [displayDate(date)], cells };
+    }
+
+    function heatmapQualityForSource(source, quality, trQuality, ceQuality) {
+      if (source !== 'both') return quality;
+      return {
+        ...quality,
+        canonical: trQuality.canonical,
+        masks: {
+          ...trQuality.masks,
+          good: trQuality.masks.good.map((item, index) => item && ceQuality.masks.good[index]),
+          valid: trQuality.masks.valid.map((item, index) => item && ceQuality.masks.valid[index])
+        }
+      };
+    }
+
+    function shiftQualityEvents(events, offsetSeconds) {
+      return (events || []).map(event => ({
+        ...event,
+        startSecond: event.startSecond + offsetSeconds,
+        endSecond: event.endSecond + offsetSeconds
+      }));
+    }
+
+    function shiftFrequencySummary(summary, offsetSeconds) {
+      const shift = data => data.map(point => [point[0] + offsetSeconds, point[1]]);
+      return {
+        ...summary,
+        avgData: shift(summary.avgData),
+        minData: shift(summary.minData),
+        maxData: shift(summary.maxData)
+      };
+    }
+
+    function mergeFrequencySummaries(items, name, options = {}) {
+      return {
+        name,
+        avgData: items.flatMap(item => item.avgData),
+        minData: items.flatMap(item => item.minData),
+        maxData: items.flatMap(item => item.maxData),
+        bucketSeconds: 900,
+        color: options.color || '#101820',
+        showMinMax: options.showMinMax !== false
+      };
+    }
+
+    function aggregateQualityResults(items) {
+      const expectedCount = items.reduce((sum, item) => sum + item.expectedCount, 0);
+      const validCount = items.reduce((sum, item) => sum + item.validCount, 0);
+      const goodQualityCount = items.reduce((sum, item) => sum + item.goodQualityCount, 0);
+      const missingCount = items.reduce((sum, item) => sum + item.missingCount, 0);
+      const invalidCount = items.reduce((sum, item) => sum + item.invalidCount, 0);
+      const duplicateTimestampCount = items.reduce((sum, item) => sum + item.duplicateTimestampCount, 0);
+      const gapEventCount = items.reduce((sum, item) => sum + (item.gapEventCount || 0), 0);
+      const stuckValueEventCount = items.reduce((sum, item) => sum + (item.stuckValueEventCount || 0), 0);
+      const totalStuckSeconds = items.reduce((sum, item) => sum + (item.totalStuckSeconds || 0), 0);
+      const durationSeconds = items.reduce((sum, item) => sum + (item.durationSeconds || 0), 0);
+      return {
+        expectedCount,
+        actualCount: items.reduce((sum, item) => sum + (item.actualCount || 0), 0),
+        observedCount: items.reduce((sum, item) => sum + (item.observedCount || 0), 0),
+        validCount,
+        uniqueValidCount: validCount,
+        goodQualityCount,
+        coverageRatio: expectedCount ? Math.min(1, validCount / expectedCount) : 0,
+        goodQualityRatio: expectedCount ? Math.min(1, goodQualityCount / expectedCount) : 0,
+        missingCount,
+        invalidCount,
+        duplicateTimestampCount,
+        gapEventCount,
+        longestGapSeconds: items.reduce((max, item) => Math.max(max, item.longestGapSeconds || 0), 0),
+        stuckValueEventCount,
+        totalStuckSeconds,
+        longestStuckSeconds: items.reduce((max, item) => Math.max(max, item.longestStuckSeconds || 0), 0),
+        startSecond: 0,
+        endSecond: durationSeconds,
+        durationSeconds,
+        qualityEvents: items.flatMap((item, index) => shiftQualityEvents(item.qualityEvents, index * 86400))
+      };
+    }
+
+    function qualityTableRows(quality, current, source, trQuality = null, ceQuality = null, dateList = [current?.date].filter(Boolean)) {
+      const expected = quality.expectedCount || 0;
+      const firstDate = dateList[0] || current.date;
+      const lastDate = dateList.at(-1) || current.date;
+      const startLabel = dateList.length > 1
+        ? `${displayDate(firstDate)} ${secondToTime(0).slice(0, 5)}`
+        : qualityDateTime(current.date, quality.startSecond);
+      const endLabel = dateList.length > 1
+        ? `${displayDate(lastDate)} ${secondToTime(86400).slice(0, 5)}`
+        : qualityDateTime(current.date, quality.endSecond);
+      const rows = [
+        { metric: t('qualityAnalysisStart'), value: startLabel },
+        { metric: t('qualityAnalysisEnd'), value: endLabel },
+        { metric: t('qualityDuration'), value: durationText(quality.durationSeconds) },
+        { metric: t('qualityExpected'), value: numberText(expected) },
+        { metric: t('qualityValid'), value: countRatioText(quality.validCount, expected) },
+        { metric: t('qualityMissing'), value: numberText(quality.missingCount) },
+        { metric: t('qualityInvalid'), value: numberText(quality.invalidCount) },
+        { metric: t('qualityDuplicate'), value: numberText(quality.duplicateTimestampCount) },
+        { metric: t('qualityStuckEvents'), value: numberText(quality.stuckValueEventCount) },
+        { metric: t('qualityStuckTotal'), value: durationText(quality.totalStuckSeconds || 0) },
+        { metric: t('qualityStuckLongest'), value: durationText(quality.longestStuckSeconds || 0) },
+        { metric: t('qualityGapEvents'), value: numberText(quality.gapEventCount || 0) },
+        { metric: t('qualityLongestGap'), value: durationText(quality.longestGapSeconds || 0) },
+        { metric: t('qualityCoverage'), value: percent(quality.coverageRatio) },
+        { metric: t('qualityGood'), value: percent(quality.goodQualityRatio) }
+      ];
+      if (source === 'both' && trQuality && ceQuality) {
+        rows.splice(5, 0,
+          { metric: t('qualityTrValid'), value: countRatioText(trQuality.goodQualityCount, trQuality.expectedCount) },
+          { metric: t('qualityCeValid'), value: countRatioText(ceQuality.goodQualityCount, ceQuality.expectedCount) },
+          { metric: t('qualityPairedValid'), value: countRatioText(quality.goodQualityCount, expected) }
+        );
+      }
+      return rows;
+    }
+
+    function computeQualityAnalysisResult(type, source, current, dateList = [current?.date].filter(Boolean), workerResult = null, analysisInput = null) {
+      const bounds = analysisWindowBounds();
+      const trSeries = analysisWindowSeries(current.rawSeries.tr);
+      const ceSeries = analysisWindowSeries(current.rawSeries.de);
+      const trQuality = analyzeRawQuality(trSeries, bounds);
+      const ceQuality = analyzeRawQuality(ceSeries, bounds);
+      const quality = source === 'de' ? ceQuality : source === 'both' ? combinedDualQuality(trQuality, ceQuality) : trQuality;
+      const sampling = buildSamplingMetadata(source === 'de' ? ceSeries : trSeries, 1, 'raw-canonical');
+      sampling.totalSamples = quality.expectedCount;
+      sampling.validSamples = quality.validCount;
+      sampling.missingRatio = quality.expectedCount ? 1 - quality.validCount / quality.expectedCount : 0;
+      sampling.requestedResolution = $('analysisResolution')?.value || 'auto';
+      sampling.resolution = '1s';
+      state.analysis.sampling = sampling;
+      const metadata = analysisMetadata(type, source, current, dateList, sampling);
+      const frequencySummaries = source === 'both'
+        ? [
+            buildQualityFrequencySummary(trQuality, sourceLabel('tr'), { color: '#101820', showMinMax: false }),
+            buildQualityFrequencySummary(ceQuality, sourceLabel('de'), { color: '#176b9c', showMinMax: false })
+          ]
+        : [buildQualityFrequencySummary(quality, sourceLabel(source), { color: '#101820', showMinMax: true })];
+      return {
+        type,
+        title: t(analysisDefinition(type).titleKey),
+        description: t(analysisDefinition(type).descriptionKey),
+        metadata,
+        cards: [
+          [t('qualityCoverage'), percent(quality.coverageRatio)],
+          [t('qualityGood'), percent(quality.goodQualityRatio)],
+          [t('qualityMissing'), numberText(quality.missingCount)],
+          [t('qualityStuckEvents'), numberText(quality.stuckValueEventCount)]
+        ],
+        events: quality.qualityEvents || [],
+        tableRows: qualityTableRows(quality, current, source, trQuality, ceQuality, dateList),
+        chart: {
+          kind: 'quality',
+          frequencySummaries,
+          heatmap: buildQualityHeatmap(heatmapQualityForSource(source, quality, trQuality, ceQuality), current.date),
+          events: quality.qualityEvents || [],
+          range: { start: bounds.start, end: bounds.end }
+        },
+        methodology: t('methodQuality'),
+        limitations: t('limitQuality')
+      };
+    }
+
+    async function computeQualityRangeResult(source, dateList) {
+      const dailyItems = dateList.map((date, index) => ({ date, index }));
+      const dailyResults = (await mapWithConcurrency(dailyItems, MAX_ANALYSIS_DAY_CONCURRENCY, async ({ date, index }) => {
+        const current = await prepareDailyContext(date, $('analysisAlignment').value);
+        const bounds = analysisWindowBounds();
+        const trQuality = analyzeRawQuality(analysisWindowSeries(current.rawSeries.tr), bounds);
+        const ceQuality = analyzeRawQuality(analysisWindowSeries(current.rawSeries.de), bounds);
+        const quality = source === 'de' ? ceQuality : source === 'both' ? combinedDualQuality(trQuality, ceQuality) : trQuality;
+        const heatmapBase = heatmapQualityForSource(source, quality, trQuality, ceQuality);
+        const offsetSeconds = index * 86400;
+        return {
+          index,
+          date,
+          current,
+          trQuality,
+          ceQuality,
+          quality,
+          heatmap: buildQualityHeatmap(heatmapBase, date, index, offsetSeconds),
+          frequencySummary: source === 'de'
+            ? shiftFrequencySummary(buildQualityFrequencySummary(ceQuality, sourceLabel('de'), { color: '#101820', showMinMax: true }), offsetSeconds)
+            : source === 'both'
+              ? {
+                  tr: shiftFrequencySummary(buildQualityFrequencySummary(trQuality, sourceLabel('tr'), { color: '#101820', showMinMax: false }), offsetSeconds),
+                  ce: shiftFrequencySummary(buildQualityFrequencySummary(ceQuality, sourceLabel('de'), { color: '#176b9c', showMinMax: false }), offsetSeconds)
+                }
+              : shiftFrequencySummary(buildQualityFrequencySummary(trQuality, sourceLabel('tr'), { color: '#101820', showMinMax: true }), offsetSeconds)
+        };
+      })).filter(Boolean).sort((a, b) => a.index - b.index);
+
+      if (!dailyResults.length) throw new Error(t('analysisNoSeries'));
+      const lastCurrent = dailyResults.at(-1).current;
+      state.current = lastCurrent;
+      state.analysis.rawSeries = lastCurrent.rawSeries;
+      state.analysis.displaySeries = lastCurrent.displaySeries;
+      state.analysis.analysisSeries = lastCurrent.analysisSeries;
+      const quality = aggregateQualityResults(dailyResults.map(item => item.quality));
+      const trAggregate = aggregateQualityResults(dailyResults.map(item => item.trQuality));
+      const ceAggregate = aggregateQualityResults(dailyResults.map(item => item.ceQuality));
+      const sampling = buildSamplingMetadata(null, 1, 'raw-canonical');
+      sampling.totalSamples = quality.expectedCount;
+      sampling.validSamples = quality.validCount;
+      sampling.missingRatio = quality.expectedCount ? 1 - quality.validCount / quality.expectedCount : 0;
+      sampling.requestedResolution = $('analysisResolution')?.value || 'auto';
+      sampling.resolution = '1s';
+      state.analysis.sampling = sampling;
+      const frequencySummaries = source === 'both'
+        ? [
+            mergeFrequencySummaries(dailyResults.map(item => item.frequencySummary.tr), sourceLabel('tr'), { color: '#101820', showMinMax: false }),
+            mergeFrequencySummaries(dailyResults.map(item => item.frequencySummary.ce), sourceLabel('de'), { color: '#176b9c', showMinMax: false })
+          ]
+        : [mergeFrequencySummaries(dailyResults.map(item => item.frequencySummary), sourceLabel(source), { color: '#101820', showMinMax: true })];
+      const firstHeatmap = dailyResults[0].heatmap;
+      const heatmap = {
+        bucketSeconds: 900,
+        labels: firstHeatmap.labels,
+        days: dailyResults.map(item => displayDate(item.date)),
+        cells: dailyResults.flatMap(item => item.heatmap.cells)
+      };
+      return {
+        type: 'quality',
+        title: t(analysisDefinition('quality').titleKey),
+        description: t(analysisDefinition('quality').descriptionKey),
+        metadata: analysisMetadata('quality', source, lastCurrent, dateList, sampling),
+        cards: [
+          [t('qualityCoverage'), percent(quality.coverageRatio)],
+          [t('qualityGood'), percent(quality.goodQualityRatio)],
+          [t('qualityMissing'), numberText(quality.missingCount)],
+          [t('qualityStuckEvents'), numberText(quality.stuckValueEventCount)]
+        ],
+        events: quality.qualityEvents || [],
+        tableRows: qualityTableRows(quality, lastCurrent, source, trAggregate, ceAggregate, dateList),
+        chart: {
+          kind: 'quality',
+          frequencySummaries,
+          heatmap,
+          events: quality.qualityEvents || [],
+          range: { start: 0, end: dailyResults.length * 86400 }
+        },
+        methodology: t('methodQuality'),
+        limitations: t('limitQuality')
+      };
+    }
+
     function computeAnalysisResult(type, source, current, dateList = [current?.date].filter(Boolean), workerResult = null, analysisInput = null) {
       const core = window.FrequencyAnalysisCore;
       if (!core) throw new Error(t('analysisCoreMissing'));
+      if (type === 'quality') return computeQualityAnalysisResult(type, source, current, dateList, workerResult, analysisInput);
       const prepared = analysisInput || prepareAnalysisInput(type, source, current);
       const series = prepared.series;
       const sampleIntervalSeconds = prepared.sampling?.intervalSeconds || 1;
       const timestamps = Array.from({ length: series.length }, (_, index) => index * sampleIntervalSeconds);
       const metadata = analysisMetadata(type, source, current, dateList, prepared.sampling);
-      if (type === 'quality') {
-        const q = core.analyzeDataQuality(timestamps, series, { expectedIntervalSeconds: sampleIntervalSeconds });
-        return {
-          type,
-          title: t(analysisDefinition(type).titleKey),
-          description: t(analysisDefinition(type).descriptionKey),
-          metadata,
-          cards: [
-            [t('qualityCoverage'), percent(q.coverageRatio)],
-            [t('qualityMissing'), q.missingCount.toLocaleString(t('localeNumeric'))],
-            [t('qualityLongestGap'), `${fmt(q.longestGapSeconds, 0)} sn`],
-            [t('qualityDuplicate'), q.duplicateTimestampCount.toLocaleString(t('localeNumeric'))]
-          ],
-          events: [],
-          tableRows: [
-            { metric: t('qualityCoverage'), value: percent(q.coverageRatio) },
-            { metric: t('qualityMissing'), value: q.missingCount.toLocaleString(t('localeNumeric')) },
-            { metric: t('qualityLongestGap'), value: `${fmt(q.longestGapSeconds, 0)} sn` },
-            { metric: t('qualityDuplicate'), value: q.duplicateTimestampCount.toLocaleString(t('localeNumeric')) }
-          ],
-          chart: { kind: 'line', series: [{ name: sourceLabel(source), data: sampleSeries(series, 60, sampleIntervalSeconds) }] },
-          methodology: t('methodQuality'),
-          limitations: t('limitQuality')
-        };
-      }
       if (type === 'rocof') {
         const rocof = workerResult || core.computeRocof(series, { method: 'movingRegression', sampleIntervalSeconds, windowSeconds: Number($('windowSec').value || 5), thresholdHzPerSecond: Number($('rocofThreshold').value || 0.01) });
         return {
@@ -7361,6 +7773,12 @@
 
     function renderGenericAnalysisChart(result) {
       if (!state.oscillationChart) return;
+      state.oscillationChart.off('click');
+      $('analysisMainChart')?.classList.toggle('quality-chart', result.chart.kind === 'quality');
+      if (result.chart.kind === 'quality') {
+        renderQualityAnalysisChart(result);
+        return;
+      }
       if (result.chart.kind === 'heatmap') {
         const spectrogram = result.chart.spectrogram;
         const data = [];
@@ -7405,6 +7823,178 @@
         dataZoom: [{ type: 'inside', filterMode: 'none' }, { type: 'slider', filterMode: 'none', height: 22, bottom: 18 }],
         series
       }, true);
+    }
+
+    function renderQualityAnalysisChart(result) {
+      const range = result.chart.range || { start: 0, end: 86400 };
+      const chartTimeLabel = (value, includeDate = false) => {
+        const total = Math.max(0, Math.round(value || 0));
+        let dayIndex = Math.floor(total / 86400);
+        let localSecond = total % 86400;
+        if (total > 0 && localSecond === 0) {
+          dayIndex -= 1;
+          localSecond = 86400;
+        }
+        const dateLabel = result.chart.heatmap?.days?.[dayIndex];
+        const timeLabel = secondToTime(localSecond).slice(0, includeDate ? 8 : 5);
+        return includeDate && dateLabel ? `${dateLabel} ${timeLabel}` : timeLabel;
+      };
+      const summaries = result.chart.frequencySummaries || [];
+      const lineSeries = [];
+      summaries.forEach((summary, index) => {
+        const suffix = summaries.length > 1 ? ` ${summary.name}` : '';
+        lineSeries.push({
+          name: summaries.length > 1 ? summary.name : t('qualityFrequencySummary'),
+          type: 'line',
+          xAxisIndex: 0,
+          yAxisIndex: 0,
+          data: summary.avgData,
+          symbol: 'none',
+          connectNulls: false,
+          lineStyle: { width: 1.8, color: summary.color || '#101820', opacity: index ? 0.82 : 1 },
+          itemStyle: { color: summary.color || '#101820' },
+          emphasis: { focus: 'series' }
+        });
+        if (summary.showMinMax) {
+          lineSeries.push({
+            name: `${t('eventMax')}${suffix}`,
+            type: 'line',
+            xAxisIndex: 0,
+            yAxisIndex: 0,
+            data: summary.maxData,
+            symbol: 'none',
+            connectNulls: false,
+            lineStyle: { width: 1, color: 'rgba(200,60,60,.62)', opacity: 0.7 },
+            itemStyle: { color: 'rgba(200,60,60,.62)' }
+          });
+          lineSeries.push({
+            name: `${t('eventMin')}${suffix}`,
+            type: 'line',
+            xAxisIndex: 0,
+            yAxisIndex: 0,
+            data: summary.minData,
+            symbol: 'none',
+            connectNulls: false,
+            lineStyle: { width: 1, color: 'rgba(23,33,43,.36)', opacity: 0.64 },
+            itemStyle: { color: 'rgba(23,33,43,.36)' }
+          });
+        }
+      });
+
+      const markTypes = [
+        { type: 'missing', name: t('qualityMissingRange'), color: 'rgba(200,60,60,.13)' },
+        { type: 'invalid', name: t('qualityInvalidRange'), color: 'rgba(179,116,0,.14)' },
+        { type: 'duplicate', name: t('qualityDuplicateRange'), color: 'rgba(27,107,156,.13)' },
+        { type: 'stuck', name: t('qualityStuckRange'), color: 'rgba(18,24,33,.13)' }
+      ];
+      const markSeries = markTypes
+        .map(group => {
+          const events = (result.chart.events || []).filter(event => event.type === group.type);
+          if (!events.length) return null;
+          return {
+            name: group.name,
+            type: 'line',
+            xAxisIndex: 0,
+            yAxisIndex: 0,
+            data: [],
+            symbol: 'none',
+            silent: true,
+            lineStyle: { opacity: 0 },
+            markArea: {
+              silent: true,
+              itemStyle: { color: group.color },
+              data: events.map(event => [{ xAxis: event.startSecond, name: group.name }, { xAxis: event.endSecond }])
+            }
+          };
+        })
+        .filter(Boolean);
+
+      const heatmap = result.chart.heatmap || { labels: [], days: [], cells: [] };
+      const heatmapData = heatmap.cells.map(cell => [
+        cell.slot,
+        cell.dayIndex,
+        Number(cell.goodQualityRatio.toFixed(4)),
+        cell.startSecond,
+        cell.endSecond,
+        cell.label,
+        cell.date
+      ]);
+
+      state.oscillationChart.setOption({
+        animation: false,
+        tooltip: {
+          trigger: 'item',
+          formatter: params => {
+            if (params.seriesType === 'heatmap') {
+              const [, , ratio, startSecond, endSecond, label] = params.value;
+              return `${t('qualityHeatmap')}<br>${label}<br>${t('qualityGood')}: ${percent(ratio)}<br>${chartTimeLabel(startSecond, true)}-${chartTimeLabel(endSecond, true)}`;
+            }
+            const value = params.value || [];
+            return `${params.seriesName}<br>${chartTimeLabel(value[0], true)}<br>${Number.isFinite(value[1]) ? `${fmt(value[1], 4)} Hz` : t('qualityNoData')}`;
+          }
+        },
+        legend: { top: 8, type: 'scroll' },
+        grid: [
+          { left: 68, right: 42, top: 58, height: 285 },
+          { left: 68, right: 42, top: 430, height: 96 }
+        ],
+        xAxis: [
+          {
+            type: 'value',
+            gridIndex: 0,
+            min: range.start,
+            max: range.end,
+            axisLabel: { formatter: value => chartTimeLabel(value, range.end > 86400) }
+          },
+          {
+            type: 'category',
+            gridIndex: 1,
+            data: heatmap.labels,
+            axisLabel: { interval: Math.max(0, Math.floor((heatmap.labels.length || 1) / 8) - 1) }
+          }
+        ],
+        yAxis: [
+          { type: 'value', gridIndex: 0, scale: true, name: 'Hz' },
+          { type: 'category', gridIndex: 1, data: heatmap.days, name: '' }
+        ],
+        visualMap: {
+          min: 0,
+          max: 1,
+          dimension: 2,
+          calculable: true,
+          orient: 'horizontal',
+          left: 'center',
+          top: 374,
+          formatter: value => percent(value)
+        },
+        dataZoom: [
+          { type: 'inside', xAxisIndex: [0], filterMode: 'none' },
+          { type: 'slider', xAxisIndex: [0], filterMode: 'none', height: 22, bottom: 14 }
+        ],
+        series: [
+          ...lineSeries,
+          ...markSeries,
+          {
+            name: t('qualityHeatmap'),
+            type: 'heatmap',
+            xAxisIndex: 1,
+            yAxisIndex: 1,
+            data: heatmapData,
+            progressive: 1000,
+            emphasis: { itemStyle: { borderColor: '#0d2f4f', borderWidth: 1.5 } }
+          }
+        ]
+      }, true);
+      state.oscillationChart.on('click', params => {
+        if (params.seriesName !== t('qualityHeatmap') || !params.value) return;
+        state.oscillationChart.dispatchAction({
+          type: 'dataZoom',
+          dataZoomIndex: 0,
+          startValue: params.value[3],
+          endValue: params.value[4]
+        });
+        $('analysisMainChart').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
     }
 
     function setAnalysisTableHeader(columns) {
@@ -8819,14 +9409,18 @@
         analysisNoCommonDate: 'Seçilen tarih için ortak Türkiye–Kıta Avrupası verisi yetersiz.',
         analysisCoreMissing: 'Analiz çekirdeği yüklenemedi.',
         analysisNoSeries: 'Seçilen kaynak için geçerli seri bulunamadı.',
-        sourceBoth: 'Türkiye + Kıta Avrupası',
-        sourceDiff: 'Türkiye − Kıta Avrupası',
-        sourceCommon: 'Ortak mod',
-        sourceDifferential: 'Fark bileşeni',
-        sourceBothShort: 'Türkiye + Kıta Avrupası',
-        sourceDiffShort: 'Türkiye − Kıta Avrupası',
-        sourceCommonShort: 'Ortak',
-        sourceDifferentialShort: 'Fark',
+        sourceTr: 'Türkiye',
+        sourceCe: 'Kıta Avrupası (CE)',
+        sourceBoth: 'Türkiye & Kıta Avrupası (Çift Seri)',
+        sourceDiff: 'Ham Frekans Farkı (TR − CE)',
+        sourceCommon: 'Ortak Mod (TR+CE)/2',
+        sourceDifferential: 'Diferansiyel Mod (TR−CE)/2',
+        sourceTrShort: 'Türkiye',
+        sourceCeShort: 'Kıta Avrupası (CE)',
+        sourceBothShort: 'Türkiye & Kıta Avrupası (Çift Seri)',
+        sourceDiffShort: 'TR − CE',
+        sourceCommonShort: '(TR+CE)/2',
+        sourceDifferentialShort: '(TR−CE)/2',
         sourceCommonFrequency: 'Ortak mod frekansı',
         sourceDiffFrequency: 'Fark frekansı',
         coverageTrLatest: 'Son Türkiye verisi',
@@ -8874,7 +9468,7 @@
         tableValue: 'Değer',
         tableFrequency: 'Frekans',
         rocofPeak: 'Tepe Hz/s',
-        limitQuality: 'Kapsama sonucu kaynak yayın gecikmesi ve doğrusal doldurma ayarlarından etkilenebilir.',
+        limitQuality: 'Coverage % unique valid timestamp / expected seconds olarak hesaplanır. Good Quality %, geçersiz, yinelenen timestamp ve 5 saniye üzeri stuck-value aralıklarını ayrıca düşer.',
         limitStats: 'Temel istatistikler olay nedeni çıkarmaz; yalnız dağılımı özetler.',
         limitEvents: 'Bant ihlali eşiği nominal frekans profiline göre yorumlanmalıdır.',
         limitRocof: 'RoCoF saniyelik ve filtreli seri gerektirir; seyrek örnekleme hatalı tepe üretebilir.',
@@ -8969,9 +9563,31 @@
         dataSourcesEntsoeLink: 'ENTSO-E resmî sitesi',
         dataSourcesClose: 'Kapat',
         qualityCoverage: 'Kapsama',
+        qualityGood: 'İyi kalite',
+        qualityAnalysisStart: 'Analiz başlangıcı',
+        qualityAnalysisEnd: 'Analiz bitişi',
+        qualityDuration: 'Toplam süre',
+        qualityExpected: 'Beklenen örnek sayısı',
+        qualityValid: 'Geçerli örnek sayısı',
         qualityMissing: 'Eksik örnek',
+        qualityInvalid: 'Geçersiz örnek',
         qualityLongestGap: 'En uzun boşluk',
         qualityDuplicate: 'Yinelenen zaman',
+        qualityGapEvents: 'Veri boşluğu olay sayısı',
+        qualityStuckEvents: 'Stuck/yinelenen değer olay sayısı',
+        qualityStuckTotal: 'Toplam stuck süresi',
+        qualityStuckLongest: 'En uzun stuck süresi',
+        qualityTrValid: 'Türkiye kaliteli örnek',
+        qualityCeValid: 'Kıta Avrupası kaliteli örnek',
+        qualityPairedValid: 'Ortak kullanılabilir / Paired Valid',
+        qualityFrequencySummary: '15 dakikalık frekans özeti',
+        qualityHeatmap: 'Data Quality Heatmap',
+        qualityMissingRange: 'Eksik veri',
+        qualityInvalidRange: 'Geçersiz veri',
+        qualityDuplicateRange: 'Yinelenen zaman',
+        qualityStuckRange: 'Stuck value',
+        qualityBadStuckValue: 'Kötü kalite - sabit değer',
+        qualityNoData: 'Veri yok',
         eventDataGap: 'Veri boşluğu',
         classNeedsReview: 'İnceleme gerekli',
         classCommonMode: 'Ortak mod',
@@ -8993,7 +9609,7 @@
         eventMax: 'Maksimum',
         rmsDeviation: 'RMS sapma',
         oscConfidence: 'Güven skoru',
-        methodQuality: 'Kapsama, eksik örnekler ve en uzun boşluk saniyelik ham seri üzerinden hesaplanır.',
+        methodQuality: 'Kapsama ve kalite metrikleri her zaman saniyelik ham/canonical zaman ekseni üzerinden hesaplanır; grafik uzun aralıkta 15 dakikalık görsel özet kullanabilir.',
         methodRocof: 'RoCoF ardışık saniyelik frekans farklarından Hz/s cinsinden hesaplanır.',
         methodPsd: 'Welch PSD, gün içindeki baskın düşük frekanslı bileşeni ve gürültü tabanını özetler.',
         methodSpectrogram: 'Spektrogram, 10 dakikalık pencerelerde baskın frekansın zamanla değişimini gösterir.',
@@ -9100,14 +9716,18 @@
         analysisNoCommonDate: 'Common Türkiye–Continental Europe data is insufficient for the selected date.',
         analysisCoreMissing: 'Analysis core could not be loaded.',
         analysisNoSeries: 'No valid series found for the selected source.',
-        sourceBoth: 'Türkiye + Continental Europe',
-        sourceDiff: 'Türkiye − Continental Europe',
-        sourceCommon: 'Common mode',
-        sourceDifferential: 'Difference component',
-        sourceBothShort: 'Türkiye + Continental Europe',
-        sourceDiffShort: 'Türkiye − Continental Europe',
-        sourceCommonShort: 'Common',
-        sourceDifferentialShort: 'Difference',
+        sourceTr: 'Türkiye',
+        sourceCe: 'Continental Europe (CE)',
+        sourceBoth: 'Türkiye & Continental Europe (Dual Series)',
+        sourceDiff: 'Raw Frequency Difference (TR − CE)',
+        sourceCommon: 'Common Mode (TR+CE)/2',
+        sourceDifferential: 'Differential Mode (TR−CE)/2',
+        sourceTrShort: 'Türkiye',
+        sourceCeShort: 'Continental Europe (CE)',
+        sourceBothShort: 'Türkiye & Continental Europe (Dual Series)',
+        sourceDiffShort: 'TR − CE',
+        sourceCommonShort: '(TR+CE)/2',
+        sourceDifferentialShort: '(TR−CE)/2',
         sourceCommonFrequency: 'Common-mode frequency',
         sourceDiffFrequency: 'Difference frequency',
         coverageTrLatest: 'Latest Türkiye data',
@@ -9155,7 +9775,7 @@
         tableValue: 'Value',
         tableFrequency: 'Frequency',
         rocofPeak: 'Peak Hz/s',
-        limitQuality: 'Coverage is affected by publication delay and interpolation settings.',
+        limitQuality: 'Coverage % is unique valid timestamp / expected seconds. Good Quality % separately excludes invalid samples, duplicate timestamps, and stuck-value runs of 5 seconds or longer.',
         limitStats: 'Basic statistics summarize distribution only and do not infer event causes.',
         limitEvents: 'Band breaches should be interpreted against the nominal frequency profile.',
         limitRocof: 'RoCoF requires second-level filtered data; sparse sampling can create false peaks.',
@@ -9250,9 +9870,31 @@
         dataSourcesEntsoeLink: 'ENTSO-E official website',
         dataSourcesClose: 'Close',
         qualityCoverage: 'Coverage',
+        qualityGood: 'Good Quality',
+        qualityAnalysisStart: 'Analysis start',
+        qualityAnalysisEnd: 'Analysis end',
+        qualityDuration: 'Total duration',
+        qualityExpected: 'Expected sample count',
+        qualityValid: 'Valid sample count',
         qualityMissing: 'Missing samples',
-        qualityLongestGap: 'Longest gap',
+        qualityInvalid: 'Invalid samples',
+        qualityLongestGap: 'Longest data gap',
         qualityDuplicate: 'Duplicate timestamps',
+        qualityGapEvents: 'Gap event count',
+        qualityStuckEvents: 'Stuck/repeated value events',
+        qualityStuckTotal: 'Total stuck duration',
+        qualityStuckLongest: 'Longest stuck duration',
+        qualityTrValid: 'Türkiye quality samples',
+        qualityCeValid: 'CE quality samples',
+        qualityPairedValid: 'Paired Valid',
+        qualityFrequencySummary: '15-minute frequency summary',
+        qualityHeatmap: 'Data Quality Heatmap',
+        qualityMissingRange: 'Missing data',
+        qualityInvalidRange: 'Invalid data',
+        qualityDuplicateRange: 'Duplicate timestamp',
+        qualityStuckRange: 'Stuck value',
+        qualityBadStuckValue: 'Bad Quality - Stuck Value',
+        qualityNoData: 'No data',
         eventDataGap: 'Data gap',
         classNeedsReview: 'Needs review',
         classCommonMode: 'Common mode',
@@ -9274,7 +9916,7 @@
         eventMax: 'Maximum',
         rmsDeviation: 'RMS deviation',
         oscConfidence: 'Confidence score',
-        methodQuality: 'Coverage, missing samples, and longest gap are computed from the raw second-level data.',
+        methodQuality: 'Coverage and quality metrics are always computed on the raw/canonical one-second time axis; long charts may use a 15-minute visual summary.',
         methodRocof: 'RoCoF is computed from adjacent second-level frequency differences in Hz/s.',
         methodPsd: 'Welch PSD summarizes the dominant low-frequency component and noise floor within the day.',
         methodSpectrogram: 'The spectrogram tracks dominant frequency changes across 10-minute windows.',
@@ -9343,22 +9985,24 @@
       const enTrLong = getSourceLabel('teias', 'long', 'en');
       const enCeLong = getSourceLabel('netztransparenz', 'long', 'en');
       Object.assign(i18n.tr, {
-        sourceTr: trShort,
-        sourceDe: ceShort,
+        sourceTr: 'Türkiye',
+        sourceCe: 'Kıta Avrupası (CE)',
+        sourceDe: 'Kıta Avrupası (CE)',
         sourceTrStandard: trStandard,
         sourceDeStandard: ceStandard,
         sourceTrLong: trLong,
         sourceDeLong: ceLong,
-        sourceTrShort: trShort,
-        sourceDeShort: ceShort,
-        sourceBoth: `${trShort} + ${ceShort}`,
-        sourceDiff: `${trShort} − ${ceShort}`,
-        sourceCommon: 'Ortak bileşen',
-        sourceDifferential: 'Fark bileşeni',
-        sourceBothShort: `${trShort} + ${ceShort}`,
-        sourceDiffShort: `${trShort} − ${ceShort}`,
-        sourceCommonShort: 'Ortak',
-        sourceDifferentialShort: 'Fark',
+        sourceTrShort: 'Türkiye',
+        sourceCeShort: 'Kıta Avrupası (CE)',
+        sourceDeShort: 'Kıta Avrupası (CE)',
+        sourceBoth: 'Türkiye & Kıta Avrupası (Çift Seri)',
+        sourceDiff: 'Ham Frekans Farkı (TR − CE)',
+        sourceCommon: 'Ortak Mod (TR+CE)/2',
+        sourceDifferential: 'Diferansiyel Mod (TR−CE)/2',
+        sourceBothShort: 'Türkiye & Kıta Avrupası (Çift Seri)',
+        sourceDiffShort: 'TR − CE',
+        sourceCommonShort: '(TR+CE)/2',
+        sourceDifferentialShort: '(TR−CE)/2',
         sourceCommonFrequency: 'Ortak bileşen frekansı',
         sourceDiffFrequency: 'Fark frekansı',
         sourceNetzLink: 'Netztransparenz',
@@ -9404,22 +10048,24 @@
         dataSourcesEuStatusTitle: ceShort
       });
       Object.assign(i18n.en, {
-        sourceTr: enTrShort,
-        sourceDe: enCeShort,
+        sourceTr: 'Türkiye',
+        sourceCe: 'Continental Europe (CE)',
+        sourceDe: 'Continental Europe (CE)',
         sourceTrStandard: enTrStandard,
         sourceDeStandard: enCeStandard,
         sourceTrLong: enTrLong,
         sourceDeLong: enCeLong,
-        sourceTrShort: enTrShort,
-        sourceDeShort: enCeShort,
-        sourceBoth: `${enTrShort} + ${enCeShort}`,
-        sourceDiff: `${enTrShort} − ${enCeShort}`,
-        sourceCommon: 'Common component',
-        sourceDifferential: 'Difference component',
-        sourceBothShort: `${enTrShort} + ${enCeShort}`,
-        sourceDiffShort: `${enTrShort} − ${enCeShort}`,
-        sourceCommonShort: 'Common',
-        sourceDifferentialShort: 'Difference',
+        sourceTrShort: 'Türkiye',
+        sourceCeShort: 'Continental Europe (CE)',
+        sourceDeShort: 'Continental Europe (CE)',
+        sourceBoth: 'Türkiye & Continental Europe (Dual Series)',
+        sourceDiff: 'Raw Frequency Difference (TR − CE)',
+        sourceCommon: 'Common Mode (TR+CE)/2',
+        sourceDifferential: 'Differential Mode (TR−CE)/2',
+        sourceBothShort: 'Türkiye & Continental Europe (Dual Series)',
+        sourceDiffShort: 'TR − CE',
+        sourceCommonShort: '(TR+CE)/2',
+        sourceDifferentialShort: '(TR−CE)/2',
         sourceCommonFrequency: 'Common-component frequency',
         sourceDiffFrequency: 'Difference frequency',
         sourceNetzLink: 'Netztransparenz',

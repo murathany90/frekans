@@ -63,6 +63,31 @@ try {
     throw new Error(`Analysis info panel does not contain moved guidance: ${infoText}`);
   }
 
+  await page.click("#analysisRunBtn");
+  await page.waitForFunction(() => document.querySelectorAll("#analysisResultCards .analysis-result-card").length === 4, { timeout: 30000 });
+  await page.waitForFunction(() => window.echarts?.getInstanceByDom(document.querySelector("#analysisMainChart"))?.getOption?.()?.series?.some(series => series.type === "heatmap"), { timeout: 20000 });
+  const qualityState = await page.evaluate(() => {
+    const chart = window.echarts.getInstanceByDom(document.querySelector("#analysisMainChart"));
+    const option = chart?.getOption?.() || {};
+    return {
+      samplingInterval: state?.analysis?.sampling?.intervalSeconds,
+      samplingMethod: state?.analysis?.sampling?.method,
+      hasQualityClass: document.querySelector("#analysisMainChart")?.classList.contains("quality-chart"),
+      seriesTypes: (option.series || []).map(series => series.type),
+      tableRows: document.querySelectorAll("#analysisEventsBody tr").length,
+      cardValues: [...document.querySelectorAll("#analysisResultCards .analysis-result-card .value")].map(node => node.textContent?.trim() || "")
+    };
+  });
+  if (qualityState.samplingInterval !== 1 || qualityState.samplingMethod !== "raw-canonical") {
+    throw new Error(`Data Coverage must use raw one-second sampling: ${JSON.stringify(qualityState)}`);
+  }
+  if (!qualityState.hasQualityClass || !qualityState.seriesTypes.includes("heatmap") || qualityState.tableRows < 12) {
+    throw new Error(`Data Coverage chart/table did not render the new quality UI: ${JSON.stringify(qualityState)}`);
+  }
+  if (!qualityState.cardValues.some(value => /%$/.test(value))) {
+    throw new Error(`Data Coverage cards do not include percentage KPIs: ${JSON.stringify(qualityState)}`);
+  }
+
   await page.click("#langToggle");
   await page.waitForFunction(() => document.querySelector(".brand h1")?.textContent?.trim() === "GridFreq");
   const enLabels = await page.$$eval("#analysisSourceSelect option, #coverageSummary .label", items => items.map(item => item.textContent?.trim() || ""));
