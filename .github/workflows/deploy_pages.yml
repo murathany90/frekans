@@ -59,6 +59,7 @@ jobs:
           node tests/frontend_public_sharing_static.mjs
           node tests/frontend_source_labels_static.mjs
           node tests/frontend_regions_static.mjs
+          node tests/frontend_live_frequency_static.mjs
           node tests/frequency_regions_time_deviation.mjs
           node tests/frontend_data_sources_modal_static.mjs
           node tests/readme_documentation_static.mjs
