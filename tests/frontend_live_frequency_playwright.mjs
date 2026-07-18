@@ -75,6 +75,13 @@ async function setMockConfig(targetPage) {
 
 try {
   await installMockRoutes(page);
+  // Override production config before page load so we can test the empty-config state first
+  await page.addInitScript(() => {
+    Object.defineProperty(window, "GRIDFREQ_CONFIG", {
+      value: Object.freeze({ liveApiBaseUrl: "" }),
+      configurable: true
+    });
+  });
   await page.goto(`${url}#/live-frequency`, { waitUntil: "networkidle" });
   await page.waitForSelector("#tab-live-frequency.active");
   await page.waitForSelector("#liveFrequencyStatus");
@@ -110,6 +117,12 @@ try {
 
   const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true });
   await installMockRoutes(mobile);
+  await mobile.addInitScript(() => {
+    Object.defineProperty(window, "GRIDFREQ_CONFIG", {
+      value: Object.freeze({ liveApiBaseUrl: "" }),
+      configurable: true
+    });
+  });
   await mobile.goto(`${url}#/live-frequency`, { waitUntil: "networkidle" });
   await setMockConfig(mobile);
   await mobile.evaluate(() => window.GridFreqLiveFrequency.refresh());

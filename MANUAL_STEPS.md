@@ -2,33 +2,20 @@
 
 Bu dosya yalnızca kullanıcının gerçekten yapması gereken işleri listeler.
 
-## 1. Wrangler Login Yenileme
+## Tamamlanan Adımlar
 
-Bu ortamda Wrangler oturumu süresi dolmuş görünüyor. Etkileşimli bir terminalde:
+- ~~Wrangler Login Yenileme~~ → Tamamlandı ✅
+- ~~GridRadar Token Secret Girişi~~ → Tamamlandı (GRIDRADAR_TOKEN Cloudflare secret olarak mevcut) ✅
+- ~~Cloudflare Worker Deploy~~ → Tamamlandı ✅
+- ~~Frontend Production API URL~~ → Gerçek Worker URL eklendi ✅
 
-```powershell
-cd C:\yazilim_projeler\zfrekans_rapor_worktrees\feat-gridradar-live-frequency\live-frequency-worker
-npx wrangler login
-```
+## Kalan Adımlar
 
-Açılan Cloudflare tarayıcı onayını tamamlayın. Token veya Cloudflare API tokenını sohbet mesajı olarak göndermeyin.
+### 1. PR Merge
 
-## 2. GridRadar Token Secret Girişi
+PR #4 (`feat/gridradar-live-frequency`) GitHub üzerinde merge edilmeye hazırdır.
 
-Codex şu komutu başlattığında:
-
-```powershell
-npx wrangler secret put GRIDRADAR_TOKEN
-```
-
-GridRadar API tokenınızı açılan gizli terminal girişine yapıştırıp Enter'a basın. Tokenı sohbet mesajı olarak göndermeyin.
-
-## 3. Cloudflare Onayı
-
-Cloudflare ilk Worker deploy sırasında tarayıcıda zorunlu hesap veya Workers onayı isterse, açılan Cloudflare ekranında onayı tamamlayın.
-
-## 4. PR Merge
-
-Branch protection veya GitHub izinleri nedeniyle PR otomatik merge edilemezse, GitHub üzerinde PR'ı siz merge edin.
+- PR: https://github.com/murathany90/frekans/pull/4
+- Branch: `feat/gridradar-live-frequency`
 
 DNS, özel alan adı, GitHub API tokenı, D1, KV veya R2 kurulumu bu ilk sürüm için zorunlu değildir.
