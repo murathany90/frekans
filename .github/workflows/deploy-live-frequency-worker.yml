@@ -1,0 +1,73 @@
+name: Deploy Live Frequency Worker
+
+on:
+  push:
+    paths:
+      - "live-frequency-worker/**"
+      - ".github/workflows/deploy-live-frequency-worker.yml"
+  pull_request:
+    paths:
+      - "live-frequency-worker/**"
+      - ".github/workflows/deploy-live-frequency-worker.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: live-frequency-worker
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: live-frequency-worker/package-lock.json
+
+      - run: npm ci
+      - run: npm test
+      - run: npm run typecheck
+      - run: npm run deploy:dry-run
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' }}
+    defaults:
+      run:
+        working-directory: live-frequency-worker
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: live-frequency-worker/package-lock.json
+
+      - run: npm ci
+
+      - name: Check Cloudflare deploy secrets
+        id: cf
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "Cloudflare secrets are not configured; skipping deploy."
+          fi
+
+      - name: Deploy Worker
+        if: ${{ steps.cf.outputs.available == 'true' }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npm run deploy

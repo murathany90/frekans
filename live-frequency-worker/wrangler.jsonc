@@ -1,0 +1,35 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "gridfreq-live-frequency",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-18",
+  "workers_dev": true,
+  "observability": {
+    "enabled": true
+  },
+  "vars": {
+    "GRIDRADAR_API_BASE_URL": "https://api.gridradar.net",
+    "GRIDRADAR_METRIC": "frequency-ucte-median-1s",
+    "POLL_INTERVAL_SECONDS": "60",
+    "RETENTION_SECONDS": "86400",
+    "CHUNK_SECONDS": "900",
+    "ALLOWED_ORIGINS": "https://gridfreq.com,https://www.gridfreq.com,https://murathany90.github.io"
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "FREQUENCY_STORE",
+        "class_name": "FrequencyStore"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["FrequencyStore"]
+    }
+  ],
+  "triggers": {
+    "crons": ["*/15 * * * *"]
+  }
+}
