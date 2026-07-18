@@ -72,6 +72,22 @@ describe("public API routes", () => {
     expect(response.headers.get("Access-Control-Allow-Methods")).toContain("GET");
   });
 
+  it("serves status metadata with the GridRadar source contract", async () => {
+    const response = await handleApiRequest(
+      new Request("https://worker.example/v1/live/status", { headers: { Origin: "https://gridfreq.com" } }),
+      store,
+      env
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      source: "GridRadar",
+      metric: "frequency-ucte-median-1s",
+      resolutionSeconds: 1,
+      retentionHours: 24
+    });
+  });
+
   it("rejects raw one second series longer than one hour", async () => {
     const response = await handleApiRequest(
       new Request("https://worker.example/v1/live/series?from=2026-07-18T00:00:00Z&to=2026-07-18T02:00:01Z&resolution=1s", {
@@ -83,6 +99,19 @@ describe("public API routes", () => {
 
     expect(response.status).toBe(400);
     await expect(response.json()).resolves.toMatchObject({ error: "range-too-large" });
+  });
+
+  it("does not expose a 24 hour raw one second series shortcut", async () => {
+    const response = await handleApiRequest(
+      new Request("https://worker.example/v1/live/series?range=24h&resolution=1s", {
+        headers: { Origin: "https://gridfreq.com" }
+      }),
+      store,
+      env
+    );
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toMatchObject({ error: "invalid-from-to" });
   });
 
   it("marks delta as no-store", async () => {

@@ -46,7 +46,20 @@ const requiredDetails = [
   ".frequency.i16",
   "minute.json",
   "hourly.json",
-  "meta.json"
+  "meta.json",
+  "Canlı Frekans",
+  "GridRadar",
+  "frequency-ucte-median-1s",
+  "1 saniye kaynak çözünürlüğü",
+  "yaklaşık 15 dakika gecikme",
+  "son 24 saatlik görünüm",
+  "Cloudflare Worker + SQLite Durable Object",
+  "24 saatlik döner veri tamponu",
+  "60 saniyelik frontend yenileme",
+  "Tarihsel/Günlük Kıta Avrupası verisi Netztransparenz",
+  "canlı/gecikmeli Kıta Avrupası verisi GridRadar",
+  "Veriler yalnızca kişisel, ticari olmayan ve fonlanmamış akademik araştırma amaçlarıyla",
+  "Ticari veya profesyonel kullanım için GridRadar"
 ];
 
 for (const detail of requiredDetails) {

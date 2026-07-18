@@ -1,8 +1,10 @@
 (() => {
   const POLL_MS = 60_000;
+  const SUMMARY_SYNC_MS = 300_000;
   const NOMINAL_HZ = 50;
+  const NORMAL_AGE_MS = 20 * 60_000;
+  const DELAYED_AGE_MS = 30 * 60_000;
   const RANGE_LABELS = new Map([
-    [900, "Son 15 dakika"],
     [3600, "Son 1 saat"],
     [21600, "Son 6 saat"],
     [86400, "Son 24 saat"]
@@ -14,16 +16,27 @@
     chart: null,
     status: null,
     minuteSeries: [],
-    rawCache: new Map(),
-    rangeSeconds: 86400,
+    rangeSeconds: 3600,
     lastTimestampMs: 0,
-    visibilityBound: false
+    lastSeriesSyncMs: 0,
+    visibilityBound: false,
+    refreshInFlight: null,
+    pollInFlight: null
   };
 
   const $ = (id) => document.getElementById(id);
 
   function apiBaseUrl() {
     return String(window.GRIDFREQ_CONFIG?.liveApiBaseUrl || "").replace(/\/$/, "");
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
   }
 
   function formatHz(value, digits = 4) {
@@ -47,7 +60,9 @@
 
   function formatAge(iso) {
     if (!iso) return "-";
-    const ageSeconds = Math.max(0, Math.floor((Date.now() - Date.parse(iso)) / 1000));
+    const parsed = Date.parse(iso);
+    if (!Number.isFinite(parsed)) return "-";
+    const ageSeconds = Math.max(0, Math.floor((Date.now() - parsed) / 1000));
     const minutes = Math.floor(ageSeconds / 60);
     const hours = Math.floor(minutes / 60);
     if (hours > 0) return `${hours} sa ${minutes % 60} dk`;
@@ -72,44 +87,129 @@
     node.textContent = message;
   }
 
+  function measurementFreshness(status = state.status) {
+    const measuredAt = status?.latestMeasurementTime ? Date.parse(status.latestMeasurementTime) : NaN;
+    if (!Number.isFinite(measuredAt)) {
+      return {
+        label: "Veri bekleniyor",
+        dot: "stale",
+        bannerTone: "warn",
+        banner: "GridRadar ölçüm zamanı henüz alınamadı; veri tamponu hazırlanıyor."
+      };
+    }
+    const ageMs = Math.max(0, Date.now() - measuredAt);
+    if (ageMs <= NORMAL_AGE_MS) {
+      return {
+        label: "Sağlıklı",
+        dot: "healthy",
+        bannerTone: "success",
+        banner: "Kıta Avrupası · GridRadar · yaklaşık 15 dakika gecikmeli veri gösteriliyor."
+      };
+    }
+    if (ageMs <= DELAYED_AGE_MS) {
+      return {
+        label: "Gecikmeli",
+        dot: "delayed",
+        bannerTone: "warn",
+        banner: "GridRadar ölçümü beklenen gecikmenin üzerinde; mevcut 60 saniyelik özet seri korunuyor."
+      };
+    }
+    return {
+      label: "Veri akışı kesintili",
+      dot: "stale",
+      bannerTone: "muted",
+      banner: "Veri akışı kesintili veya eski; son alınan GridRadar ölçümü gösteriliyor."
+    };
+  }
+
+  function updateStatusFromFreshness() {
+    const freshness = measurementFreshness();
+    if (!state.minuteSeries.length) {
+      setStatus("İlk 24 saatlik tampon hazırlanıyor; henüz grafik verisi yok.", "warn");
+      return;
+    }
+    setStatus(freshness.banner, freshness.bannerTone);
+  }
+
+  function selectedMinuteSeries() {
+    const cutoff = Date.now() - state.rangeSeconds * 1000;
+    return state.minuteSeries.filter((point) => Date.parse(point.timestamp) >= cutoff);
+  }
+
   function computeSeriesStats(series) {
     const valid = series.filter((point) => Number.isFinite(point.meanHz));
     const minValues = series.map((point) => point.minHz).filter(Number.isFinite);
     const maxValues = series.map((point) => point.maxHz).filter(Number.isFinite);
-    const mean = valid.length ? valid.reduce((sum, point) => sum + point.meanHz, 0) / valid.length : NaN;
-    const validSamples = series.reduce((sum, point) => sum + (Number(point.validSamples) || 0), 0);
-    const expectedSamples = Math.max(1, series.length * 60);
+    let weightedSum = 0;
+    let weightTotal = 0;
+    valid.forEach((point) => {
+      const weight = Math.max(0, Number(point.validSamples) || 0);
+      if (weight > 0) {
+        weightedSum += point.meanHz * weight;
+        weightTotal += weight;
+      }
+    });
+    const mean = weightTotal
+      ? weightedSum / weightTotal
+      : valid.length
+        ? valid.reduce((sum, point) => sum + point.meanHz, 0) / valid.length
+        : NaN;
     return {
       mean,
       min: minValues.length ? Math.min(...minValues) : NaN,
       max: maxValues.length ? Math.max(...maxValues) : NaN,
-      validSamples,
-      missingSamples: Math.max(0, expectedSamples - validSamples),
-      validRatio: validSamples / expectedSamples
+      points: series.length
     };
   }
 
-  function kpi(label, value, sub = "") {
-    return `<article class="live-frequency-kpi"><div class="label">${label}</div><div class="value">${value}</div>${sub ? `<div class="sub">${sub}</div>` : ""}</article>`;
+  function kpi(label, valueHtml, sub = "", tooltip = "") {
+    const safeLabel = escapeHtml(label);
+    const safeSub = escapeHtml(sub);
+    const tooltipAttrs = tooltip
+      ? ` tabindex="0" data-tooltip="${escapeHtml(tooltip)}" aria-label="${safeLabel}: ${escapeHtml(tooltip)}"`
+      : "";
+    return `<article class="live-frequency-kpi"${tooltipAttrs}><div class="label">${safeLabel}</div><div class="value">${valueHtml}</div>${safeSub ? `<div class="sub">${safeSub}</div>` : ""}</article>`;
   }
 
   function renderKpis() {
     const root = $("liveFrequencyKpis");
     if (!root) return;
     const status = state.status || {};
-    const stats = computeSeriesStats(state.minuteSeries);
-    const connection = status.status === "healthy" ? "Sağlıklı" : status.status === "warming" ? "Tampon hazırlanıyor" : status.status === "auth-error" ? "Yetki sorunu" : "Kontrol gerekli";
+    const series = selectedMinuteSeries();
+    const stats = computeSeriesStats(series);
+    const freshness = measurementFreshness(status);
+    const age = formatAge(status.latestMeasurementTime);
+    const rangeLabel = RANGE_LABELS.get(state.rangeSeconds) || "Seçili aralık";
+    const maxMeanMin = [
+      `<span class="live-frequency-stat"><b>Mak</b> ${escapeHtml(formatHz(stats.max))}</span>`,
+      `<span class="live-frequency-stat"><b>Ort</b> ${escapeHtml(formatHz(stats.mean))}</span>`,
+      `<span class="live-frequency-stat"><b>Min</b> ${escapeHtml(formatHz(stats.min))}</span>`
+    ].join("");
     root.innerHTML = [
-      kpi("Son erişilebilir frekans", formatHz(status.latestFrequencyHz), "GridRadar"),
-      kpi("Nominal sapma", formatMhz(status.latestFrequencyHz), "50.000 Hz referans"),
-      kpi("Ölçüm zamanı", formatTime(status.latestMeasurementTime), "UTC/yerel tooltipte"),
-      kpi("Veri yaşı", formatAge(status.latestMeasurementTime), "Yaklaşık 15 dakika gecikmeli"),
-      kpi("24s minimum", formatHz(status.minFrequencyHz ?? stats.min)),
-      kpi("24s maksimum", formatHz(status.maxFrequencyHz ?? stats.max)),
-      kpi("24s ortalama", formatHz(status.meanFrequencyHz ?? stats.mean)),
-      kpi("Geçerli örnek oranı", `${((status.validSampleRatio ?? stats.validRatio) * 100).toFixed(2)}%`),
-      kpi("Eksik veri", `${stats.missingSamples.toLocaleString("tr-TR")} sn`, `${(100 - stats.validRatio * 100).toFixed(2)}%`),
-      kpi("Bağlantı durumu", connection, apiBaseUrl() ? "Worker API" : "API URL bekleniyor")
+      kpi(
+        "Ölçüm Zamanı",
+        escapeHtml(formatTime(status.latestMeasurementTime)),
+        "Yerel tarih ve saat",
+        "GridRadar tarafından sağlanan son frekans ölçümünün tarayıcı yerel saatine çevrilmiş zamanıdır."
+      ),
+      kpi(
+        "Bağlantı / Veri Yaşı",
+        `<span class="live-frequency-status-line"><span class="live-frequency-status-dot ${freshness.dot}" aria-hidden="true"></span>${escapeHtml(freshness.label)}</span>`,
+        age,
+        "Durum, son ölçüm zamanı ile şu an arasındaki yaşa göre hesaplanır: 20 dakikaya kadar sağlıklı, 20-30 dakika gecikmeli, 30 dakikadan eskiyse veri akışı zayıf kabul edilir."
+      ),
+      kpi(
+        "Mak-Ort-Min",
+        `<span class="live-frequency-stat-stack">${maxMeanMin}</span>`,
+        `${rangeLabel} · ${stats.points.toLocaleString("tr-TR")} dk`,
+        "Maksimum, ortalama ve minimum değerler seçili zaman aralığındaki 60 saniyelik özet GridRadar serisinden hesaplanır."
+      ),
+      kpi(
+        "Nominal Sapma",
+        escapeHtml(formatMhz(status.latestFrequencyHz)),
+        "50.000 Hz referans",
+        "Son frekans ölçümünün nominal 50.000 Hz sistem frekansından mHz cinsinden farkıdır."
+      )
     ].join("");
   }
 
@@ -134,40 +234,21 @@
     return state.chart;
   }
 
-  function filteredMinuteSeries() {
-    const cutoff = Date.now() - state.rangeSeconds * 1000;
-    return state.minuteSeries.filter((point) => Date.parse(point.timestamp) >= cutoff);
-  }
-
-  async function rawSeriesForCurrentRange() {
-    if (state.rangeSeconds > 3600) return null;
-    const to = new Date().toISOString();
-    const from = new Date(Date.now() - state.rangeSeconds * 1000).toISOString();
-    const key = `${from}:${to}`;
-    if (!state.rawCache.has(key)) {
-      state.rawCache.set(key, fetchJson(`/v1/live/series?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&resolution=1s`));
-    }
-    return state.rawCache.get(key);
-  }
-
   async function renderChart() {
     const chart = ensureChart();
     if (!chart) return;
-    const raw = await rawSeriesForCurrentRange().catch(() => null);
-    const minute = filteredMinuteSeries();
-    const useRaw = Array.isArray(raw) && raw.length > 0;
-    const axisData = useRaw ? raw.map((point) => new Date(point.timestampMs).toISOString()) : minute.map((point) => point.timestamp);
-    const meanData = useRaw ? raw.map((point) => point.frequencyHz) : minute.map((point) => point.meanHz);
-    const minData = useRaw ? [] : minute.map((point) => point.minHz);
-    const maxData = useRaw ? [] : minute.map((point) => point.maxHz);
+    const minute = selectedMinuteSeries();
+    const axisData = minute.map((point) => point.timestamp);
     chart.setOption({
       animation: false,
+      color: ["#111827", "#c83c3c", "#6b7280"],
       tooltip: {
         trigger: "axis",
         formatter(params) {
           const time = params?.[0]?.axisValue;
-          const utc = new Date(time).toISOString().replace("T", " ").replace(".000Z", " UTC");
-          const local = new Date(time).toLocaleString("tr-TR", { hour12: false });
+          const date = new Date(time);
+          const utc = Number.isNaN(date.getTime()) ? time : date.toISOString().replace("T", " ").replace(".000Z", " UTC");
+          const local = Number.isNaN(date.getTime()) ? "" : date.toLocaleString("tr-TR", { hour12: false });
           const rows = params.map((item) => `${item.marker}${item.seriesName}: ${formatHz(item.value, 4)}`).join("<br>");
           return `${utc}<br>${local}<br>${rows}`;
         }
@@ -175,85 +256,130 @@
       legend: { top: 0 },
       grid: { left: 52, right: 20, top: 54, bottom: 54 },
       xAxis: { type: "category", data: axisData, boundaryGap: false },
-      yAxis: { type: "value", min: 49.85, max: 50.15, axisLabel: { formatter: (value) => Number(value).toFixed(3) } },
+      yAxis: { type: "value", scale: true, axisLabel: { formatter: (value) => Number(value).toFixed(3) } },
       dataZoom: [{ type: "inside" }, { type: "slider", height: 24 }],
       series: [
         {
-          name: useRaw ? "1 sn frekans" : "Dakikalık ortalama",
+          name: "Canlı frekans",
           type: "line",
-          data: meanData,
+          data: minute.map((point) => point.meanHz),
           showSymbol: false,
           connectNulls: false,
-          lineStyle: { width: 2, color: "#176b9c" },
+          lineStyle: { width: 2, color: "#111827" },
           markLine: {
             silent: true,
             symbol: "none",
             data: [
-              { yAxis: 50, lineStyle: { color: "#17212b", width: 1.5 }, label: { formatter: "50.000 Hz" } },
-              { yAxis: 50.02, lineStyle: { color: "#19714d", type: "dashed" }, label: { formatter: "+20 mHz" } },
-              { yAxis: 49.98, lineStyle: { color: "#19714d", type: "dashed" }, label: { formatter: "-20 mHz" } },
-              { yAxis: 50.05, lineStyle: { color: "#b37400", type: "dashed" }, label: { formatter: "+50 mHz" } },
-              { yAxis: 49.95, lineStyle: { color: "#b37400", type: "dashed" }, label: { formatter: "-50 mHz" } },
-              { yAxis: 50.1, lineStyle: { color: "#c83c3c", type: "dotted" }, label: { formatter: "+100 mHz" } },
-              { yAxis: 49.9, lineStyle: { color: "#c83c3c", type: "dotted" }, label: { formatter: "-100 mHz" } }
+              { yAxis: 50, lineStyle: { color: "#17212b", width: 1.2 }, label: { formatter: "50.000 Hz" } }
             ]
           }
         },
-        { name: "Dakikalık minimum", type: "line", data: minData, showSymbol: false, connectNulls: false, lineStyle: { width: 1, opacity: .55 } },
-        { name: "Dakikalık maksimum", type: "line", data: maxData, showSymbol: false, connectNulls: false, lineStyle: { width: 1, opacity: .55 } }
+        {
+          name: "Maksimum",
+          type: "line",
+          data: minute.map((point) => point.maxHz),
+          showSymbol: false,
+          connectNulls: false,
+          lineStyle: { width: 1.2, color: "#c83c3c", opacity: 0.82 }
+        },
+        {
+          name: "Minimum",
+          type: "line",
+          data: minute.map((point) => point.minHz),
+          showSymbol: false,
+          connectNulls: false,
+          lineStyle: { width: 1.2, color: "#6b7280", opacity: 0.78 }
+        }
       ].filter((series) => series.data.length)
     }, true);
   }
 
+  function updateLastTimestampFromStatus() {
+    const latest = state.status?.latestMeasurementTime ? Date.parse(state.status.latestMeasurementTime) : 0;
+    if (Number.isFinite(latest)) state.lastTimestampMs = Math.max(state.lastTimestampMs, latest || 0);
+  }
+
+  async function syncMinuteSeries() {
+    const series = await fetchJson("/v1/live/series?range=24h&resolution=60s");
+    state.minuteSeries = Array.isArray(series) ? series : [];
+    state.lastSeriesSyncMs = Date.now();
+  }
+
   async function refreshAll() {
-    if (!apiBaseUrl()) {
-      setStatus("Worker API URL yapılandırılmadı. Cloudflare deploy sonrası bu sekme otomatik bağlanacak.", "warn");
-      renderKpis();
-      return;
-    }
-    setStatus("Canlı frekans verisi yükleniyor.", "muted");
+    if (state.refreshInFlight) return state.refreshInFlight;
+    state.refreshInFlight = (async () => {
+      if (!apiBaseUrl()) {
+        setStatus("Worker API URL yapılandırılmadı. Cloudflare deploy sonrası bu sekme otomatik bağlanacak.", "warn");
+        renderKpis();
+        return;
+      }
+      setStatus("Canlı frekans verisi yükleniyor.", "muted");
+      try {
+        const [status] = await Promise.all([
+          fetchJson("/v1/live/status"),
+          syncMinuteSeries()
+        ]);
+        state.status = status;
+        updateLastTimestampFromStatus();
+        updateStatusFromFreshness();
+        renderKpis();
+        renderBufferNotice();
+        await renderChart();
+      } catch (error) {
+        const message = error?.message === "auth"
+          ? "GridRadar API token/yetki sorunu. Worker secret durumunu kontrol edin."
+          : "GridRadar bağlantısı veya Worker geçici olarak kullanılamıyor.";
+        setStatus(message, "warn");
+        renderKpis();
+      }
+    })();
     try {
-      const [status, series] = await Promise.all([
-        fetchJson("/v1/live/status"),
-        fetchJson("/v1/live/series?range=24h&resolution=60s")
-      ]);
-      state.status = status;
-      state.minuteSeries = Array.isArray(series) ? series : [];
-      const latest = state.status?.latestMeasurementTime ? Date.parse(state.status.latestMeasurementTime) : 0;
-      state.lastTimestampMs = Math.max(state.lastTimestampMs, latest || 0);
-      setStatus(state.minuteSeries.length ? "Yaklaşık 15 dakika gecikmeli canlı veri gösteriliyor." : "İlk 24 saatlik tampon hazırlanıyor; henüz grafik verisi yok.", state.minuteSeries.length ? "good" : "warn");
-      renderKpis();
-      renderBufferNotice();
-      await renderChart();
-    } catch (error) {
-      const message = error?.message === "auth"
-        ? "GridRadar API token/yetki sorunu. Worker secret durumunu kontrol edin."
-        : "GridRadar bağlantısı veya Worker geçici olarak kullanılamıyor.";
-      setStatus(message, "warn");
-      renderKpis();
+      return await state.refreshInFlight;
+    } finally {
+      state.refreshInFlight = null;
     }
   }
 
-  async function pollDelta() {
-    if (!state.active || document.hidden || !apiBaseUrl()) return;
-    try {
-      const delta = await fetchJson(`/v1/live/delta?after=${state.lastTimestampMs || 0}`);
-      if (Array.isArray(delta) && delta.length) {
-        state.lastTimestampMs = Math.max(...delta.map((point) => Number(point.timestampMs) || 0), state.lastTimestampMs);
-        await refreshAll();
-      } else {
-        state.status = await fetchJson("/v1/live/status");
+  async function pollLiveData() {
+    if (!state.active || document.hidden || !apiBaseUrl() || state.pollInFlight) return;
+    state.pollInFlight = (async () => {
+      try {
+        const [status, delta] = await Promise.all([
+          fetchJson("/v1/live/status"),
+          fetchJson(`/v1/live/delta?after=${state.lastTimestampMs || 0}`)
+        ]);
+        state.status = status;
+        updateLastTimestampFromStatus();
+        if (Array.isArray(delta) && delta.length) {
+          state.lastTimestampMs = Math.max(...delta.map((point) => Number(point.timestampMs) || 0), state.lastTimestampMs);
+        }
+        if (Date.now() - state.lastSeriesSyncMs >= SUMMARY_SYNC_MS) {
+          await syncMinuteSeries();
+          await renderChart();
+        }
+        updateStatusFromFreshness();
         renderKpis();
         renderBufferNotice();
+      } catch {
+        setStatus("Canlı veri yenilemesi gecikti; mevcut grafik korunuyor.", "warn");
       }
-    } catch {
-      setStatus("Canlı veri yenilemesi gecikti; mevcut grafik korunuyor.", "warn");
+    })();
+    try {
+      return await state.pollInFlight;
+    } finally {
+      state.pollInFlight = null;
     }
+  }
+
+  function clearPolling() {
+    if (state.timer !== null) clearInterval(state.timer);
+    state.timer = null;
   }
 
   function schedulePolling() {
-    clearInterval(state.timer);
-    state.timer = window.setInterval(pollDelta, POLL_MS);
+    clearPolling();
+    if (!state.active || document.hidden) return;
+    state.timer = window.setInterval(pollLiveData, POLL_MS);
   }
 
   function bindControls() {
@@ -261,9 +387,10 @@
       if (button.dataset.boundLiveRange) return;
       button.dataset.boundLiveRange = "1";
       button.addEventListener("click", async () => {
-        state.rangeSeconds = Number(button.dataset.liveRange) || 86400;
+        state.rangeSeconds = Number(button.dataset.liveRange) || 3600;
         document.querySelectorAll("[data-live-range]").forEach((item) => item.classList.toggle("active", item === button));
         setStatus(`${RANGE_LABELS.get(state.rangeSeconds) || "Seçili aralık"} gösteriliyor.`, "muted");
+        renderKpis();
         await renderChart();
       });
     });
@@ -272,7 +399,7 @@
   function onVisibilityChange() {
     if (!state.active) return;
     if (document.hidden) {
-      clearInterval(state.timer);
+      clearPolling();
     } else {
       refreshAll();
       schedulePolling();
@@ -298,8 +425,7 @@
 
   function stop() {
     state.active = false;
-    clearInterval(state.timer);
-    state.timer = null;
+    clearPolling();
     window.removeEventListener("resize", resize);
     if (state.chart) {
       state.chart.dispose();
