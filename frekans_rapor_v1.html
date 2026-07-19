@@ -863,6 +863,8 @@
       font-weight: 800;
       white-space: nowrap;
     }
+    .quality-zoom-reset-icon { display: none; }
+    .quality-zoom-reset-text { display: inline; }
     .chart-toolbar svg {
       width: 18px;
       height: 18px;
@@ -1687,6 +1689,17 @@
         justify-content: flex-end;
         opacity: 1;
       }
+      .chart-toolbar .quality-zoom-reset-btn {
+        width: 40px;
+        min-width: 40px;
+        padding: 0;
+      }
+      .quality-zoom-reset-btn .quality-zoom-reset-icon {
+        display: block;
+      }
+      #qualityZoomResetText {
+        display: none;
+      }
       .chart-layer-controls {
         max-width: 100%;
         overflow-x: auto;
@@ -1919,8 +1932,11 @@
             </div>
           </div>
         </div>
-        <div class="chart-wrapper live-frequency-chart-wrapper">
+        <div class="chart-wrapper live-frequency-chart-wrapper" id="liveFrequencyChartWrapper">
           <div id="liveFrequencyChart" class="chart" role="img" aria-label="Yaklaşık 15 dakika gecikmeli Kıta Avrupası frekans grafiği"></div>
+          <div class="chart-toolbar">
+            <button type="button" aria-label="Tam ekran" title="Tam ekran" data-action="fullscreen" data-chart="liveFrequencyChart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5"/><path d="M16 3h5v5"/><path d="M21 16v5h-5"/><path d="M8 21H3v-5"/></svg></button>
+          </div>
         </div>
       </div>
 
@@ -2336,7 +2352,7 @@
         <div class="chart-wrapper" id="oscChartWrapper">
           <div id="analysisMainChart" class="chart tall"></div>
           <div class="chart-toolbar">
-            <button type="button" class="quality-zoom-reset-btn hidden" id="qualityZoomResetBtn" data-action="resetzoom" data-chart="analysisMainChart" data-i18n="qualityResetZoomBtn" aria-label="Zoom'u Sıfırla">Zoom'u Sıfırla</button>
+            <button type="button" class="quality-zoom-reset-btn hidden" id="qualityZoomResetBtn" data-action="resetzoom" data-chart="analysisMainChart" aria-label="Zoom Sıfırla" title="Zoom Sıfırla"><svg class="quality-zoom-reset-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v6h6"/><path d="M8 12h8"/></svg><span id="qualityZoomResetText" class="quality-zoom-reset-text" data-i18n="qualityResetZoomBtn">Zoom Sıfırla</span></button>
             <button type="button" aria-label="Tam ekran" title="Tam ekran" data-action="fullscreen" data-chart="analysisMainChart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5"/><path d="M16 3h5v5"/><path d="M21 16v5h-5"/><path d="M8 21H3v-5"/></svg></button>
             <button type="button" aria-label="Grafiği PNG olarak indir" title="Grafiği PNG olarak indir" data-action="download" data-chart="analysisMainChart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg></button>
             <button type="button" aria-label="Yakınlaştırmayı sıfırla" title="Yakınlaştırmayı sıfırla" data-action="resetzoom" data-chart="analysisMainChart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v6h6"/></svg></button>
@@ -4239,7 +4255,12 @@
     }
 
     function toggleChartFullscreen(chartId) {
-      const wrapper = chartId === 'frequencyChart' ? $('freqChartWrapper') : $('oscChartWrapper');
+      const wrapper = chartId === 'frequencyChart'
+        ? $('freqChartWrapper')
+        : chartId === 'liveFrequencyChart'
+          ? $('liveFrequencyChartWrapper')
+          : $('oscChartWrapper');
+      if (!wrapper?.requestFullscreen) return;
       if (document.fullscreenElement === wrapper) {
         document.exitFullscreen();
       } else {
@@ -4342,6 +4363,8 @@
     function handleFullscreenChange() {
       state.frequencyChart?.resize();
       state.oscillationChart?.resize();
+      const liveChart = $('liveFrequencyChart') ? window.echarts?.getInstanceByDom($('liveFrequencyChart')) : null;
+      liveChart?.resize();
     }
 
     function handleKeyboardShortcut(e) {
@@ -7415,7 +7438,7 @@
     }
 
     function shiftFrequencySummary(summary, offsetSeconds) {
-      const shift = data => data.map(point => [point[0] + offsetSeconds, point[1]]);
+      const shift = data => data.map(point => [point[0] + offsetSeconds, point[1], ...point.slice(2)]);
       return {
         ...summary,
         avgData: shift(summary.avgData),
@@ -7549,7 +7572,7 @@
         : [buildQualityFrequencySummary(quality, sourceLabel(source), { color: '#101820', showMinMax: false })];
       return {
         type,
-        title: `${t(analysisDefinition(type).titleKey)} · ${t('qualityRepeatedRange')}`,
+        title: t(analysisDefinition(type).titleKey),
         description: t(analysisDefinition(type).descriptionKey),
         metadata,
         cards: [
@@ -7634,7 +7657,7 @@
       };
       return {
         type: 'quality',
-        title: `${t(analysisDefinition('quality').titleKey)} · ${t('qualityRepeatedRange')}`,
+        title: t(analysisDefinition('quality').titleKey),
         description: t(analysisDefinition('quality').descriptionKey),
         metadata: analysisMetadata('quality', source, lastCurrent, dateList, sampling),
         cards: [
@@ -7671,7 +7694,7 @@
         const rocof = workerResult || core.computeRocof(series, { method: 'movingRegression', sampleIntervalSeconds, windowSeconds: Number($('windowSec').value || 5), thresholdHzPerSecond: Number($('rocofThreshold').value || 0.01) });
         return {
           type,
-        title: `${t(analysisDefinition(type).titleKey)} · ${t('qualityRepeatedRange')}`,
+          title: t(analysisDefinition(type).titleKey),
           description: t(analysisDefinition(type).descriptionKey),
           metadata,
           cards: [
@@ -7945,7 +7968,7 @@
           type: 'line',
           xAxisIndex: 0,
           yAxisIndex: 0,
-          data: summary.avgData,
+          data: summary.avgData.map(point => [point[0], point[1], summary.bucketSeconds || 1]),
           symbol: 'none',
           connectNulls: false,
           lineStyle: { width: 1.8, color: summary.color || '#101820', opacity: index ? 0.82 : 1 },
@@ -7958,7 +7981,7 @@
             type: 'line',
             xAxisIndex: 0,
             yAxisIndex: 0,
-            data: summary.maxData,
+            data: summary.maxData.map(point => [point[0], point[1], summary.bucketSeconds || 1]),
             symbol: 'none',
             connectNulls: false,
             lineStyle: { width: 1, color: 'rgba(200,60,60,.62)', opacity: 0.7 },
@@ -7969,7 +7992,7 @@
             type: 'line',
             xAxisIndex: 0,
             yAxisIndex: 0,
-            data: summary.minData,
+            data: summary.minData.map(point => [point[0], point[1], summary.bucketSeconds || 1]),
             symbol: 'none',
             connectNulls: false,
             lineStyle: { width: 1, color: 'rgba(23,33,43,.36)', opacity: 0.64 },
@@ -7988,7 +8011,7 @@
 
       state.oscillationChart.setOption({
         animation: false,
-        tooltip: qualityChartTooltip(chartTimeLabel),
+        tooltip: qualityChartTooltip(chartTimeLabel, result),
         legend: { top: 8, type: 'scroll' },
         grid: [
           { left: 68, right: 42, top: 58, height: 285 },
@@ -8050,7 +8073,7 @@
         { type: 'missing', name: t('qualityMissingRange'), color: 'rgba(220,38,38,.24)', borderColor: '#dc2626', lineColor: '#dc2626', lineType: 'dashed' },
         { type: 'invalid', name: t('qualityInvalidRange'), color: 'rgba(179,116,0,.14)' },
         { type: 'duplicate', name: t('qualityDuplicateRange'), color: 'rgba(27,107,156,.13)' },
-        { type: 'repeated', name: t('qualityRepeatedRangeShort'), color: 'rgba(18,24,33,.13)' }
+        { type: 'repeated', name: t('qualityRepeatedRange'), markerName: t('qualityRepeatedRangeShort'), color: 'rgba(18,24,33,.13)' }
       ];
     }
 
@@ -8076,7 +8099,7 @@
                 return [
                   {
                     xAxis: event.startSecond,
-                    name: group.name,
+                    name: group.markerName || group.name,
                     eventType: event.type,
                     eventStartSecond: event.startSecond,
                     eventEndSecond: event.endSecond,
@@ -8163,22 +8186,73 @@
       return [...byKey.values()];
     }
 
-    function qualityChartTooltip(chartTimeLabel) {
+    function qualityChartTooltip(chartTimeLabel, result) {
+      const eventLabel = event => {
+        const type = event?.eventType || event?.type;
+        if (type === 'missing') return t('qualityMissingRange');
+        if (type === 'invalid') return t('qualityInvalidRange');
+        if (type === 'duplicate') return t('qualityDuplicateRange');
+        if (type === 'repeated') return t('qualityRepeatedRangeShort');
+        return t('qualityStatusGood');
+      };
+      const eventDuration = event => event?.eventDurationSeconds || event?.durationSeconds || Math.max(0, (event?.eventEndSecond ?? event?.endSecond ?? 0) - (event?.eventStartSecond ?? event?.startSecond ?? 0));
+      const eventWindow = event => ({
+        start: event?.eventStartSecond ?? event?.startSecond,
+        end: event?.eventEndSecond ?? event?.endSecond
+      });
+      const findEventInWindow = (start, end) => {
+        const events = result?.chart?.events || [];
+        return events.find(event => event.startSecond < end && event.endSecond > start) || null;
+      };
+      const lineTooltip = params => {
+        const value = params.value || params.data || [];
+        const x = Number(value[0]);
+        const y = Number(value[1]);
+        const bucketSeconds = Math.max(1, Number(value[2]) || 1);
+        const start = bucketSeconds > 1 ? x - bucketSeconds / 2 : x;
+        const end = bucketSeconds > 1 ? x + bucketSeconds / 2 : x + 1;
+        const event = findEventInWindow(start, end);
+        const status = event ? eventLabel(event) : t('qualityStatusGood');
+        const lines = [
+          `<strong>${params.seriesName || t('qualityFrequencySummary')}</strong>`,
+          bucketSeconds > 1
+            ? `${t('qualityTooltipInterval')}: ${chartTimeLabel(start, true)}-${chartTimeLabel(end, true)}`
+            : `${t('qualityTooltipDateTime')}: ${chartTimeLabel(x, true)}`,
+          `${t('qualityTooltipFrequency')}: ${Number.isFinite(y) ? `${fmt(y, 4)} Hz` : t('qualityMissingTooltipTitle')}`,
+          `${t('qualityTooltipStatus')}: ${status}`
+        ];
+        if (event) {
+          lines.push(`${t('qualityTooltipEvent')}: ${eventLabel(event)}`);
+          if ((event.type || event.eventType) === 'repeated') lines.push(`${t('tableDuration')}: ${durationText(eventDuration(event))}`);
+        }
+        return lines.join('<br>');
+      };
       return {
         trigger: 'item',
+        triggerOn: 'mousemove|click',
         axisPointer: { type: 'cross' },
         formatter: params => {
           const eventData = Array.isArray(params.data) ? params.data[0] : params.data;
-          if (eventData?.eventType === 'missing') {
-            return `<strong>${t('qualityMissingTooltipTitle')}</strong><br>${t('eventStart')}: ${chartTimeLabel(eventData.eventStartSecond, true)}<br>${t('eventEnd')}: ${chartTimeLabel(eventData.eventEndSecond, true)}<br>${t('tableDuration')}: ${durationText(eventData.eventDurationSeconds || Math.max(0, eventData.eventEndSecond - eventData.eventStartSecond))}`;
+          if (eventData?.eventType) {
+            const label = eventLabel(eventData);
+            const window = eventWindow(eventData);
+            const lines = [
+              `<strong>${label}</strong>`,
+              `${t('eventStart')}: ${chartTimeLabel(window.start, true)}`,
+              `${t('eventEnd')}: ${chartTimeLabel(window.end, true)}`,
+              `${t('tableDuration')}: ${durationText(eventDuration(eventData))}`,
+              `${t('qualityTooltipStatus')}: ${label}`
+            ];
+            if (eventData.eventType !== 'missing') lines.push(`${t('qualityTooltipEvent')}: ${label}`);
+            return lines.join('<br>');
           }
           if (params.seriesType === 'heatmap') {
             const [, , ratio, startSecond, endSecond, label] = params.value;
             const qualityText = ratio < 0 ? t('qualityNoData') : percent(ratio);
             return `${t('qualityHeatmap')}<br>${label}<br>${t('qualityGood')}: ${qualityText}<br>${chartTimeLabel(startSecond, true)}-${chartTimeLabel(endSecond, true)}`;
           }
-          const value = params.value || [];
-          return `${params.seriesName}<br>${chartTimeLabel(value[0], true)}<br>${Number.isFinite(value[1]) ? `${fmt(value[1], 4)} Hz` : t('qualityNoData')}`;
+          if (params.seriesType === 'line') return lineTooltip(params);
+          return params.seriesName || '';
         }
       };
     }
@@ -8194,7 +8268,7 @@
           for (let i = localStart; i < localEnd; i += 1) {
             const x = offset + quality.startSecond + i;
             const value = quality.masks.valid[i] ? quality.canonical.values[i] : null;
-            data.push([x, Number.isFinite(value) ? Number(value.toFixed(6)) : null]);
+            data.push([x, Number.isFinite(value) ? Number(value.toFixed(6)) : null, 1]);
           }
         }
         return {
@@ -9840,7 +9914,7 @@
         qualityRepeatedTotal: 'Yinelenen Ardışık Frekans Süresi',
         qualityRepeatedLongest: 'En Uzun Yinelenen Ardışık Frekans Süresi',
         qualityRepeatedThresholdLabel: 'YD eşiği (sn)',
-        qualityResetZoomBtn: "Tüm Grafiği Göster / Zoom'u Sıfırla",
+        qualityResetZoomBtn: 'Zoom Sıfırla',
         qualityTrValid: 'Türkiye kaliteli örnek',
         qualityCeValid: 'Kıta Avrupası kaliteli örnek',
         qualityPairedValid: 'Ortak kullanılabilir / Paired Valid',
@@ -9853,6 +9927,12 @@
         qualityRepeatedRangeShort: 'YD',
         qualityMissingTooltipTitle: 'Eksik Veri',
         qualityNoData: 'Veri yok',
+        qualityTooltipDateTime: 'Tarih ve saat',
+        qualityTooltipInterval: 'Aralık',
+        qualityTooltipFrequency: 'Frekans',
+        qualityTooltipStatus: 'Veri kalite durumu',
+        qualityTooltipEvent: 'Kalite olayı',
+        qualityStatusGood: 'İyi kalite',
         eventDataGap: 'Veri boşluğu',
         classNeedsReview: 'İnceleme gerekli',
         classCommonMode: 'Ortak mod',
@@ -10150,7 +10230,7 @@
         qualityRepeatedTotal: 'Repeated Consecutive Frequency Duration',
         qualityRepeatedLongest: 'Longest Repeated Consecutive Frequency Duration',
         qualityRepeatedThresholdLabel: 'RV threshold (s)',
-        qualityResetZoomBtn: 'Show Full Chart / Reset Zoom',
+        qualityResetZoomBtn: 'Reset Zoom',
         qualityTrValid: 'Türkiye quality samples',
         qualityCeValid: 'CE quality samples',
         qualityPairedValid: 'Paired Valid',
@@ -10163,6 +10243,12 @@
         qualityRepeatedRangeShort: 'RV',
         qualityMissingTooltipTitle: 'Missing Data',
         qualityNoData: 'No data',
+        qualityTooltipDateTime: 'Date and time',
+        qualityTooltipInterval: 'Interval',
+        qualityTooltipFrequency: 'Frequency',
+        qualityTooltipStatus: 'Data quality status',
+        qualityTooltipEvent: 'Quality event',
+        qualityStatusGood: 'Good quality',
         eventDataGap: 'Data gap',
         classNeedsReview: 'Needs review',
         classCommonMode: 'Common mode',
@@ -10498,7 +10584,7 @@
       });
       const actionLabels = { fullscreen: 'fullscreenLabel', download: 'downloadPngLabel', resetzoom: 'resetZoomLabel' };
       document.querySelectorAll('.chart-toolbar [data-action]').forEach(button => {
-        const key = actionLabels[button.dataset.action];
+        const key = button.id === 'qualityZoomResetBtn' ? 'qualityResetZoomBtn' : actionLabels[button.dataset.action];
         if (!key) return;
         button.setAttribute('aria-label', t(key));
         button.setAttribute('title', t(key));

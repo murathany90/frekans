@@ -32,8 +32,11 @@ assert.match(html, /QUALITY_DATE_MODES/, "Data Coverage restricts date modes to 
 assert.match(html, /function qualityDisplayBucketSeconds\(/, "Data Coverage chooses display resolution automatically");
 assert.match(html, /function buildQualitySecondWindowSeries\(/, "Heatmap click can show second-level detail data");
 assert.match(html, /showQualityDetailWindow\(/, "Data Coverage table and heatmap clicks use second-level zoom");
-assert.match(html, /qualityRepeatedRangeShort/, "Data Coverage chart legend can use YD/RV short labels");
+assert.match(html, /name:\s*t\(['"]qualityRepeatedRange['"]\)/, "Data Coverage chart legend uses the full YD/RV layer label");
+assert.match(html, /markerName:\s*t\(['"]qualityRepeatedRangeShort['"]\)/, "Data Coverage chart markers use compact YD/RV labels");
 assert.match(html, /qualityResetZoomBtn/, "Data Coverage has a visible reset zoom button");
+assert.match(html, /qualityZoomResetText/, "Data Coverage reset zoom button has desktop text");
+assert.match(html, /quality-zoom-reset-icon/, "Data Coverage reset zoom button has a mobile icon");
 assert.match(html, /function resetQualityChartZoom\(/, "Data Coverage can restore the full quality chart after drill-down");
 assert.match(html, /function showQualityFullRange\(/, "Data Coverage reset re-renders the selected analysis period");
 assert.match(html, /longestMissing/, "Data Coverage longest gap row is linked to its source missing event");
@@ -41,6 +44,9 @@ assert.match(html, /drilldownType:\s*['"]missing['"]/, "Data Coverage longest ga
 assert.match(html, /#dc2626/, "Missing data is highlighted with a clear red chart color");
 assert.match(html, /type:\s*['"]dashed['"]/, "Missing data uses a dashed visual indicator");
 assert.match(html, /qualityMissingTooltipTitle/, "Missing data tooltip text is translated");
+assert.match(html, /qualityTooltipFrequency/, "Data Coverage chart tooltip includes a translated frequency label");
+assert.match(html, /qualityTooltipStatus/, "Data Coverage chart tooltip includes a translated quality status label");
+assert.match(html, /qualityTooltipInterval/, "Data Coverage summary tooltip includes the visual bucket interval");
 assert.match(html, /visualMap:[\s\S]*#1f9d55/, "heatmap uses green for 100% quality");
 assert.match(html, /visualMap:[\s\S]*#facc15[\s\S]*#f97316[\s\S]*#dc2626/, "heatmap uses yellow-orange-red as quality drops");
 assert.match(html, /visualMap:[\s\S]*#d1d5db/, "heatmap uses grey for no-data cells");
@@ -48,6 +54,8 @@ assert.match(html, /days:\s*dailyResults\.map\(item => displayDate\(item\.date\)
 
 const qualityMinMaxEnabled = /buildQualityFrequencySummary\([^)]*\{[^}]*showMinMax:\s*true/.test(html);
 assert.equal(qualityMinMaxEnabled, false, "Data Coverage main frequency graph must not show min/max lines");
+
+assert.doesNotMatch(html, /title:\s*`\$\{t\(analysisDefinition\([^)]*\)\.titleKey\)\}\s*[^`]*qualityRepeatedRange/, "Data Coverage chart titles must not append YD/RV explanation text");
 
 const legacyQualityBranch = /if\s*\(type\s*===\s*['"]quality['"]\)\s*\{[\s\S]{0,1200}?sampleSeries\(series,\s*60,\s*sampleIntervalSeconds\)/.test(html);
 assert.equal(legacyQualityBranch, false, "quality KPI/chart path must not reuse resolution-dependent sampled series");

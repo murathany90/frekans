@@ -19,7 +19,9 @@ const requiredMarkers = [
   'id="liveFrequencyHourNav"',
   'id="liveFrequencyPrevHour"',
   'id="liveFrequencyNextHour"',
+  'id="liveFrequencyChartWrapper"',
   'id="liveFrequencySourceTerms"',
+  'data-action="fullscreen" data-chart="liveFrequencyChart"',
   "#/live-frequency",
   "'tab-live-frequency': 'live-frequency'",
   "'live-frequency': 'tab-live-frequency'"
@@ -79,6 +81,10 @@ if (!/SUMMARY_SYNC_MS\s*=\s*300_000/.test(liveJs)) {
 
 if (!/rangeSeconds:\s*3600/.test(liveJs)) {
   throw new Error("Live Frequency frontend state must default to 1 hour.");
+}
+
+if (!/liveFrequencyChartWrapper/.test(html) || !/liveFrequencyChart/.test(html.match(/function toggleChartFullscreen[\s\S]*?function downloadChart/)?.[0] || "")) {
+  throw new Error("Live Frequency chart must be wired into the shared fullscreen control.");
 }
 
 for (const marker of [

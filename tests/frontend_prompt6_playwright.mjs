@@ -179,11 +179,35 @@ try {
     const repeatedEvents = result.events.filter(event => event.type === "repeated");
     const missingEvents = result.events.filter(event => event.type === "missing");
     const option = window.echarts.getInstanceByDom(document.querySelector("#analysisMainChart")).getOption();
+    const tooltip = Array.isArray(option.tooltip) ? option.tooltip[0] : option.tooltip;
+    const formatter = tooltip?.formatter;
+    const firstLine = (option.series || []).find(series => series.type === "line" && (series.data || []).some(point => Array.isArray(point) && point[1] !== null));
+    const firstLinePoint = (firstLine?.data || []).find(point => Array.isArray(point) && point[1] !== null);
+    const repeatedSeries = (option.series || []).find(series => /YD \/|RV \/|Yinelenen|Repeated/.test(series.name || ""));
+    const repeatedArea = repeatedSeries?.markArea?.data?.[0];
+    const missingSeries = (option.series || []).find(series => /Eksik Veri|Missing Data/.test(series.name || ""));
+    const missingArea = missingSeries?.markArea?.data?.[0];
+    const summaryTooltip = typeof formatter === "function" && firstLinePoint
+      ? formatter({ seriesType: "line", seriesName: firstLine.name, seriesIndex: option.series.indexOf(firstLine), data: firstLinePoint, value: firstLinePoint })
+      : "";
+    const repeatedTooltip = typeof formatter === "function" && repeatedArea
+      ? formatter({ seriesType: "line", seriesName: repeatedSeries.name, data: repeatedArea, value: null })
+      : "";
+    const missingTooltip = typeof formatter === "function" && missingArea
+      ? formatter({ seriesType: "line", seriesName: missingSeries.name, data: missingArea, value: null })
+      : "";
     return {
+      titleText: document.querySelector("#oscChartTitle")?.textContent?.trim() || "",
       repeatedEvents: repeatedEvents.map(event => ({ start: event.startSecond, end: event.endSecond, duration: event.durationSeconds })),
       missingEvents: missingEvents.map(event => ({ start: event.startSecond, end: event.endSecond, duration: event.durationSeconds })),
       repeatedLegendNames: (option.series || []).filter(series => /YD|RV|Yinelenen|Repeated/.test(series.name || "")).map(series => series.name),
+      repeatedMarkerNames: (repeatedSeries?.markArea?.data || []).map(area => area?.[0]?.name).filter(Boolean),
+      summaryTooltip,
+      repeatedTooltip,
+      missingTooltip,
       hasResetButton: Boolean(document.querySelector("#qualityZoomResetBtn")),
+      resetLabel: document.querySelector("#qualityZoomResetBtn")?.textContent?.trim() || "",
+      resetAria: document.querySelector("#qualityZoomResetBtn")?.getAttribute("aria-label") || "",
       resetHidden: document.querySelector("#qualityZoomResetBtn")?.hidden,
       tableText: document.querySelector("#analysisEventsBody")?.textContent || ""
     };
@@ -197,8 +221,26 @@ try {
   if (!syntheticQuality.hasResetButton || !syntheticQuality.resetHidden || !/En Uzun Veri Boşluğu|Longest Data Gap/.test(syntheticQuality.tableText)) {
     throw new Error(`Synthetic Data Coverage controls/table are incomplete: ${JSON.stringify(syntheticQuality)}`);
   }
-  if (syntheticQuality.repeatedLegendNames.some(name => /Yinelenen Değer|Repeated Value/.test(name))) {
-    throw new Error(`Chart legend must use short YD/RV labels: ${JSON.stringify(syntheticQuality.repeatedLegendNames)}`);
+  if (!/Veri Kapsama ve Kalite Özeti|Data Coverage and Quality Summary/.test(syntheticQuality.titleText) || /YD|RV|Yinelenen|Repeated/.test(syntheticQuality.titleText.replace(/Data Coverage and Quality Summary|Veri Kapsama ve Kalite Özeti/g, ""))) {
+    throw new Error(`Data Coverage chart title must stay concise: ${syntheticQuality.titleText}`);
+  }
+  if (!syntheticQuality.repeatedLegendNames.some(name => /YD \/ Yinelenen Değer|RV \/ Repeated Value/.test(name))) {
+    throw new Error(`Chart legend must use the full YD/RV layer label: ${JSON.stringify(syntheticQuality.repeatedLegendNames)}`);
+  }
+  if (!syntheticQuality.repeatedMarkerNames.length || syntheticQuality.repeatedMarkerNames.some(name => !/^(YD|RV)$/.test(name))) {
+    throw new Error(`Chart YD/RV markers must use compact labels: ${JSON.stringify(syntheticQuality.repeatedMarkerNames)}`);
+  }
+  if (!/Zoom Sıfırla|Reset Zoom/.test(syntheticQuality.resetLabel) || !/Zoom Sıfırla|Reset Zoom/.test(syntheticQuality.resetAria)) {
+    throw new Error(`Quality reset button label is not compact: ${JSON.stringify({ label: syntheticQuality.resetLabel, aria: syntheticQuality.resetAria })}`);
+  }
+  if (!/Tarih|Date|Saat|Time|Aralık|Interval/i.test(syntheticQuality.summaryTooltip) || !/Frekans|Frequency/i.test(syntheticQuality.summaryTooltip) || !/Durum|Status|Kalite|Quality/i.test(syntheticQuality.summaryTooltip)) {
+    throw new Error(`Data Coverage summary tooltip is incomplete: ${syntheticQuality.summaryTooltip}`);
+  }
+  if (!/YD|RV/.test(syntheticQuality.repeatedTooltip) || !/Süre|Duration/i.test(syntheticQuality.repeatedTooltip)) {
+    throw new Error(`Data Coverage YD/RV tooltip is incomplete: ${syntheticQuality.repeatedTooltip}`);
+  }
+  if (!/Eksik Veri|Missing Data/.test(syntheticQuality.missingTooltip) || /50\.\d+\s*Hz/.test(syntheticQuality.missingTooltip)) {
+    throw new Error(`Missing data tooltip must avoid invented frequency values: ${syntheticQuality.missingTooltip}`);
   }
 
   await page.locator("#analysisEventsBody tr.event-row", { hasText: /En Uzun Veri Boşluğu|Longest Data Gap/ }).click();
@@ -209,13 +251,20 @@ try {
   const gapZoomState = await page.evaluate(() => {
     const chart = window.echarts.getInstanceByDom(document.querySelector("#analysisMainChart"));
     const option = chart.getOption();
+    const tooltip = Array.isArray(option.tooltip) ? option.tooltip[0] : option.tooltip;
+    const formatter = tooltip?.formatter;
+    const secondSeries = (option.series || []).find(series => /1s$/.test(series.name || ""));
+    const secondPoint = (secondSeries?.data || []).find(point => Array.isArray(point) && point[1] !== null);
     const missingSeries = (option.series || []).filter(series => /Eksik Veri|Missing Data/.test(series.name || ""));
     return {
       xMin: option.xAxis?.[0]?.min,
       xMax: option.xAxis?.[0]?.max,
       resetHidden: document.querySelector("#qualityZoomResetBtn")?.hidden,
       missingSeriesCount: missingSeries.length,
-      missingSeriesJson: JSON.stringify(missingSeries)
+      missingSeriesJson: JSON.stringify(missingSeries),
+      detailTooltip: typeof formatter === "function" && secondPoint
+        ? formatter({ seriesType: "line", seriesName: secondSeries.name, seriesIndex: option.series.indexOf(secondSeries), data: secondPoint, value: secondPoint })
+        : ""
     };
   });
   if (!(gapZoomState.xMin <= 400 && gapZoomState.xMax >= 420) || gapZoomState.resetHidden) {
@@ -223,6 +272,9 @@ try {
   }
   if (!/#dc2626|dashed|Eksik Veri|Missing Data/.test(gapZoomState.missingSeriesJson)) {
     throw new Error(`Missing data is not clearly marked in red/dashed style: ${gapZoomState.missingSeriesJson}`);
+  }
+  if (!/1s|Tarih|Date|Saat|Time/i.test(gapZoomState.detailTooltip) || !/Frekans|Frequency/i.test(gapZoomState.detailTooltip)) {
+    throw new Error(`Second-level zoom tooltip must show real second data: ${gapZoomState.detailTooltip}`);
   }
 
   await page.click("#qualityZoomResetBtn");
@@ -245,6 +297,26 @@ try {
   await page.waitForFunction(() => document.querySelector("#qualityZoomResetBtn")?.hidden === false, { timeout: 10000 });
   await page.click("#qualityZoomResetBtn");
   await page.waitForFunction(() => document.querySelector("#qualityZoomResetBtn")?.hidden === true, { timeout: 10000 });
+
+  await page.setViewportSize({ width: 360, height: 760 });
+  await page.locator("#analysisEventsBody tr.event-row", { hasText: /En Uzun Veri Boşluğu|Longest Data Gap/ }).click();
+  await page.waitForFunction(() => document.querySelector("#qualityZoomResetBtn")?.hidden === false, { timeout: 10000 });
+  const mobileReset = await page.evaluate(() => {
+    const button = document.querySelector("#qualityZoomResetBtn");
+    const text = document.querySelector("#qualityZoomResetText");
+    const icon = document.querySelector("#qualityZoomResetBtn .quality-zoom-reset-icon");
+    return {
+      overflow: document.documentElement.scrollWidth > window.innerWidth,
+      textDisplay: text ? getComputedStyle(text).display : "",
+      iconDisplay: icon ? getComputedStyle(icon).display : "",
+      label: button?.textContent?.trim() || ""
+    };
+  });
+  if (mobileReset.overflow || mobileReset.textDisplay !== "none" || mobileReset.iconDisplay === "none") {
+    throw new Error(`Mobile reset zoom button must use an icon without horizontal scroll: ${JSON.stringify(mobileReset)}`);
+  }
+  await page.click("#qualityZoomResetBtn");
+  await page.setViewportSize({ width: 1440, height: 900 });
 
   await page.click("#langToggle");
   await page.waitForFunction(() => document.querySelector(".brand h1")?.textContent?.trim() === "GridFreq");
