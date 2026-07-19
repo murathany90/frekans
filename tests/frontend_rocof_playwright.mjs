@@ -66,6 +66,7 @@ try {
     document.querySelector("#rocofThreshold").value = "2";
     document.querySelector("#minDuration").value = "2";
     document.querySelector("#repeatedValueSeconds").value = "15";
+    updateAnalysisAvailability();
     updateAnalysisParameterPanel();
     const current = {
       date: "2026-01-01",
@@ -99,6 +100,9 @@ try {
       })),
       cards: [...document.querySelectorAll("#analysisResultCards .analysis-result-card")].map(card => card.textContent.trim()),
       visibleParams: [...document.querySelectorAll(".analysis-controls.compact [data-param-key]")].filter(el => !el.hidden).map(el => el.dataset.paramKey),
+      visibleSources: [...document.querySelectorAll("#analysisSourceSelect option")]
+        .filter(option => !option.hidden && !option.disabled)
+        .map(option => option.value),
       dateOptions: [...document.querySelectorAll("#analysisDateMode option")].filter(option => !option.hidden && !option.disabled).map(option => option.value),
       headers: [...document.querySelectorAll("#analysisEventsHead th")].map(th => th.textContent.trim()),
       tableRows: document.querySelectorAll("#analysisEventsBody tr.event-row").length,
@@ -115,6 +119,7 @@ try {
   assert.equal(initial.kind, "rocof");
   assert.equal(initial.samplingMethod, "good-quality-canonical");
   assert.deepEqual(initial.allowedSources, ["tr", "de", "both", "common"]);
+  assert.deepEqual(initial.visibleSources, ["tr", "de", "both", "common"]);
   assert.deepEqual(initial.dateOptions, ["single", "range"]);
   assert(initial.visibleParams.includes("rocofMethod"));
   assert(initial.visibleParams.includes("rocofThreshold"));

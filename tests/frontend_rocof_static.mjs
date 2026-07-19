@@ -18,6 +18,7 @@ assert.match(
 );
 assert.match(html, /type\s*===\s*['"]rocof['"][\s\S]{0,120}return\s*['"]1s['"]/, "RoCoF analysis resolution should be locked to 1s.");
 assert.match(rocofBlock, /parameterKeys:\s*\[[^\]]*['"]rocofMethod['"][^\]]*['"]rocofThreshold['"][^\]]*['"]duration['"][^\]]*['"]yd['"][^\]]*\]/, "RoCoF should expose method, mHz/s threshold, duration, and YD/RV controls.");
+assert.match(html, /function\s+updateAnalysisSourceOptions\(\)[\s\S]*option\.hidden\s*=\s*!\s*allowed[\s\S]*option\.disabled\s*=\s*!\s*allowed/, "RoCoF source select should hide and disable disallowed source modes.");
 assert.match(html, /id=["']rocofMethod["']/, "RoCoF method select should exist.");
 assert.match(html, /id=["']rocofPreFilterSeconds["']/, "Filtered derivative pre-filter control should exist.");
 assert.match(html, /id=["']rocofRegressionWindowSeconds["']/, "Moving regression window control should exist.");

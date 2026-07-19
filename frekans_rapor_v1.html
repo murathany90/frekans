@@ -6648,10 +6648,30 @@
       return analysisRegistry[type] || analysisRegistry.stats;
     }
 
+    function updateAnalysisSourceOptions() {
+      const select = $('analysisSourceSelect');
+      if (!select) return getAnalysisSource();
+      const def = analysisDefinition();
+      const allowedSources = Array.isArray(def.allowedSources) && def.allowedSources.length ? def.allowedSources : ANALYSIS_SOURCES;
+      let firstAllowed = null;
+      [...select.options].forEach(option => {
+        const allowed = allowedSources.includes(option.value);
+        option.hidden = !allowed;
+        option.disabled = !allowed;
+        option.title = allowed ? '' : t('analysisSourceNotAllowed', { analysis: t(def.labelKey), source: sourceLabel(option.value) });
+        if (allowed && !firstAllowed) firstAllowed = option.value;
+      });
+      if (!allowedSources.includes(select.value) && firstAllowed) {
+        select.value = firstAllowed;
+        if ($('oscSourceSelect')) $('oscSourceSelect').value = firstAllowed;
+      }
+      return select.value;
+    }
+
     function updateAnalysisAvailability() {
       const select = $('analysisTypeSelect');
       if (!select) return;
-      const source = getAnalysisSource();
+      const source = updateAnalysisSourceOptions();
       let firstAllowed = null;
       [...select.options].forEach(option => {
         const def = analysisDefinition(option.value);
