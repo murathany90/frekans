@@ -678,6 +678,28 @@
     th { background: #eef5f9; color: var(--navy); font-size: .81rem; position: sticky; top: 0; z-index: 2; }
     td { font-size: .84rem; }
     tbody tr:hover { background: #f7fbfd; }
+    table.stats-table th,
+    table.stats-table td {
+      padding: 6px 8px;
+      font-size: .79rem;
+      line-height: 1.24;
+    }
+    table.stats-table td:first-child {
+      white-space: normal;
+      font-weight: 800;
+      color: #1c3344;
+    }
+    table.stats-table .analysis-group-row th {
+      position: static;
+      padding: 7px 8px;
+      background: #f7fafc;
+      color: #0d2f4f;
+      font-size: .72rem;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      border-top: 1px solid #e1e8ee;
+      border-bottom: 1px solid #dce6ed;
+    }
 
     .inventory-table td:nth-child(n+3) { text-align: right; }
 
@@ -3145,7 +3167,7 @@
         descriptionKey: 'analysisStatsDesc',
         allowedSources: ['tr', 'de', 'both'],
         allowedResolutions: ['1s'],
-        parameterKeys: ['statsBand'],
+        parameterKeys: ['statsBand', 'yd'],
         requiresPairedSeries: false,
         minSampleIntervalSeconds: 1,
         preferredResolution: '1s',
@@ -7903,21 +7925,36 @@
 
     function statsTableRows(stats, statsMeta) {
       const longest = statsMeta.longestBandViolation;
+      const group = key => ({ group: t(key) });
+      const row = (metricKey, value, helpKey = '', extra = {}) => ({
+        metric: t(metricKey),
+        value,
+        tooltip: helpKey ? t(helpKey) : '',
+        ...extra
+      });
+      const percentileRow = (label, value) => ({
+        metric: label,
+        value: statsValueText(value, 4, ' Hz'),
+        tooltip: t('statsHelpPercentile')
+      });
       return [
-        { metric: t('qualityExpected'), value: numberText(statsMeta.expectedCount) },
-        { metric: t('qualityValid'), value: numberText(stats.count) },
-        { metric: t('statsGoodUsedCount'), value: numberText(statsMeta.goodUsedCount) },
-        { metric: t('statsExcludedCount'), value: numberText(statsMeta.excludedCount) },
-        { metric: t('qualityMissing'), value: numberText(statsMeta.quality?.missingCount || 0) },
-        { metric: t('qualityInvalid'), value: numberText(statsMeta.quality?.invalidCount || 0) },
-        { metric: t('qualityDuplicate'), value: numberText(statsMeta.quality?.duplicateTimestampCount || 0) },
-        { metric: t('qualityRepeatedEvents'), value: numberText(statsMeta.quality?.repeatedValueEventCount || 0) },
-        { metric: t('qualityRepeatedTotal'), value: durationText(statsMeta.quality?.totalRepeatedValueSeconds || 0) },
-        { metric: t('statsMean'), value: statsValueText(stats.mean, 4, ' Hz') },
-        { metric: t('statsMedian'), value: statsValueText(stats.median, 4, ' Hz') },
+        group('statsGroupSamples'),
+        row('qualityExpected', numberText(statsMeta.expectedCount), 'statsHelpExpected'),
+        row('statsRawValidCount', numberText(statsMeta.rawValidSampleCount ?? statsMeta.quality?.rawValidSampleCount ?? statsMeta.quality?.validCount ?? 0), 'statsHelpRawValid'),
+        row('statsGoodUsedCount', numberText(statsMeta.goodUsedCount), 'statsHelpGoodUsed'),
+        row('statsExcludedCount', numberText(statsMeta.excludedCount), 'statsHelpExcluded'),
+        row('qualityMissing', numberText(statsMeta.quality?.missingCount || 0), 'statsHelpMissing'),
+        row('qualityInvalid', numberText(statsMeta.quality?.invalidCount || 0), 'statsHelpInvalid'),
+        row('qualityDuplicate', numberText(statsMeta.quality?.duplicateTimestampCount || 0), 'statsHelpDuplicate'),
+        row('qualityRepeatedEvents', numberText(statsMeta.quality?.repeatedValueEventCount || 0), 'statsHelpRepeated'),
+        row('qualityRepeatedTotal', durationText(statsMeta.quality?.totalRepeatedValueSeconds || 0), 'statsHelpRepeated'),
+        group('statsGroupFrequency'),
+        row('statsMean', statsValueText(stats.mean, 4, ' Hz'), 'statsHelpMean'),
+        row('statsMedian', statsValueText(stats.median, 4, ' Hz'), 'statsHelpMedian'),
         {
           metric: t('eventMin'),
           value: `${statsValueText(stats.min, 4, ' Hz')} · ${statsSecondLabel(statsMeta.dateList, statsMeta.minSecond)}`,
+          tooltip: t('statsHelpExtreme'),
           startSecond: statsMeta.minSecond,
           endSecond: Number.isFinite(statsMeta.minSecond) ? statsMeta.minSecond + 1 : NaN,
           drilldownType: 'min'
@@ -7925,35 +7962,40 @@
         {
           metric: t('eventMax'),
           value: `${statsValueText(stats.max, 4, ' Hz')} · ${statsSecondLabel(statsMeta.dateList, statsMeta.maxSecond)}`,
+          tooltip: t('statsHelpExtreme'),
           startSecond: statsMeta.maxSecond,
           endSecond: Number.isFinite(statsMeta.maxSecond) ? statsMeta.maxSecond + 1 : NaN,
           drilldownType: 'max'
         },
-        { metric: t('statsVariance'), value: statsValueText(stats.variance, 8, ' Hz²') },
-        { metric: t('statsStdDev'), value: statsValueText(stats.stdDev, 6, ' Hz') },
-        { metric: t('rmsDeviation'), value: statsValueText(stats.rmsDeviationMhz, 2, ' mHz') },
-        { metric: t('statsMeanAbsDeviation50'), value: statsValueText(stats.meanAbsDeviationMhz, 2, ' mHz') },
-        { metric: 'P01', value: statsValueText(stats.p01, 4, ' Hz') },
-        { metric: 'P05', value: statsValueText(stats.p05, 4, ' Hz') },
-        { metric: 'P25', value: statsValueText(stats.p25, 4, ' Hz') },
-        { metric: 'P50', value: statsValueText(stats.median, 4, ' Hz') },
-        { metric: 'P75', value: statsValueText(stats.p75, 4, ' Hz') },
-        { metric: 'P95', value: statsValueText(stats.p95, 4, ' Hz') },
-        { metric: 'P99', value: statsValueText(stats.p99, 4, ' Hz') },
-        { metric: t('statsSkewness'), value: statsValueText(stats.skewness, 4) },
-        { metric: t('statsExcessKurtosis'), value: statsValueText(stats.kurtosis, 4) },
-        { metric: t('statsInBandRatio'), value: percent(stats.inBandRatio) },
-        { metric: t('statsOutOfBandDuration'), value: durationText(stats.outOfBandSeconds || 0) },
-        { metric: t('statsLowerBandViolationSeconds'), value: durationText(statsMeta.lowerBandViolationSeconds || 0) },
-        { metric: t('statsUpperBandViolationSeconds'), value: durationText(statsMeta.upperBandViolationSeconds || 0) },
-        { metric: t('statsBandViolationEvents'), value: numberText(stats.bandViolationEventCount || 0) },
+        group('statsGroupDeviation'),
+        row('statsVariance', statsValueText(stats.variance, 8, ' Hz²'), 'statsHelpVariance'),
+        row('statsStdDev', statsValueText(stats.stdDev, 6, ' Hz'), 'statsHelpStdDev'),
+        row('rmsDeviation', statsValueText(stats.rmsDeviationMhz, 2, ' mHz'), 'statsHelpRms'),
+        row('statsMeanAbsDeviation50', statsValueText(stats.meanAbsDeviationMhz, 2, ' mHz'), 'statsHelpMeanAbsDeviation'),
+        row('statsInBandRatio', percent(stats.inBandRatio), 'statsHelpInBand'),
+        row('statsOutOfBandDuration', durationText(stats.outOfBandSeconds || 0), 'statsHelpOutOfBand'),
+        row('statsLowerBandViolationSeconds', durationText(statsMeta.lowerBandViolationSeconds || 0), 'statsHelpBandViolationDuration'),
+        row('statsUpperBandViolationSeconds', durationText(statsMeta.upperBandViolationSeconds || 0), 'statsHelpBandViolationDuration'),
+        row('statsBandViolationEvents', numberText(stats.bandViolationEventCount || 0), 'statsHelpBandViolationEvents'),
         {
           metric: t('statsLongestBandViolation'),
           value: longest ? `${durationText(stats.longestBandViolationSeconds || longest.durationSeconds || 0)} · ${statsSecondLabel(statsMeta.dateList, longest.startSecond)}` : durationText(stats.longestBandViolationSeconds || 0),
+          tooltip: t('statsHelpLongestBandViolation'),
           startSecond: longest?.startSecond,
           endSecond: longest?.endSecond,
           drilldownType: 'band'
-        }
+        },
+        group('statsGroupPercentiles'),
+        percentileRow('P01', stats.p01),
+        percentileRow('P05', stats.p05),
+        percentileRow('P25', stats.p25),
+        percentileRow('P50', stats.median),
+        percentileRow('P75', stats.p75),
+        percentileRow('P95', stats.p95),
+        percentileRow('P99', stats.p99),
+        group('statsGroupShape'),
+        row('statsSkewness', statsValueText(stats.skewness, 4), 'statsHelpSkewness'),
+        row('statsExcessKurtosis', statsValueText(stats.kurtosis, 4), 'statsHelpKurtosis')
       ];
     }
 
@@ -7977,6 +8019,7 @@
       state.analysis.sampling = sampling;
       const statsMeta = {
         expectedCount: good.expectedCount,
+        rawValidSampleCount: quality?.rawValidSampleCount ?? quality?.validCount ?? stats.count,
         goodUsedCount: good.usedCount,
         excludedCount: good.excludedCount,
         minSecond: minPoint.second,
@@ -8354,7 +8397,9 @@
     function renderAnalysisResult(result) {
       $('oscChartTitle').textContent = result.title;
       $('analysisResultCards').innerHTML = result.cards.map(([label, value]) => `<div class="analysis-result-card"><div class="label">${label}</div><div class="value">${value}</div></div>`).join('');
-      $('oscCountTag').textContent = t('findingsCount', { count: result.events.length });
+      $('oscCountTag').textContent = result.type === 'stats'
+        ? t('statsBandViolationCount', { count: result.events.length })
+        : t('findingsCount', { count: result.events.length });
       renderGenericAnalysisChart(result);
       renderAnalysisTable(result);
       updateAnalysisSamplingInfo(result.metadata?.sampling || state.analysis.sampling);
@@ -8797,18 +8842,40 @@
       const findQualityEvent = (start, end) => (result.chart.qualityEvents || [])
         .find(event => event.startSecond < end && event.endSecond > start);
       const eventLabel = event => {
-        if (!event) return t('qualityStatusGood');
-        if (event.type === 'missing') return t('qualityMissingRange');
-        if (event.type === 'invalid') return t('qualityInvalidRange');
-        if (event.type === 'duplicate') return t('qualityDuplicateRange');
-        if (event.type === 'repeated') return t('qualityRepeatedRangeShort');
+        const type = event?.eventType || event?.type;
+        if (!type) return t('qualityStatusGood');
+        if (type === 'band') return event.eventLabel || (event.eventSide === 'lower' ? t('statsLowerBandViolation') : t('statsUpperBandViolation'));
+        if (type === 'missing') return t('qualityMissingRange');
+        if (type === 'invalid') return t('qualityInvalidRange');
+        if (type === 'duplicate') return t('qualityDuplicateRange');
+        if (type === 'repeated') return t('qualityRepeatedRangeShort');
         return event.classification || t('classNeedsReview');
       };
+      const eventDuration = event => event?.eventDurationSeconds || event?.durationSeconds || Math.max(0, (event?.eventEndSecond ?? event?.endSecond ?? 0) - (event?.eventStartSecond ?? event?.startSecond ?? 0));
+      const eventWindow = event => ({
+        start: event?.eventStartSecond ?? event?.startSecond,
+        end: event?.eventEndSecond ?? event?.endSecond
+      });
       return {
         trigger: 'item',
         triggerOn: 'mousemove|click',
         axisPointer: { type: 'cross' },
         formatter: params => {
+          const eventData = Array.isArray(params.data) ? params.data[0] : params.data;
+          if (eventData?.eventType) {
+            const label = eventLabel(eventData);
+            const window = eventWindow(eventData);
+            const lines = [
+              `<strong>${label}</strong>`,
+              `${t('eventStart')}: ${chartTimeLabel(window.start, true)}`,
+              `${t('eventEnd')}: ${chartTimeLabel(window.end, true)}`,
+              `${t('tableDuration')}: ${durationText(eventDuration(eventData))}`
+            ];
+            if (eventData.eventType === 'band' && Number.isFinite(Number(eventData.eventValue))) {
+              lines.push(`${t('qualityTooltipFrequency')}: ${fmt(Number(eventData.eventValue), 4)} Hz`);
+            }
+            return lines.join('<br>');
+          }
           if (params.seriesType === 'heatmap') {
             const [, , rmsMhz, startSecond, endSecond, label, meanHz, meanDeviationMhz] = params.value || [];
             if (rmsMhz < 0) return `${t('statsHeatmap')}<br>${label}<br>${t('qualityNoData')}`;
@@ -8844,35 +8911,60 @@
 
     function buildStatsBandEventSeries(events, highlight = null) {
       if (!events?.length) return [];
-      return [{
-        name: t('statsBandViolationEvents'),
-        type: 'line',
-        xAxisIndex: 0,
-        yAxisIndex: 0,
-        data: [],
-        symbol: 'none',
-        silent: true,
-        lineStyle: { opacity: 0 },
-        markArea: {
-          silent: false,
-          itemStyle: { color: 'rgba(220,38,38,.11)', borderColor: 'rgba(220,38,38,.45)', borderWidth: 1 },
-          data: events.map(event => {
-            const selected = highlight && Math.abs((highlight.startSecond ?? -1) - event.startSecond) < 1e-6 && Math.abs((highlight.endSecond ?? -1) - event.endSecond) < 1e-6;
-            return [
-              {
-                xAxis: event.startSecond,
-                name: event.side === 'lower' ? t('statsLowerBandViolation') : t('statsUpperBandViolation'),
-                eventType: 'band',
-                eventStartSecond: event.startSecond,
-                eventEndSecond: event.endSecond,
-                eventDurationSeconds: event.durationSeconds,
-                itemStyle: selected ? { color: 'rgba(220,38,38,.24)', borderColor: '#dc2626', borderWidth: 1.5 } : undefined
-              },
-              { xAxis: event.endSecond }
-            ];
-          })
+      const groups = [
+        {
+          side: 'lower',
+          legend: t('statsLowerBandViolationLegend'),
+          marker: t('statsLowerBandViolationShort'),
+          label: t('statsLowerBandViolation'),
+          color: 'rgba(248,113,113,.12)',
+          borderColor: 'rgba(220,38,38,.42)'
+        },
+        {
+          side: 'upper',
+          legend: t('statsUpperBandViolationLegend'),
+          marker: t('statsUpperBandViolationShort'),
+          label: t('statsUpperBandViolation'),
+          color: 'rgba(220,38,38,.13)',
+          borderColor: 'rgba(185,28,28,.48)'
         }
-      }];
+      ];
+      return groups.map(group => {
+        const groupEvents = events.filter(event => event.side === group.side);
+        if (!groupEvents.length) return null;
+        return {
+          name: group.legend,
+          type: 'line',
+          xAxisIndex: 0,
+          yAxisIndex: 0,
+          data: [],
+          symbol: 'none',
+          silent: true,
+          lineStyle: { opacity: 0 },
+          markArea: {
+            silent: false,
+            itemStyle: { color: group.color, borderColor: group.borderColor, borderWidth: 1 },
+            data: groupEvents.map(event => {
+              const selected = highlight && Math.abs((highlight.startSecond ?? -1) - event.startSecond) < 1e-6 && Math.abs((highlight.endSecond ?? -1) - event.endSecond) < 1e-6;
+              return [
+                {
+                  xAxis: event.startSecond,
+                  name: group.marker,
+                  eventType: 'band',
+                  eventSide: event.side,
+                  eventLabel: group.label,
+                  eventStartSecond: event.startSecond,
+                  eventEndSecond: event.endSecond,
+                  eventDurationSeconds: event.durationSeconds,
+                  eventValue: event.value,
+                  itemStyle: selected ? { color: 'rgba(220,38,38,.24)', borderColor: '#dc2626', borderWidth: 1.5 } : undefined
+                },
+                { xAxis: event.endSecond }
+              ];
+            })
+          }
+        };
+      }).filter(Boolean);
     }
 
     function statsChartTimeLabel(result) {
@@ -8952,10 +9044,11 @@
           top: 374,
           pieces: [
             { value: -1, label: t('qualityNoData'), color: '#d1d5db' },
-            { gte: 0, lte: 5, label: '0-5 mHz', color: '#1f9d55' },
-            { gt: 5, lte: 10, label: '5-10 mHz', color: '#facc15' },
-            { gt: 10, lte: 20, label: '10-20 mHz', color: '#f97316' },
-            { gt: 20, label: '>20 mHz', color: '#dc2626' }
+            { gte: 0, lte: 25, label: '0-25 mHz', color: '#1f9d55' },
+            { gt: 25, lte: 50, label: '25-50 mHz', color: '#facc15' },
+            { gt: 50, lte: 100, label: '50-100 mHz', color: '#f97316' },
+            { gt: 100, lte: 200, label: '100-200 mHz', color: '#ea580c' },
+            { gt: 200, label: '>200 mHz', color: '#dc2626' }
           ]
         },
         dataZoom: [
@@ -9034,6 +9127,7 @@
       const def = analysisDefinition(result.type);
       const columns = result.tableColumns || def.tableColumns || [];
       const body = $('analysisEventsBody');
+      body?.closest('table')?.classList.toggle('stats-table', result.type === 'stats');
       $('analysisTableTitle').textContent = result.tableTitle || result.title || t(def.titleKey);
       $('analysisTableDescription').textContent = result.description || t(def.descriptionKey);
       setAnalysisTableHeader(columns);
@@ -9043,11 +9137,21 @@
         return;
       }
       body.innerHTML = rows.map(row => {
+        if (row.group) {
+          return `<tr class="analysis-group-row"><th colspan="${Math.max(1, columns.length)}">${escapeHtml(row.group)}</th></tr>`;
+        }
         const clickable = Number.isFinite(row.startSecond);
         const attrs = clickable
           ? `data-start="${row.startSecond}" data-end="${row.endSecond}" data-drilldown-type="${row.drilldownType || ''}"`
           : '';
-        return `<tr class="${clickable ? 'event-row' : ''}" ${attrs}>${columns.map(column => `<td>${formatTableCell(row[column.key])}</td>`).join('')}</tr>`;
+        const cells = columns.map(column => {
+          const cell = formatTableCell(row[column.key]);
+          if (column.key === 'metric' && row.tooltip) {
+            return `<td><span class="metric-name" tabindex="0" data-tooltip="${escapeHtml(row.tooltip)}" aria-label="${escapeHtml(`${cell}: ${row.tooltip}`)}">${escapeHtml(cell)}</span></td>`;
+          }
+          return `<td>${cell}</td>`;
+        }).join('');
+        return `<tr class="${clickable ? 'event-row' : ''}" ${attrs}>${cells}</tr>`;
       }).join('');
       body.querySelectorAll('.event-row').forEach(row => row.addEventListener('click', () => {
         const range = result.chart?.range || { start: 0, end: 86400 };
@@ -10060,6 +10164,9 @@
         // Duration
         durationMinSec: '{m} dk {s} sn',
         durationSec: '{s} sn',
+        eventStart: 'Başlangıç',
+        eventEnd: 'Bitiş',
+        tableDuration: 'Süre',
         // Event source mean/range header
         eventSourceMeanHead: '{source} ort.',
         eventSourceRangeHead: '{source} min–maks',
@@ -10382,6 +10489,9 @@
         // Duration
         durationMinSec: '{m}m {s}s',
         durationSec: '{s}s',
+        eventStart: 'Start',
+        eventEnd: 'End',
+        tableDuration: 'Duration',
         // Event source mean/range header
         eventSourceMeanHead: '{source} mean',
         eventSourceRangeHead: '{source} min–max',
@@ -10628,6 +10738,11 @@
         qualityResetZoomBtn: 'Zoom Sıfırla',
         statsBandMinLabel: 'İstatistik alt bandı (Hz)',
         statsBandMaxLabel: 'İstatistik üst bandı (Hz)',
+        statsGroupSamples: 'Örnek kalitesi',
+        statsGroupFrequency: 'Frekans dağılımı',
+        statsGroupDeviation: 'Sapma ve bant',
+        statsGroupPercentiles: 'Yüzdelikler',
+        statsGroupShape: 'Dağılım şekli',
         statsMean: 'Ortalama',
         statsMedian: 'Medyan',
         statsVariance: 'Varyans',
@@ -10637,19 +10752,48 @@
         statsExcessKurtosis: 'Fazlalık Basıklık (Excess Kurtosis)',
         statsInBandRatio: 'Bant içinde kalma oranı',
         statsOutOfBandDuration: 'Bant dışında kalma süresi',
+        statsRawValidCount: 'Geçerli Örnek',
         statsGoodUsedCount: 'Kullanılan iyi kalite örnek',
         statsExcludedCount: 'Elenen Örnek',
         statsLowerBandViolationSeconds: 'Alt bant ihlal süresi',
         statsUpperBandViolationSeconds: 'Üst bant ihlal süresi',
         statsBandViolationEvents: 'Bant ihlal olay sayısı',
+        statsBandViolationCount: '{count} Bant İhlali',
         statsLongestBandViolation: 'En uzun bant ihlali',
-        statsLowerBandViolation: 'Alt bant ihlali',
-        statsUpperBandViolation: 'Üst bant ihlali',
-        statsHeatmap: 'Frekans Sapması Heatmap',
+        statsLowerBandViolation: 'Alt Bant İhlali',
+        statsUpperBandViolation: 'Üst Bant İhlali',
+        statsLowerBandViolationShort: 'Aİ',
+        statsUpperBandViolationShort: 'Üİ',
+        statsLowerBandViolationLegend: 'Aİ / Alt Bant İhlali',
+        statsUpperBandViolationLegend: 'Üİ / Üst Bant İhlali',
+        statsHeatmap: '15 dk RMS Sapma',
         statsFrequencySummary: 'Frekans özeti',
         statsTooltipMean: 'Ortalama frekans',
         statsTooltipMeanDeviation: 'Ortalama sapma',
         statsTooltipRmsDeviation: 'RMS sapma',
+        statsHelpExpected: 'Analiz dönemindeki beklenen saniyelik örnek sayısı.',
+        statsHelpRawValid: 'Ham/canonical eksende fiziksel sınırlar içinde kalan geçerli frekans örnekleri.',
+        statsHelpGoodUsed: 'İstatistik hesabında kullanılan Good Quality örnekler; missing, invalid, duplicate timestamp ve YD dışlanır.',
+        statsHelpExcluded: 'Beklenen örneklerden Good Quality filtresi sonrası istatistik hesabına alınmayan sayı.',
+        statsHelpMissing: 'Timestamp veya beklenen saniye eksik olduğu için veri bulunmayan örnekler.',
+        statsHelpInvalid: 'NaN, boş, parse edilemeyen, sonsuz veya fiziksel sınır dışı değerler.',
+        statsHelpDuplicate: 'Aynı saniye için yinelenen timestamp kayıtları.',
+        statsHelpRepeated: 'Eşik süresi boyunca kesintisiz aynı frekans değerinin tekrar ettiği YD olayları.',
+        statsHelpMean: 'Good Quality saniyelik örneklerin aritmetik ortalaması.',
+        statsHelpMedian: 'Good Quality saniyelik örneklerin orta değeri.',
+        statsHelpExtreme: 'Good Quality saniyelik örnekler içindeki uç değer; tıklayınca ilgili saniyeye zoom yapılır.',
+        statsHelpVariance: 'Good Quality frekans değerlerinin ortalama etrafındaki yayılımının karesi.',
+        statsHelpStdDev: 'Varyansın karekökü; frekans dağılımının tipik yayılımı.',
+        statsHelpRms: 'Nominal 50 Hz değerine göre RMS sapma; birim mHz.',
+        statsHelpMeanAbsDeviation: 'Nominal 50 Hz değerinden mutlak sapmaların ortalaması.',
+        statsHelpPercentile: 'Good Quality örneklerin yüzdelik değeri; P95 örneklerin yüzde 95inin bu değerin altında olduğunu gösterir.',
+        statsHelpSkewness: 'Dağılımın sağa veya sola asimetrisini gösterir.',
+        statsHelpKurtosis: 'Dağılım kuyruklarının normal dağılıma göre fazlalığını gösterir.',
+        statsHelpInBand: 'Good Quality örneklerin 49.95-50.05 Hz istatistik bandı içinde kalan oranı.',
+        statsHelpOutOfBand: 'Good Quality örneklerin istatistik bandı dışında kaldığı toplam süre.',
+        statsHelpBandViolationDuration: 'Alt veya üst istatistik bandı ihlalinde geçen toplam süre.',
+        statsHelpBandViolationEvents: 'Kesintisiz alt/üst bant ihlali aralıklarının olay sayısı.',
+        statsHelpLongestBandViolation: 'En uzun kesintisiz bant ihlali; tıklayınca ilgili aralığa zoom yapılır.',
         qualityTrValid: 'Türkiye kaliteli örnek',
         qualityCeValid: 'Kıta Avrupası kaliteli örnek',
         qualityPairedValid: 'Ortak kullanılabilir / Paired Valid',
@@ -10968,6 +11112,11 @@
         qualityResetZoomBtn: 'Reset Zoom',
         statsBandMinLabel: 'Statistics lower band (Hz)',
         statsBandMaxLabel: 'Statistics upper band (Hz)',
+        statsGroupSamples: 'Sample quality',
+        statsGroupFrequency: 'Frequency distribution',
+        statsGroupDeviation: 'Deviation and band',
+        statsGroupPercentiles: 'Percentiles',
+        statsGroupShape: 'Distribution shape',
         statsMean: 'Mean',
         statsMedian: 'Median',
         statsVariance: 'Variance',
@@ -10977,19 +11126,48 @@
         statsExcessKurtosis: 'Excess Kurtosis',
         statsInBandRatio: 'In-band Ratio',
         statsOutOfBandDuration: 'Out-of-band Duration',
+        statsRawValidCount: 'Raw Valid Sample',
         statsGoodUsedCount: 'Good-quality samples used',
         statsExcludedCount: 'Excluded Sample',
         statsLowerBandViolationSeconds: 'Lower-band Violation Duration',
         statsUpperBandViolationSeconds: 'Upper-band Violation Duration',
         statsBandViolationEvents: 'Band Violation Event Count',
+        statsBandViolationCount: '{count} Band Violations',
         statsLongestBandViolation: 'Longest Band Violation',
-        statsLowerBandViolation: 'Lower-band violation',
-        statsUpperBandViolation: 'Upper-band violation',
-        statsHeatmap: 'Frequency Deviation Heatmap',
+        statsLowerBandViolation: 'Lower Band Violation',
+        statsUpperBandViolation: 'Upper Band Violation',
+        statsLowerBandViolationShort: 'LB',
+        statsUpperBandViolationShort: 'UB',
+        statsLowerBandViolationLegend: 'LB / Lower Band Violation',
+        statsUpperBandViolationLegend: 'UB / Upper Band Violation',
+        statsHeatmap: '15-min RMS Deviation',
         statsFrequencySummary: 'Frequency summary',
         statsTooltipMean: 'Mean frequency',
         statsTooltipMeanDeviation: 'Mean deviation',
         statsTooltipRmsDeviation: 'RMS deviation',
+        statsHelpExpected: 'Expected one-second sample count in the analysis period.',
+        statsHelpRawValid: 'Raw/canonical frequency samples inside the physical valid range.',
+        statsHelpGoodUsed: 'Good Quality samples used by statistics after excluding Missing, Invalid, Duplicate Timestamp, and RV.',
+        statsHelpExcluded: 'Expected samples left out of the statistics after the Good Quality filter.',
+        statsHelpMissing: 'Expected seconds where no timestamp or sample is present.',
+        statsHelpInvalid: 'NaN, empty, unparsable, infinite, or physically out-of-range values.',
+        statsHelpDuplicate: 'Repeated timestamp records for the same second.',
+        statsHelpRepeated: 'RV events where the same frequency value repeats continuously for the threshold duration.',
+        statsHelpMean: 'Arithmetic mean of Good Quality one-second samples.',
+        statsHelpMedian: 'Middle value of Good Quality one-second samples.',
+        statsHelpExtreme: 'Extreme Good Quality one-second sample; click to zoom to that second.',
+        statsHelpVariance: 'Squared spread of Good Quality frequency values around the mean.',
+        statsHelpStdDev: 'Square root of variance; typical spread of the frequency distribution.',
+        statsHelpRms: 'RMS deviation from nominal 50 Hz, in mHz.',
+        statsHelpMeanAbsDeviation: 'Average absolute deviation from nominal 50 Hz.',
+        statsHelpPercentile: 'Percentile of Good Quality samples; P95 means 95 percent of samples are below this value.',
+        statsHelpSkewness: 'Asymmetry of the distribution to the left or right.',
+        statsHelpKurtosis: 'Excess tail weight compared with a normal distribution.',
+        statsHelpInBand: 'Share of Good Quality samples inside the 49.95-50.05 Hz statistics band.',
+        statsHelpOutOfBand: 'Total time Good Quality samples spend outside the statistics band.',
+        statsHelpBandViolationDuration: 'Total time spent in lower or upper statistics-band violation.',
+        statsHelpBandViolationEvents: 'Count of continuous lower/upper band violation intervals.',
+        statsHelpLongestBandViolation: 'Longest continuous band violation; click to zoom to the interval.',
         qualityTrValid: 'Türkiye quality samples',
         qualityCeValid: 'CE quality samples',
         qualityPairedValid: 'Paired Valid',

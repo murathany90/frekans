@@ -40,11 +40,21 @@ for (const marker of [
   "function showStatsFullRange(",
   "statsBandMinHz",
   "statsBandMaxHz",
+  "repeatedValueSeconds",
   "statsGoodUsedCount",
+  "statsRawValidCount",
   "statsExcludedCount",
   "statsLowerBandViolationSeconds",
   "statsUpperBandViolationSeconds",
+  "statsLowerBandViolationShort",
+  "statsUpperBandViolationShort",
+  "statsLowerBandViolationLegend",
+  "statsUpperBandViolationLegend",
+  "statsBandViolationCount",
   "statsHeatmap",
+  "statsGroupSamples",
+  "statsHelpVariance",
+  "statsHelpPercentile",
   "statsTooltipRmsDeviation",
 ]) {
   assert.match(html, new RegExp(marker.replace(/[()]/g, "\\$&")), `Missing Basic Stats marker: ${marker}`);
@@ -52,12 +62,20 @@ for (const marker of [
 
 assert.match(html, /id=["']statsBandMinHz["'][^>]+value=["']49\.95["']/, "Basic Stats lower band defaults to 49.95 Hz");
 assert.match(html, /id=["']statsBandMaxHz["'][^>]+value=["']50\.05["']/, "Basic Stats upper band defaults to 50.05 Hz");
+assert.match(html, /id=["']repeatedValueSeconds["'][^>]+value=["']15["']/, "Basic Stats shares the default 15s YD/RV threshold control");
+assert.match(html, /stats:[\s\S]{0,260}?parameterKeys:\s*\[['"]statsBand['"],\s*['"]yd['"]\]/, "Basic Stats exposes the shared YD/RV threshold setting");
+assert.match(html, /statsHeatmap:\s*['"]15 dk RMS Sapma['"][\s\S]*statsHeatmap:\s*['"]15-min RMS Deviation['"]/, "Basic Stats heatmap label is localized");
+assert.match(html, /statsRawValidCount:\s*['"]Geçerli Örnek['"][\s\S]*statsRawValidCount:\s*['"]Raw Valid Sample['"]/, "Basic Stats separates raw valid sample labels in TR/EN");
+assert.match(html, /statsLowerBandViolationLegend:\s*['"]Aİ \/ Alt Bant İhlali['"][\s\S]*statsUpperBandViolationLegend:\s*['"]Üİ \/ Üst Bant İhlali['"][\s\S]*statsLowerBandViolationLegend:\s*['"]LB \/ Lower Band Violation['"][\s\S]*statsUpperBandViolationLegend:\s*['"]UB \/ Upper Band Violation['"]/, "Basic Stats band legend labels are localized and compact");
 assert.match(html, /type\s*===\s*['"]stats['"][\s\S]{0,120}?return\s*['"]1s['"]/, "Basic Stats analysis resolution is locked to 1s");
 assert.match(html, /masks\.good/, "Basic Stats must use good-quality masks");
 assert.match(html, /chart:\s*\{[\s\S]{0,120}kind:\s*['"]stats['"]/, "Basic Stats uses a dedicated chart renderer");
 assert.match(html, /type:\s*['"]heatmap['"][\s\S]{0,180}statsHeatmap/, "Basic Stats includes the deviation heatmap series");
+assert.match(html, /0-25 mHz[\s\S]*25-50 mHz[\s\S]*50-100 mHz[\s\S]*100-200 mHz[\s\S]*>200 mHz/, "Basic Stats heatmap uses the requested RMS mHz bands");
 assert.match(html, /data-param-key=["']statsBand["']/, "Basic Stats frequency band controls are scoped separately from oscillation band controls");
 assert.match(html, /dataZoom:[\s\S]{0,220}xAxisIndex:\s*\[0\]/, "Basic Stats zoom must affect the main frequency axis");
 assert.match(html, /drilldownType:\s*['"]min['"][\s\S]*drilldownType:\s*['"]max['"][\s\S]*drilldownType:\s*['"]band['"]/, "Basic Stats min/max/longest band rows are drillable");
+assert.match(html, /class=["']analysis-group-row["']|analysis-group-row/, "Basic Stats table includes compact logical group rows");
+assert.match(html, /data-tooltip="\$\{escapeHtml\(row\.tooltip\)\}"/, "Basic Stats technical metric rows expose tooltips");
 
 console.log("frontend_basic_stats_static ok");

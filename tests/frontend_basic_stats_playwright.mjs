@@ -33,11 +33,13 @@ try {
     return {
       resolutionHidden: document.querySelector('[data-param-key="resolution"]')?.hidden,
       statsBandVisible: document.querySelector('[data-param-key="statsBand"]')?.hidden === false,
+      ydVisible: document.querySelector('[data-param-key="yd"]')?.hidden === false,
       lower: document.querySelector("#statsBandMinHz")?.value,
-      upper: document.querySelector("#statsBandMaxHz")?.value
+      upper: document.querySelector("#statsBandMaxHz")?.value,
+      ydThreshold: document.querySelector("#repeatedValueSeconds")?.value
     };
   });
-  if (!controls.resolutionHidden || !controls.statsBandVisible || controls.lower !== "49.95" || controls.upper !== "50.05") {
+  if (!controls.resolutionHidden || !controls.statsBandVisible || !controls.ydVisible || controls.lower !== "49.95" || controls.upper !== "50.05" || controls.ydThreshold !== "15") {
     throw new Error(`Basic Stats controls are not scoped correctly: ${JSON.stringify(controls)}`);
   }
 
@@ -45,6 +47,7 @@ try {
     document.querySelector("#analysisTypeSelect").value = "stats";
     document.querySelector("#statsBandMinHz").value = "49.95";
     document.querySelector("#statsBandMaxHz").value = "50.05";
+    document.querySelector("#repeatedValueSeconds").value = "15";
     const series = Array.from({ length: 3600 }, (_, second) => 50 + Math.sin(second / 80) * 0.002);
     series[300] = 49.94;
     series[600] = 50.08;
@@ -69,11 +72,15 @@ try {
     const formatter = tooltip?.formatter;
     const lineSeries = (option.series || []).find(series => series.type === "line" && (series.data || []).length);
     const heatmap = (option.series || []).find(series => series.type === "heatmap");
+    const bandSeries = (option.series || []).filter(series => series.type === "line" && series.markArea && /Aİ|Üİ|Lower|Upper/.test(series.name || ""));
+    const bandMarker = bandSeries[0]?.markArea?.data?.[0]?.[0];
     const linePoint = lineSeries?.data?.find(point => Array.isArray(point) && point[1] !== null);
     const heatmapPoint = heatmap?.data?.find(point => Array.isArray(point) && point[2] >= 0);
     return {
       count: result.stats.count,
       expectedCount: result.statsMeta.expectedCount,
+      rawValidSampleCount: result.statsMeta.rawValidSampleCount,
+      goodUsedCount: result.statsMeta.goodUsedCount,
       excludedCount: result.statsMeta.excludedCount,
       minSecond: result.statsMeta.minSecond,
       maxSecond: result.statsMeta.maxSecond,
@@ -86,9 +93,16 @@ try {
       chartKind: result.chart.kind,
       seriesTypes: (option.series || []).map(series => series.type),
       heatmapName: heatmap?.name || "",
+      bandSeriesNames: bandSeries.map(series => series.name || ""),
+      bandMarkerNames: bandSeries.flatMap(series => (series.markArea?.data || []).map(item => item?.[0]?.name || "")),
+      countTag: document.querySelector("#oscCountTag")?.textContent || "",
+      tooltipTargets: document.querySelectorAll("#analysisEventsBody [data-tooltip]").length,
       visualMapJson: JSON.stringify(option.visualMap || {}),
       lineTooltip: typeof formatter === "function" && linePoint
         ? formatter({ seriesType: "line", seriesName: lineSeries.name, data: linePoint, value: linePoint })
+        : "",
+      bandTooltip: typeof formatter === "function" && bandMarker
+        ? formatter({ seriesType: "line", seriesName: bandSeries[0].name, data: bandMarker, value: bandMarker })
         : "",
       heatmapTooltip: typeof formatter === "function" && heatmapPoint
         ? formatter({ seriesType: "heatmap", seriesName: heatmap.name, value: heatmapPoint, data: heatmapPoint })
@@ -99,11 +113,15 @@ try {
   if (synthetic.count !== 3574 || synthetic.expectedCount !== 3600 || synthetic.excludedCount !== 26) {
     throw new Error(`Basic Stats must use only good-quality canonical samples: ${JSON.stringify(synthetic)}`);
   }
+  if (synthetic.rawValidSampleCount !== 3589 || synthetic.goodUsedCount !== 3574) {
+    throw new Error(`Basic Stats must separate raw valid and good-quality samples: ${JSON.stringify(synthetic)}`);
+  }
   if (synthetic.cards.length !== 4 || synthetic.cards.some(label => /Medyan|Median|P01|P99|Bant|Band/.test(label))) {
     throw new Error(`Basic Stats top KPI cards must stay compact: ${JSON.stringify(synthetic.cards)}`);
   }
   for (const label of [
-    /Geçerli Örnek|Valid Sample/,
+    /Geçerli Örnek|Raw Valid Sample/,
+    /Kullanılan iyi kalite örnek|Good-quality samples used/,
     /Elenen Örnek|Excluded Sample/,
     /Medyan|Median/,
     /Varyans|Variance/,
@@ -135,6 +153,21 @@ try {
   }
   if (!synthetic.seriesTypes.includes("heatmap") || !/Sapma|Deviation/.test(synthetic.heatmapName) || !/#d1d5db|#1f9d55|#facc15|#f97316|#dc2626/.test(synthetic.visualMapJson)) {
     throw new Error(`Basic Stats heatmap is missing or mis-colored: ${JSON.stringify(synthetic)}`);
+  }
+  if (!/15 dk RMS Sapma|15-min RMS Deviation/.test(synthetic.heatmapName) || !/0-25 mHz/.test(synthetic.visualMapJson) || !/25-50 mHz/.test(synthetic.visualMapJson) || !/50-100 mHz/.test(synthetic.visualMapJson) || !/100-200 mHz/.test(synthetic.visualMapJson) || !/>200 mHz/.test(synthetic.visualMapJson)) {
+    throw new Error(`Basic Stats heatmap bands/name are wrong: ${JSON.stringify(synthetic)}`);
+  }
+  if (!synthetic.bandSeriesNames.some(name => /Aİ \/ Alt Bant İhlali|Lower Band Violation/.test(name)) || !synthetic.bandSeriesNames.some(name => /Üİ \/ Üst Bant İhlali|Upper Band Violation/.test(name))) {
+    throw new Error(`Basic Stats band legend labels are not compact: ${JSON.stringify(synthetic.bandSeriesNames)}`);
+  }
+  if (!synthetic.bandMarkerNames.includes("Aİ") || !synthetic.bandMarkerNames.includes("Üİ") || synthetic.bandMarkerNames.some(name => /Alt Bant|Üst Bant|Lower-band|Upper-band/.test(name))) {
+    throw new Error(`Basic Stats band markers should only use short labels: ${JSON.stringify(synthetic.bandMarkerNames)}`);
+  }
+  if (!/2 Bant İhlali|2 Band Violations/.test(synthetic.countTag)) {
+    throw new Error(`Basic Stats count tag should describe band violations: ${synthetic.countTag}`);
+  }
+  if (synthetic.tooltipTargets < 8 || !/Alt Bant|Üst Bant|Lower-band|Upper-band/.test(synthetic.bandTooltip)) {
+    throw new Error(`Basic Stats technical/band tooltips are incomplete: ${JSON.stringify(synthetic)}`);
   }
   if (!/Tarih|Date|Saat|Time/.test(synthetic.lineTooltip) || !/Frekans|Frequency/.test(synthetic.lineTooltip)) {
     throw new Error(`Basic Stats line tooltip is incomplete: ${synthetic.lineTooltip}`);
