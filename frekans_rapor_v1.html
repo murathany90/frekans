@@ -1682,6 +1682,24 @@
       .chart { height: 360px; }
       .chart-wrapper {
         padding-top: 52px;
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: hidden;
+      }
+      #tab-oscillation .panel,
+      #tab-oscillation .analysis-result-card,
+      #tab-oscillation .table-wrap,
+      #analysisMainChart,
+      #analysisMainChart > div,
+      #analysisMainChart canvas {
+        max-width: 100%;
+        min-width: 0;
+      }
+      #tab-oscillation .analysis-result-card .label,
+      #tab-oscillation .analysis-result-card .value,
+      #tab-oscillation td,
+      #tab-oscillation th {
+        overflow-wrap: anywhere;
       }
       .chart-toolbar {
         left: 8px;

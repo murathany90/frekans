@@ -169,6 +169,11 @@ try {
   await page.waitForFunction(() => document.querySelector("#qualityZoomResetBtn")?.hidden === true, { timeout: 10000 });
 
   await page.setViewportSize({ width: 360, height: 760 });
+  await page.evaluate(() => {
+    window.dispatchEvent(new Event("resize"));
+    window.echarts?.getInstanceByDom(document.querySelector("#analysisMainChart"))?.resize();
+  });
+  await page.waitForTimeout(100);
   const mobile = await page.evaluate(() => ({
     horizontalScroll: document.documentElement.scrollWidth > window.innerWidth,
     resetIcon: Boolean(document.querySelector("#qualityZoomResetBtn .quality-zoom-reset-icon"))
