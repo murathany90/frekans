@@ -82,5 +82,7 @@ assert.match(html, /dataZoom:[\s\S]{0,220}xAxisIndex:\s*\[0\]/, "Basic Stats zoo
 assert.match(html, /drilldownType:\s*['"]min['"][\s\S]*drilldownType:\s*['"]max['"][\s\S]*drilldownType:\s*['"]band['"]/, "Basic Stats min/max/longest band rows are drillable");
 assert.match(html, /class=["']analysis-group-row["']|analysis-group-row/, "Basic Stats table includes compact logical group rows");
 assert.match(html, /data-tooltip="\$\{escapeHtml\(row\.tooltip\)\}"/, "Basic Stats technical metric rows expose tooltips");
+assert.match(html, /data-tooltip-kind=["']metric-help["']|data-tooltip-kind=\\["']metric-help\\["']/, "Basic Stats metric help tooltips are separate from chart data tooltips");
+assert.match(html, /class=["']metric-info-icon["'][\s\S]{0,80}&#9432;/, "Basic Stats technical metric rows show an info icon");
 
 console.log("frontend_basic_stats_static ok");

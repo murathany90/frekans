@@ -14,7 +14,7 @@ const artifactDir = process.env.PLAYWRIGHT_ARTIFACT_DIR || "playwright-artifacts
 mkdirSync(artifactDir, { recursive: true });
 
 const browser = await chromium.launch({ headless: true });
-const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, hasTouch: true });
 const consoleErrors = [];
 page.on("console", message => {
   if (message.type() === "error") consoleErrors.push(message.text());
@@ -143,6 +143,8 @@ try {
       bandMarkerNames: bandSeries.flatMap(series => (series.markArea?.data || []).map(item => item?.[0]?.name || "")),
       countTag: document.querySelector("#oscCountTag")?.textContent || "",
       tooltipTargets: document.querySelectorAll("#analysisEventsBody [data-tooltip]").length,
+      metricHelpIcons: document.querySelectorAll("#analysisEventsBody .metric-name .metric-info-icon").length,
+      metricHelpKinds: [...document.querySelectorAll("#analysisEventsBody .metric-name[data-tooltip-kind]")].map(node => node.dataset.tooltipKind),
       visualMapJson: JSON.stringify(option.visualMap || {}),
       lineTooltip: typeof formatter === "function" && linePoint
         ? formatter({ seriesType: "line", seriesName: lineSeries.name, data: linePoint, value: linePoint })
@@ -222,6 +224,39 @@ try {
     throw new Error(`Basic Stats heatmap tooltip is incomplete: ${synthetic.heatmapTooltip}`);
   }
 
+  if (synthetic.metricHelpIcons < 12 || !synthetic.metricHelpKinds.every(kind => kind === "metric-help")) {
+    throw new Error(`Basic Stats technical metric tooltips need visible info icons and a distinct tooltip kind: ${JSON.stringify(synthetic)}`);
+  }
+
+  const varianceMetric = page.locator("#analysisEventsBody .metric-name", { hasText: /Varyans|Variance/ }).first();
+  await varianceMetric.locator(".metric-info-icon").waitFor({ state: "visible", timeout: 5000 });
+  await varianceMetric.scrollIntoViewIfNeeded();
+  await varianceMetric.hover({ force: true });
+  await page.waitForSelector("#appTooltip:not(.hidden)");
+  const varianceTooltip = await page.locator("#appTooltip").evaluate(node => {
+    const rect = node.getBoundingClientRect();
+    const style = getComputedStyle(node);
+    return {
+      text: node.textContent || "",
+      left: rect.left,
+      right: rect.right,
+      zIndex: Number(style.zIndex),
+      pointerEvents: style.pointerEvents,
+      visible: !node.classList.contains("hidden") && rect.width > 0 && rect.height > 0
+    };
+  });
+  if (!varianceTooltip.visible || !/Good Quality|Variance|spread|frekans/i.test(varianceTooltip.text) || varianceTooltip.left < 0 || varianceTooltip.right > 1440 || varianceTooltip.zIndex < 5000 || varianceTooltip.pointerEvents !== "none") {
+    throw new Error(`Variance help tooltip is not visibly rendered with the right text/layering: ${JSON.stringify(varianceTooltip)}`);
+  }
+
+  const stdDevMetric = page.locator("#analysisEventsBody .metric-name", { hasText: /Standart Sapma|Standard Deviation/ }).first();
+  await stdDevMetric.focus();
+  await page.waitForSelector("#appTooltip:not(.hidden)");
+  const focusedTooltip = await page.locator("#appTooltip").textContent();
+  if (!/Varyans|Square root|frekans|distribution/i.test(focusedTooltip || "")) {
+    throw new Error(`Metric help tooltip did not remain keyboard accessible: ${focusedTooltip}`);
+  }
+
   await page.locator("#analysisEventsBody tr.event-row", { hasText: /Minimum|Minimum/ }).click();
   await page.waitForFunction(() => {
     const option = window.echarts?.getInstanceByDom(document.querySelector("#analysisMainChart"))?.getOption?.() || {};
@@ -259,6 +294,23 @@ try {
   }));
   if (mobile.horizontalScroll || !mobile.resetIcon) {
     throw new Error(`Basic Stats mobile layout is not compact: ${JSON.stringify(mobile)}`);
+  }
+
+  const rmsMetricIcon = page.locator("#analysisEventsBody .metric-name", { hasText: /RMS/ }).locator(".metric-info-icon").first();
+  await rmsMetricIcon.scrollIntoViewIfNeeded();
+  await rmsMetricIcon.tap({ force: true });
+  await page.waitForSelector("#appTooltip:not(.hidden)");
+  const mobileMetricTooltip = await page.locator("#appTooltip").evaluate(node => {
+    const rect = node.getBoundingClientRect();
+    return {
+      text: node.textContent || "",
+      visible: !node.classList.contains("hidden") && rect.width > 0 && rect.height > 0,
+      left: rect.left,
+      right: rect.right
+    };
+  });
+  if (!mobileMetricTooltip.visible || !/RMS|nominal|50 Hz/i.test(mobileMetricTooltip.text) || mobileMetricTooltip.left < 0 || mobileMetricTooltip.right > 360) {
+    throw new Error(`Mobile metric help tooltip is not tappable or viewport-safe: ${JSON.stringify(mobileMetricTooltip)}`);
   }
 
   if (consoleErrors.length) {

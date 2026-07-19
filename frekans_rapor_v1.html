@@ -1031,12 +1031,45 @@
     }
     .metric-name {
       position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      max-width: 100%;
       cursor: help;
       overflow: visible !important;
     }
     .metric-name:focus-visible {
       outline: 2px solid rgba(27, 152, 181, .42);
       outline-offset: -2px;
+    }
+    .metric-label {
+      min-width: 0;
+    }
+    .metric-info-icon {
+      display: inline-grid;
+      place-items: center;
+      width: 15px;
+      height: 15px;
+      flex: 0 0 15px;
+      border: 1px solid rgba(13, 47, 79, .32);
+      border-radius: 999px;
+      color: #0d2f4f;
+      background: #f8fbfd;
+      font-size: .7rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .metric-name[data-tooltip-kind="metric-help"] .metric-info-icon {
+      color: #0b6f85;
+      border-color: rgba(27, 152, 181, .42);
+      background: #eefbfe;
+    }
+    .metric-name[data-tooltip-kind="metric-help"]:hover .metric-info-icon,
+    .metric-name[data-tooltip-kind="metric-help"]:focus-visible .metric-info-icon,
+    .metric-name[data-tooltip-kind="metric-help"].app-tooltip-target .metric-info-icon {
+      color: #063447;
+      border-color: rgba(13, 47, 79, .55);
+      background: #dff7fb;
     }
     .mobile-hour-view { display: none; }
     .mobile-hour-detail {
@@ -6207,7 +6240,11 @@
     let appTooltipHideTimer = null;
 
     function appTooltipElement() {
-      return $('appTooltip');
+      const tooltip = $('appTooltip');
+      if (tooltip && document.body && tooltip.parentElement !== document.body) {
+        document.body.appendChild(tooltip);
+      }
+      return tooltip;
     }
 
     function resolveTooltipTarget(start) {
@@ -6279,6 +6316,7 @@
         showAppTooltip(target);
       };
       document.addEventListener('pointerenter', showFromEvent, true);
+      document.addEventListener('mouseover', showFromEvent, true);
       document.addEventListener('focusin', showFromEvent);
       document.addEventListener('pointerdown', event => {
         const target = resolveTooltipTarget(event.target);
@@ -6290,8 +6328,22 @@
           showAppTooltip(target, { autoHide: 2600 });
         }
       }, true);
+      document.addEventListener('touchstart', event => {
+        const target = resolveTooltipTarget(event.target);
+        if (!target) {
+          hideAppTooltip();
+          return;
+        }
+        showAppTooltip(target, { autoHide: 2600 });
+      }, { capture: true, passive: true });
       document.addEventListener('pointerleave', event => {
         if (resolveTooltipTarget(event.target) === appTooltipTarget) hideAppTooltip();
+      }, true);
+      document.addEventListener('mouseout', event => {
+        const target = resolveTooltipTarget(event.target);
+        if (!target || target !== appTooltipTarget) return;
+        if (event.relatedTarget && target.contains(event.relatedTarget)) return;
+        hideAppTooltip();
       }, true);
       document.addEventListener('focusout', event => {
         if (resolveTooltipTarget(event.target) === appTooltipTarget) hideAppTooltip();
@@ -6303,8 +6355,14 @@
         }
       });
       window.addEventListener('scroll', () => {
-        if (appTooltipTarget && document.activeElement === appTooltipTarget) {
-          positionAppTooltip(appTooltipTarget);
+        if (appTooltipTarget && document.contains(appTooltipTarget)) {
+          const rect = appTooltipTarget.getBoundingClientRect();
+          const visible = rect.bottom >= 0 && rect.top <= window.innerHeight && rect.right >= 0 && rect.left <= window.innerWidth;
+          if (visible) {
+            positionAppTooltip(appTooltipTarget);
+            return;
+          }
+          hideAppTooltip();
           return;
         }
         hideAppTooltip();
@@ -7973,7 +8031,8 @@
       const percentileRow = (label, value) => ({
         metric: label,
         value: statsValueText(value, 4, ' Hz'),
-        tooltip: t('statsHelpPercentile')
+        tooltip: t('statsHelpPercentile'),
+        metricHelp: true
       });
       return [
         group('statsGroupSamples'),
@@ -8006,15 +8065,15 @@
           drilldownType: 'max'
         },
         group('statsGroupDeviation'),
-        row('statsVariance', statsValueText(stats.variance, 8, ' Hz²'), 'statsHelpVariance'),
-        row('statsStdDev', statsValueText(stats.stdDev, 6, ' Hz'), 'statsHelpStdDev'),
-        row('rmsDeviation', statsValueText(stats.rmsDeviationMhz, 2, ' mHz'), 'statsHelpRms'),
-        row('statsMeanAbsDeviation50', statsValueText(stats.meanAbsDeviationMhz, 2, ' mHz'), 'statsHelpMeanAbsDeviation'),
-        row('statsInBandRatio', percent(stats.inBandRatio), 'statsHelpInBand'),
-        row('statsOutOfBandDuration', durationText(stats.outOfBandSeconds || 0), 'statsHelpOutOfBand'),
-        row('statsLowerBandViolationSeconds', durationText(statsMeta.lowerBandViolationSeconds || 0), 'statsHelpBandViolationDuration'),
-        row('statsUpperBandViolationSeconds', durationText(statsMeta.upperBandViolationSeconds || 0), 'statsHelpBandViolationDuration'),
-        row('statsBandViolationEvents', numberText(stats.bandViolationEventCount || 0), 'statsHelpBandViolationEvents'),
+        row('statsVariance', statsValueText(stats.variance, 8, ' Hz²'), 'statsHelpVariance', { metricHelp: true }),
+        row('statsStdDev', statsValueText(stats.stdDev, 6, ' Hz'), 'statsHelpStdDev', { metricHelp: true }),
+        row('rmsDeviation', statsValueText(stats.rmsDeviationMhz, 2, ' mHz'), 'statsHelpRms', { metricHelp: true }),
+        row('statsMeanAbsDeviation50', statsValueText(stats.meanAbsDeviationMhz, 2, ' mHz'), 'statsHelpMeanAbsDeviation', { metricHelp: true }),
+        row('statsInBandRatio', percent(stats.inBandRatio), 'statsHelpInBand', { metricHelp: true }),
+        row('statsOutOfBandDuration', durationText(stats.outOfBandSeconds || 0), 'statsHelpOutOfBand', { metricHelp: true }),
+        row('statsLowerBandViolationSeconds', durationText(statsMeta.lowerBandViolationSeconds || 0), 'statsHelpBandViolationDuration', { metricHelp: true }),
+        row('statsUpperBandViolationSeconds', durationText(statsMeta.upperBandViolationSeconds || 0), 'statsHelpBandViolationDuration', { metricHelp: true }),
+        row('statsBandViolationEvents', numberText(stats.bandViolationEventCount || 0), 'statsHelpBandViolationEvents', { metricHelp: true }),
         {
           metric: t('statsLongestBandViolation'),
           value: longest ? `${durationText(stats.longestBandViolationSeconds || longest.durationSeconds || 0)} · ${statsSecondLabel(statsMeta.dateList, longest.startSecond)}` : durationText(stats.longestBandViolationSeconds || 0),
@@ -8032,8 +8091,8 @@
         percentileRow('P95', stats.p95),
         percentileRow('P99', stats.p99),
         group('statsGroupShape'),
-        row('statsSkewness', statsValueText(stats.skewness, 4), 'statsHelpSkewness'),
-        row('statsExcessKurtosis', statsValueText(stats.kurtosis, 4), 'statsHelpKurtosis')
+        row('statsSkewness', statsValueText(stats.skewness, 4), 'statsHelpSkewness', { metricHelp: true }),
+        row('statsExcessKurtosis', statsValueText(stats.kurtosis, 4), 'statsHelpKurtosis', { metricHelp: true })
       ];
     }
 
@@ -9185,7 +9244,9 @@
         const cells = columns.map(column => {
           const cell = formatTableCell(row[column.key]);
           if (column.key === 'metric' && row.tooltip) {
-            return `<td><span class="metric-name" tabindex="0" data-tooltip="${escapeHtml(row.tooltip)}" aria-label="${escapeHtml(`${cell}: ${row.tooltip}`)}">${escapeHtml(cell)}</span></td>`;
+            const kindAttr = row.metricHelp ? ' data-tooltip-kind="metric-help"' : '';
+            const icon = row.metricHelp ? '<span class="metric-info-icon" aria-hidden="true">&#9432;</span>' : '';
+            return `<td><span class="metric-name" tabindex="0"${kindAttr} data-tooltip="${escapeHtml(row.tooltip)}" aria-label="${escapeHtml(`${cell}: ${row.tooltip}`)}"><span class="metric-label">${escapeHtml(cell)}</span>${icon}</span></td>`;
           }
           return `<td>${cell}</td>`;
         }).join('');
