@@ -2323,6 +2323,8 @@
             <div class="field" data-param-key="window"><label for="analysisEndHour" data-i18n="endHourLabel">Bitiş saati</label><input id="analysisEndHour" type="time" value="23:59" /></div>
             <div class="field" data-param-key="resolution"><label for="analysisResolution" data-i18n="resolutionLabel">Çözünürlük</label><select id="analysisResolution"><option value="auto" data-i18n="resolutionAuto">Otomatik</option><option value="1s" data-i18n="resolutionSecond">Saniyelik</option><option value="10s" data-i18n="resolution10s">10 saniyelik</option><option value="1m" data-i18n="resolutionMinute">Dakikalık</option><option value="1h" data-i18n="resolutionHour">Saatlik</option></select></div>
             <div class="field" data-param-key="alignment"><label for="analysisAlignment" data-i18n="alignmentLabel">Zaman eşleştirme</label><select id="analysisAlignment"><option value="utcAuto" data-i18n="utcAuto">UTC - otomatik</option><option value="sameLocal" data-i18n="sameLocal">Aynı yerel saat</option><option value="manual" data-i18n="manualOption">Manuel</option></select></div>
+            <div class="field" data-param-key="statsBand"><label for="statsBandMinHz" data-i18n="statsBandMinLabel">İstatistik alt bandı (Hz)</label><input id="statsBandMinHz" type="number" min="49" max="51" step="0.001" value="49.95" /></div>
+            <div class="field" data-param-key="statsBand"><label for="statsBandMaxHz" data-i18n="statsBandMaxLabel">İstatistik üst bandı (Hz)</label><input id="statsBandMaxHz" type="number" min="49" max="51" step="0.001" value="50.05" /></div>
             <div class="field" data-param-key="band"><label for="bandMin" data-i18n="bandMinLabel">Alt bant (Hz)</label><input id="bandMin" type="number" min="0.01" max="0.45" step="0.01" value="0.10" /></div>
             <div class="field" data-param-key="band"><label for="bandMax" data-i18n="bandMaxLabel">Üst bant (Hz)</label><input id="bandMax" type="number" min="0.02" max="0.49" step="0.01" value="0.20" /></div>
             <div class="field" data-param-key="threshold"><label for="oscThreshold" data-i18n="oscThresholdLabel">Eşik (mHz)</label><input id="oscThreshold" type="number" min="0.1" max="200" step="0.5" value="10" /></div>
@@ -3031,6 +3033,8 @@
       chartStepSeconds: 5,
       bandMin: 0.10,
       bandMax: 0.20,
+      statsBandMinHz: 49.95,
+      statsBandMaxHz: 50.05,
       thresholdMhz: 10,
       windowSec: 120,
       stepSec: 10,
@@ -3122,8 +3126,8 @@
         titleKey: 'analysisStatsTitle',
         descriptionKey: 'analysisStatsDesc',
         allowedSources: ['tr', 'de', 'both'],
-        allowedResolutions: ['1s', '10s', '1m', '1h'],
-        parameterKeys: [],
+        allowedResolutions: ['1s'],
+        parameterKeys: ['statsBand'],
         requiresPairedSeries: false,
         minSampleIntervalSeconds: 1,
         preferredResolution: '1s',
@@ -4351,6 +4355,10 @@
       if (chartId === 'frequencyChart') resetFrequencyZoomState();
       if (chartId === 'analysisMainChart' && state.analysis.lastResult?.chart?.kind === 'quality') {
         resetQualityChartZoom();
+        return;
+      }
+      if (chartId === 'analysisMainChart' && state.analysis.lastResult?.chart?.kind === 'stats') {
+        showStatsFullRange(state.analysis.lastResult);
         return;
       }
       chart.dispatchAction({ type: 'dataZoom', start: 0, end: 100 });
@@ -6529,8 +6537,15 @@
 
     function updateAnalysisParameterPanel() {
       const def = analysisDefinition();
-      const isQuality = $('analysisTypeSelect')?.value === 'quality';
-      const visible = new Set([...(isQuality ? ['date', 'alignment', 'yd'] : ANALYSIS_BASE_PARAMS), ...(def.parameterKeys || [])]);
+      const type = $('analysisTypeSelect')?.value || 'stats';
+      const isQuality = type === 'quality';
+      const isStats = type === 'stats';
+      const baseParams = isQuality
+        ? ['date', 'alignment', 'yd']
+        : isStats
+          ? ['date', 'alignment', 'yd']
+          : ANALYSIS_BASE_PARAMS;
+      const visible = new Set([...baseParams, ...(def.parameterKeys || [])]);
       document.querySelectorAll('.analysis-controls.compact [data-param-key]').forEach(field => {
         field.hidden = !visible.has(field.dataset.paramKey);
       });
@@ -6557,6 +6572,7 @@
     function resolveAnalysisResolution(type, selectedResolution = 'auto') {
       const def = analysisDefinition(type);
       if (type === 'quality') return '1s';
+      if (type === 'stats') return '1s';
       if (selectedResolution && selectedResolution !== 'auto') return selectedResolution;
       if (type === 'trend') return '1m';
       if (type === 'psd') return '1s';
@@ -6967,6 +6983,15 @@
       try {
         if (type === 'quality' && dateList.length > 1) {
           const result = await computeQualityRangeResult(source, dateList);
+          state.analysis.lastResult = result;
+          renderAnalysisResult(result);
+          renderReportPreview();
+          updateUrlState({ date, source, analysis: type, tab: 'oscillation' });
+          setBanner('analysisStatus', t('analysisDone'), 'success');
+          return;
+        }
+        if (type === 'stats' && dateList.length > 1) {
+          const result = await computeStatsRangeResult(source, dateList);
           state.analysis.lastResult = result;
           renderAnalysisResult(result);
           renderReportPreview();
@@ -7596,6 +7621,436 @@
       };
     }
 
+    function statsBandBounds() {
+      const fallbackMin = Number(state.settings.statsBandMinHz ?? 49.95);
+      const fallbackMax = Number(state.settings.statsBandMaxHz ?? 50.05);
+      let min = Number($('statsBandMinHz')?.value ?? fallbackMin);
+      let max = Number($('statsBandMaxHz')?.value ?? fallbackMax);
+      if (!Number.isFinite(min)) min = 49.95;
+      if (!Number.isFinite(max)) max = 50.05;
+      if (!(max > min)) return { min: 49.95, max: 50.05 };
+      return { min, max };
+    }
+
+    function statsWindowForSeries(series, requestedBounds = analysisWindowBounds()) {
+      const source = series || [];
+      const length = source.length || 0;
+      const start = Math.min(Math.max(0, requestedBounds.start || 0), length);
+      const end = Math.min(Math.max(start, requestedBounds.end || length), length);
+      const values = typeof source.slice === 'function' ? source.slice(start, end) : Array.from(source).slice(start, end);
+      return {
+        values,
+        bounds: {
+          start: requestedBounds.start || 0,
+          end: (requestedBounds.start || 0) + values.length
+        }
+      };
+    }
+
+    function analyzeStatsQuality(series, bounds) {
+      const core = window.FrequencyAnalysisCore;
+      return core.analyzeDataQuality(null, series, qualityAnalysisOptions(bounds));
+    }
+
+    function buildStatsGoodSeries(source, trQuality, ceQuality, offsetSeconds = 0) {
+      const primary = source === 'de' ? ceQuality : trQuality;
+      const expectedCount = source === 'both'
+        ? Math.min(trQuality.expectedCount || 0, ceQuality.expectedCount || 0)
+        : primary.expectedCount || 0;
+      const values = new Array(expectedCount).fill(NaN);
+      let usedCount = 0;
+      if (source === 'both') {
+        for (let i = 0; i < expectedCount; i += 1) {
+          if (!trQuality.masks.good[i] || !ceQuality.masks.good[i]) continue;
+          const a = trQuality.canonical.values[i];
+          const b = ceQuality.canonical.values[i];
+          if (!Number.isFinite(a) || !Number.isFinite(b)) continue;
+          values[i] = (a + b) / 2;
+          usedCount += 1;
+        }
+      } else {
+        for (let i = 0; i < expectedCount; i += 1) {
+          if (!primary.masks.good[i]) continue;
+          const value = primary.canonical.values[i];
+          if (!Number.isFinite(value)) continue;
+          values[i] = value;
+          usedCount += 1;
+        }
+      }
+      const startSecond = offsetSeconds + (primary?.startSecond || 0);
+      return {
+        values,
+        expectedCount,
+        usedCount,
+        excludedCount: Math.max(0, expectedCount - usedCount),
+        startSecond,
+        endSecond: startSecond + expectedCount
+      };
+    }
+
+    function statsDisplayBucketSeconds(durationSeconds) {
+      if (durationSeconds <= 2 * 86400) return 60;
+      if (durationSeconds <= 14 * 86400) return 900;
+      return 3600;
+    }
+
+    function buildStatsFrequencySummary(goodSeries, startSecond = 0) {
+      const durationSeconds = goodSeries.length || 0;
+      const bucketSeconds = statsDisplayBucketSeconds(durationSeconds);
+      const data = [];
+      for (let start = 0; start < goodSeries.length; start += bucketSeconds) {
+        const end = Math.min(goodSeries.length, start + bucketSeconds);
+        let sum = 0;
+        let count = 0;
+        for (let i = start; i < end; i += 1) {
+          const value = goodSeries[i];
+          if (!Number.isFinite(value)) continue;
+          sum += value;
+          count += 1;
+        }
+        const second = startSecond + start + (end - start) / 2;
+        data.push([second, count ? Number((sum / count).toFixed(6)) : null, bucketSeconds]);
+      }
+      return {
+        name: t('statsFrequencySummary'),
+        data,
+        bucketSeconds
+      };
+    }
+
+    function statsPointSeries(goodSeries, startSecond = 0) {
+      return goodSeries.map((value, index) => [
+        startSecond + index,
+        Number.isFinite(value) ? Number(value.toFixed(6)) : null,
+        1
+      ]);
+    }
+
+    function findStatsExtreme(goodSeries, startSecond = 0, mode = 'min') {
+      let value = mode === 'min' ? Infinity : -Infinity;
+      let second = NaN;
+      for (let i = 0; i < goodSeries.length; i += 1) {
+        const current = goodSeries[i];
+        if (!Number.isFinite(current)) continue;
+        const better = mode === 'min' ? current < value : current > value;
+        if (better) {
+          value = current;
+          second = startSecond + i;
+        }
+      }
+      return Number.isFinite(second) ? { value, second } : { value: NaN, second: NaN };
+    }
+
+    function buildStatsBandViolationEvents(goodSeries, bandMinHz, bandMaxHz, startSecond = 0) {
+      const events = [];
+      let runStart = -1;
+      let runSide = null;
+      let peak = NaN;
+      const closeRun = endIndex => {
+        if (runStart < 0 || !runSide) return;
+        events.push({
+          type: 'band',
+          side: runSide,
+          startSecond: startSecond + runStart,
+          endSecond: startSecond + endIndex,
+          durationSeconds: endIndex - runStart,
+          value: peak,
+          classification: runSide === 'lower' ? t('statsLowerBandViolation') : t('statsUpperBandViolation')
+        });
+        runStart = -1;
+        runSide = null;
+        peak = NaN;
+      };
+      for (let i = 0; i <= goodSeries.length; i += 1) {
+        const value = i < goodSeries.length ? goodSeries[i] : NaN;
+        const side = Number.isFinite(value)
+          ? value < bandMinHz ? 'lower' : value > bandMaxHz ? 'upper' : null
+          : null;
+        if (side) {
+          if (runStart < 0 || runSide !== side) {
+            closeRun(i);
+            runStart = i;
+            runSide = side;
+            peak = value;
+          } else if (
+            side === 'lower'
+              ? value < peak
+              : value > peak
+          ) {
+            peak = value;
+          }
+          continue;
+        }
+        closeRun(i);
+      }
+      const lowerSeconds = events.filter(event => event.side === 'lower').reduce((sum, event) => sum + event.durationSeconds, 0);
+      const upperSeconds = events.filter(event => event.side === 'upper').reduce((sum, event) => sum + event.durationSeconds, 0);
+      const longest = events.slice().sort((a, b) => (b.durationSeconds || 0) - (a.durationSeconds || 0) || a.startSecond - b.startSecond)[0] || null;
+      return { events, lowerSeconds, upperSeconds, longest };
+    }
+
+    function buildStatsHeatmap(goodSeries, dateList = [], startSecond = 0) {
+      const bucketSeconds = 900;
+      const cells = [];
+      const dayCount = Math.max(1, Math.ceil((goodSeries.length || 1) / 86400));
+      for (let dayIndex = 0; dayIndex < dayCount; dayIndex += 1) {
+        const dayStart = dayIndex * 86400;
+        const dayEnd = Math.min(goodSeries.length, dayStart + 86400);
+        for (let start = dayStart; start < dayEnd; start += bucketSeconds) {
+          const end = Math.min(dayEnd, start + bucketSeconds);
+          let sum = 0;
+          let sumDeviation = 0;
+          let sumSquaredDeviation = 0;
+          let count = 0;
+          for (let i = start; i < end; i += 1) {
+            const value = goodSeries[i];
+            if (!Number.isFinite(value)) continue;
+            const deviation = value - state.settings.nominalFrequency;
+            sum += value;
+            sumDeviation += deviation;
+            sumSquaredDeviation += deviation * deviation;
+            count += 1;
+          }
+          const localStartSecond = start % 86400;
+          const localEndSecond = end % 86400 || (end > start ? 86400 : 0);
+          const slot = Math.floor(localStartSecond / bucketSeconds);
+          const date = dateList[dayIndex] || dateList.at(-1) || state.current?.date;
+          const label = `${displayDate(date)} ${secondToTime(localStartSecond).slice(0, 5)}-${secondToTime(localEndSecond).slice(0, 5)}`;
+          cells.push({
+            slot,
+            dayIndex,
+            startSecond: startSecond + start,
+            endSecond: startSecond + end,
+            label,
+            date,
+            observedCount: count,
+            expectedCount: Math.max(0, end - start),
+            meanHz: count ? sum / count : NaN,
+            meanDeviationMhz: count ? (sumDeviation / count) * 1000 : NaN,
+            rmsDeviationMhz: count ? Math.sqrt(sumSquaredDeviation / count) * 1000 : NaN
+          });
+        }
+      }
+      const maxSlot = cells.reduce((max, cell) => Math.max(max, cell.slot), 0);
+      return {
+        bucketSeconds,
+        labels: Array.from({ length: maxSlot + 1 }, (_, slot) => quarterLabel(slot)),
+        days: Array.from({ length: dayCount }, (_, index) => displayDate(dateList[index] || dateList.at(-1) || state.current?.date)),
+        cells
+      };
+    }
+
+    function buildStatsHeatmapData(heatmap) {
+      return (heatmap.cells || []).map(cell => [
+        cell.slot,
+        cell.dayIndex,
+        cell.observedCount ? Number(cell.rmsDeviationMhz.toFixed(3)) : -1,
+        cell.startSecond,
+        cell.endSecond,
+        cell.label,
+        Number.isFinite(cell.meanHz) ? Number(cell.meanHz.toFixed(6)) : null,
+        Number.isFinite(cell.meanDeviationMhz) ? Number(cell.meanDeviationMhz.toFixed(3)) : null,
+        Number.isFinite(cell.rmsDeviationMhz) ? Number(cell.rmsDeviationMhz.toFixed(3)) : null
+      ]);
+    }
+
+    function statsHeatmapSeries(heatmapData) {
+      return {
+        type: 'heatmap',
+        name: t('statsHeatmap'),
+        xAxisIndex: 1,
+        yAxisIndex: 1,
+        data: heatmapData,
+        progressive: 1000,
+        emphasis: { itemStyle: { borderColor: '#0d2f4f', borderWidth: 1.5 } }
+      };
+    }
+
+    function statsSecondLabel(dateList, second, includeSeconds = true) {
+      const total = Math.max(0, Math.round(second || 0));
+      let dayIndex = Math.floor(total / 86400);
+      let localSecond = total % 86400;
+      if (total > 0 && localSecond === 0) {
+        dayIndex -= 1;
+        localSecond = 86400;
+      }
+      const date = dateList[dayIndex] || dateList.at(-1) || state.current?.date;
+      const time = secondToTime(localSecond).slice(0, includeSeconds ? 8 : 5);
+      return date ? `${displayDate(date)} ${time}` : time;
+    }
+
+    function statsValueText(value, digits = 4, unit = '') {
+      return Number.isFinite(value) ? `${fmt(value, digits)}${unit}` : '—';
+    }
+
+    function statsTableRows(stats, statsMeta) {
+      const longest = statsMeta.longestBandViolation;
+      return [
+        { metric: t('qualityExpected'), value: numberText(statsMeta.expectedCount) },
+        { metric: t('qualityValid'), value: numberText(stats.count) },
+        { metric: t('statsGoodUsedCount'), value: numberText(statsMeta.goodUsedCount) },
+        { metric: t('statsExcludedCount'), value: numberText(statsMeta.excludedCount) },
+        { metric: t('qualityMissing'), value: numberText(statsMeta.quality?.missingCount || 0) },
+        { metric: t('qualityInvalid'), value: numberText(statsMeta.quality?.invalidCount || 0) },
+        { metric: t('qualityDuplicate'), value: numberText(statsMeta.quality?.duplicateTimestampCount || 0) },
+        { metric: t('qualityRepeatedEvents'), value: numberText(statsMeta.quality?.repeatedValueEventCount || 0) },
+        { metric: t('qualityRepeatedTotal'), value: durationText(statsMeta.quality?.totalRepeatedValueSeconds || 0) },
+        { metric: t('statsMean'), value: statsValueText(stats.mean, 4, ' Hz') },
+        { metric: t('statsMedian'), value: statsValueText(stats.median, 4, ' Hz') },
+        {
+          metric: t('eventMin'),
+          value: `${statsValueText(stats.min, 4, ' Hz')} · ${statsSecondLabel(statsMeta.dateList, statsMeta.minSecond)}`,
+          startSecond: statsMeta.minSecond,
+          endSecond: Number.isFinite(statsMeta.minSecond) ? statsMeta.minSecond + 1 : NaN,
+          drilldownType: 'min'
+        },
+        {
+          metric: t('eventMax'),
+          value: `${statsValueText(stats.max, 4, ' Hz')} · ${statsSecondLabel(statsMeta.dateList, statsMeta.maxSecond)}`,
+          startSecond: statsMeta.maxSecond,
+          endSecond: Number.isFinite(statsMeta.maxSecond) ? statsMeta.maxSecond + 1 : NaN,
+          drilldownType: 'max'
+        },
+        { metric: t('statsVariance'), value: statsValueText(stats.variance, 8, ' Hz²') },
+        { metric: t('statsStdDev'), value: statsValueText(stats.stdDev, 6, ' Hz') },
+        { metric: t('rmsDeviation'), value: statsValueText(stats.rmsDeviationMhz, 2, ' mHz') },
+        { metric: t('statsMeanAbsDeviation50'), value: statsValueText(stats.meanAbsDeviationMhz, 2, ' mHz') },
+        { metric: 'P01', value: statsValueText(stats.p01, 4, ' Hz') },
+        { metric: 'P05', value: statsValueText(stats.p05, 4, ' Hz') },
+        { metric: 'P25', value: statsValueText(stats.p25, 4, ' Hz') },
+        { metric: 'P50', value: statsValueText(stats.median, 4, ' Hz') },
+        { metric: 'P75', value: statsValueText(stats.p75, 4, ' Hz') },
+        { metric: 'P95', value: statsValueText(stats.p95, 4, ' Hz') },
+        { metric: 'P99', value: statsValueText(stats.p99, 4, ' Hz') },
+        { metric: t('statsSkewness'), value: statsValueText(stats.skewness, 4) },
+        { metric: t('statsExcessKurtosis'), value: statsValueText(stats.kurtosis, 4) },
+        { metric: t('statsInBandRatio'), value: percent(stats.inBandRatio) },
+        { metric: t('statsOutOfBandDuration'), value: durationText(stats.outOfBandSeconds || 0) },
+        { metric: t('statsLowerBandViolationSeconds'), value: durationText(statsMeta.lowerBandViolationSeconds || 0) },
+        { metric: t('statsUpperBandViolationSeconds'), value: durationText(statsMeta.upperBandViolationSeconds || 0) },
+        { metric: t('statsBandViolationEvents'), value: numberText(stats.bandViolationEventCount || 0) },
+        {
+          metric: t('statsLongestBandViolation'),
+          value: longest ? `${durationText(stats.longestBandViolationSeconds || longest.durationSeconds || 0)} · ${statsSecondLabel(statsMeta.dateList, longest.startSecond)}` : durationText(stats.longestBandViolationSeconds || 0),
+          startSecond: longest?.startSecond,
+          endSecond: longest?.endSecond,
+          drilldownType: 'band'
+        }
+      ];
+    }
+
+    function buildStatsResultFromGoodSeries(type, source, current, dateList, good, quality, qualityEvents) {
+      const core = window.FrequencyAnalysisCore;
+      const band = statsBandBounds();
+      const stats = core.computeBasicStats(good.values, {
+        nominalHz: state.settings.nominalFrequency,
+        bandMinHz: band.min,
+        bandMaxHz: band.max
+      });
+      const minPoint = findStatsExtreme(good.values, good.startSecond, 'min');
+      const maxPoint = findStatsExtreme(good.values, good.startSecond, 'max');
+      const bandEvents = buildStatsBandViolationEvents(good.values, band.min, band.max, good.startSecond);
+      const sampling = buildSamplingMetadata(good.values, 1, 'good-quality-canonical');
+      sampling.totalSamples = good.expectedCount;
+      sampling.validSamples = good.usedCount;
+      sampling.missingRatio = good.expectedCount ? good.excludedCount / good.expectedCount : 0;
+      sampling.requestedResolution = '1s';
+      sampling.resolution = '1s';
+      state.analysis.sampling = sampling;
+      const statsMeta = {
+        expectedCount: good.expectedCount,
+        goodUsedCount: good.usedCount,
+        excludedCount: good.excludedCount,
+        minSecond: minPoint.second,
+        maxSecond: maxPoint.second,
+        lowerBandViolationSeconds: bandEvents.lowerSeconds,
+        upperBandViolationSeconds: bandEvents.upperSeconds,
+        longestBandViolation: bandEvents.longest,
+        bandMinHz: band.min,
+        bandMaxHz: band.max,
+        quality,
+        dateList
+      };
+      return {
+        type,
+        title: t(analysisDefinition('stats').titleKey),
+        description: t(analysisDefinition('stats').descriptionKey),
+        metadata: analysisMetadata('stats', source, current, dateList, sampling),
+        stats,
+        statsMeta,
+        cards: [
+          [t('statsMean'), statsValueText(stats.mean, 4, ' Hz')],
+          [t('eventMin'), statsValueText(stats.min, 4, ' Hz')],
+          [t('eventMax'), statsValueText(stats.max, 4, ' Hz')],
+          [t('rmsDeviation'), statsValueText(stats.rmsDeviationMhz, 2, ' mHz')]
+        ],
+        events: bandEvents.events,
+        tableRows: statsTableRows(stats, statsMeta),
+        chart: { kind: 'stats',
+          sourceName: sourceLabel(source),
+          frequencySummary: buildStatsFrequencySummary(good.values, good.startSecond),
+          detailPoints: statsPointSeries(good.values, good.startSecond),
+          heatmap: buildStatsHeatmap(good.values, dateList, good.startSecond),
+          qualityEvents,
+          bandEvents: bandEvents.events,
+          range: { start: good.startSecond, end: good.endSecond },
+          band
+        },
+        methodology: t('methodStats'),
+        limitations: t('limitStats')
+      };
+    }
+
+    function computeStatsAnalysisResult(type, source, current, dateList = [current?.date].filter(Boolean)) {
+      const requestedBounds = analysisWindowBounds();
+      const trWindow = statsWindowForSeries(current.rawSeries?.tr || current.tr, requestedBounds);
+      const ceWindow = statsWindowForSeries(current.rawSeries?.de || current.de, requestedBounds);
+      const trQuality = analyzeStatsQuality(trWindow.values, trWindow.bounds);
+      const ceQuality = analyzeStatsQuality(ceWindow.values, ceWindow.bounds);
+      const quality = source === 'de' ? ceQuality : source === 'both' ? combinedDualQuality(trQuality, ceQuality) : trQuality;
+      const good = buildStatsGoodSeries(source, trQuality, ceQuality);
+      return buildStatsResultFromGoodSeries(type, source, current, dateList, good, quality, quality.qualityEvents || []);
+    }
+
+    async function computeStatsRangeResult(source, dateList) {
+      const dailyItems = dateList.map((date, index) => ({ date, index }));
+      const dailyResults = (await mapWithConcurrency(dailyItems, MAX_ANALYSIS_DAY_CONCURRENCY, async ({ date, index }) => {
+        const current = await prepareDailyContext(date, $('analysisAlignment').value);
+        const requestedBounds = analysisWindowBounds();
+        const offsetSeconds = index * 86400;
+        const trWindow = statsWindowForSeries(current.rawSeries.tr, requestedBounds);
+        const ceWindow = statsWindowForSeries(current.rawSeries.de, requestedBounds);
+        const trQuality = analyzeStatsQuality(trWindow.values, trWindow.bounds);
+        const ceQuality = analyzeStatsQuality(ceWindow.values, ceWindow.bounds);
+        const quality = source === 'de' ? ceQuality : source === 'both' ? combinedDualQuality(trQuality, ceQuality) : trQuality;
+        const good = buildStatsGoodSeries(source, trQuality, ceQuality, offsetSeconds);
+        return { date, index, current, quality, good };
+      })).filter(Boolean).sort((a, b) => a.index - b.index);
+      if (!dailyResults.length) throw new Error(t('analysisNoSeries'));
+      const expectedCount = dailyResults.reduce((sum, item) => sum + item.good.expectedCount, 0);
+      const values = new Array(expectedCount).fill(NaN);
+      let cursor = 0;
+      for (const item of dailyResults) {
+        for (let i = 0; i < item.good.values.length; i += 1) values[cursor + i] = item.good.values[i];
+        cursor += item.good.values.length;
+      }
+      const good = {
+        values,
+        expectedCount,
+        usedCount: values.reduce((sum, value) => sum + (Number.isFinite(value) ? 1 : 0), 0),
+        excludedCount: values.reduce((sum, value) => sum + (Number.isFinite(value) ? 0 : 1), 0),
+        startSecond: 0,
+        endSecond: expectedCount
+      };
+      const quality = aggregateQualityResults(dailyResults.map(item => item.quality));
+      const lastCurrent = dailyResults.at(-1).current;
+      state.current = lastCurrent;
+      state.analysis.rawSeries = lastCurrent.rawSeries;
+      state.analysis.displaySeries = lastCurrent.displaySeries;
+      state.analysis.analysisSeries = lastCurrent.analysisSeries;
+      return buildStatsResultFromGoodSeries('stats', source, lastCurrent, dateList, good, quality, quality.qualityEvents || []);
+    }
+
     async function computeQualityRangeResult(source, dateList) {
       const dailyItems = dateList.map((date, index) => ({ date, index }));
       const dailyResults = (await mapWithConcurrency(dailyItems, MAX_ANALYSIS_DAY_CONCURRENCY, async ({ date, index }) => {
@@ -7685,6 +8140,7 @@
       const core = window.FrequencyAnalysisCore;
       if (!core) throw new Error(t('analysisCoreMissing'));
       if (type === 'quality') return computeQualityAnalysisResult(type, source, current, dateList, workerResult, analysisInput);
+      if (type === 'stats') return computeStatsAnalysisResult(type, source, current, dateList);
       const prepared = analysisInput || prepareAnalysisInput(type, source, current);
       const series = prepared.series;
       const sampleIntervalSeconds = prepared.sampling?.intervalSeconds || 1;
@@ -7889,13 +8345,18 @@
     function renderGenericAnalysisChart(result) {
       if (!state.oscillationChart) return;
       state.oscillationChart.off('click');
-      $('analysisMainChart')?.classList.toggle('quality-chart', result.chart.kind === 'quality');
-      if (result.chart.kind !== 'quality') {
+      const richAnalysisChart = result.chart.kind === 'quality' || result.chart.kind === 'stats';
+      $('analysisMainChart')?.classList.toggle('quality-chart', richAnalysisChart);
+      if (!richAnalysisChart) {
         $('analysisMainChart').style.height = '';
         setQualityZoomResetVisible(false);
       }
       if (result.chart.kind === 'quality') {
         renderQualityAnalysisChart(result);
+        return;
+      }
+      if (result.chart.kind === 'stats') {
+        renderStatsAnalysisChart(result);
         return;
       }
       if (result.chart.kind === 'heatmap') {
@@ -8314,6 +8775,230 @@
       setQualityZoomResetVisible(false);
     }
 
+    function statsChartTooltip(chartTimeLabel, result) {
+      const findQualityEvent = (start, end) => (result.chart.qualityEvents || [])
+        .find(event => event.startSecond < end && event.endSecond > start);
+      const eventLabel = event => {
+        if (!event) return t('qualityStatusGood');
+        if (event.type === 'missing') return t('qualityMissingRange');
+        if (event.type === 'invalid') return t('qualityInvalidRange');
+        if (event.type === 'duplicate') return t('qualityDuplicateRange');
+        if (event.type === 'repeated') return t('qualityRepeatedRangeShort');
+        return event.classification || t('classNeedsReview');
+      };
+      return {
+        trigger: 'item',
+        triggerOn: 'mousemove|click',
+        axisPointer: { type: 'cross' },
+        formatter: params => {
+          if (params.seriesType === 'heatmap') {
+            const [, , rmsMhz, startSecond, endSecond, label, meanHz, meanDeviationMhz] = params.value || [];
+            if (rmsMhz < 0) return `${t('statsHeatmap')}<br>${label}<br>${t('qualityNoData')}`;
+            return [
+              `<strong>${t('statsHeatmap')}</strong>`,
+              `${t('qualityTooltipInterval')}: ${label}`,
+              `${t('statsTooltipMean')}: ${statsValueText(meanHz, 4, ' Hz')}`,
+              `${t('statsTooltipMeanDeviation')}: ${statsValueText(meanDeviationMhz, 2, ' mHz')}`,
+              `${t('statsTooltipRmsDeviation')}: ${statsValueText(rmsMhz, 2, ' mHz')}`,
+              `${chartTimeLabel(startSecond, true)}-${chartTimeLabel(endSecond, true)}`
+            ].join('<br>');
+          }
+          if (params.seriesType === 'line') {
+            const value = params.value || params.data || [];
+            const x = Number(value[0]);
+            const y = Number(value[1]);
+            const bucketSeconds = Math.max(1, Number(value[2]) || 1);
+            const start = bucketSeconds > 1 ? x - bucketSeconds / 2 : x;
+            const end = bucketSeconds > 1 ? x + bucketSeconds / 2 : x + 1;
+            const event = findQualityEvent(start, end);
+            return [
+              `<strong>${params.seriesName || t('statsFrequencySummary')}</strong>`,
+              `${t('qualityTooltipDateTime')}: ${bucketSeconds > 1 ? `${chartTimeLabel(start, true)}-${chartTimeLabel(end, true)}` : chartTimeLabel(x, true)}`,
+              `${t('qualityTooltipFrequency')}: ${Number.isFinite(y) ? `${fmt(y, 4)} Hz` : t('qualityMissingTooltipTitle')}`,
+              `${t('qualityTooltipStatus')}: ${eventLabel(event)}`,
+              event ? `${t('qualityTooltipEvent')}: ${eventLabel(event)}` : ''
+            ].filter(Boolean).join('<br>');
+          }
+          return params.seriesName || '';
+        }
+      };
+    }
+
+    function buildStatsBandEventSeries(events, highlight = null) {
+      if (!events?.length) return [];
+      return [{
+        name: t('statsBandViolationEvents'),
+        type: 'line',
+        xAxisIndex: 0,
+        yAxisIndex: 0,
+        data: [],
+        symbol: 'none',
+        silent: true,
+        lineStyle: { opacity: 0 },
+        markArea: {
+          silent: false,
+          itemStyle: { color: 'rgba(220,38,38,.11)', borderColor: 'rgba(220,38,38,.45)', borderWidth: 1 },
+          data: events.map(event => {
+            const selected = highlight && Math.abs((highlight.startSecond ?? -1) - event.startSecond) < 1e-6 && Math.abs((highlight.endSecond ?? -1) - event.endSecond) < 1e-6;
+            return [
+              {
+                xAxis: event.startSecond,
+                name: event.side === 'lower' ? t('statsLowerBandViolation') : t('statsUpperBandViolation'),
+                eventType: 'band',
+                eventStartSecond: event.startSecond,
+                eventEndSecond: event.endSecond,
+                eventDurationSeconds: event.durationSeconds,
+                itemStyle: selected ? { color: 'rgba(220,38,38,.24)', borderColor: '#dc2626', borderWidth: 1.5 } : undefined
+              },
+              { xAxis: event.endSecond }
+            ];
+          })
+        }
+      }];
+    }
+
+    function statsChartTimeLabel(result) {
+      return (value, includeDate = false) => {
+        const total = Math.max(0, Math.round(value || 0));
+        let dayIndex = Math.floor(total / 86400);
+        let localSecond = total % 86400;
+        if (total > 0 && localSecond === 0) {
+          dayIndex -= 1;
+          localSecond = 86400;
+        }
+        const dateLabel = result.statsMeta?.dateList?.[dayIndex];
+        const timeLabel = secondToTime(localSecond).slice(0, includeDate ? 8 : 5);
+        return includeDate && dateLabel ? `${displayDate(dateLabel)} ${timeLabel}` : timeLabel;
+      };
+    }
+
+    function renderStatsAnalysisChart(result) {
+      setQualityZoomResetVisible(false);
+      const range = result.chart.range || { start: 0, end: 86400 };
+      const chartTimeLabel = statsChartTimeLabel(result);
+      const heatmap = result.chart.heatmap || { labels: [], days: [], cells: [] };
+      const heatmapData = buildStatsHeatmapData(heatmap);
+      const heatmapHeight = Math.max(96, heatmap.days.length * 18);
+      const chartHeight = Math.max(620, 520 + heatmapHeight);
+      $('analysisMainChart').style.height = `${chartHeight}px`;
+      state.oscillationChart.resize();
+      const series = [
+        {
+          name: result.chart.frequencySummary?.name || t('statsFrequencySummary'),
+          type: 'line',
+          xAxisIndex: 0,
+          yAxisIndex: 0,
+          data: result.chart.frequencySummary?.data || [],
+          symbol: 'none',
+          connectNulls: false,
+          lineStyle: { width: 1.8, color: '#101820' },
+          itemStyle: { color: '#101820' }
+        },
+        ...buildQualityMarkSeries(result.chart.qualityEvents || []),
+        ...buildStatsBandEventSeries(result.chart.bandEvents || []),
+        statsHeatmapSeries(heatmapData)
+      ];
+      state.oscillationChart.setOption({
+        animation: false,
+        tooltip: statsChartTooltip(chartTimeLabel, result),
+        legend: { top: 8, type: 'scroll' },
+        grid: [
+          { left: 68, right: 42, top: 58, height: 285 },
+          { left: 68, right: 42, top: 430, height: heatmapHeight }
+        ],
+        xAxis: [
+          {
+            type: 'value',
+            gridIndex: 0,
+            min: range.start,
+            max: range.end,
+            axisLabel: { formatter: value => chartTimeLabel(value, range.end > 86400) }
+          },
+          {
+            type: 'category',
+            gridIndex: 1,
+            data: heatmap.labels,
+            axisLabel: { interval: Math.max(0, Math.floor((heatmap.labels.length || 1) / 8) - 1) }
+          }
+        ],
+        yAxis: [
+          { type: 'value', gridIndex: 0, scale: true, name: 'Hz' },
+          { type: 'category', gridIndex: 1, data: heatmap.days, name: '' }
+        ],
+        visualMap: {
+          type: 'piecewise',
+          dimension: 2,
+          seriesIndex: series.length - 1,
+          orient: 'horizontal',
+          left: 'center',
+          top: 374,
+          pieces: [
+            { value: -1, label: t('qualityNoData'), color: '#d1d5db' },
+            { gte: 0, lte: 5, label: '0-5 mHz', color: '#1f9d55' },
+            { gt: 5, lte: 10, label: '5-10 mHz', color: '#facc15' },
+            { gt: 10, lte: 20, label: '10-20 mHz', color: '#f97316' },
+            { gt: 20, label: '>20 mHz', color: '#dc2626' }
+          ]
+        },
+        dataZoom: [
+          { type: 'inside', xAxisIndex: [0], filterMode: 'none' },
+          { type: 'slider', xAxisIndex: [0], filterMode: 'none', height: 22, bottom: 14 }
+        ],
+        series
+      }, true);
+      state.oscillationChart.on('click', params => {
+        if (params.seriesName !== t('statsHeatmap') || !params.value) return;
+        showStatsDetailWindow(result, params.value[3], params.value[4]);
+        $('analysisMainChart').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    }
+
+    function buildStatsSecondWindowSeries(result, startSecond, endSecond) {
+      const data = (result.chart.detailPoints || [])
+        .filter(point => point[0] >= startSecond && point[0] <= endSecond)
+        .map(point => [point[0], point[1], 1]);
+      return [{
+        name: `${result.chart.sourceName || sourceLabel(getAnalysisSource())} · 1s`,
+        type: 'line',
+        xAxisIndex: 0,
+        yAxisIndex: 0,
+        data,
+        symbol: 'none',
+        connectNulls: false,
+        lineStyle: { width: 1.6, color: '#101820' },
+        itemStyle: { color: '#101820' }
+      }];
+    }
+
+    function showStatsDetailWindow(result, startSecond, endSecond, highlight = null) {
+      if (!state.oscillationChart || result?.chart?.kind !== 'stats') return;
+      const range = result.chart.range || { start: 0, end: 86400 };
+      const start = Math.max(range.start, Number(startSecond));
+      const end = Math.min(range.end, Number(endSecond));
+      if (!(end > start)) return;
+      const heatmapData = buildStatsHeatmapData(result.chart.heatmap || { cells: [] });
+      const series = [
+        ...buildStatsSecondWindowSeries(result, start, end),
+        ...buildQualityMarkSeries(result.chart.qualityEvents || [], highlight),
+        ...buildStatsBandEventSeries(result.chart.bandEvents || [], highlight),
+        statsHeatmapSeries(heatmapData)
+      ];
+      state.oscillationChart.setOption({
+        xAxis: [{ min: start, max: end }],
+        series
+      }, { replaceMerge: ['series'] });
+      state.oscillationChart.dispatchAction({ type: 'dataZoom', dataZoomIndex: 0, startValue: start, endValue: end });
+      setQualityZoomResetVisible(true);
+    }
+
+    function showStatsFullRange(result = state.analysis.lastResult) {
+      if (!result?.chart || result.chart.kind !== 'stats') return;
+      renderStatsAnalysisChart(result);
+      const range = result.chart.range || { start: 0, end: 86400 };
+      state.oscillationChart?.dispatchAction({ type: 'dataZoom', dataZoomIndex: 0, startValue: range.start, endValue: range.end });
+      setQualityZoomResetVisible(false);
+    }
+
     function setAnalysisTableHeader(columns) {
       const head = $('analysisEventsHead');
       if (!head) return;
@@ -8354,6 +9039,8 @@
         const end = Math.min(range.end, eventEnd + 30);
         if (result.chart?.kind === 'quality') {
           showQualityDetailWindow(result, start, end, { startSecond: eventStart, endSecond: eventEnd, type: row.dataset.drilldownType });
+        } else if (result.chart?.kind === 'stats') {
+          showStatsDetailWindow(result, start, end, { startSecond: eventStart, endSecond: eventEnd, type: row.dataset.drilldownType });
         } else {
           state.oscillationChart?.dispatchAction({ type: 'dataZoom', startValue: start, endValue: end });
         }
@@ -8446,8 +9133,10 @@
           dateRange: dateList,
           timeWindowSeconds: [windowBounds.start, windowBounds.end],
           alignment: $('analysisAlignment')?.value || state.settings.alignmentMode,
-          resolution: type === 'quality' ? '1s' : ($('analysisResolution')?.value || 'auto'),
-          bandHz: [Number($('bandMin').value), Number($('bandMax').value)]
+          resolution: (type === 'quality' || type === 'stats') ? '1s' : ($('analysisResolution')?.value || 'auto'),
+          bandHz: type === 'stats'
+            ? [Number($('statsBandMinHz')?.value || 49.95), Number($('statsBandMaxHz')?.value || 50.05)]
+            : [Number($('bandMin').value), Number($('bandMax').value)]
         },
         sampling,
         sources: [sourceLabel(source, 'report')],
@@ -8665,6 +9354,8 @@
       $('diffAxisMax').value = s.diffAxisMax;
       $('bandMin').value = s.bandMin;
       $('bandMax').value = s.bandMax;
+      if ($('statsBandMinHz')) $('statsBandMinHz').value = s.statsBandMinHz ?? 49.95;
+      if ($('statsBandMaxHz')) $('statsBandMaxHz').value = s.statsBandMaxHz ?? 50.05;
       $('oscThreshold').value = s.thresholdMhz;
       $('windowSec').value = s.windowSec;
       $('stepSec').value = s.stepSec;
@@ -8699,6 +9390,8 @@
         diffAxisMax: Number($('diffAxisMax').value),
         bandMin: Number($('bandMin').value),
         bandMax: Number($('bandMax').value),
+        statsBandMinHz: Number($('statsBandMinHz')?.value || 49.95),
+        statsBandMaxHz: Number($('statsBandMaxHz')?.value || 50.05),
         thresholdMhz: Number($('oscThreshold').value),
         windowSec: Number($('windowSec').value),
         stepSec: Number($('stepSec').value),
@@ -9915,6 +10608,30 @@
         qualityRepeatedLongest: 'En Uzun Yinelenen Ardışık Frekans Süresi',
         qualityRepeatedThresholdLabel: 'YD eşiği (sn)',
         qualityResetZoomBtn: 'Zoom Sıfırla',
+        statsBandMinLabel: 'İstatistik alt bandı (Hz)',
+        statsBandMaxLabel: 'İstatistik üst bandı (Hz)',
+        statsMean: 'Ortalama',
+        statsMedian: 'Medyan',
+        statsVariance: 'Varyans',
+        statsStdDev: 'Standart Sapma',
+        statsMeanAbsDeviation50: 'Ortalama Mutlak Sapma (50 Hz)',
+        statsSkewness: 'Çarpıklık',
+        statsExcessKurtosis: 'Fazlalık Basıklık (Excess Kurtosis)',
+        statsInBandRatio: 'Bant içinde kalma oranı',
+        statsOutOfBandDuration: 'Bant dışında kalma süresi',
+        statsGoodUsedCount: 'Kullanılan iyi kalite örnek',
+        statsExcludedCount: 'Elenen Örnek',
+        statsLowerBandViolationSeconds: 'Alt bant ihlal süresi',
+        statsUpperBandViolationSeconds: 'Üst bant ihlal süresi',
+        statsBandViolationEvents: 'Bant ihlal olay sayısı',
+        statsLongestBandViolation: 'En uzun bant ihlali',
+        statsLowerBandViolation: 'Alt bant ihlali',
+        statsUpperBandViolation: 'Üst bant ihlali',
+        statsHeatmap: 'Frekans Sapması Heatmap',
+        statsFrequencySummary: 'Frekans özeti',
+        statsTooltipMean: 'Ortalama frekans',
+        statsTooltipMeanDeviation: 'Ortalama sapma',
+        statsTooltipRmsDeviation: 'RMS sapma',
         qualityTrValid: 'Türkiye kaliteli örnek',
         qualityCeValid: 'Kıta Avrupası kaliteli örnek',
         qualityPairedValid: 'Ortak kullanılabilir / Paired Valid',
@@ -9962,7 +10679,7 @@
         methodCoherence: 'Koherens ve faz, seçilen frekansta ortak hareketin tutarlılığını tahmin eder.',
         methodEvents: 'Olay analizi, nominal frekanstan sapmanın eşik üstünde kaldığı aralıkları çıkarır.',
         methodTrend: 'Trend görünümü saatlik/günlük hata ölçülerini özetler.',
-        methodStats: 'Temel istatistikler, saniyelik geçerli örneklerin dağılımını hesaplar.',
+        methodStats: 'Temel istatistikler, Missing/Invalid/Duplicate Timestamp/YD olayları elendikten sonra kalan saniyelik good-quality canonical örneklerin dağılımını hesaplar.',
         methodOscillation: 'Osilasyon analizi band geçiren FIR filtresi ve kayan pencere eşikleme ile aday aralıkları çıkarır.',
         reportLimitations: 'Sonuçlar veri kalitesi, hizalama seçimi, eksik saniyeler ve kaynak revizyonlarından etkilenebilir.',
         reportsTitle: 'Raporlar',
@@ -10231,6 +10948,30 @@
         qualityRepeatedLongest: 'Longest Repeated Consecutive Frequency Duration',
         qualityRepeatedThresholdLabel: 'RV threshold (s)',
         qualityResetZoomBtn: 'Reset Zoom',
+        statsBandMinLabel: 'Statistics lower band (Hz)',
+        statsBandMaxLabel: 'Statistics upper band (Hz)',
+        statsMean: 'Mean',
+        statsMedian: 'Median',
+        statsVariance: 'Variance',
+        statsStdDev: 'Standard Deviation',
+        statsMeanAbsDeviation50: 'Mean Absolute Deviation (50 Hz)',
+        statsSkewness: 'Skewness',
+        statsExcessKurtosis: 'Excess Kurtosis',
+        statsInBandRatio: 'In-band Ratio',
+        statsOutOfBandDuration: 'Out-of-band Duration',
+        statsGoodUsedCount: 'Good-quality samples used',
+        statsExcludedCount: 'Excluded Sample',
+        statsLowerBandViolationSeconds: 'Lower-band Violation Duration',
+        statsUpperBandViolationSeconds: 'Upper-band Violation Duration',
+        statsBandViolationEvents: 'Band Violation Event Count',
+        statsLongestBandViolation: 'Longest Band Violation',
+        statsLowerBandViolation: 'Lower-band violation',
+        statsUpperBandViolation: 'Upper-band violation',
+        statsHeatmap: 'Frequency Deviation Heatmap',
+        statsFrequencySummary: 'Frequency summary',
+        statsTooltipMean: 'Mean frequency',
+        statsTooltipMeanDeviation: 'Mean deviation',
+        statsTooltipRmsDeviation: 'RMS deviation',
         qualityTrValid: 'Türkiye quality samples',
         qualityCeValid: 'CE quality samples',
         qualityPairedValid: 'Paired Valid',
@@ -10278,7 +11019,7 @@
         methodCoherence: 'Coherence and phase estimate shared motion at the selected frequency.',
         methodEvents: 'Event analysis extracts intervals where deviation from nominal frequency exceeds the threshold.',
         methodTrend: 'The trend view summarizes hourly and daily error metrics.',
-        methodStats: 'Basic statistics describe the distribution of valid second-level samples.',
+        methodStats: 'Basic statistics describe the distribution of one-second good-quality canonical samples after excluding Missing, Invalid, Duplicate Timestamp, and RV events.',
         methodOscillation: 'Oscillation analysis uses a band-pass FIR filter and sliding-window thresholding.',
         reportLimitations: 'Results may be affected by data quality, alignment mode, missing seconds, and source revisions.',
         reportsTitle: 'Reports',

@@ -22,11 +22,13 @@ on:
       - "tests/frontend_source_labels_static.mjs"
       - "tests/frontend_regions_static.mjs"
       - "tests/frontend_live_frequency_static.mjs"
+      - "tests/frontend_basic_stats_static.mjs"
       - "tests/frequency_regions_time_deviation.mjs"
       - "tests/frontend_data_sources_modal_static.mjs"
       - "tests/frontend_hash_routing_playwright.mjs"
       - "tests/frontend_regions_playwright.mjs"
       - "tests/frontend_live_frequency_playwright.mjs"
+      - "tests/frontend_basic_stats_playwright.mjs"
       - "tests/frontend_chart_state_tooltips_playwright.mjs"
       - "tests/frontend_daily_mobile_compact_playwright.mjs"
       - "tests/frontend_prompt6_playwright.mjs"
@@ -56,11 +58,13 @@ on:
       - "tests/frontend_source_labels_static.mjs"
       - "tests/frontend_regions_static.mjs"
       - "tests/frontend_live_frequency_static.mjs"
+      - "tests/frontend_basic_stats_static.mjs"
       - "tests/frequency_regions_time_deviation.mjs"
       - "tests/frontend_data_sources_modal_static.mjs"
       - "tests/frontend_hash_routing_playwright.mjs"
       - "tests/frontend_regions_playwright.mjs"
       - "tests/frontend_live_frequency_playwright.mjs"
+      - "tests/frontend_basic_stats_playwright.mjs"
       - "tests/frontend_chart_state_tooltips_playwright.mjs"
       - "tests/frontend_daily_mobile_compact_playwright.mjs"
       - "tests/frontend_prompt6_playwright.mjs"
@@ -106,6 +110,7 @@ jobs:
           node tests/frontend_source_labels_static.mjs
           node tests/frontend_regions_static.mjs
           node tests/frontend_live_frequency_static.mjs
+          node tests/frontend_basic_stats_static.mjs
           node tests/frequency_regions_time_deviation.mjs
           node tests/frontend_data_sources_modal_static.mjs
           node tests/readme_documentation_static.mjs
@@ -142,6 +147,7 @@ jobs:
           node tests/frontend_hash_routing_playwright.mjs
           node tests/frontend_regions_playwright.mjs
           node tests/frontend_live_frequency_playwright.mjs
+          node tests/frontend_basic_stats_playwright.mjs
           node tests/frontend_chart_state_tooltips_playwright.mjs
           node tests/frontend_daily_mobile_compact_playwright.mjs
 
