@@ -63,4 +63,55 @@ if (quality.longestGapSeconds < 30 || quality.missingCount < 30) {
   throw new Error("data quality analysis did not detect the 30-second gap");
 }
 
+// -----------------------------------------------------------------------------
+// RoCoF Regression Tests
+// -----------------------------------------------------------------------------
+function assertEqual(actual, expected, label) {
+  if (actual !== expected) throw new Error(`${label}: expected ${expected}, got ${actual}`);
+}
+
+// 1. Threshold exact value should not trigger event
+const thresholdValues = [0, 0.01, 0.03, 0.03, 0.01, 0];
+const exactThresholdRocof = computeRocof(thresholdValues, { method: "central", thresholdHzPerSecond: 0.03, minEventSeconds: 1 });
+assertEqual(exactThresholdRocof.events.length, 0, "Exact threshold value should not trigger event");
+
+// 2. Event boundaries and durations
+const boundaryValues = [
+  0, 
+  0.04, 0.08, 0.12, 0.16, // pos
+  0.16, 
+  0.12, 0.08, 0.04, 0.00  // neg
+];
+// simple diffs:
+// i=1: 0.04 (>0.035), i=2: 0.04, i=3: 0.04, i=4: 0.04.
+// i=5: 0.00
+// i=6: -0.04 (< -0.035), i=7: -0.04, i=8: -0.04, i=9: -0.04
+const boundaryRocof = computeRocof(boundaryValues, { method: "simple", thresholdHzPerSecond: 0.035, minEventSeconds: 2 });
+const posEvent = boundaryRocof.events.find(e => e.peakHzPerSecond > 0);
+const negEvent = boundaryRocof.events.find(e => e.peakHzPerSecond < 0);
+
+assertEqual(posEvent.startSecond, 1, "Positive event startSecond");
+assertEqual(posEvent.lastViolationSecond, 4, "Positive event lastViolationSecond");
+assertEqual(posEvent.endExclusiveSecond, 5, "Positive event endExclusiveSecond");
+assertEqual(posEvent.durationSeconds, 4, "Positive event durationSeconds");
+
+assertEqual(negEvent.startSecond, 6, "Negative event startSecond");
+assertEqual(negEvent.lastViolationSecond, 9, "Negative event lastViolationSecond");
+assertEqual(negEvent.endExclusiveSecond, 10, "Negative event endExclusiveSecond");
+assertEqual(negEvent.durationSeconds, 4, "Negative event durationSeconds");
+
+// 3. Sample quality metrics
+// Total 10 values. All finite. method "simple" has 1 boundary NaN at i=0. clean=9.
+assertEqual(boundaryRocof.originalValidCount, 10, "originalValidCount");
+assertEqual(boundaryRocof.methodDiscardCount, 1, "methodDiscardCount");
+assertEqual(boundaryRocof.rocofCalculatedCount, 9, "rocofCalculatedCount");
+
+// 4. Moving regression discard metrics
+const mrValues = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // 10 values
+const mrRocof = computeRocof(mrValues, { method: "movingRegression", windowSeconds: 3, sampleIntervalSeconds: 1 });
+// radius = floor((3/1)/2) = 1. Valid bounds: 1 to 8 (8 values). Discard: 2.
+assertEqual(mrRocof.originalValidCount, 10, "MR originalValidCount");
+assertEqual(mrRocof.methodDiscardCount, 2, "MR methodDiscardCount");
+assertEqual(mrRocof.rocofCalculatedCount, 8, "MR rocofCalculatedCount");
+
 console.log("synthetic_signal_analysis ok");
