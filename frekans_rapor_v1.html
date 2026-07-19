@@ -6238,6 +6238,7 @@
 
     let appTooltipTarget = null;
     let appTooltipHideTimer = null;
+    let appTooltipHoldUntil = 0;
 
     function appTooltipElement() {
       const tooltip = $('appTooltip');
@@ -6293,12 +6294,14 @@
       target.setAttribute('aria-describedby', 'appTooltip');
       positionAppTooltip(target);
       if (options.autoHide) {
+        appTooltipHoldUntil = Date.now() + options.autoHide;
         appTooltipHideTimer = setTimeout(hideAppTooltip, options.autoHide);
       }
     }
 
     function hideAppTooltip() {
       clearTimeout(appTooltipHideTimer);
+      appTooltipHoldUntil = 0;
       const tooltip = appTooltipElement();
       if (!tooltip) return;
       tooltip.classList.add('hidden');
@@ -6337,9 +6340,11 @@
         showAppTooltip(target, { autoHide: 2600 });
       }, { capture: true, passive: true });
       document.addEventListener('pointerleave', event => {
+        if (Date.now() < appTooltipHoldUntil) return;
         if (resolveTooltipTarget(event.target) === appTooltipTarget) hideAppTooltip();
       }, true);
       document.addEventListener('mouseout', event => {
+        if (Date.now() < appTooltipHoldUntil) return;
         const target = resolveTooltipTarget(event.target);
         if (!target || target !== appTooltipTarget) return;
         if (event.relatedTarget && target.contains(event.relatedTarget)) return;
