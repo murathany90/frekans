@@ -8886,21 +8886,44 @@
       };
     }
 
-    function renderAnalysisResult(result) {
-      $('oscChartTitle').textContent = result.title;
-      $('analysisResultCards').innerHTML = result.cards.map(card => {
-        const normalized = Array.isArray(card)
-          ? { label: card[0], value: card[1], tooltip: card[3] || '' }
-          : card;
+    function normalizeAnalysisCard(card) {
+      if (Array.isArray(card)) {
+        return {
+          label: card[0] ?? '',
+          value: card[1] ?? '',
+          sub: card[2] ?? '',
+          tooltip: card[3] ?? ''
+        };
+      }
+      if (card && typeof card === 'object') {
+        return {
+          label: card.label ?? card.title ?? '',
+          value: card.value ?? '',
+          sub: card.sub ?? '',
+          tooltip: card.tooltip ?? card.help ?? '',
+          startSecond: card.startSecond,
+          endSecond: card.endSecond,
+          drilldownType: card.drilldownType
+        };
+      }
+      return { label: '', value: card ?? '', sub: '', tooltip: '' };
+    }
+
+    function renderAnalysisCards(result) {
+      const grid = $('analysisResultCards');
+      if (!grid) return;
+      grid.innerHTML = (result.cards || []).map(card => {
+        const normalized = normalizeAnalysisCard(card);
         const clickable = Number.isFinite(normalized.startSecond);
+        const endSecond = Number.isFinite(normalized.endSecond) ? normalized.endSecond : Number(normalized.startSecond) + 1;
         const attrs = [
           normalized.tooltip ? `tabindex="0" data-tooltip="${escapeHtml(normalized.tooltip)}" aria-label="${escapeHtml(`${normalized.label}: ${normalized.value}. ${normalized.tooltip}`)}"` : '',
-          clickable ? `data-start="${normalized.startSecond}" data-end="${normalized.endSecond}" data-drilldown-type="${normalized.drilldownType || ''}"` : ''
+          clickable ? `data-start="${normalized.startSecond}" data-end="${endSecond}" data-drilldown-type="${normalized.drilldownType || ''}"` : ''
         ].filter(Boolean).join(' ');
         const icon = normalized.tooltip ? '<span class="metric-info-icon" aria-hidden="true">&#9432;</span>' : '';
         return `<div class="analysis-result-card${clickable ? ' event-row' : ''}" ${attrs}><div class="label"><span class="metric-label">${escapeHtml(normalized.label)}</span>${icon}</div><div class="value">${escapeHtml(normalized.value)}</div></div>`;
       }).join('');
-      $('analysisResultCards').querySelectorAll('.event-row').forEach(card => card.addEventListener('click', () => {
+      grid.querySelectorAll('.event-row').forEach(card => card.addEventListener('click', () => {
         const range = result.chart?.range || { start: 0, end: 86400 };
         const eventStart = Number(card.dataset.start);
         const eventEnd = Number(card.dataset.end);
@@ -8915,6 +8938,19 @@
         }
         $('analysisMainChart')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }));
+    }
+
+    function heatmapRangeFromValue(value) {
+      if (!Array.isArray(value)) return null;
+      const startSecond = Number(value[3]);
+      const endSecond = Number(value[4]);
+      if (!Number.isFinite(startSecond) || !Number.isFinite(endSecond) || !(endSecond > startSecond)) return null;
+      return { startSecond, endSecond };
+    }
+
+    function renderAnalysisResult(result) {
+      $('oscChartTitle').textContent = result.title;
+      renderAnalysisCards(result);
       $('oscCountTag').textContent = result.type === 'stats' || result.type === 'events'
         ? t('statsBandViolationCount', { count: result.events.length })
         : t('findingsCount', { count: result.events.length });
@@ -9108,8 +9144,10 @@
         ]
       }, true);
       state.oscillationChart.on('click', params => {
-        if (params.seriesName !== t('qualityHeatmap') || !params.value) return;
-        showQualityDetailWindow(result, params.value[3], params.value[4]);
+        if (params.seriesName !== t('qualityHeatmap')) return;
+        const range = heatmapRangeFromValue(params.value);
+        if (!range) return;
+        showQualityDetailWindow(result, range.startSecond, range.endSecond);
         $('analysisMainChart').scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
     }
@@ -9293,6 +9331,7 @@
             return lines.join('<br>');
           }
           if (params.seriesType === 'heatmap') {
+            if (!Array.isArray(params.value)) return params.seriesName || '';
             const [, , ratio, startSecond, endSecond, label] = params.value;
             const qualityText = ratio < 0 ? t('qualityNoData') : percent(ratio);
             return `${t('qualityHeatmap')}<br>${label}<br>${t('qualityGood')}: ${qualityText}<br>${chartTimeLabel(startSecond, true)}-${chartTimeLabel(endSecond, true)}`;
@@ -9399,7 +9438,8 @@
             return lines.join('<br>');
           }
           if (params.seriesType === 'heatmap') {
-            const [, , rmsMhz, startSecond, endSecond, label, meanHz, meanDeviationMhz] = params.value || [];
+            if (!Array.isArray(params.value)) return params.seriesName || '';
+            const [, , rmsMhz, startSecond, endSecond, label, meanHz, meanDeviationMhz] = params.value;
             if (rmsMhz < 0) return `${t('statsHeatmap')}<br>${label}<br>${t('qualityNoData')}`;
             return [
               `<strong>${t('statsHeatmap')}</strong>`,
@@ -9580,8 +9620,10 @@
         series
       }, true);
       state.oscillationChart.on('click', params => {
-        if (params.seriesName !== t('statsHeatmap') || !params.value) return;
-        showStatsDetailWindow(result, params.value[3], params.value[4]);
+        if (params.seriesName !== t('statsHeatmap')) return;
+        const range = heatmapRangeFromValue(params.value);
+        if (!range) return;
+        showStatsDetailWindow(result, range.startSecond, range.endSecond);
         $('analysisMainChart').scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
     }
@@ -9740,7 +9782,8 @@
             ].join('<br>');
           }
           if (params.seriesType === 'heatmap') {
-            const [, , ratio, startSecond, endSecond, label, lowerSeconds, upperSeconds, violationSeconds, eventCount, maxExceedanceMhz] = params.value || [];
+            if (!Array.isArray(params.value)) return params.seriesName || '';
+            const [, , ratio, startSecond, endSecond, label, lowerSeconds, upperSeconds, violationSeconds, eventCount, maxExceedanceMhz] = params.value;
             if (ratio < 0) return `${t('bandViolationHeatmap')}<br>${label}<br>${t('qualityNoData')}`;
             return [
               `<strong>${t('bandViolationHeatmap')}</strong>`,
@@ -9863,8 +9906,10 @@
         series
       }, true);
       state.oscillationChart.on('click', params => {
-        if (params.seriesName !== t('bandViolationHeatmap') || !params.value) return;
-        showBandViolationDetailWindow(result, params.value[3], params.value[4]);
+        if (params.seriesName !== t('bandViolationHeatmap')) return;
+        const range = heatmapRangeFromValue(params.value);
+        if (!range) return;
+        showBandViolationDetailWindow(result, range.startSecond, range.endSecond);
         $('analysisMainChart').scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
     }
@@ -10057,7 +10102,7 @@
         methodology: t('methodOscillation'),
         limitations: t('limitOscillation')
       };
-      $('analysisResultCards').innerHTML = result.cards.map(([label, value]) => `<div class="analysis-result-card"><div class="label">${label}</div><div class="value">${value}</div></div>`).join('');
+      renderAnalysisCards(result);
       return result;
     }
 
@@ -10168,7 +10213,7 @@
           <p><strong>${result.title}</strong> • ${displayDate(state.current?.date)} • ${result.metadata.generatedAt}</p>
           <p>${result.description || ''}</p>
         </section>
-        ${parts.has('summary') ? `<section class="print-section"><h3>${text.summary}</h3><ul>${result.cards.map(([label, value]) => `<li>${label}: ${value}</li>`).join('')}</ul>${reportTableHtml(result)}</section>` : ''}
+        ${parts.has('summary') ? `<section class="print-section"><h3>${text.summary}</h3><ul>${(result.cards || []).map(normalizeAnalysisCard).map(card => `<li>${escapeHtml(card.label)}: ${escapeHtml(card.value)}</li>`).join('')}</ul>${reportTableHtml(result)}</section>` : ''}
         ${parts.has('quality') ? `<section class="print-section"><h3>${text.quality}</h3><p>${trt('qualityCoverage')}: ${percent(1 - (result.metadata?.sampling?.missingRatio || 0))}</p><p>${samplingReportText(result.metadata?.sampling)}</p></section>` : ''}
         ${parts.has('methodology') ? `<section class="print-section"><h3>${text.method}</h3><p>${result.methodology}</p></section>` : ''}
         ${parts.has('limitations') ? `<section class="print-section"><h3>${text.limits}</h3><p>${result.limitations || trt('reportLimitations')}</p></section>` : ''}
@@ -10203,7 +10248,20 @@
     function exportAnalysisCsv() {
       const result = state.analysis.lastResult;
       if (!result) return;
-      const rows = [['start', 'end', 'type', 'value', 'classification'], ...result.events.map(event => [event.start, event.end, event.type, event.value, event.classification])];
+      const columns = result.tableColumns || analysisDefinition(result.type).tableColumns || [];
+      const tableRows = result.tableRows || [];
+      const rows = columns.length && tableRows.length
+        ? [
+            columns.map(column => t(column.labelKey)),
+            ...tableRows.map(row => columns.map(column => formatTableCell(row[column.key])))
+          ]
+        : [['start', 'end', 'type', 'value', 'classification'], ...(result.events || []).map(event => [
+            event.start ?? event.startSecond ?? '',
+            event.end ?? event.endSecond ?? '',
+            event.type ?? event.eventType ?? '',
+            event.value ?? event.extremeHz ?? '',
+            event.classification ?? event.eventLabel ?? ''
+          ])];
       downloadBlob('analysis-events.csv', rows.map(row => row.map(cell => `"${String(cell ?? '').replace(/"/g, '""')}"`).join(',')).join('\n'), 'text/csv');
     }
 

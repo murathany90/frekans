@@ -42,5 +42,13 @@ assert.doesNotMatch(core, /bandMinHz\s*=\s*49\.95/, "Old 49.95 Hz lower band fal
 assert.doesNotMatch(core, /bandMaxHz\s*=\s*50\.05/, "Old 50.05 Hz upper band fallback should be gone.");
 assert.match(html, /bandViolationHeatmap/, "Band violation heatmap i18n/rendering hooks should exist.");
 assert.match(html, /bandViolationExceedanceHelp/, "Event table technical tooltip text should exist.");
+assert.match(html, /function normalizeAnalysisCard\s*\(/, "Analysis cards should be normalized through one shared helper.");
+assert.doesNotMatch(
+  html,
+  /renderReportPreview[\s\S]*?result\.cards\.map\(\(\[label,\s*value\]\)/,
+  "Report preview must not destructure analysis cards as tuples only."
+);
+assert.match(html, /Array\.isArray\(params\.value\)/, "Heatmap tooltip/click handlers should guard params.value before destructuring.");
+assert.match(html, /event\.startSecond[\s\S]*event\.endSecond/, "Analysis CSV export should support event startSecond/endSecond fields.");
 
 console.log("Band violation static checks passed.");
