@@ -2363,8 +2363,8 @@
             <div class="field" data-param-key="window"><label for="analysisEndHour" data-i18n="endHourLabel">Bitiş saati</label><input id="analysisEndHour" type="time" value="23:59" /></div>
             <div class="field" data-param-key="resolution"><label for="analysisResolution" data-i18n="resolutionLabel">Çözünürlük</label><select id="analysisResolution"><option value="auto" data-i18n="resolutionAuto">Otomatik</option><option value="1s" data-i18n="resolutionSecond">Saniyelik</option><option value="10s" data-i18n="resolution10s">10 saniyelik</option><option value="1m" data-i18n="resolutionMinute">Dakikalık</option><option value="1h" data-i18n="resolutionHour">Saatlik</option></select></div>
             <div class="field" data-param-key="alignment"><label for="analysisAlignment" data-i18n="alignmentLabel">Zaman eşleştirme</label><select id="analysisAlignment"><option value="utcAuto" data-i18n="utcAuto">UTC - otomatik</option><option value="sameLocal" data-i18n="sameLocal">Aynı yerel saat</option><option value="manual" data-i18n="manualOption">Manuel</option></select></div>
-            <div class="field" data-param-key="statsBand"><label for="statsBandMinHz" data-i18n="statsBandMinLabel">İstatistik alt bandı (Hz)</label><input id="statsBandMinHz" type="number" min="49" max="51" step="0.001" value="49.95" /></div>
-            <div class="field" data-param-key="statsBand"><label for="statsBandMaxHz" data-i18n="statsBandMaxLabel">İstatistik üst bandı (Hz)</label><input id="statsBandMaxHz" type="number" min="49" max="51" step="0.001" value="50.05" /></div>
+            <div class="field" data-param-key="statsBand"><label for="statsBandMinHz" data-i18n="statsBandMinLabel">İstatistik alt bandı (Hz)</label><input id="statsBandMinHz" type="number" min="49" max="51" step="0.001" value="49.90" /></div>
+            <div class="field" data-param-key="statsBand"><label for="statsBandMaxHz" data-i18n="statsBandMaxLabel">İstatistik üst bandı (Hz)</label><input id="statsBandMaxHz" type="number" min="49" max="51" step="0.001" value="50.10" /></div>
             <div class="field" data-param-key="band"><label for="bandMin" data-i18n="bandMinLabel">Alt bant (Hz)</label><input id="bandMin" type="number" min="0.01" max="0.45" step="0.01" value="0.10" /></div>
             <div class="field" data-param-key="band"><label for="bandMax" data-i18n="bandMaxLabel">Üst bant (Hz)</label><input id="bandMax" type="number" min="0.02" max="0.49" step="0.01" value="0.20" /></div>
             <div class="field" data-param-key="threshold"><label for="oscThreshold" data-i18n="oscThresholdLabel">Eşik (mHz)</label><input id="oscThreshold" type="number" min="0.1" max="200" step="0.5" value="10" /></div>
@@ -3073,8 +3073,8 @@
       chartStepSeconds: 5,
       bandMin: 0.10,
       bandMax: 0.20,
-      statsBandMinHz: 49.95,
-      statsBandMaxHz: 50.05,
+      statsBandMinHz: 49.90,
+      statsBandMaxHz: 50.10,
       thresholdMhz: 10,
       windowSec: 120,
       stepSec: 10,
@@ -3146,6 +3146,7 @@
     const RESOLUTION_SECONDS = { '1s': 1, '10s': 10, '1m': 60, '1h': 3600 };
     const ANALYSIS_BASE_PARAMS = ['date', 'resolution', 'alignment'];
     const QUALITY_DATE_MODES = new Set(['single', 'range']);
+    const LIMITED_DATE_MODE_ANALYSES = new Set(['quality', 'stats']);
     const analysisRegistry = {
       quality: {
         labelKey: 'analysisQuality',
@@ -4207,7 +4208,10 @@
         updateAnalysisAvailability();
       });
       $('analysisDateSelect').addEventListener('change', () => updateUrlState({ date: $('analysisDateSelect').value }));
-      $('analysisDateMode').addEventListener('change', () => updateUrlState({ mode: $('analysisDateMode').value }));
+      $('analysisDateMode').addEventListener('change', () => {
+        updateAnalysisAvailability();
+        updateUrlState({ mode: $('analysisDateMode').value });
+      });
       $('analysisStartDate').addEventListener('change', () => updateUrlState({ start: $('analysisStartDate').value }));
       $('analysisEndDate').addEventListener('change', () => updateUrlState({ end: $('analysisEndDate').value }));
       $('analysisTypeSelect').addEventListener('change', () => {
@@ -5241,11 +5245,14 @@
       const base = reportDatesForAnalysisSource(source, type);
       const dates = (base.length ? base : reportDatesForCurrentMode()).sort();
       const selected = $('analysisDateSelect').value || dates.at(-1) || latestCommonDate();
-      const mode = $('analysisDateMode')?.value || 'single';
+      const limitedDateMode = type === 'quality' || type === 'stats';
+      const requestedMode = $('analysisDateMode')?.value || 'single';
+      const mode = limitedDateMode && !QUALITY_DATE_MODES.has(requestedMode) ? 'single' : requestedMode;
       if (!selected) return [];
       if (mode === 'range') {
-        const start = $('analysisStartDate').value || selected;
-        const end = $('analysisEndDate').value || selected;
+        const rangeFallback = limitedDateMode ? (dates.at(-1) || latestCommonDate() || selected) : selected;
+        const start = $('analysisStartDate').value || rangeFallback;
+        const end = $('analysisEndDate').value || rangeFallback;
         return dates.filter(date => date >= start && date <= end);
       }
       if (mode === 'last7' || mode === 'last30') {
@@ -6593,20 +6600,51 @@
     }
 
     function updateQualityControlVisibility() {
-      const isQuality = $('analysisTypeSelect')?.value === 'quality';
+      const type = $('analysisTypeSelect')?.value || 'stats';
+      const hasLimitedDateModes = LIMITED_DATE_MODE_ANALYSES.has(type);
       const modeSelect = $('analysisDateMode');
       if (!modeSelect) return;
       [...modeSelect.options].forEach(option => {
-        const allowed = !isQuality || QUALITY_DATE_MODES.has(option.value);
+        const allowed = !hasLimitedDateModes || QUALITY_DATE_MODES.has(option.value);
         option.hidden = !allowed;
         option.disabled = !allowed;
       });
-      if (isQuality && !QUALITY_DATE_MODES.has(modeSelect.value)) {
+      if (hasLimitedDateModes && !QUALITY_DATE_MODES.has(modeSelect.value)) {
         modeSelect.value = 'single';
       }
-      if (isQuality && $('analysisResolution')) {
+      if (hasLimitedDateModes && $('analysisResolution')) {
         $('analysisResolution').value = 'auto';
       }
+      syncAnalysisDateControlState();
+    }
+
+    function syncAnalysisDateControlState() {
+      const type = $('analysisTypeSelect')?.value || 'stats';
+      const modeSelect = $('analysisDateMode');
+      if (!modeSelect) return;
+      const hasLimitedDateModes = LIMITED_DATE_MODE_ANALYSES.has(type);
+      const isRangeMode = hasLimitedDateModes && modeSelect.value === 'range';
+      const dateModeField = modeSelect.closest('.field');
+      const dateControlsVisible = !dateModeField?.hidden;
+      const start = $('analysisStartDate');
+      const end = $('analysisEndDate');
+      [start, end].forEach(input => {
+        if (!input) return;
+        const field = input.closest('.field');
+        if (field) {
+          field.hidden = dateControlsVisible && hasLimitedDateModes ? !isRangeMode : field.hidden;
+        }
+        input.disabled = dateControlsVisible && hasLimitedDateModes ? !isRangeMode : false;
+      });
+      const mainDateDisabled = Boolean(dateControlsVisible && isRangeMode);
+      const analysisDateField = document.querySelector('.analysis-date-field');
+      analysisDateField?.classList.toggle('is-passive', mainDateDisabled);
+      analysisDateField?.setAttribute('aria-disabled', mainDateDisabled ? 'true' : 'false');
+      ['analysisCalToggle', 'analysisPrevDayBtn', 'analysisNextDayBtn', 'copyDailyDateBtn'].forEach(id => {
+        const control = $(id);
+        if (control) control.disabled = mainDateDisabled;
+      });
+      if ($('analysisDateSelect')) $('analysisDateSelect').disabled = mainDateDisabled;
     }
 
     function resolveAnalysisResolution(type, selectedResolution = 'auto') {
@@ -7662,13 +7700,13 @@
     }
 
     function statsBandBounds() {
-      const fallbackMin = Number(state.settings.statsBandMinHz ?? 49.95);
-      const fallbackMax = Number(state.settings.statsBandMaxHz ?? 50.05);
+      const fallbackMin = Number(state.settings.statsBandMinHz ?? 49.90);
+      const fallbackMax = Number(state.settings.statsBandMaxHz ?? 50.10);
       let min = Number($('statsBandMinHz')?.value ?? fallbackMin);
       let max = Number($('statsBandMaxHz')?.value ?? fallbackMax);
-      if (!Number.isFinite(min)) min = 49.95;
-      if (!Number.isFinite(max)) max = 50.05;
-      if (!(max > min)) return { min: 49.95, max: 50.05 };
+      if (!Number.isFinite(min)) min = 49.90;
+      if (!Number.isFinite(max)) max = 50.10;
+      if (!(max > min)) return { min: 49.90, max: 50.10 };
       return { min, max };
     }
 
@@ -9257,7 +9295,7 @@
           alignment: $('analysisAlignment')?.value || state.settings.alignmentMode,
           resolution: (type === 'quality' || type === 'stats') ? '1s' : ($('analysisResolution')?.value || 'auto'),
           bandHz: type === 'stats'
-            ? [Number($('statsBandMinHz')?.value || 49.95), Number($('statsBandMaxHz')?.value || 50.05)]
+            ? [Number($('statsBandMinHz')?.value || 49.90), Number($('statsBandMaxHz')?.value || 50.10)]
             : [Number($('bandMin').value), Number($('bandMax').value)]
         },
         sampling,
@@ -9448,6 +9486,12 @@
         if (!Number.isFinite(Number(saved.repeatedValueSeconds)) && Number.isFinite(Number(saved.stuckValueSeconds))) {
           merged.repeatedValueSeconds = Number(saved.stuckValueSeconds);
         }
+        if (!Number.isFinite(Number(saved.statsBandMinHz)) || Number(saved.statsBandMinHz) === 49.95) {
+          merged.statsBandMinHz = DEFAULT_SETTINGS.statsBandMinHz;
+        }
+        if (!Number.isFinite(Number(saved.statsBandMaxHz)) || Number(saved.statsBandMaxHz) === 50.05) {
+          merged.statsBandMaxHz = DEFAULT_SETTINGS.statsBandMaxHz;
+        }
         return merged;
       } catch { return { ...DEFAULT_SETTINGS }; }
     }
@@ -9476,8 +9520,8 @@
       $('diffAxisMax').value = s.diffAxisMax;
       $('bandMin').value = s.bandMin;
       $('bandMax').value = s.bandMax;
-      if ($('statsBandMinHz')) $('statsBandMinHz').value = s.statsBandMinHz ?? 49.95;
-      if ($('statsBandMaxHz')) $('statsBandMaxHz').value = s.statsBandMaxHz ?? 50.05;
+      if ($('statsBandMinHz')) $('statsBandMinHz').value = s.statsBandMinHz ?? 49.90;
+      if ($('statsBandMaxHz')) $('statsBandMaxHz').value = s.statsBandMaxHz ?? 50.10;
       $('oscThreshold').value = s.thresholdMhz;
       $('windowSec').value = s.windowSec;
       $('stepSec').value = s.stepSec;
@@ -9512,8 +9556,8 @@
         diffAxisMax: Number($('diffAxisMax').value),
         bandMin: Number($('bandMin').value),
         bandMax: Number($('bandMax').value),
-        statsBandMinHz: Number($('statsBandMinHz')?.value || 49.95),
-        statsBandMaxHz: Number($('statsBandMaxHz')?.value || 50.05),
+        statsBandMinHz: Number($('statsBandMinHz')?.value || 49.90),
+        statsBandMaxHz: Number($('statsBandMaxHz')?.value || 50.10),
         thresholdMhz: Number($('oscThreshold').value),
         windowSec: Number($('windowSec').value),
         stepSec: Number($('stepSec').value),
@@ -10789,7 +10833,7 @@
         statsHelpPercentile: 'Good Quality örneklerin yüzdelik değeri; P95 örneklerin yüzde 95inin bu değerin altında olduğunu gösterir.',
         statsHelpSkewness: 'Dağılımın sağa veya sola asimetrisini gösterir.',
         statsHelpKurtosis: 'Dağılım kuyruklarının normal dağılıma göre fazlalığını gösterir.',
-        statsHelpInBand: 'Good Quality örneklerin 49.95-50.05 Hz istatistik bandı içinde kalan oranı.',
+        statsHelpInBand: 'Good Quality örneklerin 49.90-50.10 Hz istatistik bandı içinde kalan oranı.',
         statsHelpOutOfBand: 'Good Quality örneklerin istatistik bandı dışında kaldığı toplam süre.',
         statsHelpBandViolationDuration: 'Alt veya üst istatistik bandı ihlalinde geçen toplam süre.',
         statsHelpBandViolationEvents: 'Kesintisiz alt/üst bant ihlali aralıklarının olay sayısı.',
@@ -11163,7 +11207,7 @@
         statsHelpPercentile: 'Percentile of Good Quality samples; P95 means 95 percent of samples are below this value.',
         statsHelpSkewness: 'Asymmetry of the distribution to the left or right.',
         statsHelpKurtosis: 'Excess tail weight compared with a normal distribution.',
-        statsHelpInBand: 'Share of Good Quality samples inside the 49.95-50.05 Hz statistics band.',
+        statsHelpInBand: 'Share of Good Quality samples inside the 49.90-50.10 Hz statistics band.',
         statsHelpOutOfBand: 'Total time Good Quality samples spend outside the statistics band.',
         statsHelpBandViolationDuration: 'Total time spent in lower or upper statistics-band violation.',
         statsHelpBandViolationEvents: 'Count of continuous lower/upper band violation intervals.',

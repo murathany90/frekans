@@ -30,27 +30,73 @@ try {
 
   const controls = await page.evaluate(() => {
     updateAnalysisAvailability();
+    const visibleDateModes = [...document.querySelector("#analysisDateMode").options]
+      .filter(option => !option.hidden && !option.disabled)
+      .map(option => option.value);
     return {
       resolutionHidden: document.querySelector('[data-param-key="resolution"]')?.hidden,
       statsBandVisible: document.querySelector('[data-param-key="statsBand"]')?.hidden === false,
       ydVisible: document.querySelector('[data-param-key="yd"]')?.hidden === false,
-      lower: document.querySelector("#statsBandMinHz")?.value,
-      upper: document.querySelector("#statsBandMaxHz")?.value,
-      ydThreshold: document.querySelector("#repeatedValueSeconds")?.value
+      lower: Number(document.querySelector("#statsBandMinHz")?.value),
+      upper: Number(document.querySelector("#statsBandMaxHz")?.value),
+      ydThreshold: document.querySelector("#repeatedValueSeconds")?.value,
+      dateMode: document.querySelector("#analysisDateMode")?.value,
+      visibleDateModes,
+      singleMainDateDisabled: document.querySelector("#analysisCalToggle")?.disabled,
+      singleStartHidden: document.querySelector("#analysisStartDate")?.closest(".field")?.hidden,
+      singleEndHidden: document.querySelector("#analysisEndDate")?.closest(".field")?.hidden
     };
   });
-  if (!controls.resolutionHidden || !controls.statsBandVisible || !controls.ydVisible || controls.lower !== "49.95" || controls.upper !== "50.05" || controls.ydThreshold !== "15") {
+  if (!controls.resolutionHidden || !controls.statsBandVisible || !controls.ydVisible || controls.lower !== 49.90 || controls.upper !== 50.10 || controls.ydThreshold !== "15") {
     throw new Error(`Basic Stats controls are not scoped correctly: ${JSON.stringify(controls)}`);
+  }
+  if (controls.dateMode !== "single" || controls.visibleDateModes.join(",") !== "single,range" || controls.singleMainDateDisabled || !controls.singleStartHidden || !controls.singleEndHidden) {
+    throw new Error(`Basic Stats date-mode defaults are wrong: ${JSON.stringify(controls)}`);
+  }
+
+  const dateModeBehavior = await page.evaluate(() => {
+    state.dataMode = "manual";
+    state.tr = new Map([
+      ["2026-01-01", {}],
+      ["2026-01-02", {}],
+      ["2026-01-03", {}],
+      ["2026-01-04", {}]
+    ]);
+    document.querySelector("#analysisDateSelect").value = "2026-01-04";
+    document.querySelector("#analysisStartDate").value = "2026-01-02";
+    document.querySelector("#analysisEndDate").value = "2026-01-03";
+    document.querySelector("#analysisDateMode").value = "range";
+    updateAnalysisAvailability();
+    const rangeDates = resolveAnalysisDates("tr", "stats");
+    const rangeControls = {
+      mainDateDisabled: document.querySelector("#analysisCalToggle")?.disabled,
+      prevDisabled: document.querySelector("#analysisPrevDayBtn")?.disabled,
+      nextDisabled: document.querySelector("#analysisNextDayBtn")?.disabled,
+      startDisabled: document.querySelector("#analysisStartDate")?.disabled,
+      endDisabled: document.querySelector("#analysisEndDate")?.disabled,
+      startHidden: document.querySelector("#analysisStartDate")?.closest(".field")?.hidden,
+      endHidden: document.querySelector("#analysisEndDate")?.closest(".field")?.hidden
+    };
+    document.querySelector("#analysisDateMode").value = "single";
+    updateAnalysisAvailability();
+    const singleDates = resolveAnalysisDates("tr", "stats");
+    return { rangeDates, singleDates, rangeControls };
+  });
+  if (dateModeBehavior.rangeDates.join(",") !== "2026-01-02,2026-01-03" || dateModeBehavior.singleDates.join(",") !== "2026-01-04") {
+    throw new Error(`Basic Stats date resolution leaked passive date values: ${JSON.stringify(dateModeBehavior)}`);
+  }
+  if (!dateModeBehavior.rangeControls.mainDateDisabled || !dateModeBehavior.rangeControls.prevDisabled || !dateModeBehavior.rangeControls.nextDisabled || dateModeBehavior.rangeControls.startDisabled || dateModeBehavior.rangeControls.endDisabled || dateModeBehavior.rangeControls.startHidden || dateModeBehavior.rangeControls.endHidden) {
+    throw new Error(`Basic Stats range controls are not active/passive correctly: ${JSON.stringify(dateModeBehavior.rangeControls)}`);
   }
 
   const synthetic = await page.evaluate(() => {
     document.querySelector("#analysisTypeSelect").value = "stats";
-    document.querySelector("#statsBandMinHz").value = "49.95";
-    document.querySelector("#statsBandMaxHz").value = "50.05";
+    document.querySelector("#statsBandMinHz").value = "49.90";
+    document.querySelector("#statsBandMaxHz").value = "50.10";
     document.querySelector("#repeatedValueSeconds").value = "15";
     const series = Array.from({ length: 3600 }, (_, second) => 50 + Math.sin(second / 80) * 0.002);
-    series[300] = 49.94;
-    series[600] = 50.08;
+    series[300] = 49.89;
+    series[600] = 50.12;
     for (let second = 1000; second < 1010; second += 1) series[second] = NaN;
     series[1200] = 52;
     for (let second = 1500; second < 1515; second += 1) series[second] = 50.001;
