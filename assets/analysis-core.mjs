@@ -41,7 +41,9 @@ export function analyzeDataQuality(timestamps, values, {
   endSecond = null,
   validMinHz = 49,
   validMaxHz = 51,
-  stuckThresholdSeconds = 5
+  repeatedValueThresholdSeconds = 10,
+  stuckThresholdSeconds = null,
+  nonFiniteAsMissing = false
 } = {}) {
   const n = values?.length || 0;
   const intervalSeconds = Math.max(1e-9, Number(expectedIntervalSeconds) || 1);
@@ -84,8 +86,10 @@ export function analyzeDataQuality(timestamps, values, {
     const canonicalSecond = windowStart + index * intervalSeconds;
     if (index < 0 || index >= expectedCount || Math.abs(ts - canonicalSecond) > intervalSeconds / 2) continue;
 
-    const value = Number(values[i]);
-    const finiteValue = Number.isFinite(value);
+    const rawValue = values[i];
+    const value = Number(rawValue);
+    const finiteValue = Number.isFinite(value) && !(typeof rawValue === "string" && rawValue.trim() === "");
+    const presentSample = finiteValue || (hasTimestamps && !nonFiniteAsMissing);
     const validValue = finiteValue && value >= validMinHz && value <= validMaxHz;
     const duplicate = observedMask[index];
     if (duplicate) {
@@ -99,8 +103,10 @@ export function analyzeDataQuality(timestamps, values, {
         classification: "Duplicate Timestamp"
       });
     }
-    if (finiteValue) {
+    if (presentSample) {
       observedMask[index] = true;
+    }
+    if (finiteValue) {
       if (previousInputValue !== null && Number.isFinite(previousInputValue) && Math.abs(value - previousInputValue) > 0.08) jumpCount += 1;
       previousInputValue = value;
     }
@@ -110,7 +116,7 @@ export function analyzeDataQuality(timestamps, values, {
         canonicalValues[index] = value;
         validMask[index] = true;
       }
-    } else if (finiteValue) {
+    } else if (presentSample) {
       invalidCount += 1;
       invalidMask[index] = true;
     }
@@ -122,8 +128,9 @@ export function analyzeDataQuality(timestamps, values, {
   const missingCount = missingEvents.reduce((sum, event) => sum + Math.round(event.durationSeconds / intervalSeconds), 0);
   const longestGapSeconds = missingEvents.reduce((max, event) => Math.max(max, event.durationSeconds), 0);
 
-  const stuckEvents = [];
-  const stuckThreshold = Math.max(intervalSeconds, Number(stuckThresholdSeconds) || 5);
+  const repeatedValueEvents = [];
+  const thresholdOption = repeatedValueThresholdSeconds ?? stuckThresholdSeconds ?? 10;
+  const repeatedThreshold = Math.max(intervalSeconds, Number(thresholdOption) || 10);
   let runStart = -1;
   let runValue = null;
   for (let i = 0; i <= expectedCount; i += 1) {
@@ -132,15 +139,15 @@ export function analyzeDataQuality(timestamps, values, {
     if (continues) continue;
     if (runStart >= 0) {
       const durationSeconds = (i - runStart) * intervalSeconds;
-      if (durationSeconds >= stuckThreshold) {
+      if (durationSeconds >= repeatedThreshold) {
         for (let j = runStart; j < i; j += 1) stuckMask[j] = true;
-        stuckEvents.push({
-          type: "stuck",
+        repeatedValueEvents.push({
+          type: "repeated",
           startSecond: windowStart + runStart * intervalSeconds,
           endSecond: windowStart + i * intervalSeconds,
           durationSeconds,
           value: runValue,
-          classification: "Bad Quality - Stuck Value"
+          classification: "Bad Quality - Repeated Value"
         });
       }
     }
@@ -159,9 +166,9 @@ export function analyzeDataQuality(timestamps, values, {
   const goodQualityCount = goodMask.reduce((sum, item) => sum + (item ? 1 : 0), 0);
   const coverageRatio = expectedCount ? Math.min(1, uniqueValidCount / expectedCount) : 0;
   const goodQualityRatio = expectedCount ? Math.min(1, goodQualityCount / expectedCount) : 0;
-  const totalStuckSeconds = stuckEvents.reduce((sum, event) => sum + event.durationSeconds, 0);
-  const longestStuckSeconds = stuckEvents.reduce((max, event) => Math.max(max, event.durationSeconds), 0);
-  const qualityEvents = [...missingEvents, ...invalidEvents, ...duplicateEvents, ...stuckEvents]
+  const totalRepeatedValueSeconds = repeatedValueEvents.reduce((sum, event) => sum + event.durationSeconds, 0);
+  const longestRepeatedValueSeconds = repeatedValueEvents.reduce((max, event) => Math.max(max, event.durationSeconds), 0);
+  const qualityEvents = [...missingEvents, ...invalidEvents, ...duplicateEvents, ...repeatedValueEvents]
     .sort((a, b) => a.startSecond - b.startSecond || a.endSecond - b.endSecond);
 
   return {
@@ -180,10 +187,15 @@ export function analyzeDataQuality(timestamps, values, {
     longestGapSeconds,
     gapEventCount,
     shortGapCount: gapEventCount,
-    stuckValueEventCount: stuckEvents.length,
-    totalStuckSeconds,
-    longestStuckSeconds,
-    stuckSeconds: longestStuckSeconds,
+    repeatedValueEventCount: repeatedValueEvents.length,
+    totalRepeatedValueSeconds,
+    longestRepeatedValueSeconds,
+    repeatedValueSeconds: longestRepeatedValueSeconds,
+    repeatedValueEvents,
+    stuckValueEventCount: repeatedValueEvents.length,
+    totalStuckSeconds: totalRepeatedValueSeconds,
+    longestStuckSeconds: longestRepeatedValueSeconds,
+    stuckSeconds: longestRepeatedValueSeconds,
     jumpCount,
     firstTimestamp,
     lastTimestamp,
@@ -195,7 +207,7 @@ export function analyzeDataQuality(timestamps, values, {
     missingEvents,
     invalidEvents,
     duplicateEvents,
-    stuckEvents,
+    stuckEvents: repeatedValueEvents,
     qualityEvents,
     canonical: {
       startSecond: windowStart,

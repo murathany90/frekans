@@ -58,7 +58,7 @@ if (!(confidence.score > 0 && confidence.score < 75)) {
 }
 
 const withGap = createSyntheticSignal({ seconds: 120, oscillationHz: 0.12, amplitudeMhz: 20, gaps: [[40, 70]] });
-const quality = analyzeDataQuality(withGap.timestamps, withGap.values, { expectedIntervalSeconds: 1 });
+const quality = analyzeDataQuality(withGap.timestamps, withGap.values, { expectedIntervalSeconds: 1, nonFiniteAsMissing: true });
 if (quality.longestGapSeconds < 30 || quality.missingCount < 30) {
   throw new Error("data quality analysis did not detect the 30-second gap");
 }

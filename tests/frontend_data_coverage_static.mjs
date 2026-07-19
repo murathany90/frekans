@@ -17,9 +17,26 @@ assert.match(html, /Türkiye & Kıta Avrupası \(Çift Seri\)/, "Turkish dual-se
 assert.match(html, /Türkiye & Continental Europe \(Dual Series\)/, "English dual-series label is updated");
 assert.match(html, /Kıta Avrupası \(CE\)/, "Turkish CE source label is explicit");
 assert.match(html, /Continental Europe \(CE\)/, "English CE source label is explicit");
-assert.match(html, /Bad Quality - Stuck Value/, "stuck-value classification is exposed for charts and tests");
-assert.match(core, /stuckThresholdSeconds\s*=\s*5/, "stuck-value threshold defaults to 5 seconds");
+assert.doesNotMatch(html, /Stuck Value|stuck-value|stuck duration/i, "Data Coverage UI must use YD/RV terminology, not Stuck Value");
+assert.match(html, /YD \/|RV \/ Repeated Value/, "YD/RV terminology is translated");
+assert.match(html, /qualityRepeatedEvents/, "repeated consecutive frequency count metric is translated");
+assert.match(html, /qualityRepeatedThresholdLabel/, "repeated-value threshold is available in the advanced panel");
+assert.match(html, /data-param-key=["']yd["']/, "Data Coverage advanced controls expose a YD/RV threshold field");
+assert.match(core, /repeatedValueThresholdSeconds\s*=\s*10/, "repeated-value threshold defaults to 10 seconds");
 assert.match(core, /uniqueValidCount/, "coverage is based on unique valid timestamps");
+assert.match(core, /repeatedValueEventCount/, "repeated-value event count is event-based");
+assert.match(html, /function updateQualityControlVisibility\(/, "Data Coverage has dedicated control visibility rules");
+assert.match(html, /QUALITY_DATE_MODES/, "Data Coverage restricts date modes to single/range");
+assert.match(html, /function qualityDisplayBucketSeconds\(/, "Data Coverage chooses display resolution automatically");
+assert.match(html, /function buildQualitySecondWindowSeries\(/, "Heatmap click can show second-level detail data");
+assert.match(html, /showQualityDetailWindow\(/, "Data Coverage table and heatmap clicks use second-level zoom");
+assert.match(html, /visualMap:[\s\S]*#1f9d55/, "heatmap uses green for 100% quality");
+assert.match(html, /visualMap:[\s\S]*#facc15[\s\S]*#f97316[\s\S]*#dc2626/, "heatmap uses yellow-orange-red as quality drops");
+assert.match(html, /visualMap:[\s\S]*#d1d5db/, "heatmap uses grey for no-data cells");
+assert.match(html, /days:\s*dailyResults\.map\(item => displayDate\(item\.date\)\)/, "range heatmap includes all selected days");
+
+const qualityMinMaxEnabled = /buildQualityFrequencySummary\([^)]*\{[^}]*showMinMax:\s*true/.test(html);
+assert.equal(qualityMinMaxEnabled, false, "Data Coverage main frequency graph must not show min/max lines");
 
 const legacyQualityBranch = /if\s*\(type\s*===\s*['"]quality['"]\)\s*\{[\s\S]{0,1200}?sampleSeries\(series,\s*60,\s*sampleIntervalSeconds\)/.test(html);
 assert.equal(legacyQualityBranch, false, "quality KPI/chart path must not reuse resolution-dependent sampled series");

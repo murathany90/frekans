@@ -62,7 +62,26 @@ try {
   if (!/Veri kapsama|koherens|rnekleme|Nyquist/i.test(infoText || "")) {
     throw new Error(`Analysis info panel does not contain moved guidance: ${infoText}`);
   }
+  const qualityControls = await page.evaluate(() => ({
+    resolutionHidden: document.querySelector('[data-param-key="resolution"]')?.hidden,
+    ydHidden: document.querySelector('[data-param-key="yd"]')?.hidden,
+    visibleDateModes: [...document.querySelectorAll("#analysisDateMode option")]
+      .filter(option => !option.hidden && !option.disabled)
+      .map(option => option.value),
+    threshold: document.querySelector("#repeatedValueSeconds")?.value
+  }));
+  if (!qualityControls.resolutionHidden || qualityControls.ydHidden || qualityControls.threshold !== "10" || qualityControls.visibleDateModes.join(",") !== "single,range") {
+    throw new Error(`Data Coverage controls are not scoped correctly: ${JSON.stringify(qualityControls)}`);
+  }
 
+  await page.locator(".analysis-advanced-panel").evaluate(details => {
+    details.open = true;
+  });
+  await page.waitForFunction(() => {
+    const input = document.querySelector("#repeatedValueSeconds");
+    return input && input.offsetParent !== null;
+  });
+  await page.fill("#repeatedValueSeconds", "2");
   await page.click("#analysisRunBtn");
   await page.waitForFunction(() => document.querySelectorAll("#analysisResultCards .analysis-result-card").length === 4, { timeout: 30000 });
   await page.waitForFunction(() => window.echarts?.getInstanceByDom(document.querySelector("#analysisMainChart"))?.getOption?.()?.series?.some(series => series.type === "heatmap"), { timeout: 20000 });
@@ -74,6 +93,7 @@ try {
       samplingMethod: state?.analysis?.sampling?.method,
       hasQualityClass: document.querySelector("#analysisMainChart")?.classList.contains("quality-chart"),
       seriesTypes: (option.series || []).map(series => series.type),
+      seriesNames: (option.series || []).map(series => series.name),
       tableRows: document.querySelectorAll("#analysisEventsBody tr").length,
       cardValues: [...document.querySelectorAll("#analysisResultCards .analysis-result-card .value")].map(node => node.textContent?.trim() || "")
     };
@@ -86,6 +106,56 @@ try {
   }
   if (!qualityState.cardValues.some(value => /%$/.test(value))) {
     throw new Error(`Data Coverage cards do not include percentage KPIs: ${JSON.stringify(qualityState)}`);
+  }
+  if (qualityState.seriesNames.some(name => /max|min/i.test(name || ""))) {
+    throw new Error(`Data Coverage graph must not show min/max series: ${JSON.stringify(qualityState.seriesNames)}`);
+  }
+
+  await page.evaluate(() => {
+    const chart = window.echarts.getInstanceByDom(document.querySelector("#analysisMainChart"));
+    const heatmap = chart.getOption().series.find(series => series.type === "heatmap");
+    const cell = (heatmap.data || []).find(item => item[2] >= 0) || heatmap.data[0];
+    showQualityDetailWindow(state.analysis.lastResult, cell[3], cell[4]);
+  });
+  await page.waitForFunction(() => window.echarts?.getInstanceByDom(document.querySelector("#analysisMainChart"))?.getOption?.()?.series?.some(series => /1s$/.test(series.name || "") && (series.data || []).length > 100), { timeout: 10000 });
+
+  const ydRows = await page.locator("#analysisEventsBody tr.event-row").count();
+  if (ydRows > 0) {
+    await page.locator("#analysisEventsBody tr.event-row").first().click();
+    await page.waitForFunction(() => window.echarts?.getInstanceByDom(document.querySelector("#analysisMainChart"))?.getOption?.()?.series?.some(series => /1s$/.test(series.name || "") && (series.data || []).length > 0), { timeout: 10000 });
+  }
+
+  const rangeCheck = await page.evaluate(async () => {
+    const dates = state.auto.manifest?.sources?.teias?.availableDates || [];
+    const selected = dates.slice(-Math.min(31, dates.length));
+    if (selected.length < 8) return { skipped: true, reason: "not enough dates" };
+    document.querySelector("#analysisDateMode").value = "range";
+    document.querySelector("#analysisStartDate").value = selected[0];
+    document.querySelector("#analysisEndDate").value = selected.at(-1);
+    document.querySelector("#repeatedValueSeconds").value = "10";
+    return { skipped: false, expectedDays: selected.length };
+  });
+  if (!rangeCheck.skipped) {
+    await page.click("#analysisRunBtn");
+    await page.waitForFunction(expectedDays => {
+      const chart = window.echarts?.getInstanceByDom(document.querySelector("#analysisMainChart"));
+      const option = chart?.getOption?.() || {};
+      const heatmap = (option.series || []).find(series => series.type === "heatmap");
+      return (option.yAxis?.[1]?.data || []).length === expectedDays && (heatmap?.data || []).length === expectedDays * 96;
+    }, rangeCheck.expectedDays, { timeout: 60000 });
+    const rangeState = await page.evaluate(() => {
+      const chart = window.echarts.getInstanceByDom(document.querySelector("#analysisMainChart"));
+      const option = chart.getOption();
+      const heatmap = (option.series || []).find(series => series.type === "heatmap");
+      return {
+        days: option.yAxis?.[1]?.data?.length || 0,
+        cells: heatmap?.data?.length || 0,
+        height: document.querySelector("#analysisMainChart")?.getBoundingClientRect().height || 0
+      };
+    });
+    if (rangeState.days !== rangeCheck.expectedDays || rangeState.cells !== rangeCheck.expectedDays * 96 || rangeState.height < 650) {
+      throw new Error(`Range heatmap did not include all selected days: ${JSON.stringify({ rangeCheck, rangeState })}`);
+    }
   }
 
   await page.click("#langToggle");

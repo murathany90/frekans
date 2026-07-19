@@ -42,7 +42,26 @@ assert.equal(invalid.missingCount, 0, "present invalid timestamps are not missin
 assertClose(invalid.coverageRatio, 0.5, "coverage excludes invalid timestamps");
 assertClose(invalid.goodQualityRatio, 0.5, "good quality excludes invalid timestamps");
 
-const stuck = analyzeDataQuality(
+const invalidPresentTimestamps = analyzeDataQuality(
+  [0, 1, 2, 3, 4],
+  [50, NaN, Infinity, "", 50.01],
+  { expectedIntervalSeconds: 1, startSecond: 0, endSecond: 5, validMinHz: 49, validMaxHz: 51 },
+);
+
+assert.equal(invalidPresentTimestamps.expectedCount, 5, "present bad-value timestamps are still expected samples");
+assert.equal(invalidPresentTimestamps.validCount, 2, "only physically valid samples count as valid");
+assert.equal(invalidPresentTimestamps.invalidCount, 3, "NaN, Infinity, empty/parse-bad values are invalid when timestamp is present");
+assert.equal(invalidPresentTimestamps.missingCount, 0, "present invalid timestamps must not be mixed with missing samples");
+
+const nineSecondRepeatedDefault = analyzeDataQuality(
+  Array.from({ length: 9 }, (_, index) => index),
+  Array.from({ length: 9 }, () => 50),
+  { expectedIntervalSeconds: 1, startSecond: 0, endSecond: 9, validMinHz: 49, validMaxHz: 51 },
+);
+
+assert.equal(nineSecondRepeatedDefault.repeatedValueEventCount, 0, "default repeated-value threshold is 10 seconds");
+
+const repeated = analyzeDataQuality(
   [0, 1, 2, 3, 4, 5, 6],
   [50, 50, 50, 50, 50, 50.01, 50.02],
   {
@@ -51,16 +70,33 @@ const stuck = analyzeDataQuality(
     endSecond: 7,
     validMinHz: 49,
     validMaxHz: 51,
-    stuckThresholdSeconds: 5,
+    repeatedValueThresholdSeconds: 5,
   },
 );
 
-assert.equal(stuck.stuckValueEventCount, 1, "5-second flat runs are stuck-value events");
-assert.equal(stuck.totalStuckSeconds, 5, "total stuck duration includes all seconds in the bad run");
-assert.equal(stuck.longestStuckSeconds, 5, "longest stuck duration is tracked separately");
-assertClose(stuck.coverageRatio, 1, "stuck values still count as covered data");
-assertClose(stuck.goodQualityRatio, 2 / 7, "stuck values are excluded from good quality data");
-assert.equal(stuck.stuckEvents[0].classification, "Bad Quality - Stuck Value");
+assert.equal(repeated.repeatedValueEventCount, 1, "5-second flat runs are repeated-value events when the threshold is set to 5");
+assert.equal(repeated.totalRepeatedValueSeconds, 5, "total repeated-value duration includes all seconds in the bad run");
+assert.equal(repeated.longestRepeatedValueSeconds, 5, "longest repeated-value duration is tracked separately");
+assertClose(repeated.coverageRatio, 1, "repeated values still count as covered data");
+assertClose(repeated.goodQualityRatio, 2 / 7, "repeated values are excluded from good quality data");
+assert.equal(repeated.repeatedValueEvents[0].type, "repeated");
+assert.equal(repeated.repeatedValueEvents[0].classification, "Bad Quality - Repeated Value");
+
+const repeatedFifteenSeconds = analyzeDataQuality(
+  Array.from({ length: 18 }, (_, index) => index),
+  [...Array.from({ length: 15 }, () => 49.99), 50.01, 50.02, 50.03],
+  {
+    expectedIntervalSeconds: 1,
+    startSecond: 0,
+    endSecond: 18,
+    validMinHz: 49,
+    validMaxHz: 51,
+    repeatedValueThresholdSeconds: 10,
+  },
+);
+
+assert.equal(repeatedFifteenSeconds.repeatedValueEventCount, 1, "a 15-second repeated run is one event, not 15 samples");
+assert.equal(repeatedFifteenSeconds.totalRepeatedValueSeconds, 15, "15-second repeated run duration is preserved");
 
 const duplicateAndStuck = analyzeDataQuality(
   [0, 1, 1, 2, 3, 4],
@@ -71,12 +107,12 @@ const duplicateAndStuck = analyzeDataQuality(
     endSecond: 5,
     validMinHz: 49,
     validMaxHz: 51,
-    stuckThresholdSeconds: 5,
+    repeatedValueThresholdSeconds: 5,
   },
 );
 
 assert.equal(duplicateAndStuck.duplicateTimestampCount, 1, "duplicate timestamp remains a separate metric");
-assert.equal(duplicateAndStuck.stuckValueEventCount, 1, "stuck-value detection uses the canonical one-second axis");
-assertClose(duplicateAndStuck.coverageRatio, 1, "duplicate plus stuck still cannot push coverage above 100%");
+assert.equal(duplicateAndStuck.repeatedValueEventCount, 1, "repeated-value detection uses the canonical one-second axis");
+assertClose(duplicateAndStuck.coverageRatio, 1, "duplicate plus repeated value still cannot push coverage above 100%");
 
 console.log("data_quality_core checks passed");
