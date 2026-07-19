@@ -70,7 +70,7 @@ try {
       .map(option => option.value),
     threshold: document.querySelector("#repeatedValueSeconds")?.value
   }));
-  if (!qualityControls.resolutionHidden || qualityControls.ydHidden || qualityControls.threshold !== "10" || qualityControls.visibleDateModes.join(",") !== "single,range") {
+  if (!qualityControls.resolutionHidden || qualityControls.ydHidden || qualityControls.threshold !== "15" || qualityControls.visibleDateModes.join(",") !== "single,range") {
     throw new Error(`Data Coverage controls are not scoped correctly: ${JSON.stringify(qualityControls)}`);
   }
 
@@ -132,7 +132,7 @@ try {
     document.querySelector("#analysisDateMode").value = "range";
     document.querySelector("#analysisStartDate").value = selected[0];
     document.querySelector("#analysisEndDate").value = selected.at(-1);
-    document.querySelector("#repeatedValueSeconds").value = "10";
+    document.querySelector("#repeatedValueSeconds").value = "15";
     return { skipped: false, expectedDays: selected.length };
   });
   if (!rangeCheck.skipped) {
@@ -157,6 +157,94 @@ try {
       throw new Error(`Range heatmap did not include all selected days: ${JSON.stringify({ rangeCheck, rangeState })}`);
     }
   }
+
+  const syntheticQuality = await page.evaluate(() => {
+    document.querySelector("#repeatedValueSeconds").value = "15";
+    document.querySelector("#analysisDateMode").value = "single";
+    const series = Array.from({ length: 86400 }, (_, second) => 50 + Math.sin(second / 120) * 0.001);
+    for (let second = 100; second < 114; second += 1) series[second] = 50.04;
+    for (let second = 200; second < 215; second += 1) series[second] = 50.05;
+    for (let second = 400; second < 420; second += 1) series[second] = NaN;
+    for (let second = 1000; second < 1020; second += 1) series[second] = NaN;
+    const current = {
+      date: "2026-01-01",
+      rawSeries: { tr: series, de: series },
+      displaySeries: { tr: series, de: series },
+      analysisSeries: { tr: series, de: series },
+      overall: { pairedCount: 86400 }
+    };
+    const result = computeQualityAnalysisResult("quality", "tr", current, ["2026-01-01"]);
+    state.analysis.lastResult = result;
+    renderAnalysisResult(result);
+    const repeatedEvents = result.events.filter(event => event.type === "repeated");
+    const missingEvents = result.events.filter(event => event.type === "missing");
+    const option = window.echarts.getInstanceByDom(document.querySelector("#analysisMainChart")).getOption();
+    return {
+      repeatedEvents: repeatedEvents.map(event => ({ start: event.startSecond, end: event.endSecond, duration: event.durationSeconds })),
+      missingEvents: missingEvents.map(event => ({ start: event.startSecond, end: event.endSecond, duration: event.durationSeconds })),
+      repeatedLegendNames: (option.series || []).filter(series => /YD|RV|Yinelenen|Repeated/.test(series.name || "")).map(series => series.name),
+      hasResetButton: Boolean(document.querySelector("#qualityZoomResetBtn")),
+      resetHidden: document.querySelector("#qualityZoomResetBtn")?.hidden,
+      tableText: document.querySelector("#analysisEventsBody")?.textContent || ""
+    };
+  });
+  if (syntheticQuality.repeatedEvents.length !== 1 || syntheticQuality.repeatedEvents[0].duration !== 15) {
+    throw new Error(`15-second YD/RV threshold behavior failed: ${JSON.stringify(syntheticQuality.repeatedEvents)}`);
+  }
+  if (syntheticQuality.missingEvents.length < 2 || syntheticQuality.missingEvents.filter(event => event.duration === 20).length < 2) {
+    throw new Error(`Equal longest missing gaps were not preserved: ${JSON.stringify(syntheticQuality.missingEvents)}`);
+  }
+  if (!syntheticQuality.hasResetButton || !syntheticQuality.resetHidden || !/En Uzun Veri Boşluğu|Longest Data Gap/.test(syntheticQuality.tableText)) {
+    throw new Error(`Synthetic Data Coverage controls/table are incomplete: ${JSON.stringify(syntheticQuality)}`);
+  }
+  if (syntheticQuality.repeatedLegendNames.some(name => /Yinelenen Değer|Repeated Value/.test(name))) {
+    throw new Error(`Chart legend must use short YD/RV labels: ${JSON.stringify(syntheticQuality.repeatedLegendNames)}`);
+  }
+
+  await page.locator("#analysisEventsBody tr.event-row", { hasText: /En Uzun Veri Boşluğu|Longest Data Gap/ }).click();
+  await page.waitForFunction(() => {
+    const option = window.echarts?.getInstanceByDom(document.querySelector("#analysisMainChart"))?.getOption?.() || {};
+    return (option.series || []).some(series => /1s$/.test(series.name || "") && (series.data || []).length > 0);
+  }, { timeout: 10000 });
+  const gapZoomState = await page.evaluate(() => {
+    const chart = window.echarts.getInstanceByDom(document.querySelector("#analysisMainChart"));
+    const option = chart.getOption();
+    const missingSeries = (option.series || []).filter(series => /Eksik Veri|Missing Data/.test(series.name || ""));
+    return {
+      xMin: option.xAxis?.[0]?.min,
+      xMax: option.xAxis?.[0]?.max,
+      resetHidden: document.querySelector("#qualityZoomResetBtn")?.hidden,
+      missingSeriesCount: missingSeries.length,
+      missingSeriesJson: JSON.stringify(missingSeries)
+    };
+  });
+  if (!(gapZoomState.xMin <= 400 && gapZoomState.xMax >= 420) || gapZoomState.resetHidden) {
+    throw new Error(`Longest gap click did not zoom to the missing range: ${JSON.stringify(gapZoomState)}`);
+  }
+  if (!/#dc2626|dashed|Eksik Veri|Missing Data/.test(gapZoomState.missingSeriesJson)) {
+    throw new Error(`Missing data is not clearly marked in red/dashed style: ${gapZoomState.missingSeriesJson}`);
+  }
+
+  await page.click("#qualityZoomResetBtn");
+  await page.waitForFunction(() => {
+    const option = window.echarts?.getInstanceByDom(document.querySelector("#analysisMainChart"))?.getOption?.() || {};
+    return document.querySelector("#qualityZoomResetBtn")?.hidden === true && option.xAxis?.[0]?.min === 0 && option.xAxis?.[0]?.max === 86400;
+  }, { timeout: 10000 });
+
+  await page.locator("#analysisEventsBody tr.event-row", { hasText: /Yinelenen Ardışık Frekans Süresi|Repeated Consecutive Frequency Duration/ }).click();
+  await page.waitForFunction(() => document.querySelector("#qualityZoomResetBtn")?.hidden === false, { timeout: 10000 });
+  await page.click("#qualityZoomResetBtn");
+  await page.waitForFunction(() => document.querySelector("#qualityZoomResetBtn")?.hidden === true, { timeout: 10000 });
+
+  await page.evaluate(() => {
+    const chart = window.echarts.getInstanceByDom(document.querySelector("#analysisMainChart"));
+    const heatmap = chart.getOption().series.find(series => series.type === "heatmap");
+    const cell = (heatmap.data || []).find(item => item[2] >= 0) || heatmap.data[0];
+    showQualityDetailWindow(state.analysis.lastResult, cell[3], cell[4]);
+  });
+  await page.waitForFunction(() => document.querySelector("#qualityZoomResetBtn")?.hidden === false, { timeout: 10000 });
+  await page.click("#qualityZoomResetBtn");
+  await page.waitForFunction(() => document.querySelector("#qualityZoomResetBtn")?.hidden === true, { timeout: 10000 });
 
   await page.click("#langToggle");
   await page.waitForFunction(() => document.querySelector(".brand h1")?.textContent?.trim() === "GridFreq");

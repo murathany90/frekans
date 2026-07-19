@@ -850,6 +850,19 @@
       outline-offset: 2px;
     }
     .chart-toolbar button.loading { opacity: .68; pointer-events: none; }
+    .chart-toolbar .quality-zoom-reset-btn.hidden { display: none; }
+    .chart-wrapper.quality-zoom-active .chart-toolbar { opacity: 1; }
+    .chart-toolbar .quality-zoom-reset-btn {
+      width: auto;
+      min-width: 0;
+      padding: 0 12px;
+      gap: 6px;
+      color: #a61f1f;
+      border-color: rgba(220,38,38,.45);
+      background: #fff;
+      font-weight: 800;
+      white-space: nowrap;
+    }
     .chart-toolbar svg {
       width: 18px;
       height: 18px;
@@ -2301,7 +2314,7 @@
             <div class="field" data-param-key="window"><label for="stepSec" data-i18n="stepSecLabel">Adım (sn)</label><input id="stepSec" type="number" min="1" max="120" step="1" value="10" /></div>
             <div class="field" data-param-key="filter"><label for="filterTaps" data-i18n="filterTapsLabel">FIR kademe</label><input id="filterTaps" type="number" min="31" max="401" step="2" value="101" /></div>
             <div class="field" data-param-key="duration"><label for="minDuration" data-i18n="minDurationLabel">Min. süre (sn)</label><input id="minDuration" type="number" min="10" max="1800" step="10" value="30" /></div>
-            <div class="field" data-param-key="yd"><label for="repeatedValueSeconds" data-i18n="qualityRepeatedThresholdLabel">YD eşiği (sn)</label><input id="repeatedValueSeconds" type="number" min="1" max="3600" step="1" value="10" /></div>
+            <div class="field" data-param-key="yd"><label for="repeatedValueSeconds" data-i18n="qualityRepeatedThresholdLabel">YD eşiği (sn)</label><input id="repeatedValueSeconds" type="number" min="1" max="3600" step="1" value="15" /></div>
             <div class="field" data-param-key="rocof"><label for="rocofThreshold" data-i18n="rocofThresholdLabel">RoCoF eşiği</label><input id="rocofThreshold" type="number" min="0.001" max="1" step="0.001" value="0.01" /></div>
           </div>
         </details>
@@ -2323,6 +2336,7 @@
         <div class="chart-wrapper" id="oscChartWrapper">
           <div id="analysisMainChart" class="chart tall"></div>
           <div class="chart-toolbar">
+            <button type="button" class="quality-zoom-reset-btn hidden" id="qualityZoomResetBtn" data-action="resetzoom" data-chart="analysisMainChart" data-i18n="qualityResetZoomBtn" aria-label="Zoom'u Sıfırla">Zoom'u Sıfırla</button>
             <button type="button" aria-label="Tam ekran" title="Tam ekran" data-action="fullscreen" data-chart="analysisMainChart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5"/><path d="M16 3h5v5"/><path d="M21 16v5h-5"/><path d="M8 21H3v-5"/></svg></button>
             <button type="button" aria-label="Grafiği PNG olarak indir" title="Grafiği PNG olarak indir" data-action="download" data-chart="analysisMainChart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg></button>
             <button type="button" aria-label="Yakınlaştırmayı sıfırla" title="Yakınlaştırmayı sıfırla" data-action="resetzoom" data-chart="analysisMainChart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v6h6"/></svg></button>
@@ -2992,7 +3006,7 @@
       nominalFrequency: 50,
       validMin: 49,
       validMax: 51,
-      repeatedValueSeconds: 10,
+      repeatedValueSeconds: 15,
       maxGapSeconds: 2,
       minPairedRatio: 90,
       graphScale: 'auto',
@@ -4280,6 +4294,14 @@
       state.chartZoomRange = { start: 0, end: 100 };
     }
 
+    function setQualityZoomResetVisible(visible) {
+      const btn = $('qualityZoomResetBtn');
+      const wrapper = $('oscChartWrapper');
+      if (btn) btn.hidden = !visible;
+      btn?.classList.toggle('hidden', !visible);
+      wrapper?.classList.toggle('quality-zoom-active', Boolean(visible));
+    }
+
     function resetDailyChartState() {
       state.chartLegendSelection = defaultChartLegendSelection();
       resetFrequencyZoomState();
@@ -4306,7 +4328,15 @@
       const chart = chartId === 'frequencyChart' ? state.frequencyChart : state.oscillationChart;
       if (!chart) return;
       if (chartId === 'frequencyChart') resetFrequencyZoomState();
+      if (chartId === 'analysisMainChart' && state.analysis.lastResult?.chart?.kind === 'quality') {
+        resetQualityChartZoom();
+        return;
+      }
       chart.dispatchAction({ type: 'dataZoom', start: 0, end: 100 });
+    }
+
+    function resetQualityChartZoom() {
+      showQualityFullRange(state.analysis.lastResult);
     }
 
     function handleFullscreenChange() {
@@ -5852,6 +5882,7 @@
       updateOscillationSourceUi();
       $('analysisMainChart')?.classList.remove('quality-chart');
       if ($('analysisMainChart')) $('analysisMainChart').style.height = '';
+      setQualityZoomResetVisible(false);
       setAnalysisTableHeader(analysisDefinition('oscillation').tableColumns);
       if ($('analysisTableTitle')) $('analysisTableTitle').textContent = t(analysisDefinition('oscillation').titleKey);
       if ($('analysisTableDescription')) $('analysisTableDescription').textContent = t(analysisDefinition('oscillation').descriptionKey);
@@ -7202,7 +7233,7 @@
         endSecond: bounds.end,
         validMinHz: state.settings.validMin,
         validMaxHz: state.settings.validMax,
-        repeatedValueThresholdSeconds: Number($('repeatedValueSeconds')?.value || state.settings.repeatedValueSeconds || state.settings.stuckValueSeconds || 10)
+        repeatedValueThresholdSeconds: Number($('repeatedValueSeconds')?.value || state.settings.repeatedValueSeconds || state.settings.stuckValueSeconds || 15)
       };
     }
 
@@ -7453,6 +7484,9 @@
       const longestRepeated = (quality.qualityEvents || [])
         .filter(event => event.type === 'repeated')
         .sort((a, b) => (b.durationSeconds || 0) - (a.durationSeconds || 0))[0];
+      const longestMissing = (quality.qualityEvents || [])
+        .filter(event => event.type === 'missing' && Math.abs((event.durationSeconds || 0) - (quality.longestGapSeconds || 0)) < 1e-6)
+        .sort((a, b) => a.startSecond - b.startSecond)[0];
       const rows = [
         { metric: t('qualityAnalysisStart'), value: startLabel },
         { metric: t('qualityAnalysisEnd'), value: endLabel },
@@ -7468,10 +7502,17 @@
           metric: t('qualityRepeatedLongest'),
           value: durationText(quality.longestRepeatedValueSeconds || quality.longestStuckSeconds || 0),
           startSecond: longestRepeated?.startSecond,
-          endSecond: longestRepeated?.endSecond
+          endSecond: longestRepeated?.endSecond,
+          drilldownType: 'repeated'
         },
         { metric: t('qualityGapEvents'), value: numberText(quality.gapEventCount || 0) },
-        { metric: t('qualityLongestGap'), value: durationText(quality.longestGapSeconds || 0) },
+        {
+          metric: t('qualityLongestGap'),
+          value: durationText(quality.longestGapSeconds || 0),
+          startSecond: longestMissing?.startSecond,
+          endSecond: longestMissing?.endSecond,
+          drilldownType: 'missing'
+        },
         { metric: t('qualityCoverage'), value: percent(quality.coverageRatio) },
         { metric: t('qualityGood'), value: percent(quality.goodQualityRatio) }
       ];
@@ -7508,7 +7549,7 @@
         : [buildQualityFrequencySummary(quality, sourceLabel(source), { color: '#101820', showMinMax: false })];
       return {
         type,
-        title: t(analysisDefinition(type).titleKey),
+        title: `${t(analysisDefinition(type).titleKey)} · ${t('qualityRepeatedRange')}`,
         description: t(analysisDefinition(type).descriptionKey),
         metadata,
         cards: [
@@ -7593,7 +7634,7 @@
       };
       return {
         type: 'quality',
-        title: t(analysisDefinition('quality').titleKey),
+        title: `${t(analysisDefinition('quality').titleKey)} · ${t('qualityRepeatedRange')}`,
         description: t(analysisDefinition('quality').descriptionKey),
         metadata: analysisMetadata('quality', source, lastCurrent, dateList, sampling),
         cards: [
@@ -7630,7 +7671,7 @@
         const rocof = workerResult || core.computeRocof(series, { method: 'movingRegression', sampleIntervalSeconds, windowSeconds: Number($('windowSec').value || 5), thresholdHzPerSecond: Number($('rocofThreshold').value || 0.01) });
         return {
           type,
-          title: t(analysisDefinition(type).titleKey),
+        title: `${t(analysisDefinition(type).titleKey)} · ${t('qualityRepeatedRange')}`,
           description: t(analysisDefinition(type).descriptionKey),
           metadata,
           cards: [
@@ -7826,7 +7867,10 @@
       if (!state.oscillationChart) return;
       state.oscillationChart.off('click');
       $('analysisMainChart')?.classList.toggle('quality-chart', result.chart.kind === 'quality');
-      if (result.chart.kind !== 'quality') $('analysisMainChart').style.height = '';
+      if (result.chart.kind !== 'quality') {
+        $('analysisMainChart').style.height = '';
+        setQualityZoomResetVisible(false);
+      }
       if (result.chart.kind === 'quality') {
         renderQualityAnalysisChart(result);
         return;
@@ -7878,6 +7922,7 @@
     }
 
     function renderQualityAnalysisChart(result) {
+      setQualityZoomResetVisible(false);
       const range = result.chart.range || { start: 0, end: 86400 };
       const chartTimeLabel = (value, includeDate = false) => {
         const total = Math.max(0, Math.round(value || 0));
@@ -8002,10 +8047,10 @@
 
     function qualityMarkTypes() {
       return [
-        { type: 'missing', name: t('qualityMissingRange'), color: 'rgba(200,60,60,.13)' },
+        { type: 'missing', name: t('qualityMissingRange'), color: 'rgba(220,38,38,.24)', borderColor: '#dc2626', lineColor: '#dc2626', lineType: 'dashed' },
         { type: 'invalid', name: t('qualityInvalidRange'), color: 'rgba(179,116,0,.14)' },
         { type: 'duplicate', name: t('qualityDuplicateRange'), color: 'rgba(27,107,156,.13)' },
-        { type: 'repeated', name: t('qualityRepeatedRange'), color: 'rgba(18,24,33,.13)' }
+        { type: 'repeated', name: t('qualityRepeatedRangeShort'), color: 'rgba(18,24,33,.13)' }
       ];
     }
 
@@ -8024,16 +8069,49 @@
             silent: true,
             lineStyle: { opacity: 0 },
             markArea: {
-              silent: true,
-              itemStyle: { color: group.color },
+              silent: false,
+              itemStyle: { color: group.color, borderColor: group.borderColor, borderWidth: group.borderColor ? 1 : 0, borderType: group.lineType },
               data: groupEvents.map(event => {
                 const isHighlighted = highlight && Math.abs(event.startSecond - highlight.startSecond) < 1e-6 && Math.abs(event.endSecond - highlight.endSecond) < 1e-6;
                 return [
-                  { xAxis: event.startSecond, name: group.name, itemStyle: isHighlighted ? { color: 'rgba(13,47,79,.24)' } : undefined },
+                  {
+                    xAxis: event.startSecond,
+                    name: group.name,
+                    eventType: event.type,
+                    eventStartSecond: event.startSecond,
+                    eventEndSecond: event.endSecond,
+                    eventDurationSeconds: event.durationSeconds,
+                    itemStyle: isHighlighted
+                      ? { color: event.type === 'missing' ? 'rgba(220,38,38,.34)' : 'rgba(13,47,79,.24)', borderColor: group.borderColor, borderWidth: group.borderColor ? 1.5 : 0, borderType: group.lineType }
+                      : undefined
+                  },
                   { xAxis: event.endSecond }
                 ];
               })
-            }
+            },
+            markLine: group.type === 'missing' ? {
+              silent: false,
+              symbol: 'none',
+              lineStyle: { color: group.lineColor, type: group.lineType, width: 1.4 },
+              data: groupEvents.flatMap(event => ([
+                {
+                  xAxis: event.startSecond,
+                  name: group.name,
+                  eventType: event.type,
+                  eventStartSecond: event.startSecond,
+                  eventEndSecond: event.endSecond,
+                  eventDurationSeconds: event.durationSeconds
+                },
+                {
+                  xAxis: event.endSecond,
+                  name: group.name,
+                  eventType: event.type,
+                  eventStartSecond: event.startSecond,
+                  eventEndSecond: event.endSecond,
+                  eventDurationSeconds: event.durationSeconds
+                }
+              ]))
+            } : undefined
           };
         })
         .filter(Boolean);
@@ -8088,7 +8166,12 @@
     function qualityChartTooltip(chartTimeLabel) {
       return {
         trigger: 'item',
+        axisPointer: { type: 'cross' },
         formatter: params => {
+          const eventData = Array.isArray(params.data) ? params.data[0] : params.data;
+          if (eventData?.eventType === 'missing') {
+            return `<strong>${t('qualityMissingTooltipTitle')}</strong><br>${t('eventStart')}: ${chartTimeLabel(eventData.eventStartSecond, true)}<br>${t('eventEnd')}: ${chartTimeLabel(eventData.eventEndSecond, true)}<br>${t('tableDuration')}: ${durationText(eventData.eventDurationSeconds || Math.max(0, eventData.eventEndSecond - eventData.eventStartSecond))}`;
+          }
           if (params.seriesType === 'heatmap') {
             const [, , ratio, startSecond, endSecond, label] = params.value;
             const qualityText = ratio < 0 ? t('qualityNoData') : percent(ratio);
@@ -8146,6 +8229,15 @@
         ]
       }, { replaceMerge: ['series'] });
       state.oscillationChart.dispatchAction({ type: 'dataZoom', dataZoomIndex: 0, startValue: start, endValue: end });
+      setQualityZoomResetVisible(true);
+    }
+
+    function showQualityFullRange(result = state.analysis.lastResult) {
+      if (!result?.chart || result.chart.kind !== 'quality') return;
+      renderQualityAnalysisChart(result);
+      const range = result.chart.range || { start: 0, end: 86400 };
+      state.oscillationChart?.dispatchAction({ type: 'dataZoom', dataZoomIndex: 0, startValue: range.start, endValue: range.end });
+      setQualityZoomResetVisible(false);
     }
 
     function setAnalysisTableHeader(columns) {
@@ -8173,11 +8265,24 @@
         body.innerHTML = `<tr><td colspan="${Math.max(1, columns.length)}" class="empty-state">${t('analysisNoTableRows')}</td></tr>`;
         return;
       }
-      body.innerHTML = rows.map(row => `<tr class="${Number.isFinite(row.startSecond) ? 'event-row' : ''}" ${Number.isFinite(row.startSecond) ? `data-start="${row.startSecond}" data-end="${row.endSecond}"` : ''}>${columns.map(column => `<td>${formatTableCell(row[column.key])}</td>`).join('')}</tr>`).join('');
+      body.innerHTML = rows.map(row => {
+        const clickable = Number.isFinite(row.startSecond);
+        const attrs = clickable
+          ? `data-start="${row.startSecond}" data-end="${row.endSecond}" data-drilldown-type="${row.drilldownType || ''}"`
+          : '';
+        return `<tr class="${clickable ? 'event-row' : ''}" ${attrs}>${columns.map(column => `<td>${formatTableCell(row[column.key])}</td>`).join('')}</tr>`;
+      }).join('');
       body.querySelectorAll('.event-row').forEach(row => row.addEventListener('click', () => {
-        const start = Math.max(0, Number(row.dataset.start) - 30);
-        const end = Math.min(86400, Number(row.dataset.end) + 30);
-        state.oscillationChart?.dispatchAction({ type: 'dataZoom', startValue: start, endValue: end });
+        const range = result.chart?.range || { start: 0, end: 86400 };
+        const eventStart = Number(row.dataset.start);
+        const eventEnd = Number(row.dataset.end);
+        const start = Math.max(range.start, eventStart - 30);
+        const end = Math.min(range.end, eventEnd + 30);
+        if (result.chart?.kind === 'quality') {
+          showQualityDetailWindow(result, start, end, { startSecond: eventStart, endSecond: eventEnd, type: row.dataset.drilldownType });
+        } else {
+          state.oscillationChart?.dispatchAction({ type: 'dataZoom', startValue: start, endValue: end });
+        }
         $('analysisMainChart').scrollIntoView({ behavior: 'smooth', block: 'center' });
       }));
     }
@@ -8491,7 +8596,7 @@
       $('stepSec').value = s.stepSec;
       $('filterTaps').value = s.filterTaps;
       $('minDuration').value = s.minDuration;
-      if ($('repeatedValueSeconds')) $('repeatedValueSeconds').value = s.repeatedValueSeconds || 10;
+      if ($('repeatedValueSeconds')) $('repeatedValueSeconds').value = s.repeatedValueSeconds || 15;
       $('analysisSourceSelect').value = s.oscillationSource || 'tr';
       $('oscSourceSelect').value = s.oscillationSource || 'tr';
       state.oscillationSource = getAnalysisSource();
@@ -8525,7 +8630,7 @@
         stepSec: Number($('stepSec').value),
         filterTaps: Number($('filterTaps').value),
         minDuration: Number($('minDuration').value),
-        repeatedValueSeconds: Number($('repeatedValueSeconds')?.value || 10),
+        repeatedValueSeconds: Number($('repeatedValueSeconds')?.value || 15),
         oscillationSource: getAnalysisSource(),
         showDifference: $('showDifference').value,
         showMinMax: $('showMinMaxEnvelope').value
@@ -9728,22 +9833,25 @@
         qualityValid: 'Geçerli Örnek',
         qualityMissing: 'Eksik Örnek',
         qualityInvalid: 'Geçersiz Örnek',
-        qualityLongestGap: 'En uzun boşluk',
+        qualityLongestGap: 'En Uzun Veri Boşluğu',
         qualityDuplicate: 'Yinelenen Zaman Damgası',
         qualityGapEvents: 'Veri boşluğu olay sayısı',
         qualityRepeatedEvents: 'Yinelenen Ardışık Frekans Sayısı',
         qualityRepeatedTotal: 'Yinelenen Ardışık Frekans Süresi',
         qualityRepeatedLongest: 'En Uzun Yinelenen Ardışık Frekans Süresi',
         qualityRepeatedThresholdLabel: 'YD eşiği (sn)',
+        qualityResetZoomBtn: "Tüm Grafiği Göster / Zoom'u Sıfırla",
         qualityTrValid: 'Türkiye kaliteli örnek',
         qualityCeValid: 'Kıta Avrupası kaliteli örnek',
         qualityPairedValid: 'Ortak kullanılabilir / Paired Valid',
         qualityFrequencySummary: '15 dakikalık frekans özeti',
         qualityHeatmap: 'Data Quality Heatmap',
-        qualityMissingRange: 'Eksik veri',
+        qualityMissingRange: 'Eksik Veri',
         qualityInvalidRange: 'Geçersiz veri',
         qualityDuplicateRange: 'Yinelenen zaman',
         qualityRepeatedRange: 'YD / Yinelenen Değer',
+        qualityRepeatedRangeShort: 'YD',
+        qualityMissingTooltipTitle: 'Eksik Veri',
         qualityNoData: 'Veri yok',
         eventDataGap: 'Veri boşluğu',
         classNeedsReview: 'İnceleme gerekli',
@@ -10035,22 +10143,25 @@
         qualityValid: 'Valid Sample',
         qualityMissing: 'Missing samples',
         qualityInvalid: 'Invalid samples',
-        qualityLongestGap: 'Longest data gap',
+        qualityLongestGap: 'Longest Data Gap',
         qualityDuplicate: 'Duplicate timestamps',
         qualityGapEvents: 'Gap event count',
         qualityRepeatedEvents: 'Repeated Consecutive Frequency Count',
         qualityRepeatedTotal: 'Repeated Consecutive Frequency Duration',
         qualityRepeatedLongest: 'Longest Repeated Consecutive Frequency Duration',
         qualityRepeatedThresholdLabel: 'RV threshold (s)',
+        qualityResetZoomBtn: 'Show Full Chart / Reset Zoom',
         qualityTrValid: 'Türkiye quality samples',
         qualityCeValid: 'CE quality samples',
         qualityPairedValid: 'Paired Valid',
         qualityFrequencySummary: '15-minute frequency summary',
         qualityHeatmap: 'Data Quality Heatmap',
-        qualityMissingRange: 'Missing data',
+        qualityMissingRange: 'Missing Data',
         qualityInvalidRange: 'Invalid data',
         qualityDuplicateRange: 'Duplicate timestamp',
         qualityRepeatedRange: 'RV / Repeated Value',
+        qualityRepeatedRangeShort: 'RV',
+        qualityMissingTooltipTitle: 'Missing Data',
         qualityNoData: 'No data',
         eventDataGap: 'Data gap',
         classNeedsReview: 'Needs review',

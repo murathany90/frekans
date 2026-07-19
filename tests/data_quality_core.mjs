@@ -53,13 +53,21 @@ assert.equal(invalidPresentTimestamps.validCount, 2, "only physically valid samp
 assert.equal(invalidPresentTimestamps.invalidCount, 3, "NaN, Infinity, empty/parse-bad values are invalid when timestamp is present");
 assert.equal(invalidPresentTimestamps.missingCount, 0, "present invalid timestamps must not be mixed with missing samples");
 
-const nineSecondRepeatedDefault = analyzeDataQuality(
-  Array.from({ length: 9 }, (_, index) => index),
-  Array.from({ length: 9 }, () => 50),
-  { expectedIntervalSeconds: 1, startSecond: 0, endSecond: 9, validMinHz: 49, validMaxHz: 51 },
+const fourteenSecondRepeatedDefault = analyzeDataQuality(
+  Array.from({ length: 14 }, (_, index) => index),
+  Array.from({ length: 14 }, () => 50),
+  { expectedIntervalSeconds: 1, startSecond: 0, endSecond: 14, validMinHz: 49, validMaxHz: 51 },
 );
 
-assert.equal(nineSecondRepeatedDefault.repeatedValueEventCount, 0, "default repeated-value threshold is 10 seconds");
+assert.equal(fourteenSecondRepeatedDefault.repeatedValueEventCount, 0, "default repeated-value threshold is 15 seconds");
+
+const fifteenSecondRepeatedDefault = analyzeDataQuality(
+  Array.from({ length: 15 }, (_, index) => index),
+  Array.from({ length: 15 }, () => 50),
+  { expectedIntervalSeconds: 1, startSecond: 0, endSecond: 15, validMinHz: 49, validMaxHz: 51 },
+);
+
+assert.equal(fifteenSecondRepeatedDefault.repeatedValueEventCount, 1, "15-second repeated runs are events at the default threshold");
 
 const repeated = analyzeDataQuality(
   [0, 1, 2, 3, 4, 5, 6],
@@ -91,7 +99,7 @@ const repeatedFifteenSeconds = analyzeDataQuality(
     endSecond: 18,
     validMinHz: 49,
     validMaxHz: 51,
-    repeatedValueThresholdSeconds: 10,
+    repeatedValueThresholdSeconds: 15,
   },
 );
 

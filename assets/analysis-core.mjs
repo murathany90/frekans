@@ -41,7 +41,7 @@ export function analyzeDataQuality(timestamps, values, {
   endSecond = null,
   validMinHz = 49,
   validMaxHz = 51,
-  repeatedValueThresholdSeconds = 10,
+  repeatedValueThresholdSeconds = 15,
   stuckThresholdSeconds = null,
   nonFiniteAsMissing = false
 } = {}) {
@@ -129,8 +129,8 @@ export function analyzeDataQuality(timestamps, values, {
   const longestGapSeconds = missingEvents.reduce((max, event) => Math.max(max, event.durationSeconds), 0);
 
   const repeatedValueEvents = [];
-  const thresholdOption = repeatedValueThresholdSeconds ?? stuckThresholdSeconds ?? 10;
-  const repeatedThreshold = Math.max(intervalSeconds, Number(thresholdOption) || 10);
+  const thresholdOption = repeatedValueThresholdSeconds ?? stuckThresholdSeconds ?? 15;
+  const repeatedThreshold = Math.max(intervalSeconds, Number(thresholdOption) || 15);
   let runStart = -1;
   let runValue = null;
   for (let i = 0; i <= expectedCount; i += 1) {
