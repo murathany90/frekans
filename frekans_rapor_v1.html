@@ -3179,7 +3179,7 @@
     const RESOLUTION_SECONDS = { '1s': 1, '10s': 10, '1m': 60, '1h': 3600 };
     const ANALYSIS_BASE_PARAMS = ['date', 'resolution', 'alignment'];
     const QUALITY_DATE_MODES = new Set(['single', 'range']);
-    const LIMITED_DATE_MODE_ANALYSES = new Set(['quality', 'stats']);
+    const LIMITED_DATE_MODE_ANALYSES = new Set(['quality', 'stats', 'events']);
     const analysisRegistry = {
       quality: {
         labelKey: 'analysisQuality',
@@ -3213,13 +3213,21 @@
         labelKey: 'analysisEvents',
         titleKey: 'analysisEventsTitle',
         descriptionKey: 'analysisEventsDesc',
-        allowedSources: ['tr', 'de', 'both', 'diff', 'differential'],
+        allowedSources: ['tr', 'de', 'both', 'common'],
         allowedResolutions: ['1s'],
-        parameterKeys: ['threshold', 'duration'],
+        parameterKeys: ['statsBand', 'yd', 'duration'],
         requiresPairedSeries: false,
         minSampleIntervalSeconds: 1,
         preferredResolution: '1s',
-        tableColumns: [{ key: 'start', labelKey: 'oscThStart' }, { key: 'end', labelKey: 'oscThEnd' }, { key: 'duration', labelKey: 'oscThDuration' }, { key: 'value', labelKey: 'tableValue' }, { key: 'classification', labelKey: 'classification' }],
+        tableColumns: [
+          { key: 'source', labelKey: 'bandViolationSource', helpKey: 'bandViolationSourceHelp' },
+          { key: 'type', labelKey: 'bandViolationType', helpKey: 'bandViolationTypeHelp' },
+          { key: 'start', labelKey: 'oscThStart' },
+          { key: 'end', labelKey: 'oscThEnd' },
+          { key: 'duration', labelKey: 'oscThDuration', helpKey: 'bandViolationDurationHelp' },
+          { key: 'extreme', labelKey: 'bandViolationExtremeHz', helpKey: 'bandViolationExtremeHelp' },
+          { key: 'exceedance', labelKey: 'bandViolationExceedanceMhz', helpKey: 'bandViolationExceedanceHelp' }
+        ],
         methodKey: 'methodEvents',
         limitationsKey: 'limitEvents'
       },
@@ -4438,6 +4446,10 @@
         showStatsFullRange(state.analysis.lastResult);
         return;
       }
+      if (chartId === 'analysisMainChart' && state.analysis.lastResult?.chart?.kind === 'bandViolation') {
+        showBandViolationFullRange(state.analysis.lastResult);
+        return;
+      }
       chart.dispatchAction({ type: 'dataZoom', start: 0, end: 100 });
     }
 
@@ -5278,7 +5290,7 @@
       const base = reportDatesForAnalysisSource(source, type);
       const dates = (base.length ? base : reportDatesForCurrentMode()).sort();
       const selected = $('analysisDateSelect').value || dates.at(-1) || latestCommonDate();
-      const limitedDateMode = type === 'quality' || type === 'stats';
+      const limitedDateMode = LIMITED_DATE_MODE_ANALYSES.has(type);
       const requestedMode = $('analysisDateMode')?.value || 'single';
       const mode = limitedDateMode && !QUALITY_DATE_MODES.has(requestedMode) ? 'single' : requestedMode;
       if (!selected) return [];
@@ -6650,9 +6662,10 @@
       const type = $('analysisTypeSelect')?.value || 'stats';
       const isQuality = type === 'quality';
       const isStats = type === 'stats';
+      const isBandViolation = type === 'events';
       const baseParams = isQuality
         ? ['date', 'alignment', 'yd']
-        : isStats
+        : isStats || isBandViolation
           ? ['date', 'alignment', 'yd']
           : ANALYSIS_BASE_PARAMS;
       const visible = new Set([...baseParams, ...(def.parameterKeys || [])]);
@@ -6714,6 +6727,7 @@
       const def = analysisDefinition(type);
       if (type === 'quality') return '1s';
       if (type === 'stats') return '1s';
+      if (type === 'events') return '1s';
       if (selectedResolution && selectedResolution !== 'auto') return selectedResolution;
       if (type === 'trend') return '1m';
       if (type === 'psd') return '1s';
@@ -7140,6 +7154,15 @@
           setBanner('analysisStatus', t('analysisDone'), 'success');
           return;
         }
+        if (type === 'events' && dateList.length > 1) {
+          const result = await computeBandViolationRangeResult(source, dateList);
+          state.analysis.lastResult = result;
+          renderAnalysisResult(result);
+          renderReportPreview();
+          updateUrlState({ date, source, analysis: type, tab: 'oscillation' });
+          setBanner('analysisStatus', t('analysisDone'), 'success');
+          return;
+        }
         if (type === 'trend' && dateList.length > 1) {
           const result = await computeTrendRangeResult(source, dateList);
           state.analysis.lastResult = result;
@@ -7156,7 +7179,9 @@
         state.analysis.analysisSeries = current.analysisSeries;
         const analysisInput = type === 'quality'
           ? prepareQualityAnalysisInput(source, current)
-          : prepareAnalysisInput(type, source, current, validation);
+          : type === 'events'
+            ? { sampling: buildSamplingMetadata(null, 1, 'good-quality-canonical') }
+            : prepareAnalysisInput(type, source, current, validation);
         state.analysis.sampling = analysisInput.sampling;
         updateAnalysisSamplingInfo(analysisInput.sampling);
         if (type !== 'quality' && requiresPairedSource(source, type) && current.overall.pairedCount < 1800) {
@@ -7882,25 +7907,42 @@
       return Number.isFinite(second) ? { value, second } : { value: NaN, second: NaN };
     }
 
-    function buildStatsBandViolationEvents(goodSeries, bandMinHz, bandMaxHz, startSecond = 0) {
+    function computeBandViolationEvents(goodSeries, bandMinHz, bandMaxHz, options = {}) {
+      const startSecond = Number(options.startSecond || 0);
+      const minDurationSeconds = Math.max(1, Number(options.minDurationSeconds || 1));
+      const source = options.source || getAnalysisSource();
+      const sourceName = options.sourceName || sourceLabel(source);
       const events = [];
       let runStart = -1;
       let runSide = null;
-      let peak = NaN;
+      let extreme = NaN;
       const closeRun = endIndex => {
         if (runStart < 0 || !runSide) return;
-        events.push({
-          type: 'band',
-          side: runSide,
-          startSecond: startSecond + runStart,
-          endSecond: startSecond + endIndex,
-          durationSeconds: endIndex - runStart,
-          value: peak,
-          classification: runSide === 'lower' ? t('statsLowerBandViolation') : t('statsUpperBandViolation')
-        });
+        const durationSeconds = endIndex - runStart;
+        if (durationSeconds >= minDurationSeconds) {
+          const bandLimitHz = runSide === 'lower' ? bandMinHz : bandMaxHz;
+          const exceedanceMhz = Math.max(0, (runSide === 'lower' ? bandLimitHz - extreme : extreme - bandLimitHz) * 1000);
+          events.push({
+            type: 'band',
+            eventType: 'band',
+            side: runSide,
+            source,
+            sourceName,
+            startSecond: startSecond + runStart,
+            endSecond: startSecond + endIndex,
+            durationSeconds,
+            value: extreme,
+            extremeHz: extreme,
+            bandLimitHz,
+            exceedanceMhz,
+            classification: runSide === 'lower' ? t('bandViolationLowerFull') : t('bandViolationUpperFull'),
+            shortLabel: runSide === 'lower' ? t('bandViolationLowerShort') : t('bandViolationUpperShort'),
+            eventLabel: runSide === 'lower' ? t('bandViolationLowerFull') : t('bandViolationUpperFull')
+          });
+        }
         runStart = -1;
         runSide = null;
-        peak = NaN;
+        extreme = NaN;
       };
       for (let i = 0; i <= goodSeries.length; i += 1) {
         const value = i < goodSeries.length ? goodSeries[i] : NaN;
@@ -7912,22 +7954,47 @@
             closeRun(i);
             runStart = i;
             runSide = side;
-            peak = value;
+            extreme = value;
           } else if (
             side === 'lower'
-              ? value < peak
-              : value > peak
+              ? value < extreme
+              : value > extreme
           ) {
-            peak = value;
+            extreme = value;
           }
           continue;
         }
         closeRun(i);
       }
+      let goodSeconds = 0;
+      for (const value of goodSeries || []) {
+        if (Number.isFinite(value)) goodSeconds += 1;
+      }
       const lowerSeconds = events.filter(event => event.side === 'lower').reduce((sum, event) => sum + event.durationSeconds, 0);
       const upperSeconds = events.filter(event => event.side === 'upper').reduce((sum, event) => sum + event.durationSeconds, 0);
+      const lowerCount = events.filter(event => event.side === 'lower').length;
+      const upperCount = events.filter(event => event.side === 'upper').length;
       const longest = events.slice().sort((a, b) => (b.durationSeconds || 0) - (a.durationSeconds || 0) || a.startSecond - b.startSecond)[0] || null;
-      return { events, lowerSeconds, upperSeconds, longest };
+      const maxLowerExceedanceMhz = events.filter(event => event.side === 'lower').reduce((max, event) => Math.max(max, event.exceedanceMhz || 0), 0);
+      const maxUpperExceedanceMhz = events.filter(event => event.side === 'upper').reduce((max, event) => Math.max(max, event.exceedanceMhz || 0), 0);
+      const violationSeconds = lowerSeconds + upperSeconds;
+      return {
+        events,
+        lowerSeconds,
+        upperSeconds,
+        lowerCount,
+        upperCount,
+        violationSeconds,
+        goodSeconds,
+        inBandRatio: goodSeconds ? Math.max(0, Math.min(1, 1 - violationSeconds / goodSeconds)) : 0,
+        longest,
+        maxLowerExceedanceMhz,
+        maxUpperExceedanceMhz
+      };
+    }
+
+    function buildStatsBandViolationEvents(goodSeries, bandMinHz, bandMaxHz, startSecond = 0) {
+      return computeBandViolationEvents(goodSeries, bandMinHz, bandMaxHz, { startSecond, minDurationSeconds: 1, source: getAnalysisSource(), sourceName: sourceLabel(getAnalysisSource()) });
     }
 
     function buildStatsHeatmap(goodSeries, dateList = [], startSecond = 0) {
@@ -8112,6 +8179,10 @@
       const minPoint = findStatsExtreme(good.values, good.startSecond, 'min');
       const maxPoint = findStatsExtreme(good.values, good.startSecond, 'max');
       const bandEvents = buildStatsBandViolationEvents(good.values, band.min, band.max, good.startSecond);
+      stats.bandViolationEventCount = bandEvents.events.length;
+      stats.outOfBandSeconds = bandEvents.violationSeconds;
+      stats.longestBandViolationSeconds = bandEvents.longest?.durationSeconds || 0;
+      stats.inBandRatio = good.usedCount ? Math.max(0, Math.min(1, 1 - bandEvents.violationSeconds / good.usedCount)) : 0;
       const sampling = buildSamplingMetadata(good.values, 1, 'good-quality-canonical');
       sampling.totalSamples = good.expectedCount;
       sampling.validSamples = good.usedCount;
@@ -8214,6 +8285,344 @@
       return buildStatsResultFromGoodSeries('stats', source, lastCurrent, dateList, good, quality, quality.qualityEvents || []);
     }
 
+    function bandViolationGoodValues(quality) {
+      const expectedCount = quality?.expectedCount || 0;
+      const values = new Array(expectedCount).fill(NaN);
+      for (let i = 0; i < expectedCount; i += 1) {
+        if (!quality.masks?.good?.[i]) continue;
+        const value = quality.canonical?.values?.[i];
+        if (Number.isFinite(value)) values[i] = value;
+      }
+      return values;
+    }
+
+    function bandViolationCommonValues(trQuality, ceQuality) {
+      const expectedCount = Math.min(trQuality?.expectedCount || 0, ceQuality?.expectedCount || 0);
+      const values = new Array(expectedCount).fill(NaN);
+      for (let i = 0; i < expectedCount; i += 1) {
+        if (!trQuality.masks?.good?.[i] || !ceQuality.masks?.good?.[i]) continue;
+        const trValue = trQuality.canonical?.values?.[i];
+        const ceValue = ceQuality.canonical?.values?.[i];
+        if (Number.isFinite(trValue) && Number.isFinite(ceValue)) values[i] = (trValue + ceValue) / 2;
+      }
+      return values;
+    }
+
+    function buildBandViolationSourceItems(source, trQuality, ceQuality, offsetSeconds = 0) {
+      const item = (id, name, color, values, startSecond = 0) => ({
+        source: id,
+        sourceName: name,
+        color,
+        values,
+        startSecond: offsetSeconds + startSecond,
+        endSecond: offsetSeconds + startSecond + values.length
+      });
+      if (source === 'de') {
+        return [item('de', sourceLabel('de'), '#176b9c', bandViolationGoodValues(ceQuality), ceQuality?.startSecond || 0)];
+      }
+      if (source === 'both') {
+        return [
+          item('tr', sourceLabel('tr'), '#101820', bandViolationGoodValues(trQuality), trQuality?.startSecond || 0),
+          item('de', sourceLabel('de'), '#176b9c', bandViolationGoodValues(ceQuality), ceQuality?.startSecond || 0)
+        ];
+      }
+      if (source === 'common') {
+        const values = bandViolationCommonValues(trQuality, ceQuality);
+        return [item('common', sourceLabel('common'), '#0f766e', values, Math.min(trQuality?.startSecond || 0, ceQuality?.startSecond || 0))];
+      }
+      return [item('tr', sourceLabel('tr'), '#101820', bandViolationGoodValues(trQuality), trQuality?.startSecond || 0)];
+    }
+
+    function mergeBandViolationSourceItems(sourceItems, range) {
+      const start = Number(range?.start || 0);
+      const end = Math.max(start, Number(range?.end || 0));
+      const length = Math.max(0, Math.round(end - start));
+      const groups = new Map();
+      for (const sourceItem of sourceItems || []) {
+        if (!groups.has(sourceItem.source)) {
+          groups.set(sourceItem.source, {
+            source: sourceItem.source,
+            sourceName: sourceItem.sourceName,
+            color: sourceItem.color,
+            values: new Array(length).fill(NaN),
+            startSecond: start,
+            endSecond: end
+          });
+        }
+        const target = groups.get(sourceItem.source);
+        for (let i = 0; i < sourceItem.values.length; i += 1) {
+          const second = Math.round(sourceItem.startSecond + i - start);
+          if (second < 0 || second >= target.values.length) continue;
+          target.values[second] = sourceItem.values[i];
+        }
+      }
+      return [...groups.values()];
+    }
+
+    function bandViolationMinimumDurationSeconds() {
+      const value = Number($('minDuration')?.value || 1);
+      return Number.isFinite(value) ? Math.max(1, value) : 1;
+    }
+
+    function buildBandViolationFrequencySummary(sourceItem) {
+      const summary = buildStatsFrequencySummary(sourceItem.values, sourceItem.startSecond);
+      return {
+        ...summary,
+        name: sourceItem.sourceName,
+        color: sourceItem.color
+      };
+    }
+
+    function buildBandViolationHeatmap(sourceItems, events, dateList = [], range = { start: 0, end: 86400 }) {
+      const bucketSeconds = 900;
+      const start = Number(range.start || 0);
+      const end = Math.max(start, Number(range.end || 0));
+      const dayCount = Math.max(1, Math.ceil((end - start || 1) / 86400));
+      const labels = Array.from({ length: 96 }, (_, slot) => quarterLabel(slot));
+      const days = Array.from({ length: dayCount }, (_, index) => displayDate(dateList[index] || dateList.at(-1) || state.current?.date));
+      const cells = [];
+      for (let dayIndex = 0; dayIndex < dayCount; dayIndex += 1) {
+        const dayStart = start + dayIndex * 86400;
+        const dayEnd = Math.min(end, dayStart + 86400);
+        for (let cellStart = dayStart; cellStart < dayEnd; cellStart += bucketSeconds) {
+          const cellEnd = Math.min(dayEnd, cellStart + bucketSeconds);
+          const localStart = Math.max(0, Math.round(cellStart - dayStart));
+          const localEnd = Math.max(localStart, Math.round(cellEnd - dayStart));
+          let goodSeconds = 0;
+          for (const sourceItem of sourceItems || []) {
+            const from = Math.max(0, Math.floor(cellStart - sourceItem.startSecond));
+            const to = Math.min(sourceItem.values.length, Math.ceil(cellEnd - sourceItem.startSecond));
+            for (let i = from; i < to; i += 1) {
+              if (Number.isFinite(sourceItem.values[i])) goodSeconds += 1;
+            }
+          }
+          let lowerSeconds = 0;
+          let upperSeconds = 0;
+          let eventCount = 0;
+          let maxExceedanceMhz = 0;
+          for (const event of events || []) {
+            const overlap = Math.max(0, Math.min(cellEnd, event.endSecond) - Math.max(cellStart, event.startSecond));
+            if (!overlap) continue;
+            eventCount += 1;
+            maxExceedanceMhz = Math.max(maxExceedanceMhz, event.exceedanceMhz || 0);
+            if (event.side === 'lower') lowerSeconds += overlap;
+            if (event.side === 'upper') upperSeconds += overlap;
+          }
+          const slot = Math.floor(localStart / bucketSeconds);
+          const date = dateList[dayIndex] || dateList.at(-1) || state.current?.date;
+          const ratio = goodSeconds ? ((lowerSeconds + upperSeconds) / goodSeconds) * 100 : -1;
+          cells.push({
+            slot,
+            dayIndex,
+            startSecond: cellStart,
+            endSecond: cellEnd,
+            label: `${displayDate(date)} ${secondToTime(localStart).slice(0, 5)}-${secondToTime(localEnd || 86400).slice(0, 5)}`,
+            lowerSeconds,
+            upperSeconds,
+            violationSeconds: lowerSeconds + upperSeconds,
+            eventCount,
+            maxExceedanceMhz,
+            goodSeconds,
+            violationRatio: ratio
+          });
+        }
+      }
+      return { bucketSeconds, labels, days, cells };
+    }
+
+    function buildBandViolationHeatmapData(heatmap) {
+      return (heatmap.cells || []).map(cell => [
+        cell.slot,
+        cell.dayIndex,
+        cell.goodSeconds ? Number(cell.violationRatio.toFixed(3)) : -1,
+        cell.startSecond,
+        cell.endSecond,
+        cell.label,
+        Number(cell.lowerSeconds || 0),
+        Number(cell.upperSeconds || 0),
+        Number(cell.violationSeconds || 0),
+        Number(cell.eventCount || 0),
+        Number((cell.maxExceedanceMhz || 0).toFixed(3)),
+        Number(cell.goodSeconds || 0)
+      ]);
+    }
+
+    function bandViolationHeatmapSeries(heatmapData) {
+      return {
+        type: 'heatmap',
+        name: t('bandViolationHeatmap'),
+        xAxisIndex: 1,
+        yAxisIndex: 1,
+        data: heatmapData,
+        progressive: 1000,
+        emphasis: { itemStyle: { borderColor: '#0d2f4f', borderWidth: 1.5 } }
+      };
+    }
+
+    function aggregateBandViolationEvents(sourceItems, band, minDurationSeconds) {
+      const perSource = (sourceItems || []).map(sourceItem => computeBandViolationEvents(sourceItem.values, band.min, band.max, {
+        startSecond: sourceItem.startSecond,
+        minDurationSeconds,
+        source: sourceItem.source,
+        sourceName: sourceItem.sourceName
+      }));
+      const events = perSource.flatMap(item => item.events).sort((a, b) => a.startSecond - b.startSecond || a.endSecond - b.endSecond || String(a.source).localeCompare(String(b.source)));
+      const lowerSeconds = events.filter(event => event.side === 'lower').reduce((sum, event) => sum + event.durationSeconds, 0);
+      const upperSeconds = events.filter(event => event.side === 'upper').reduce((sum, event) => sum + event.durationSeconds, 0);
+      const lowerCount = events.filter(event => event.side === 'lower').length;
+      const upperCount = events.filter(event => event.side === 'upper').length;
+      const goodSeconds = sourceItems.reduce((sum, item) => sum + item.values.reduce((count, value) => count + (Number.isFinite(value) ? 1 : 0), 0), 0);
+      const violationSeconds = lowerSeconds + upperSeconds;
+      const longest = events.slice().sort((a, b) => (b.durationSeconds || 0) - (a.durationSeconds || 0) || a.startSecond - b.startSecond)[0] || null;
+      const maxLowerExceedanceMhz = events.filter(event => event.side === 'lower').reduce((max, event) => Math.max(max, event.exceedanceMhz || 0), 0);
+      const maxUpperExceedanceMhz = events.filter(event => event.side === 'upper').reduce((max, event) => Math.max(max, event.exceedanceMhz || 0), 0);
+      return {
+        events,
+        lowerSeconds,
+        upperSeconds,
+        lowerCount,
+        upperCount,
+        violationSeconds,
+        goodSeconds,
+        inBandRatio: goodSeconds ? Math.max(0, Math.min(1, 1 - violationSeconds / goodSeconds)) : 0,
+        longest,
+        maxLowerExceedanceMhz,
+        maxUpperExceedanceMhz
+      };
+    }
+
+    function bandViolationEventRows(events, dateList) {
+      return (events || []).map(event => ({
+        source: event.sourceName,
+        type: event.side === 'lower' ? t('bandViolationLowerShort') : t('bandViolationUpperShort'),
+        start: statsSecondLabel(dateList, event.startSecond),
+        end: statsSecondLabel(dateList, event.endSecond),
+        duration: durationText(event.durationSeconds || 0),
+        extreme: statsValueText(event.extremeHz ?? event.value, 4, ' Hz'),
+        exceedance: statsValueText(event.exceedanceMhz, 2, ' mHz'),
+        startSecond: event.startSecond,
+        endSecond: event.endSecond,
+        drilldownType: 'band'
+      }));
+    }
+
+    function bandViolationResultFromSources(type, source, current, dateList, sourceItems, quality, qualityEvents) {
+      const band = statsBandBounds();
+      const range = {
+        start: Math.min(...sourceItems.map(item => item.startSecond), 0),
+        end: Math.max(...sourceItems.map(item => item.endSecond), 86400)
+      };
+      const chartSources = mergeBandViolationSourceItems(sourceItems, range);
+      const minDurationSeconds = bandViolationMinimumDurationSeconds();
+      const bandResult = aggregateBandViolationEvents(chartSources, band, minDurationSeconds);
+      const sampling = buildSamplingMetadata(null, 1, 'good-quality-canonical');
+      sampling.totalSamples = chartSources.reduce((sum, item) => sum + item.values.length, 0);
+      sampling.validSamples = bandResult.goodSeconds;
+      sampling.missingRatio = sampling.totalSamples ? 1 - bandResult.goodSeconds / sampling.totalSamples : 0;
+      sampling.requestedResolution = '1s';
+      sampling.resolution = '1s';
+      state.analysis.sampling = sampling;
+      const longest = bandResult.longest;
+      const card = (label, value, helpKey = '', extra = {}) => ({
+        label,
+        value,
+        tooltip: helpKey ? t(helpKey) : '',
+        ...extra
+      });
+      return {
+        type,
+        title: t(analysisDefinition('events').titleKey),
+        description: t(analysisDefinition('events').descriptionKey),
+        metadata: analysisMetadata('events', source, current, dateList, sampling),
+        bandViolationMeta: {
+          band,
+          minDurationSeconds,
+          goodSeconds: bandResult.goodSeconds,
+          lowerCount: bandResult.lowerCount,
+          upperCount: bandResult.upperCount,
+          lowerSeconds: bandResult.lowerSeconds,
+          upperSeconds: bandResult.upperSeconds,
+          maxLowerExceedanceMhz: bandResult.maxLowerExceedanceMhz,
+          maxUpperExceedanceMhz: bandResult.maxUpperExceedanceMhz,
+          longest,
+          dateList
+        },
+        cards: [
+          card(t('bandViolationTotal'), numberText(bandResult.events.length), 'bandViolationTotalHelp'),
+          card(t('bandViolationTotalDuration'), durationText(bandResult.violationSeconds), 'bandViolationTotalDurationHelp'),
+          card(
+            t('bandViolationLongest'),
+            longest ? `${durationText(longest.durationSeconds || 0)} · ${statsSecondLabel(dateList, longest.startSecond)}` : durationText(0),
+            'bandViolationLongestHelp',
+            { startSecond: longest?.startSecond, endSecond: longest?.endSecond, drilldownType: 'band' }
+          ),
+          card(t('bandViolationInBandRatio'), percent(bandResult.inBandRatio), 'bandViolationInBandRatioHelp')
+        ],
+        events: bandResult.events,
+        tableRows: bandViolationEventRows(bandResult.events, dateList),
+        chart: {
+          kind: 'bandViolation',
+          sourceItems: chartSources,
+          frequencySummaries: chartSources.map(buildBandViolationFrequencySummary),
+          heatmap: buildBandViolationHeatmap(chartSources, bandResult.events, dateList, range),
+          qualityEvents: qualityEvents || [],
+          bandEvents: bandResult.events,
+          range,
+          band
+        },
+        methodology: t('methodEvents'),
+        limitations: t('limitEvents')
+      };
+    }
+
+    function computeBandViolationAnalysisResult(type, source, current, dateList = [current?.date].filter(Boolean)) {
+      const requestedBounds = analysisWindowBounds();
+      const trWindow = statsWindowForSeries(current.rawSeries?.tr || current.tr, requestedBounds);
+      const ceWindow = statsWindowForSeries(current.rawSeries?.de || current.de, requestedBounds);
+      const trQuality = analyzeStatsQuality(trWindow.values, trWindow.bounds);
+      const ceQuality = analyzeStatsQuality(ceWindow.values, ceWindow.bounds);
+      const quality = source === 'de'
+        ? ceQuality
+        : (source === 'both' || source === 'common')
+          ? combinedDualQuality(trQuality, ceQuality)
+          : trQuality;
+      const sourceItems = buildBandViolationSourceItems(source, trQuality, ceQuality);
+      return bandViolationResultFromSources(type, source, current, dateList, sourceItems, quality, quality.qualityEvents || []);
+    }
+
+    async function computeBandViolationRangeResult(source, dateList) {
+      const dailyItems = dateList.map((date, index) => ({ date, index }));
+      const dailyResults = (await mapWithConcurrency(dailyItems, MAX_ANALYSIS_DAY_CONCURRENCY, async ({ date, index }) => {
+        const current = await prepareDailyContext(date, $('analysisAlignment').value);
+        const requestedBounds = analysisWindowBounds();
+        const offsetSeconds = index * 86400;
+        const trWindow = statsWindowForSeries(current.rawSeries.tr, requestedBounds);
+        const ceWindow = statsWindowForSeries(current.rawSeries.de, requestedBounds);
+        const trQuality = analyzeStatsQuality(trWindow.values, trWindow.bounds);
+        const ceQuality = analyzeStatsQuality(ceWindow.values, ceWindow.bounds);
+        const quality = source === 'de'
+          ? ceQuality
+          : (source === 'both' || source === 'common')
+            ? combinedDualQuality(trQuality, ceQuality)
+            : trQuality;
+        return {
+          date,
+          index,
+          current,
+          quality,
+          sourceItems: buildBandViolationSourceItems(source, trQuality, ceQuality, offsetSeconds)
+        };
+      })).filter(Boolean).sort((a, b) => a.index - b.index);
+      if (!dailyResults.length) throw new Error(t('analysisNoSeries'));
+      const lastCurrent = dailyResults.at(-1).current;
+      state.current = lastCurrent;
+      state.analysis.rawSeries = lastCurrent.rawSeries;
+      state.analysis.displaySeries = lastCurrent.displaySeries;
+      state.analysis.analysisSeries = lastCurrent.analysisSeries;
+      const quality = aggregateQualityResults(dailyResults.map(item => item.quality));
+      return bandViolationResultFromSources('events', source, lastCurrent, dateList, dailyResults.flatMap(item => item.sourceItems), quality, quality.qualityEvents || []);
+    }
+
     async function computeQualityRangeResult(source, dateList) {
       const dailyItems = dateList.map((date, index) => ({ date, index }));
       const dailyResults = (await mapWithConcurrency(dailyItems, MAX_ANALYSIS_DAY_CONCURRENCY, async ({ date, index }) => {
@@ -8304,6 +8713,7 @@
       if (!core) throw new Error(t('analysisCoreMissing'));
       if (type === 'quality') return computeQualityAnalysisResult(type, source, current, dateList, workerResult, analysisInput);
       if (type === 'stats') return computeStatsAnalysisResult(type, source, current, dateList);
+      if (type === 'events') return computeBandViolationAnalysisResult(type, source, current, dateList);
       const prepared = analysisInput || prepareAnalysisInput(type, source, current);
       const series = prepared.series;
       const sampleIntervalSeconds = prepared.sampling?.intervalSeconds || 1;
@@ -8432,26 +8842,6 @@
           limitations: t('limitCoherence')
         };
       }
-      if (type === 'events') {
-        const events = detectFrequencyEvents(series, sampleIntervalSeconds);
-        return {
-          type,
-          title: t(analysisDefinition(type).titleKey),
-          description: t(analysisDefinition(type).descriptionKey),
-          metadata,
-          cards: [
-            [t('eventCount'), events.length.toLocaleString(t('localeNumeric'))],
-            [t('eventMin'), `${fmt(Math.min(...finiteValues(series)), 4)} Hz`],
-            [t('eventMax'), `${fmt(Math.max(...finiteValues(series)), 4)} Hz`],
-            [t('classification'), t('classNeedsReview')]
-          ],
-          events,
-          tableRows: events.map(event => ({ start: secondToTime(event.start), end: secondToTime(event.end), duration: durationText(Math.max(0, event.end - event.start)), value: fmt(event.value, 4), classification: event.classification })),
-          chart: { kind: 'line', series: [{ name: sourceLabel(source), data: sampleSeries(series, 60, sampleIntervalSeconds) }] },
-          methodology: t('methodEvents'),
-          limitations: t('limitEvents')
-        };
-      }
       if (type === 'trend') {
         return {
           type,
@@ -8498,8 +8888,34 @@
 
     function renderAnalysisResult(result) {
       $('oscChartTitle').textContent = result.title;
-      $('analysisResultCards').innerHTML = result.cards.map(([label, value]) => `<div class="analysis-result-card"><div class="label">${label}</div><div class="value">${value}</div></div>`).join('');
-      $('oscCountTag').textContent = result.type === 'stats'
+      $('analysisResultCards').innerHTML = result.cards.map(card => {
+        const normalized = Array.isArray(card)
+          ? { label: card[0], value: card[1], tooltip: card[3] || '' }
+          : card;
+        const clickable = Number.isFinite(normalized.startSecond);
+        const attrs = [
+          normalized.tooltip ? `tabindex="0" data-tooltip="${escapeHtml(normalized.tooltip)}" aria-label="${escapeHtml(`${normalized.label}: ${normalized.value}. ${normalized.tooltip}`)}"` : '',
+          clickable ? `data-start="${normalized.startSecond}" data-end="${normalized.endSecond}" data-drilldown-type="${normalized.drilldownType || ''}"` : ''
+        ].filter(Boolean).join(' ');
+        const icon = normalized.tooltip ? '<span class="metric-info-icon" aria-hidden="true">&#9432;</span>' : '';
+        return `<div class="analysis-result-card${clickable ? ' event-row' : ''}" ${attrs}><div class="label"><span class="metric-label">${escapeHtml(normalized.label)}</span>${icon}</div><div class="value">${escapeHtml(normalized.value)}</div></div>`;
+      }).join('');
+      $('analysisResultCards').querySelectorAll('.event-row').forEach(card => card.addEventListener('click', () => {
+        const range = result.chart?.range || { start: 0, end: 86400 };
+        const eventStart = Number(card.dataset.start);
+        const eventEnd = Number(card.dataset.end);
+        const start = Math.max(range.start, eventStart - 30);
+        const end = Math.min(range.end, eventEnd + 30);
+        if (result.chart?.kind === 'stats') {
+          showStatsDetailWindow(result, start, end, { startSecond: eventStart, endSecond: eventEnd, type: card.dataset.drilldownType });
+        } else if (result.chart?.kind === 'bandViolation') {
+          showBandViolationDetailWindow(result, start, end, { startSecond: eventStart, endSecond: eventEnd, type: card.dataset.drilldownType });
+        } else if (result.chart?.kind === 'quality') {
+          showQualityDetailWindow(result, start, end, { startSecond: eventStart, endSecond: eventEnd, type: card.dataset.drilldownType });
+        }
+        $('analysisMainChart')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }));
+      $('oscCountTag').textContent = result.type === 'stats' || result.type === 'events'
         ? t('statsBandViolationCount', { count: result.events.length })
         : t('findingsCount', { count: result.events.length });
       renderGenericAnalysisChart(result);
@@ -8510,7 +8926,7 @@
     function renderGenericAnalysisChart(result) {
       if (!state.oscillationChart) return;
       state.oscillationChart.off('click');
-      const richAnalysisChart = result.chart.kind === 'quality' || result.chart.kind === 'stats';
+      const richAnalysisChart = result.chart.kind === 'quality' || result.chart.kind === 'stats' || result.chart.kind === 'bandViolation';
       $('analysisMainChart')?.classList.toggle('quality-chart', richAnalysisChart);
       if (!richAnalysisChart) {
         $('analysisMainChart').style.height = '';
@@ -8522,6 +8938,10 @@
       }
       if (result.chart.kind === 'stats') {
         renderStatsAnalysisChart(result);
+        return;
+      }
+      if (result.chart.kind === 'bandViolation') {
+        renderBandViolationAnalysisChart(result);
         return;
       }
       if (result.chart.kind === 'heatmap') {
@@ -9212,6 +9632,296 @@
       setQualityZoomResetVisible(false);
     }
 
+    function bandViolationChartTimeLabel(result) {
+      return (value, includeDate = false) => {
+        const total = Math.max(0, Math.round(value || 0));
+        let dayIndex = Math.floor(total / 86400);
+        let localSecond = total % 86400;
+        if (total > 0 && localSecond === 0) {
+          dayIndex -= 1;
+          localSecond = 86400;
+        }
+        const dateLabel = result.bandViolationMeta?.dateList?.[dayIndex];
+        const timeLabel = secondToTime(localSecond).slice(0, includeDate ? 8 : 5);
+        return includeDate && dateLabel ? `${displayDate(dateLabel)} ${timeLabel}` : timeLabel;
+      };
+    }
+
+    function bandViolationEventLabel(event) {
+      if (!event) return t('qualityStatusGood');
+      if (event.side === 'lower' || event.eventSide === 'lower') return t('bandViolationLowerFull');
+      if (event.side === 'upper' || event.eventSide === 'upper') return t('bandViolationUpperFull');
+      return event.classification || t('classNeedsReview');
+    }
+
+    function buildBandViolationEventSeries(events, highlight = null) {
+      if (!events?.length) return [];
+      const total = events.length;
+      const labelStride = total > 80 ? Math.ceil(total / 80) : 1;
+      const groups = [
+        {
+          side: 'lower',
+          legend: t('bandViolationLowerLegend'),
+          marker: t('bandViolationLowerShort'),
+          label: t('bandViolationLowerFull'),
+          color: 'rgba(248,113,113,.13)',
+          borderColor: 'rgba(220,38,38,.46)'
+        },
+        {
+          side: 'upper',
+          legend: t('bandViolationUpperLegend'),
+          marker: t('bandViolationUpperShort'),
+          label: t('bandViolationUpperFull'),
+          color: 'rgba(185,28,28,.14)',
+          borderColor: 'rgba(127,29,29,.50)'
+        }
+      ];
+      return groups.map(group => {
+        const groupEvents = events.filter(event => event.side === group.side);
+        if (!groupEvents.length) return null;
+        return {
+          name: group.legend,
+          type: 'line',
+          xAxisIndex: 0,
+          yAxisIndex: 0,
+          data: [],
+          symbol: 'none',
+          silent: false,
+          lineStyle: { opacity: 0 },
+          markArea: {
+            silent: false,
+            itemStyle: { color: group.color, borderColor: group.borderColor, borderWidth: 1 },
+            data: groupEvents.map((event, index) => {
+              const selected = highlight && Math.abs((highlight.startSecond ?? -1) - event.startSecond) < 1e-6 && Math.abs((highlight.endSecond ?? -1) - event.endSecond) < 1e-6;
+              return [
+                {
+                  xAxis: event.startSecond,
+                  name: index % labelStride === 0 ? group.marker : '',
+                  eventType: 'band',
+                  eventSide: event.side,
+                  eventSource: event.source,
+                  eventSourceName: event.sourceName,
+                  eventLabel: group.label,
+                  eventStartSecond: event.startSecond,
+                  eventEndSecond: event.endSecond,
+                  eventDurationSeconds: event.durationSeconds,
+                  eventValue: event.extremeHz ?? event.value,
+                  eventLimitHz: event.bandLimitHz,
+                  eventExceedanceMhz: event.exceedanceMhz,
+                  itemStyle: selected ? { color: 'rgba(220,38,38,.27)', borderColor: '#dc2626', borderWidth: 1.8 } : undefined
+                },
+                { xAxis: event.endSecond }
+              ];
+            })
+          }
+        };
+      }).filter(Boolean);
+    }
+
+    function bandViolationChartTooltip(chartTimeLabel, result) {
+      const findEvent = (start, end, seriesName = '') => (result.chart.bandEvents || [])
+        .find(event => event.startSecond < end && event.endSecond > start && (!seriesName || seriesName.includes(event.sourceName)));
+      return {
+        trigger: 'item',
+        triggerOn: 'mousemove|click',
+        axisPointer: { type: 'cross' },
+        formatter: params => {
+          const eventData = Array.isArray(params.data) ? params.data[0] : params.data;
+          if (eventData?.eventType === 'band') {
+            return [
+              `<strong>${eventData.eventLabel || bandViolationEventLabel(eventData)}</strong>`,
+              `${t('bandViolationSource')}: ${eventData.eventSourceName || sourceLabel(eventData.eventSource)}`,
+              `${t('eventStart')}: ${chartTimeLabel(eventData.eventStartSecond, true)}`,
+              `${t('eventEnd')}: ${chartTimeLabel(eventData.eventEndSecond, true)}`,
+              `${t('tableDuration')}: ${durationText(eventData.eventDurationSeconds || 0)}`,
+              `${t('qualityTooltipFrequency')}: ${statsValueText(Number(eventData.eventValue), 4, ' Hz')}`,
+              `${t('bandViolationBandLimit')}: ${statsValueText(Number(eventData.eventLimitHz), 3, ' Hz')}`,
+              `${t('bandViolationExceedanceMhz')}: ${statsValueText(Number(eventData.eventExceedanceMhz), 2, ' mHz')}`
+            ].join('<br>');
+          }
+          if (params.seriesType === 'heatmap') {
+            const [, , ratio, startSecond, endSecond, label, lowerSeconds, upperSeconds, violationSeconds, eventCount, maxExceedanceMhz] = params.value || [];
+            if (ratio < 0) return `${t('bandViolationHeatmap')}<br>${label}<br>${t('qualityNoData')}`;
+            return [
+              `<strong>${t('bandViolationHeatmap')}</strong>`,
+              `${t('qualityTooltipInterval')}: ${label}`,
+              `${t('bandViolationRatio')}: ${fmt(Number(ratio), 2)}%`,
+              `${t('bandViolationLowerDuration')}: ${durationText(lowerSeconds || 0)}`,
+              `${t('bandViolationUpperDuration')}: ${durationText(upperSeconds || 0)}`,
+              `${t('bandViolationTotalDuration')}: ${durationText(violationSeconds || 0)}`,
+              `${t('eventCount')}: ${numberText(eventCount || 0)}`,
+              `${t('bandViolationMaxExceedance')}: ${statsValueText(maxExceedanceMhz, 2, ' mHz')}`,
+              `${chartTimeLabel(startSecond, true)}-${chartTimeLabel(endSecond, true)}`
+            ].join('<br>');
+          }
+          if (params.seriesType === 'line') {
+            const value = params.value || params.data || [];
+            const x = Number(value[0]);
+            const y = Number(value[1]);
+            const bucketSeconds = Math.max(1, Number(value[2]) || 1);
+            const start = bucketSeconds > 1 ? x - bucketSeconds / 2 : x;
+            const end = bucketSeconds > 1 ? x + bucketSeconds / 2 : x + 1;
+            const event = findEvent(start, end, params.seriesName || '');
+            return [
+              `<strong>${params.seriesName || t('statsFrequencySummary')}</strong>`,
+              `${t('qualityTooltipDateTime')}: ${bucketSeconds > 1 ? `${chartTimeLabel(start, true)}-${chartTimeLabel(end, true)}` : chartTimeLabel(x, true)}`,
+              `${t('qualityTooltipFrequency')}: ${Number.isFinite(y) ? `${fmt(y, 4)} Hz` : t('qualityMissingTooltipTitle')}`,
+              `${t('qualityTooltipStatus')}: ${event ? bandViolationEventLabel(event) : t('qualityStatusGood')}`,
+              event ? `${t('bandViolationExceedanceMhz')}: ${statsValueText(event.exceedanceMhz, 2, ' mHz')}` : ''
+            ].filter(Boolean).join('<br>');
+          }
+          return params.seriesName || '';
+        }
+      };
+    }
+
+    function renderBandViolationAnalysisChart(result) {
+      setQualityZoomResetVisible(false);
+      const range = result.chart.range || { start: 0, end: 86400 };
+      const chartTimeLabel = bandViolationChartTimeLabel(result);
+      const heatmap = result.chart.heatmap || { labels: [], days: [], cells: [] };
+      const heatmapData = buildBandViolationHeatmapData(heatmap);
+      const heatmapHeight = Math.max(96, heatmap.days.length * 18);
+      const chartHeight = Math.max(620, 520 + heatmapHeight);
+      $('analysisMainChart').style.height = `${chartHeight}px`;
+      state.oscillationChart.resize();
+      const band = result.chart.band || statsBandBounds();
+      const frequencySeries = (result.chart.frequencySummaries || []).map((summary, index) => ({
+        name: summary.name || t('statsFrequencySummary'),
+        type: 'line',
+        xAxisIndex: 0,
+        yAxisIndex: 0,
+        data: summary.data || [],
+        symbol: 'none',
+        connectNulls: false,
+        lineStyle: { width: 1.8, color: summary.color || '#101820', opacity: index ? 0.82 : 1 },
+        itemStyle: { color: summary.color || '#101820' },
+        markLine: index === 0 ? {
+          silent: true,
+          symbol: 'none',
+          label: { formatter: params => params.name },
+          lineStyle: { color: 'rgba(13,47,79,.42)', type: 'dashed', width: 1 },
+          data: [
+            { yAxis: band.min, name: t('bandViolationLowerBandLine') },
+            { yAxis: band.max, name: t('bandViolationUpperBandLine') }
+          ]
+        } : undefined
+      }));
+      const series = [
+        ...frequencySeries,
+        ...buildQualityMarkSeries(result.chart.qualityEvents || []),
+        ...buildBandViolationEventSeries(result.chart.bandEvents || []),
+        bandViolationHeatmapSeries(heatmapData)
+      ];
+      state.oscillationChart.setOption({
+        animation: false,
+        tooltip: bandViolationChartTooltip(chartTimeLabel, result),
+        legend: { top: 8, type: 'scroll' },
+        grid: [
+          { left: 68, right: 42, top: 58, height: 285 },
+          { left: 68, right: 42, top: 430, height: heatmapHeight }
+        ],
+        xAxis: [
+          {
+            type: 'value',
+            gridIndex: 0,
+            min: range.start,
+            max: range.end,
+            axisLabel: { formatter: value => chartTimeLabel(value, range.end > 86400) }
+          },
+          {
+            type: 'category',
+            gridIndex: 1,
+            data: heatmap.labels,
+            axisLabel: { interval: Math.max(0, Math.floor((heatmap.labels.length || 1) / 8) - 1) }
+          }
+        ],
+        yAxis: [
+          { type: 'value', gridIndex: 0, scale: true, name: 'Hz' },
+          { type: 'category', gridIndex: 1, data: heatmap.days, name: '' }
+        ],
+        visualMap: {
+          type: 'piecewise',
+          dimension: 2,
+          seriesIndex: series.length - 1,
+          orient: 'horizontal',
+          left: 'center',
+          top: 374,
+          pieces: [
+            { value: -1, label: t('qualityNoData'), color: '#d1d5db' },
+            { value: 0, label: '0%', color: '#1f9d55' },
+            { gt: 0, lte: 5, label: '0-5%', color: '#a3e635' },
+            { gt: 5, lte: 20, label: '5-20%', color: '#facc15' },
+            { gt: 20, lte: 50, label: '20-50%', color: '#f97316' },
+            { gt: 50, lte: 100, label: '50-100%', color: '#7f1d1d' }
+          ]
+        },
+        dataZoom: [
+          { type: 'inside', xAxisIndex: [0], filterMode: 'none' },
+          { type: 'slider', xAxisIndex: [0], filterMode: 'none', height: 22, bottom: 14 }
+        ],
+        series
+      }, true);
+      state.oscillationChart.on('click', params => {
+        if (params.seriesName !== t('bandViolationHeatmap') || !params.value) return;
+        showBandViolationDetailWindow(result, params.value[3], params.value[4]);
+        $('analysisMainChart').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    }
+
+    function buildBandViolationSecondWindowSeries(result, startSecond, endSecond) {
+      return (result.chart.sourceItems || []).map(sourceItem => {
+        const data = [];
+        const from = Math.max(0, Math.floor(startSecond - sourceItem.startSecond));
+        const to = Math.min(sourceItem.values.length, Math.ceil(endSecond - sourceItem.startSecond));
+        for (let i = from; i < to; i += 1) {
+          const x = sourceItem.startSecond + i;
+          const value = sourceItem.values[i];
+          data.push([x, Number.isFinite(value) ? Number(value.toFixed(6)) : null, 1]);
+        }
+        return {
+          name: `${sourceItem.sourceName} · 1s`,
+          type: 'line',
+          xAxisIndex: 0,
+          yAxisIndex: 0,
+          data,
+          symbol: 'none',
+          connectNulls: false,
+          lineStyle: { width: 1.6, color: sourceItem.color || '#101820' },
+          itemStyle: { color: sourceItem.color || '#101820' }
+        };
+      });
+    }
+
+    function showBandViolationDetailWindow(result, startSecond, endSecond, highlight = null) {
+      if (!state.oscillationChart || result?.chart?.kind !== 'bandViolation') return;
+      const range = result.chart.range || { start: 0, end: 86400 };
+      const start = Math.max(range.start, Number(startSecond));
+      const end = Math.min(range.end, Number(endSecond));
+      if (!(end > start)) return;
+      const heatmapData = buildBandViolationHeatmapData(result.chart.heatmap || { cells: [] });
+      const series = [
+        ...buildBandViolationSecondWindowSeries(result, start, end),
+        ...buildQualityMarkSeries(result.chart.qualityEvents || [], highlight),
+        ...buildBandViolationEventSeries(result.chart.bandEvents || [], highlight),
+        bandViolationHeatmapSeries(heatmapData)
+      ];
+      state.oscillationChart.setOption({
+        xAxis: [{ min: start, max: end }],
+        series
+      }, { replaceMerge: ['series'] });
+      state.oscillationChart.dispatchAction({ type: 'dataZoom', dataZoomIndex: 0, startValue: start, endValue: end });
+      setQualityZoomResetVisible(true);
+    }
+
+    function showBandViolationFullRange(result = state.analysis.lastResult) {
+      if (!result?.chart || result.chart.kind !== 'bandViolation') return;
+      renderBandViolationAnalysisChart(result);
+      const range = result.chart.range || { start: 0, end: 86400 };
+      state.oscillationChart?.dispatchAction({ type: 'dataZoom', dataZoomIndex: 0, startValue: range.start, endValue: range.end });
+      setQualityZoomResetVisible(false);
+    }
+
     function setAnalysisTableHeader(columns) {
       const head = $('analysisEventsHead');
       if (!head) return;
@@ -9221,7 +9931,11 @@
           : column.key === 'range'
             ? t('eventSourceRangeHead', { source: sourceShortLabel(getAnalysisSource()) })
             : t(column.labelKey);
-        return `<th>${label}</th>`;
+        if (column.helpKey) {
+          const help = t(column.helpKey);
+          return `<th><span class="metric-name" tabindex="0" data-tooltip-kind="metric-help" data-tooltip="${escapeHtml(help)}" aria-label="${escapeHtml(`${label}: ${help}`)}"><span class="metric-label">${escapeHtml(label)}</span><span class="metric-info-icon" aria-hidden="true">&#9432;</span></span></th>`;
+        }
+        return `<th>${escapeHtml(label)}</th>`;
       }).join('')}</tr>`;
     }
 
@@ -9229,7 +9943,7 @@
       const def = analysisDefinition(result.type);
       const columns = result.tableColumns || def.tableColumns || [];
       const body = $('analysisEventsBody');
-      body?.closest('table')?.classList.toggle('stats-table', result.type === 'stats');
+      body?.closest('table')?.classList.toggle('stats-table', result.type === 'stats' || result.type === 'events');
       $('analysisTableTitle').textContent = result.tableTitle || result.title || t(def.titleKey);
       $('analysisTableDescription').textContent = result.description || t(def.descriptionKey);
       setAnalysisTableHeader(columns);
@@ -9267,6 +9981,8 @@
           showQualityDetailWindow(result, start, end, { startSecond: eventStart, endSecond: eventEnd, type: row.dataset.drilldownType });
         } else if (result.chart?.kind === 'stats') {
           showStatsDetailWindow(result, start, end, { startSecond: eventStart, endSecond: eventEnd, type: row.dataset.drilldownType });
+        } else if (result.chart?.kind === 'bandViolation') {
+          showBandViolationDetailWindow(result, start, end, { startSecond: eventStart, endSecond: eventEnd, type: row.dataset.drilldownType });
         } else {
           state.oscillationChart?.dispatchAction({ type: 'dataZoom', startValue: start, endValue: end });
         }
@@ -9359,8 +10075,8 @@
           dateRange: dateList,
           timeWindowSeconds: [windowBounds.start, windowBounds.end],
           alignment: $('analysisAlignment')?.value || state.settings.alignmentMode,
-          resolution: (type === 'quality' || type === 'stats') ? '1s' : ($('analysisResolution')?.value || 'auto'),
-          bandHz: type === 'stats'
+          resolution: (type === 'quality' || type === 'stats' || type === 'events') ? '1s' : ($('analysisResolution')?.value || 'auto'),
+          bandHz: (type === 'stats' || type === 'events')
             ? [Number($('statsBandMinHz')?.value || 49.90), Number($('statsBandMaxHz')?.value || 50.10)]
             : [Number($('bandMin').value), Number($('bandMax').value)]
         },
@@ -10715,8 +11431,8 @@
         analysisQualityDesc: 'Eksik örnekler, kapsama oranı ve zaman sürekliliği ölçülür.',
         analysisStatsTitle: 'Temel Frekans İstatistikleri',
         analysisStatsDesc: 'Ortalama, minimum, maksimum ve RMS sapma seçilen seri üzerinde hesaplanır.',
-        analysisEventsTitle: 'Bant İhlali Bulguları',
-        analysisEventsDesc: 'Nominal frekanstan eşik üstü sapmalar olay aralığı olarak listelenir.',
+        analysisEventsTitle: 'Bant İhlali Özeti',
+        analysisEventsDesc: 'Good Quality saniyelik frekans verisinde 49.90-50.10 Hz bandı dışındaki olaylar listelenir.',
         analysisRocofTitle: 'RoCoF Bulguları',
         analysisRocofDesc: 'Frekans değişim hızı olayları ve tepe Hz/s değerleri raporlanır.',
         analysisPsdTitle: 'Welch PSD Spektral Özeti',
@@ -10737,7 +11453,7 @@
         rocofPeak: 'Tepe Hz/s',
         limitQuality: 'Coverage % unique valid timestamp / expected seconds olarak hesaplanır. Good Quality %, geçersiz, yinelenen timestamp ve YD/RV eşiğini aşan ardışık aynı frekans aralıklarını ayrıca düşer.',
         limitStats: 'Temel istatistikler olay nedeni çıkarmaz; yalnız dağılımı özetler.',
-        limitEvents: 'Bant ihlali eşiği nominal frekans profiline göre yorumlanmalıdır.',
+        limitEvents: 'Missing, invalid, yinelenen timestamp ve YD/RV olarak işaretlenen saniyeler bant ihlali hesabına dahil edilmez; kalite boşluğu olayları böler.',
         limitRocof: 'RoCoF saniyelik ve filtreli seri gerektirir; seyrek örnekleme hatalı tepe üretebilir.',
         limitPsd: 'PSD bantları Nyquist sınırının altında ve aynı örnekleme varsayımıyla yorumlanmalıdır.',
         limitSpectrogram: 'Spektrogram kısa süreli pencerelere duyarlıdır; dakikalık/saatlik veri uygun değildir.',
@@ -10904,6 +11620,37 @@
         statsHelpBandViolationDuration: 'Alt veya üst istatistik bandı ihlalinde geçen toplam süre.',
         statsHelpBandViolationEvents: 'Kesintisiz alt/üst bant ihlali aralıklarının olay sayısı.',
         statsHelpLongestBandViolation: 'En uzun kesintisiz bant ihlali; tıklayınca ilgili aralığa zoom yapılır.',
+        bandViolationTotal: 'Toplam Bant İhlali',
+        bandViolationTotalHelp: 'Good Quality saniyelik örneklerde alt veya üst bant dışında kalan kesintisiz olay sayısı.',
+        bandViolationTotalDuration: 'Toplam İhlal Süresi',
+        bandViolationTotalDurationHelp: 'Good Quality saniyelik örneklerde bant dışında geçen toplam süre.',
+        bandViolationLongest: 'En Uzun Bant İhlali',
+        bandViolationLongestHelp: 'En uzun kesintisiz bant ihlali; tıklayınca gerçek saniyelik veride ilgili olaya zoom yapılır.',
+        bandViolationInBandRatio: 'Bant İçinde Kalma Oranı',
+        bandViolationInBandRatioHelp: 'Good Quality örneklerin tanımlı alt/üst bant içinde kaldığı oran.',
+        bandViolationSource: 'Kaynak',
+        bandViolationSourceHelp: 'Olayın hesaplandığı ölçüm serisi. Çift seri modunda Türkiye ve CE olayları ayrı tutulur.',
+        bandViolationType: 'Tür',
+        bandViolationTypeHelp: 'Aİ alt bant ihlali, Üİ üst bant ihlalidir.',
+        bandViolationDurationHelp: 'Olayın başlangıç ve bitişi arasındaki kesintisiz ihlal süresi.',
+        bandViolationExtremeHz: 'Ekstrem Hz',
+        bandViolationExtremeHelp: 'Alt bant olayında minimum, üst bant olayında maksimum frekans değeri.',
+        bandViolationExceedanceMhz: 'Aşım mHz',
+        bandViolationExceedanceHelp: 'İlgili olayda frekansın tanımlı alt veya üst bant limitini maksimum ne kadar aştığı.',
+        bandViolationLowerFull: 'Alt Bant İhlali',
+        bandViolationUpperFull: 'Üst Bant İhlali',
+        bandViolationLowerShort: 'Aİ',
+        bandViolationUpperShort: 'Üİ',
+        bandViolationLowerLegend: 'Aİ / Alt Bant İhlali',
+        bandViolationUpperLegend: 'Üİ / Üst Bant İhlali',
+        bandViolationHeatmap: 'Bant İhlali Heatmap',
+        bandViolationRatio: 'İhlal oranı',
+        bandViolationLowerDuration: 'Aİ süresi',
+        bandViolationUpperDuration: 'Üİ süresi',
+        bandViolationMaxExceedance: 'Maksimum limit aşımı',
+        bandViolationBandLimit: 'Bant limiti',
+        bandViolationLowerBandLine: 'Alt bant',
+        bandViolationUpperBandLine: 'Üst bant',
         qualityTrValid: 'Türkiye kaliteli örnek',
         qualityCeValid: 'Kıta Avrupası kaliteli örnek',
         qualityPairedValid: 'Ortak kullanılabilir / Paired Valid',
@@ -10949,7 +11696,7 @@
         methodSpectrogram: 'Spektrogram, 10 dakikalık pencerelerde baskın frekansın zamanla değişimini gösterir.',
         methodCrossCorrelation: 'Çapraz korelasyon, Türkiye ve Kıta Avrupası serileri arasındaki en güçlü gecikmeli benzerliği arar.',
         methodCoherence: 'Koherens ve faz, seçilen frekansta ortak hareketin tutarlılığını tahmin eder.',
-        methodEvents: 'Olay analizi, nominal frekanstan sapmanın eşik üstünde kaldığı aralıkları çıkarır.',
+        methodEvents: 'Bant ihlali analizi, 1 saniyelik canonical Good Quality veride alt/üst frekans bandı dışındaki ardışık saniyeleri olay olarak gruplar.',
         methodTrend: 'Trend görünümü saatlik/günlük hata ölçülerini özetler.',
         methodStats: 'Temel istatistikler, Missing/Invalid/Duplicate Timestamp/YD olayları elendikten sonra kalan saniyelik good-quality canonical örneklerin dağılımını hesaplar.',
         methodOscillation: 'Osilasyon analizi band geçiren FIR filtresi ve kayan pencere eşikleme ile aday aralıkları çıkarır.',
@@ -11089,8 +11836,8 @@
         analysisQualityDesc: 'Missing samples, coverage ratio, and time continuity are measured.',
         analysisStatsTitle: 'Basic Frequency Statistics',
         analysisStatsDesc: 'Mean, minimum, maximum, and RMS deviation are computed for the selected series.',
-        analysisEventsTitle: 'Band Breach Findings',
-        analysisEventsDesc: 'Intervals above the deviation threshold from nominal frequency are listed.',
+        analysisEventsTitle: 'Band Violation Summary',
+        analysisEventsDesc: 'Events outside the 49.90-50.10 Hz band are listed from Good Quality one-second frequency data.',
         analysisRocofTitle: 'RoCoF Findings',
         analysisRocofDesc: 'Frequency rate-of-change events and peak Hz/s values are reported.',
         analysisPsdTitle: 'Welch PSD Spectral Summary',
@@ -11111,7 +11858,7 @@
         rocofPeak: 'Peak Hz/s',
         limitQuality: 'Coverage % is unique valid timestamp / expected seconds. Good Quality % separately excludes invalid samples, duplicate timestamps, and repeated-value runs that meet the configured RV threshold.',
         limitStats: 'Basic statistics summarize distribution only and do not infer event causes.',
-        limitEvents: 'Band breaches should be interpreted against the nominal frequency profile.',
+        limitEvents: 'Seconds marked as Missing, Invalid, Duplicate Timestamp, or RV are excluded from band-violation detection; quality gaps split events.',
         limitRocof: 'RoCoF requires second-level filtered data; sparse sampling can create false peaks.',
         limitPsd: 'PSD bands must remain below Nyquist and share the same sampling assumption.',
         limitSpectrogram: 'Spectrogram is sensitive to short windows; minutely/hourly data is unsuitable.',
@@ -11278,6 +12025,37 @@
         statsHelpBandViolationDuration: 'Total time spent in lower or upper statistics-band violation.',
         statsHelpBandViolationEvents: 'Count of continuous lower/upper band violation intervals.',
         statsHelpLongestBandViolation: 'Longest continuous band violation; click to zoom to the interval.',
+        bandViolationTotal: 'Total Band Violations',
+        bandViolationTotalHelp: 'Continuous lower or upper band violation event count in Good Quality one-second samples.',
+        bandViolationTotalDuration: 'Total Violation Duration',
+        bandViolationTotalDurationHelp: 'Total time spent outside the configured band in Good Quality one-second samples.',
+        bandViolationLongest: 'Longest Band Violation',
+        bandViolationLongestHelp: 'Longest continuous band violation; click to zoom to the event with real one-second data.',
+        bandViolationInBandRatio: 'In-band Ratio',
+        bandViolationInBandRatioHelp: 'Share of Good Quality samples that remain inside the configured lower/upper band.',
+        bandViolationSource: 'Source',
+        bandViolationSourceHelp: 'Measurement series used for the event. In dual-series mode, Türkiye and CE events remain separate.',
+        bandViolationType: 'Type',
+        bandViolationTypeHelp: 'LBV means Lower Band Violation; UBV means Upper Band Violation.',
+        bandViolationDurationHelp: 'Continuous violation duration between event start and end.',
+        bandViolationExtremeHz: 'Extreme Hz',
+        bandViolationExtremeHelp: 'Minimum frequency for a lower-band event; maximum frequency for an upper-band event.',
+        bandViolationExceedanceMhz: 'Exceedance mHz',
+        bandViolationExceedanceHelp: 'Maximum amount by which frequency exceeded the configured lower or upper band limit during the event.',
+        bandViolationLowerFull: 'Lower Band Violation',
+        bandViolationUpperFull: 'Upper Band Violation',
+        bandViolationLowerShort: 'LBV',
+        bandViolationUpperShort: 'UBV',
+        bandViolationLowerLegend: 'LBV / Lower Band Violation',
+        bandViolationUpperLegend: 'UBV / Upper Band Violation',
+        bandViolationHeatmap: 'Band Violation Heatmap',
+        bandViolationRatio: 'Violation ratio',
+        bandViolationLowerDuration: 'LBV duration',
+        bandViolationUpperDuration: 'UBV duration',
+        bandViolationMaxExceedance: 'Maximum limit exceedance',
+        bandViolationBandLimit: 'Band limit',
+        bandViolationLowerBandLine: 'Lower band',
+        bandViolationUpperBandLine: 'Upper band',
         qualityTrValid: 'Türkiye quality samples',
         qualityCeValid: 'CE quality samples',
         qualityPairedValid: 'Paired Valid',
@@ -11323,7 +12101,7 @@
         methodSpectrogram: 'The spectrogram tracks dominant frequency changes across 10-minute windows.',
         methodCrossCorrelation: 'Cross-correlation searches for the strongest delayed similarity between Türkiye and Continental Europe.',
         methodCoherence: 'Coherence and phase estimate shared motion at the selected frequency.',
-        methodEvents: 'Event analysis extracts intervals where deviation from nominal frequency exceeds the threshold.',
+        methodEvents: 'Band violation analysis groups consecutive one-second canonical Good Quality samples outside the lower/upper frequency band.',
         methodTrend: 'The trend view summarizes hourly and daily error metrics.',
         methodStats: 'Basic statistics describe the distribution of one-second good-quality canonical samples after excluding Missing, Invalid, Duplicate Timestamp, and RV events.',
         methodOscillation: 'Oscillation analysis uses a band-pass FIR filter and sliding-window thresholding.',

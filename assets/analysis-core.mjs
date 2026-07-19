@@ -251,8 +251,8 @@ function collectMaskEvents(mask, startSecond, intervalSeconds, type, classificat
 
 export function computeBasicStats(values, {
   nominalHz = DEFAULT_NOMINAL_HZ,
-  bandMinHz = 49.95,
-  bandMaxHz = 50.05
+  bandMinHz = 49.90,
+  bandMaxHz = 50.10
 } = {}) {
   const clean = finiteValues(values).sort((a, b) => a - b);
   const n = clean.length;
