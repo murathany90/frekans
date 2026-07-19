@@ -28,7 +28,7 @@ assert.match(
 );
 assert.match(
   html,
-  /LIMITED_DATE_MODE_ANALYSES\s*=\s*new Set\(\s*\[\s*['"]quality['"]\s*,\s*['"]stats['"]\s*,\s*['"]events['"]\s*\]\s*\)/,
+  /LIMITED_DATE_MODE_ANALYSES\s*=\s*new Set\(\s*\[\s*['"]quality['"]\s*,\s*['"]stats['"]\s*,\s*['"]events['"]\s*,\s*['"]rocof['"]\s*\]\s*\)/,
   "Band violation should use the single-day/date-range-only date mode."
 );
 assert.match(

@@ -52,7 +52,7 @@ if (!/allowedResolutions:\s*\[\s*'1s'\s*\][\s\S]{0,420}spectrogram/.test(html) &
   throw new Error("Spectrogram must require second-level analysis resolution.");
 }
 
-if (!/data-param-key="band"/.test(html) || !/data-param-key="rocof"/.test(html)) {
+if (!/data-param-key="band"/.test(html) || !/data-param-key="rocofThreshold"/.test(html) || !/data-param-key="rocofMethod"/.test(html)) {
   throw new Error("Advanced analysis parameters must be tagged with data-param-key.");
 }
 

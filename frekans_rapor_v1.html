@@ -1307,6 +1307,32 @@
       gap: 10px;
       margin: 12px 0;
     }
+    .analysis-detail-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 6px;
+      margin: 0 0 10px;
+    }
+    .analysis-detail-summary[hidden] { display: none; }
+    .analysis-detail-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfdfe;
+      padding: 6px 8px;
+      color: var(--muted);
+      font-size: .76rem;
+      font-weight: 800;
+    }
+    .analysis-detail-item strong {
+      color: var(--navy);
+      font-size: .8rem;
+      white-space: nowrap;
+    }
     .report-preview {
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -2406,7 +2432,10 @@
             <div class="field" data-param-key="filter"><label for="filterTaps" data-i18n="filterTapsLabel">FIR kademe</label><input id="filterTaps" type="number" min="31" max="401" step="2" value="101" /></div>
             <div class="field" data-param-key="duration"><label for="minDuration" data-i18n="minDurationLabel">Min. süre (sn)</label><input id="minDuration" type="number" min="10" max="1800" step="10" value="30" /></div>
             <div class="field" data-param-key="yd"><label for="repeatedValueSeconds" data-i18n="qualityRepeatedThresholdLabel">YD eşiği (sn)</label><input id="repeatedValueSeconds" type="number" min="1" max="3600" step="1" value="15" /></div>
-            <div class="field" data-param-key="rocof"><label for="rocofThreshold" data-i18n="rocofThresholdLabel">RoCoF eşiği</label><input id="rocofThreshold" type="number" min="0.001" max="1" step="0.001" value="0.01" /></div>
+            <div class="field" data-param-key="rocofMethod"><label for="rocofMethod" data-i18n="rocofMethodLabel">RoCoF yöntemi</label><select id="rocofMethod"><option value="central" data-i18n="rocofMethodCentral">Merkezi Fark</option><option value="filteredDerivative" data-i18n="rocofMethodFiltered">Filtreli Türev</option><option value="movingRegression" data-i18n="rocofMethodRegression">Hareketli Regresyon</option></select></div>
+            <div class="field" data-param-key="rocofThreshold"><label for="rocofThreshold" data-i18n="rocofThresholdLabel">RoCoF eşiği (mHz/s)</label><input id="rocofThreshold" type="number" min="0.1" max="1000" step="0.1" value="10" /></div>
+            <div class="field" data-param-key="rocofPrefilter"><label for="rocofPreFilterSeconds" data-i18n="rocofPreFilterLabel">Ön filtre süresi (sn)</label><input id="rocofPreFilterSeconds" type="number" min="1" max="120" step="1" value="5" /></div>
+            <div class="field" data-param-key="rocofRegression"><label for="rocofRegressionWindowSeconds" data-i18n="rocofRegressionWindowLabel">Regresyon pencere süresi (sn)</label><input id="rocofRegressionWindowSeconds" type="number" min="3" max="300" step="2" value="5" /></div>
           </div>
         </details>
 
@@ -3179,7 +3208,7 @@
     const RESOLUTION_SECONDS = { '1s': 1, '10s': 10, '1m': 60, '1h': 3600 };
     const ANALYSIS_BASE_PARAMS = ['date', 'resolution', 'alignment'];
     const QUALITY_DATE_MODES = new Set(['single', 'range']);
-    const LIMITED_DATE_MODE_ANALYSES = new Set(['quality', 'stats', 'events']);
+    const LIMITED_DATE_MODE_ANALYSES = new Set(['quality', 'stats', 'events', 'rocof']);
     const analysisRegistry = {
       quality: {
         labelKey: 'analysisQuality',
@@ -3235,13 +3264,22 @@
         labelKey: 'analysisRocof',
         titleKey: 'analysisRocofTitle',
         descriptionKey: 'analysisRocofDesc',
-        allowedSources: ['tr', 'de', 'both'],
+        allowedSources: ['tr', 'de', 'both', 'common'],
         allowedResolutions: ['1s'],
-        parameterKeys: ['window', 'rocof', 'duration'],
+        parameterKeys: ['rocofMethod', 'rocofThreshold', 'duration', 'yd'],
         requiresPairedSeries: false,
         minSampleIntervalSeconds: 1,
         preferredResolution: '1s',
-        tableColumns: [{ key: 'start', labelKey: 'oscThStart' }, { key: 'end', labelKey: 'oscThEnd' }, { key: 'duration', labelKey: 'oscThDuration' }, { key: 'value', labelKey: 'rocofPeak' }, { key: 'classification', labelKey: 'classification' }],
+        tableColumns: [
+          { key: 'source', labelKey: 'bandViolationSource', helpKey: 'bandViolationSourceHelp' },
+          { key: 'type', labelKey: 'rocofEventType', helpKey: 'rocofEventTypeHelp' },
+          { key: 'start', labelKey: 'oscThStart' },
+          { key: 'end', labelKey: 'oscThEnd' },
+          { key: 'duration', labelKey: 'oscThDuration', helpKey: 'rocofDurationHelp' },
+          { key: 'peak', labelKey: 'rocofPeak', helpKey: 'rocofPeakHelp' },
+          { key: 'startHz', labelKey: 'rocofStartHz', helpKey: 'rocofStartHzHelp' },
+          { key: 'extremeHz', labelKey: 'rocofExtremeHz', helpKey: 'rocofExtremeHzHelp' }
+        ],
         methodKey: 'methodRocof',
         limitationsKey: 'limitRocof'
       },
@@ -4263,6 +4301,7 @@
         updateAnalysisAvailability();
         updateUrlState({ resolution: $('analysisResolution').value });
       });
+      $('rocofMethod')?.addEventListener('change', updateAnalysisParameterPanel);
       $('analysisAlignment').addEventListener('change', () => updateUrlState({ alignment: $('analysisAlignment').value }));
       $('oscSourceSelect').addEventListener('change', handleOscillationSourceChange);
       $('resetZoomBtn').addEventListener('click', resetDailyChartState);
@@ -4448,6 +4487,10 @@
       }
       if (chartId === 'analysisMainChart' && state.analysis.lastResult?.chart?.kind === 'bandViolation') {
         showBandViolationFullRange(state.analysis.lastResult);
+        return;
+      }
+      if (chartId === 'analysisMainChart' && state.analysis.lastResult?.chart?.kind === 'rocof') {
+        showRocofFullRange(state.analysis.lastResult);
         return;
       }
       chart.dispatchAction({ type: 'dataZoom', start: 0, end: 100 });
@@ -6663,15 +6706,28 @@
       const isQuality = type === 'quality';
       const isStats = type === 'stats';
       const isBandViolation = type === 'events';
+      const isRocof = type === 'rocof';
       const baseParams = isQuality
         ? ['date', 'alignment', 'yd']
-        : isStats || isBandViolation
+        : isStats || isBandViolation || isRocof
           ? ['date', 'alignment', 'yd']
           : ANALYSIS_BASE_PARAMS;
       const visible = new Set([...baseParams, ...(def.parameterKeys || [])]);
+      if (isRocof) {
+        const method = $('rocofMethod')?.value || 'central';
+        if (method === 'filteredDerivative') visible.add('rocofPrefilter');
+        if (method === 'movingRegression') visible.add('rocofRegression');
+      }
       document.querySelectorAll('.analysis-controls.compact [data-param-key]').forEach(field => {
         field.hidden = !visible.has(field.dataset.paramKey);
       });
+      const durationInput = $('minDuration');
+      if (durationInput) {
+        durationInput.min = isRocof ? '1' : '10';
+        durationInput.step = isRocof ? '1' : '10';
+        if (isRocof && Number(durationInput.value || 0) > 10) durationInput.value = '2';
+        if (!isRocof && Number(durationInput.value || 0) < 10) durationInput.value = String(state.settings.minDuration || 30);
+      }
       updateQualityControlVisibility();
     }
 
@@ -6728,6 +6784,7 @@
       if (type === 'quality') return '1s';
       if (type === 'stats') return '1s';
       if (type === 'events') return '1s';
+      if (type === 'rocof') return '1s';
       if (selectedResolution && selectedResolution !== 'auto') return selectedResolution;
       if (type === 'trend') return '1m';
       if (type === 'psd') return '1s';
@@ -7163,6 +7220,15 @@
           setBanner('analysisStatus', t('analysisDone'), 'success');
           return;
         }
+        if (type === 'rocof' && dateList.length > 1) {
+          const result = await computeRocofRangeResult(source, dateList);
+          state.analysis.lastResult = result;
+          renderAnalysisResult(result);
+          renderReportPreview();
+          updateUrlState({ date, source, analysis: type, tab: 'oscillation' });
+          setBanner('analysisStatus', t('analysisDone'), 'success');
+          return;
+        }
         if (type === 'trend' && dateList.length > 1) {
           const result = await computeTrendRangeResult(source, dateList);
           state.analysis.lastResult = result;
@@ -7181,7 +7247,9 @@
           ? prepareQualityAnalysisInput(source, current)
           : type === 'events'
             ? { sampling: buildSamplingMetadata(null, 1, 'good-quality-canonical') }
-            : prepareAnalysisInput(type, source, current, validation);
+            : type === 'rocof'
+              ? { sampling: buildSamplingMetadata(null, 1, 'good-quality-canonical') }
+              : prepareAnalysisInput(type, source, current, validation);
         state.analysis.sampling = analysisInput.sampling;
         updateAnalysisSamplingInfo(analysisInput.sampling);
         if (type !== 'quality' && requiresPairedSource(source, type) && current.overall.pairedCount < 1800) {
@@ -7231,7 +7299,7 @@
     }
 
     function shouldUseAnalysisWorker(type) {
-      return ['psd', 'spectrogram', 'coherence', 'crossCorrelation', 'rocof'].includes(type);
+      return ['psd', 'spectrogram', 'coherence', 'crossCorrelation'].includes(type);
     }
 
     function prepareAnalysisInput(type, source, current, validation = validateAnalysisSelection(type, source, $('analysisResolution')?.value || 'auto')) {
@@ -7330,11 +7398,11 @@
       };
       if (type === 'rocof') {
         return {
-          method: 'movingRegression',
+          method: rocofMethodValue(),
           sampleIntervalSeconds,
-          windowSeconds: Number($('windowSec').value || 5),
-          preFilterSeconds: 5,
-          thresholdHzPerSecond: Number($('rocofThreshold').value || 0.01),
+          windowSeconds: Number($('rocofRegressionWindowSeconds')?.value || $('windowSec')?.value || 5),
+          preFilterSeconds: Number($('rocofPreFilterSeconds')?.value || 5),
+          thresholdHzPerSecond: rocofThresholdHzPerSecond(),
           minEventSeconds: Number($('minDuration').value || 1)
         };
       }
@@ -8623,6 +8691,393 @@
       return bandViolationResultFromSources('events', source, lastCurrent, dateList, dailyResults.flatMap(item => item.sourceItems), quality, quality.qualityEvents || []);
     }
 
+    function rocofMethodValue() {
+      return $('rocofMethod')?.value || 'central';
+    }
+
+    function rocofMethodLabel(method = rocofMethodValue()) {
+      if (method === 'filteredDerivative') return t('rocofMethodFiltered');
+      if (method === 'movingRegression') return t('rocofMethodRegression');
+      return t('rocofMethodCentral');
+    }
+
+    function rocofThresholdMhzPerSecond() {
+      const value = Number($('rocofThreshold')?.value || 10);
+      return Number.isFinite(value) ? Math.max(0.1, value) : 10;
+    }
+
+    function rocofThresholdHzPerSecond() {
+      return rocofThresholdMhzPerSecond() / 1000;
+    }
+
+    function rocofMinimumDurationSeconds() {
+      const value = Number($('minDuration')?.value || 1);
+      return Number.isFinite(value) ? Math.max(1, value) : 1;
+    }
+
+    function rocofOptions() {
+      return {
+        method: rocofMethodValue(),
+        sampleIntervalSeconds: 1,
+        windowSeconds: Number($('rocofRegressionWindowSeconds')?.value || $('windowSec')?.value || 5),
+        preFilterSeconds: Number($('rocofPreFilterSeconds')?.value || 5),
+        thresholdHzPerSecond: rocofThresholdHzPerSecond(),
+        minEventSeconds: rocofMinimumDurationSeconds()
+      };
+    }
+
+    function rocofMhzText(value, digits = 2) {
+      return Number.isFinite(value) ? `${fmt(value * 1000, digits)} mHz/s` : '—';
+    }
+
+    function rocofMhzValueText(value, digits = 2) {
+      return Number.isFinite(value) ? `${fmt(value, digits)} mHz/s` : '—';
+    }
+
+    function rocofEventLabel(event) {
+      return event?.side === 'negative' ? t('rocofNegativeFull') : t('rocofPositiveFull');
+    }
+
+    function rocofEventShortLabel(event) {
+      return event?.side === 'negative' ? t('rocofNegativeShort') : t('rocofPositiveShort');
+    }
+
+    function rocofExtremeFrequencyText(event) {
+      if (!event) return '—';
+      const value = event.side === 'negative' ? event.minFrequencyHz : event.maxFrequencyHz;
+      const second = event.side === 'negative' ? event.minFrequencySecond : event.maxFrequencySecond;
+      return `${statsValueText(value, 4, ' Hz')} · ${statsSecondLabel(event.dateList || [], second)}`;
+    }
+
+    function computeRocofSourceItem(sourceItem, options) {
+      const core = window.FrequencyAnalysisCore;
+      const result = core.computeRocof(sourceItem.values, {
+        ...options,
+        startSecond: sourceItem.startSecond
+      });
+      const rocofSeries = Array.from(result.series || []);
+      const events = (result.events || []).map(event => ({
+        ...event,
+        source: sourceItem.source,
+        sourceName: sourceItem.sourceName,
+        color: sourceItem.color,
+        eventType: 'rocof',
+        type: 'rocof',
+        eventLabel: rocofEventLabel(event),
+        shortLabel: rocofEventShortLabel(event),
+        classification: rocofEventLabel(event),
+        peakMhzPerSecond: Number.isFinite(event.peakMhzPerSecond)
+          ? event.peakMhzPerSecond
+          : event.peakHzPerSecond * 1000,
+        thresholdMhzPerSecond: rocofThresholdMhzPerSecond(),
+        method: options.method
+      }));
+      return {
+        sourceItem,
+        source: sourceItem.source,
+        sourceName: sourceItem.sourceName,
+        color: sourceItem.color,
+        startSecond: sourceItem.startSecond,
+        endSecond: sourceItem.endSecond,
+        values: sourceItem.values,
+        rocofSeries,
+        events,
+        sampleCount: result.sampleCount || sourceItem.values.length,
+        rocofSampleCount: result.rocofSampleCount || rocofSeries.filter(Number.isFinite).length,
+        unavailableSamples: result.unavailableSamples || Math.max(0, sourceItem.values.length - rocofSeries.filter(Number.isFinite).length),
+        maxPositive: result.maxPositive,
+        maxNegative: result.maxNegative,
+        meanAbsolute: result.meanAbsolute,
+        rms: result.rms
+      };
+    }
+
+    function aggregateRocofResults(rocofItems) {
+      const events = (rocofItems || [])
+        .flatMap(item => item.events || [])
+        .sort((a, b) => a.startSecond - b.startSecond || a.endSecond - b.endSecond || String(a.source).localeCompare(String(b.source)));
+      let maxPositive = -Infinity;
+      let maxNegative = Infinity;
+      let sumAbs = 0;
+      let sumSquares = 0;
+      let rocofSampleCount = 0;
+      let goodUsed = 0;
+      let sampleCount = 0;
+      for (const item of rocofItems || []) {
+        sampleCount += item.sampleCount || item.values?.length || 0;
+        for (const value of item.values || []) {
+          if (Number.isFinite(value)) goodUsed += 1;
+        }
+        for (const value of item.rocofSeries || []) {
+          if (!Number.isFinite(value)) continue;
+          maxPositive = Math.max(maxPositive, value);
+          maxNegative = Math.min(maxNegative, value);
+          sumAbs += Math.abs(value);
+          sumSquares += value * value;
+          rocofSampleCount += 1;
+        }
+      }
+      const positiveEvents = events.filter(event => event.side === 'positive');
+      const negativeEvents = events.filter(event => event.side === 'negative');
+      const longest = events.slice().sort((a, b) => (b.durationSeconds || 0) - (a.durationSeconds || 0) || a.startSecond - b.startSecond)[0] || null;
+      const maxPositiveEvent = positiveEvents.slice().sort((a, b) => (b.peakHzPerSecond || -Infinity) - (a.peakHzPerSecond || -Infinity))[0] || null;
+      const maxNegativeEvent = negativeEvents.slice().sort((a, b) => (a.peakHzPerSecond || Infinity) - (b.peakHzPerSecond || Infinity))[0] || null;
+      const positiveSeconds = positiveEvents.reduce((sum, event) => sum + (event.durationSeconds || 0), 0);
+      const negativeSeconds = negativeEvents.reduce((sum, event) => sum + (event.durationSeconds || 0), 0);
+      return {
+        events,
+        maxPositive: Number.isFinite(maxPositive) ? maxPositive : NaN,
+        maxNegative: Number.isFinite(maxNegative) ? maxNegative : NaN,
+        meanAbsolute: rocofSampleCount ? sumAbs / rocofSampleCount : NaN,
+        rms: rocofSampleCount ? Math.sqrt(sumSquares / rocofSampleCount) : NaN,
+        rocofSampleCount,
+        goodUsed,
+        sampleCount,
+        qualityUnavailable: Math.max(0, sampleCount - goodUsed),
+        positiveEventCount: positiveEvents.length,
+        negativeEventCount: negativeEvents.length,
+        positiveSeconds,
+        negativeSeconds,
+        thresholdSeconds: positiveSeconds + negativeSeconds,
+        longest,
+        maxPositiveEvent,
+        maxNegativeEvent
+      };
+    }
+
+    function rocofDetailRows(rocofResult) {
+      const detail = (label, value, tooltip = '') => ({ label, value, tooltip });
+      return [
+        detail(t('rocofMethod'), rocofMethodLabel(rocofResult.method), t('rocofMethodHelp')),
+        detail(t('rocofThresholdMhz'), rocofMhzValueText(rocofResult.thresholdMhzPerSecond), t('rocofThresholdHelp')),
+        detail(t('rocofMeanAbs'), rocofMhzText(rocofResult.meanAbsolute), t('rocofMeanAbsHelp')),
+        detail(t('rocofRms'), rocofMhzText(rocofResult.rms), t('rocofRmsHelp')),
+        detail(t('rocofPositiveCount'), numberText(rocofResult.positiveEventCount), t('rocofEventCountHelp')),
+        detail(t('rocofPositiveDuration'), durationText(rocofResult.positiveSeconds), t('rocofDurationHelp')),
+        detail(t('rocofNegativeCount'), numberText(rocofResult.negativeEventCount), t('rocofEventCountHelp')),
+        detail(t('rocofNegativeDuration'), durationText(rocofResult.negativeSeconds), t('rocofDurationHelp')),
+        detail(t('rocofGoodUsed'), numberText(rocofResult.goodUsed), t('rocofGoodUsedHelp')),
+        detail(t('rocofUnavailable'), numberText(rocofResult.qualityUnavailable), t('rocofUnavailableHelp'))
+      ];
+    }
+
+    function rocofEventRows(events, dateList) {
+      return (events || []).map(event => ({
+        source: event.sourceName,
+        type: rocofEventShortLabel(event),
+        start: statsSecondLabel(dateList, event.startSecond),
+        end: statsSecondLabel(dateList, event.endSecond),
+        duration: durationText(event.durationSeconds || 0),
+        peak: rocofMhzText(event.peakHzPerSecond),
+        startHz: statsValueText(event.startFrequencyHz, 4, ' Hz'),
+        extremeHz: rocofExtremeFrequencyText({ ...event, dateList }),
+        startSecond: event.startSecond,
+        endSecond: event.endSecond,
+        drilldownType: 'rocof'
+      }));
+    }
+
+    function buildRocofHeatmap(rocofItems, events, dateList = [], range = { start: 0, end: 86400 }, thresholdMhzPerSecond = 10) {
+      const bucketSeconds = 900;
+      const start = Number(range.start || 0);
+      const end = Math.max(start, Number(range.end || 0));
+      const dayCount = Math.max(1, Math.ceil((end - start || 1) / 86400));
+      const labels = Array.from({ length: 96 }, (_, slot) => quarterLabel(slot));
+      const days = Array.from({ length: dayCount }, (_, index) => displayDate(dateList[index] || dateList.at(-1) || state.current?.date));
+      const cells = [];
+      for (let dayIndex = 0; dayIndex < dayCount; dayIndex += 1) {
+        const dayStart = start + dayIndex * 86400;
+        const dayEnd = Math.min(end, dayStart + 86400);
+        for (let cellStart = dayStart; cellStart < dayEnd; cellStart += bucketSeconds) {
+          const cellEnd = Math.min(dayEnd, cellStart + bucketSeconds);
+          const localStart = Math.max(0, Math.round(cellStart - dayStart));
+          const localEnd = Math.max(localStart, Math.round(cellEnd - dayStart));
+          let rocofCount = 0;
+          let peakAbsMhz = 0;
+          for (const item of rocofItems || []) {
+            const from = Math.max(0, Math.floor(cellStart - item.startSecond));
+            const to = Math.min(item.rocofSeries.length, Math.ceil(cellEnd - item.startSecond));
+            for (let i = from; i < to; i += 1) {
+              const value = item.rocofSeries[i];
+              if (!Number.isFinite(value)) continue;
+              rocofCount += 1;
+              peakAbsMhz = Math.max(peakAbsMhz, Math.abs(value * 1000));
+            }
+          }
+          let positiveSeconds = 0;
+          let negativeSeconds = 0;
+          let eventCount = 0;
+          for (const event of events || []) {
+            const overlap = Math.max(0, Math.min(cellEnd, event.endSecond) - Math.max(cellStart, event.startSecond));
+            if (!overlap) continue;
+            eventCount += 1;
+            peakAbsMhz = Math.max(peakAbsMhz, Math.abs(event.peakMhzPerSecond || event.peakHzPerSecond * 1000 || 0));
+            if (event.side === 'positive') positiveSeconds += overlap;
+            if (event.side === 'negative') negativeSeconds += overlap;
+          }
+          const slot = Math.floor(localStart / bucketSeconds);
+          const date = dateList[dayIndex] || dateList.at(-1) || state.current?.date;
+          const severity = rocofCount ? peakAbsMhz / Math.max(0.1, thresholdMhzPerSecond) : -1;
+          cells.push({
+            slot,
+            dayIndex,
+            startSecond: cellStart,
+            endSecond: cellEnd,
+            label: `${displayDate(date)} ${secondToTime(localStart).slice(0, 5)}-${secondToTime(localEnd || 86400).slice(0, 5)}`,
+            positiveSeconds,
+            negativeSeconds,
+            thresholdSeconds: positiveSeconds + negativeSeconds,
+            eventCount,
+            peakAbsMhz,
+            rocofCount,
+            severity
+          });
+        }
+      }
+      return { bucketSeconds, labels, days, cells };
+    }
+
+    function buildRocofHeatmapData(heatmap) {
+      return (heatmap.cells || []).map(cell => [
+        cell.slot,
+        cell.dayIndex,
+        cell.rocofCount ? Number(cell.severity.toFixed(3)) : -1,
+        cell.startSecond,
+        cell.endSecond,
+        cell.label,
+        Number(cell.positiveSeconds || 0),
+        Number(cell.negativeSeconds || 0),
+        Number(cell.thresholdSeconds || 0),
+        Number(cell.eventCount || 0),
+        Number((cell.peakAbsMhz || 0).toFixed(3)),
+        Number(cell.rocofCount || 0)
+      ]);
+    }
+
+    function rocofResultFromSources(type, source, current, dateList, sourceItems, quality, qualityEvents) {
+      if (!sourceItems?.length) throw new Error(t('analysisNoSeries'));
+      const options = rocofOptions();
+      const range = {
+        start: Math.min(...sourceItems.map(item => item.startSecond), 0),
+        end: Math.max(...sourceItems.map(item => item.endSecond), Math.max(86400, dateList.length * 86400))
+      };
+      const rocofItems = sourceItems.map(item => computeRocofSourceItem(item, options));
+      const aggregate = aggregateRocofResults(rocofItems);
+      const sampling = buildSamplingMetadata(null, 1, 'good-quality-canonical');
+      sampling.totalSamples = aggregate.sampleCount;
+      sampling.validSamples = aggregate.goodUsed;
+      sampling.missingRatio = sampling.totalSamples ? aggregate.qualityUnavailable / sampling.totalSamples : 0;
+      sampling.requestedResolution = '1s';
+      sampling.resolution = '1s';
+      state.analysis.sampling = sampling;
+      const thresholdMhzPerSecond = rocofThresholdMhzPerSecond();
+      const card = (label, value, helpKey = '', extra = {}) => ({
+        label,
+        value,
+        tooltip: helpKey ? t(helpKey) : '',
+        ...extra
+      });
+      return {
+        type,
+        title: t(analysisDefinition('rocof').titleKey),
+        description: t(analysisDefinition('rocof').descriptionKey),
+        metadata: analysisMetadata('rocof', source, current, dateList, sampling),
+        rocofMeta: {
+          ...aggregate,
+          method: options.method,
+          thresholdMhzPerSecond,
+          minDurationSeconds: options.minEventSeconds,
+          dateList
+        },
+        cards: [
+          card(t('rocofMaxPositive'), rocofMhzText(aggregate.maxPositive), 'rocofMaxPositiveHelp', {
+            startSecond: aggregate.maxPositiveEvent?.startSecond,
+            endSecond: aggregate.maxPositiveEvent?.endSecond,
+            drilldownType: 'rocof'
+          }),
+          card(t('rocofMaxNegative'), rocofMhzText(aggregate.maxNegative), 'rocofMaxNegativeHelp', {
+            startSecond: aggregate.maxNegativeEvent?.startSecond,
+            endSecond: aggregate.maxNegativeEvent?.endSecond,
+            drilldownType: 'rocof'
+          }),
+          card(t('rocofEvents'), numberText(aggregate.events.length), 'rocofEventCountHelp'),
+          card(t('rocofTotalDuration'), durationText(aggregate.thresholdSeconds), 'rocofTotalDurationHelp', {
+            startSecond: aggregate.longest?.startSecond,
+            endSecond: aggregate.longest?.endSecond,
+            drilldownType: 'rocof'
+          })
+        ],
+        detailRows: rocofDetailRows({
+          ...aggregate,
+          method: options.method,
+          thresholdMhzPerSecond
+        }),
+        events: aggregate.events,
+        tableRows: rocofEventRows(aggregate.events, dateList),
+        chart: {
+          kind: 'rocof',
+          sourceItems: mergeBandViolationSourceItems(sourceItems, range),
+          rocofItems,
+          heatmap: buildRocofHeatmap(rocofItems, aggregate.events, dateList, range, thresholdMhzPerSecond),
+          qualityEvents: qualityEvents || [],
+          rocofEvents: aggregate.events,
+          range,
+          thresholdMhzPerSecond,
+          method: options.method
+        },
+        methodology: t('methodRocof'),
+        limitations: t('limitRocof')
+      };
+    }
+
+    function computeRocofAnalysisResult(type, source, current, dateList = [current?.date].filter(Boolean)) {
+      const requestedBounds = analysisWindowBounds();
+      const trWindow = statsWindowForSeries(current.rawSeries?.tr || current.tr, requestedBounds);
+      const ceWindow = statsWindowForSeries(current.rawSeries?.de || current.de, requestedBounds);
+      const trQuality = analyzeStatsQuality(trWindow.values, trWindow.bounds);
+      const ceQuality = analyzeStatsQuality(ceWindow.values, ceWindow.bounds);
+      const quality = source === 'de'
+        ? ceQuality
+        : (source === 'both' || source === 'common')
+          ? combinedDualQuality(trQuality, ceQuality)
+          : trQuality;
+      const sourceItems = buildBandViolationSourceItems(source, trQuality, ceQuality);
+      return rocofResultFromSources(type, source, current, dateList, sourceItems, quality, quality.qualityEvents || []);
+    }
+
+    async function computeRocofRangeResult(source, dateList) {
+      const dailyItems = dateList.map((date, index) => ({ date, index }));
+      const dailyResults = (await mapWithConcurrency(dailyItems, MAX_ANALYSIS_DAY_CONCURRENCY, async ({ date, index }) => {
+        const current = await prepareDailyContext(date, $('analysisAlignment').value);
+        const requestedBounds = analysisWindowBounds();
+        const offsetSeconds = index * 86400;
+        const trWindow = statsWindowForSeries(current.rawSeries.tr, requestedBounds);
+        const ceWindow = statsWindowForSeries(current.rawSeries.de, requestedBounds);
+        const trQuality = analyzeStatsQuality(trWindow.values, trWindow.bounds);
+        const ceQuality = analyzeStatsQuality(ceWindow.values, ceWindow.bounds);
+        const quality = source === 'de'
+          ? ceQuality
+          : (source === 'both' || source === 'common')
+            ? combinedDualQuality(trQuality, ceQuality)
+            : trQuality;
+        return {
+          date,
+          index,
+          current,
+          quality,
+          sourceItems: buildBandViolationSourceItems(source, trQuality, ceQuality, offsetSeconds)
+        };
+      })).filter(Boolean).sort((a, b) => a.index - b.index);
+      if (!dailyResults.length) throw new Error(t('analysisNoSeries'));
+      const lastCurrent = dailyResults.at(-1).current;
+      state.current = lastCurrent;
+      state.analysis.rawSeries = lastCurrent.rawSeries;
+      state.analysis.displaySeries = lastCurrent.displaySeries;
+      state.analysis.analysisSeries = lastCurrent.analysisSeries;
+      const quality = aggregateQualityResults(dailyResults.map(item => item.quality));
+      return rocofResultFromSources('rocof', source, lastCurrent, dateList, dailyResults.flatMap(item => item.sourceItems), quality, quality.qualityEvents || []);
+    }
+
     async function computeQualityRangeResult(source, dateList) {
       const dailyItems = dateList.map((date, index) => ({ date, index }));
       const dailyResults = (await mapWithConcurrency(dailyItems, MAX_ANALYSIS_DAY_CONCURRENCY, async ({ date, index }) => {
@@ -8714,31 +9169,12 @@
       if (type === 'quality') return computeQualityAnalysisResult(type, source, current, dateList, workerResult, analysisInput);
       if (type === 'stats') return computeStatsAnalysisResult(type, source, current, dateList);
       if (type === 'events') return computeBandViolationAnalysisResult(type, source, current, dateList);
+      if (type === 'rocof') return computeRocofAnalysisResult(type, source, current, dateList);
       const prepared = analysisInput || prepareAnalysisInput(type, source, current);
       const series = prepared.series;
       const sampleIntervalSeconds = prepared.sampling?.intervalSeconds || 1;
       const timestamps = Array.from({ length: series.length }, (_, index) => index * sampleIntervalSeconds);
       const metadata = analysisMetadata(type, source, current, dateList, prepared.sampling);
-      if (type === 'rocof') {
-        const rocof = workerResult || core.computeRocof(series, { method: 'movingRegression', sampleIntervalSeconds, windowSeconds: Number($('windowSec').value || 5), thresholdHzPerSecond: Number($('rocofThreshold').value || 0.01) });
-        return {
-          type,
-          title: t(analysisDefinition(type).titleKey),
-          description: t(analysisDefinition(type).descriptionKey),
-          metadata,
-          cards: [
-            [t('rocofMaxPositive'), `${fmt(rocof.maxPositive, 5)} Hz/s`],
-            [t('rocofMaxNegative'), `${fmt(rocof.maxNegative, 5)} Hz/s`],
-            [t('rocofRms'), `${fmt(rocof.rms, 5)} Hz/s`],
-            [t('rocofEvents'), rocof.events.length.toLocaleString(t('localeNumeric'))]
-          ],
-          events: rocof.events.map(event => ({ start: event.startSecond, end: event.endSecond, type: t('analysisRocof'), value: event.peakHzPerSecond, classification: t('classNeedsReview') })),
-          tableRows: rocof.events.map(event => ({ start: secondToTime(event.startSecond), end: secondToTime(event.endSecond), duration: durationText(Math.max(0, event.endSecond - event.startSecond)), value: `${fmt(event.peakHzPerSecond, 5)} Hz/s`, classification: t('classNeedsReview') })),
-          chart: { kind: 'line', series: [{ name: t('analysisRocof'), data: sampleSeries(rocof.series, 10, sampleIntervalSeconds) }] },
-          methodology: t('methodRocof'),
-          limitations: t('limitRocof')
-        };
-      }
       if (type === 'psd') {
         const dominant = workerResult || core.computeWelchPsd(series, workerAnalysisParameters('psd'));
         const peak = dominant.peaks?.[0] || dominant;
@@ -8933,11 +9369,38 @@
           showStatsDetailWindow(result, start, end, { startSecond: eventStart, endSecond: eventEnd, type: card.dataset.drilldownType });
         } else if (result.chart?.kind === 'bandViolation') {
           showBandViolationDetailWindow(result, start, end, { startSecond: eventStart, endSecond: eventEnd, type: card.dataset.drilldownType });
+        } else if (result.chart?.kind === 'rocof') {
+          showRocofDetailWindow(result, start, end, { startSecond: eventStart, endSecond: eventEnd, type: card.dataset.drilldownType });
         } else if (result.chart?.kind === 'quality') {
           showQualityDetailWindow(result, start, end, { startSecond: eventStart, endSecond: eventEnd, type: card.dataset.drilldownType });
         }
         $('analysisMainChart')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }));
+    }
+
+    function renderAnalysisDetailSummary(result) {
+      const anchor = $('analysisResultCards');
+      if (!anchor) return;
+      let summary = $('analysisDetailSummary');
+      if (!summary) {
+        summary = document.createElement('div');
+        summary.id = 'analysisDetailSummary';
+        summary.className = 'analysis-detail-summary';
+        anchor.insertAdjacentElement('afterend', summary);
+      }
+      const rows = result.detailRows || [];
+      summary.hidden = !rows.length;
+      if (!rows.length) {
+        summary.innerHTML = '';
+        return;
+      }
+      summary.innerHTML = rows.map(row => {
+        const attrs = row.tooltip
+          ? `tabindex="0" data-tooltip="${escapeHtml(row.tooltip)}" aria-label="${escapeHtml(`${row.label}: ${row.value}. ${row.tooltip}`)}"`
+          : '';
+        const icon = row.tooltip ? '<span class="metric-info-icon" aria-hidden="true">&#9432;</span>' : '';
+        return `<div class="analysis-detail-item" ${attrs}><span class="metric-label">${escapeHtml(row.label)}</span>${icon}<strong>${escapeHtml(row.value)}</strong></div>`;
+      }).join('');
     }
 
     function heatmapRangeFromValue(value) {
@@ -8951,6 +9414,7 @@
     function renderAnalysisResult(result) {
       $('oscChartTitle').textContent = result.title;
       renderAnalysisCards(result);
+      renderAnalysisDetailSummary(result);
       $('oscCountTag').textContent = result.type === 'stats' || result.type === 'events'
         ? t('statsBandViolationCount', { count: result.events.length })
         : t('findingsCount', { count: result.events.length });
@@ -8962,7 +9426,7 @@
     function renderGenericAnalysisChart(result) {
       if (!state.oscillationChart) return;
       state.oscillationChart.off('click');
-      const richAnalysisChart = result.chart.kind === 'quality' || result.chart.kind === 'stats' || result.chart.kind === 'bandViolation';
+      const richAnalysisChart = result.chart.kind === 'quality' || result.chart.kind === 'stats' || result.chart.kind === 'bandViolation' || result.chart.kind === 'rocof';
       $('analysisMainChart')?.classList.toggle('quality-chart', richAnalysisChart);
       if (!richAnalysisChart) {
         $('analysisMainChart').style.height = '';
@@ -8978,6 +9442,10 @@
       }
       if (result.chart.kind === 'bandViolation') {
         renderBandViolationAnalysisChart(result);
+        return;
+      }
+      if (result.chart.kind === 'rocof') {
+        renderRocofAnalysisChart(result);
         return;
       }
       if (result.chart.kind === 'heatmap') {
@@ -9967,6 +10435,485 @@
       setQualityZoomResetVisible(false);
     }
 
+    function rocofDisplayBucketSeconds(durationSeconds) {
+      if (durationSeconds <= 2 * 86400) return 60;
+      if (durationSeconds <= 14 * 86400) return 900;
+      return 3600;
+    }
+
+    function rocofChartTimeLabel(result) {
+      return (value, includeDate = false) => {
+        const total = Math.max(0, Math.round(value || 0));
+        let dayIndex = Math.floor(total / 86400);
+        let localSecond = total % 86400;
+        if (total > 0 && localSecond === 0) {
+          dayIndex -= 1;
+          localSecond = 86400;
+        }
+        const dateLabel = result.rocofMeta?.dateList?.[dayIndex];
+        const timeLabel = secondToTime(localSecond).slice(0, includeDate ? 8 : 5);
+        return includeDate && dateLabel ? `${displayDate(dateLabel)} ${timeLabel}` : timeLabel;
+      };
+    }
+
+    function buildRocofDisplaySeries(result) {
+      const range = result.chart.range || { start: 0, end: 86400 };
+      const bucketSeconds = rocofDisplayBucketSeconds(Math.max(0, range.end - range.start));
+      const groups = new Map();
+      for (const item of result.chart.rocofItems || []) {
+        if (!groups.has(item.source)) {
+          groups.set(item.source, { source: item.source, name: item.sourceName, color: item.color, items: [] });
+        }
+        groups.get(item.source).items.push(item);
+      }
+      const threshold = Math.max(0.1, Number(result.chart.thresholdMhzPerSecond || 10));
+      const thresholdMarkLine = {
+        silent: true,
+        symbol: 'none',
+        label: { formatter: params => params.name },
+        lineStyle: { color: 'rgba(13,47,79,.42)', type: 'dashed', width: 1 },
+        data: [
+          { yAxis: threshold, name: `+${fmt(threshold, 1)} mHz/s` },
+          { yAxis: -threshold, name: `-${fmt(threshold, 1)} mHz/s` }
+        ]
+      };
+      const series = [];
+      for (const group of groups.values()) {
+        const positiveData = [];
+        const negativeData = [];
+        for (let cellStart = range.start; cellStart < range.end; cellStart += bucketSeconds) {
+          const cellEnd = Math.min(range.end, cellStart + bucketSeconds);
+          let maxPositive = -Infinity;
+          let minNegative = Infinity;
+          let positiveFrequency = NaN;
+          let negativeFrequency = NaN;
+          for (const item of group.items) {
+            const from = Math.max(0, Math.floor(cellStart - item.startSecond));
+            const to = Math.min(item.rocofSeries.length, Math.ceil(cellEnd - item.startSecond));
+            for (let i = from; i < to; i += 1) {
+              const value = item.rocofSeries[i];
+              if (!Number.isFinite(value)) continue;
+              const mhz = value * 1000;
+              const frequency = item.values?.[i];
+              if (mhz > maxPositive) {
+                maxPositive = mhz;
+                positiveFrequency = frequency;
+              }
+              if (mhz < minNegative) {
+                minNegative = mhz;
+                negativeFrequency = frequency;
+              }
+            }
+          }
+          const x = cellStart + (cellEnd - cellStart) / 2;
+          positiveData.push([x, Number.isFinite(maxPositive) ? Number(maxPositive.toFixed(3)) : null, bucketSeconds, Number.isFinite(positiveFrequency) ? Number(positiveFrequency.toFixed(6)) : null]);
+          negativeData.push([x, Number.isFinite(minNegative) ? Number(minNegative.toFixed(3)) : null, bucketSeconds, Number.isFinite(negativeFrequency) ? Number(negativeFrequency.toFixed(6)) : null]);
+        }
+        const firstSeries = series.length === 0;
+        series.push({
+          name: `${group.name} ${t('rocofPositiveShort')}`,
+          type: 'line',
+          xAxisIndex: 0,
+          yAxisIndex: 0,
+          data: positiveData,
+          symbol: 'none',
+          connectNulls: false,
+          lineStyle: { width: 1.5, color: '#dc2626', opacity: 0.72 },
+          itemStyle: { color: '#dc2626' },
+          markLine: firstSeries ? thresholdMarkLine : undefined
+        });
+        series.push({
+          name: `${group.name} ${t('rocofNegativeShort')}`,
+          type: 'line',
+          xAxisIndex: 0,
+          yAxisIndex: 0,
+          data: negativeData,
+          symbol: 'none',
+          connectNulls: false,
+          lineStyle: { width: 1.5, color: group.color || '#101820', opacity: 0.62 },
+          itemStyle: { color: group.color || '#101820' }
+        });
+      }
+      return series;
+    }
+
+    function buildRocofEventSeries(events, highlight = null) {
+      if (!events?.length) return [];
+      const total = events.length;
+      const labelStride = total > 80 ? Math.ceil(total / 80) : 1;
+      const groups = [
+        {
+          side: 'positive',
+          legend: t('rocofPositiveLegend'),
+          marker: t('rocofPositiveShort'),
+          label: t('rocofPositiveFull'),
+          color: 'rgba(220,38,38,.13)',
+          borderColor: 'rgba(185,28,28,.48)'
+        },
+        {
+          side: 'negative',
+          legend: t('rocofNegativeLegend'),
+          marker: t('rocofNegativeShort'),
+          label: t('rocofNegativeFull'),
+          color: 'rgba(23,33,43,.10)',
+          borderColor: 'rgba(23,33,43,.36)'
+        }
+      ];
+      return groups.map(group => {
+        const groupEvents = events.filter(event => event.side === group.side);
+        if (!groupEvents.length) return null;
+        return {
+          name: group.legend,
+          type: 'line',
+          xAxisIndex: 0,
+          yAxisIndex: 0,
+          data: [],
+          symbol: 'none',
+          silent: false,
+          lineStyle: { opacity: 0 },
+          markArea: {
+            silent: false,
+            itemStyle: { color: group.color, borderColor: group.borderColor, borderWidth: 1 },
+            data: groupEvents.map((event, index) => {
+              const selected = highlight && Math.abs((highlight.startSecond ?? -1) - event.startSecond) < 1e-6 && Math.abs((highlight.endSecond ?? -1) - event.endSecond) < 1e-6;
+              return [
+                {
+                  xAxis: event.startSecond,
+                  name: index % labelStride === 0 ? group.marker : '',
+                  eventType: 'rocof',
+                  eventSide: event.side,
+                  eventSource: event.source,
+                  eventSourceName: event.sourceName,
+                  eventLabel: group.label,
+                  eventStartSecond: event.startSecond,
+                  eventEndSecond: event.endSecond,
+                  eventDurationSeconds: event.durationSeconds,
+                  eventPeakMhzPerSecond: event.peakMhzPerSecond,
+                  eventPeakHzPerSecond: event.peakHzPerSecond,
+                  eventStartFrequencyHz: event.startFrequencyHz,
+                  eventEndFrequencyHz: event.endFrequencyHz,
+                  eventMinFrequencyHz: event.minFrequencyHz,
+                  eventMaxFrequencyHz: event.maxFrequencyHz,
+                  itemStyle: selected ? { color: 'rgba(220,38,38,.24)', borderColor: '#dc2626', borderWidth: 1.8 } : undefined
+                },
+                { xAxis: event.endSecond }
+              ];
+            })
+          }
+        };
+      }).filter(Boolean);
+    }
+
+    function rocofHeatmapSeries(heatmapData) {
+      return {
+        type: 'heatmap',
+        name: t('rocofSeverityHeatmap'),
+        xAxisIndex: 1,
+        yAxisIndex: 1,
+        data: heatmapData,
+        progressive: 1000,
+        emphasis: { itemStyle: { borderColor: '#0d2f4f', borderWidth: 1.5 } }
+      };
+    }
+
+    function rocofChartTooltip(chartTimeLabel, result) {
+      const findEvent = (start, end, seriesName = '') => (result.chart.rocofEvents || [])
+        .find(event => event.startSecond < end && event.endSecond > start && (!seriesName || seriesName.includes(event.sourceName)));
+      return {
+        trigger: 'item',
+        triggerOn: 'mousemove|click',
+        axisPointer: { type: 'cross' },
+        formatter: params => {
+          const eventData = Array.isArray(params.data) ? params.data[0] : params.data;
+          if (eventData?.eventType === 'rocof') {
+            return [
+              `<strong>${eventData.eventLabel || rocofEventLabel(eventData)}</strong>`,
+              `${t('bandViolationSource')}: ${eventData.eventSourceName || sourceLabel(eventData.eventSource)}`,
+              `${t('eventStart')}: ${chartTimeLabel(eventData.eventStartSecond, true)}`,
+              `${t('eventEnd')}: ${chartTimeLabel(eventData.eventEndSecond, true)}`,
+              `${t('tableDuration')}: ${durationText(eventData.eventDurationSeconds || 0)}`,
+              `${t('rocofPeak')}: ${rocofMhzValueText(Number(eventData.eventPeakMhzPerSecond), 2)}`,
+              `${t('rocofThresholdMhz')}: ${rocofMhzValueText(result.chart.thresholdMhzPerSecond, 1)}`,
+              `${t('rocofStartHz')}: ${statsValueText(Number(eventData.eventStartFrequencyHz), 4, ' Hz')}`,
+              `${t('rocofExtremeHz')}: ${statsValueText(eventData.eventSide === 'negative' ? Number(eventData.eventMinFrequencyHz) : Number(eventData.eventMaxFrequencyHz), 4, ' Hz')}`
+            ].join('<br>');
+          }
+          if (params.seriesType === 'heatmap') {
+            if (!Array.isArray(params.value)) return params.seriesName || '';
+            const [, , severity, startSecond, endSecond, label, positiveSeconds, negativeSeconds, thresholdSeconds, eventCount, peakAbsMhz] = params.value;
+            if (severity < 0) return `${t('rocofSeverityHeatmap')}<br>${label}<br>${t('qualityNoData')}`;
+            return [
+              `<strong>${t('rocofSeverityHeatmap')}</strong>`,
+              `${t('qualityTooltipInterval')}: ${label}`,
+              `${t('rocofSeverityRatio')}: ${fmt(Number(severity), 2)}x`,
+              `${t('rocofPeakAbs')}: ${rocofMhzValueText(peakAbsMhz, 2)}`,
+              `${t('rocofPositiveDuration')}: ${durationText(positiveSeconds || 0)}`,
+              `${t('rocofNegativeDuration')}: ${durationText(negativeSeconds || 0)}`,
+              `${t('rocofTotalDuration')}: ${durationText(thresholdSeconds || 0)}`,
+              `${t('eventCount')}: ${numberText(eventCount || 0)}`,
+              `${chartTimeLabel(startSecond, true)}-${chartTimeLabel(endSecond, true)}`
+            ].join('<br>');
+          }
+          if (params.seriesType === 'scatter') {
+            const value = params.value || params.data || [];
+            return [
+              `<strong>${value[2] || params.seriesName || t('rocofFrequencyPoints')}</strong>`,
+              `${t('qualityTooltipDateTime')}: ${chartTimeLabel(Number(value[0]), true)}`,
+              `${t('qualityTooltipFrequency')}: ${statsValueText(Number(value[1]), 4, ' Hz')}`
+            ].join('<br>');
+          }
+          if (params.seriesType === 'line') {
+            const value = params.value || params.data || [];
+            const x = Number(value[0]);
+            const y = Number(value[1]);
+            const bucketSeconds = Math.max(1, Number(value[2]) || 1);
+            const start = bucketSeconds > 1 ? x - bucketSeconds / 2 : x;
+            const end = bucketSeconds > 1 ? x + bucketSeconds / 2 : x + 1;
+            const event = findEvent(start, end, params.seriesName || '');
+            const isFrequency = String(params.seriesName || '').includes(t('rocofFrequencyLine'));
+            return [
+              `<strong>${params.seriesName || t('analysisRocof')}</strong>`,
+              bucketSeconds > 1
+                ? `${t('qualityTooltipInterval')}: ${chartTimeLabel(start, true)}-${chartTimeLabel(end, true)}`
+                : `${t('qualityTooltipDateTime')}: ${chartTimeLabel(x, true)}`,
+              isFrequency
+                ? `${t('qualityTooltipFrequency')}: ${Number.isFinite(y) ? `${fmt(y, 4)} Hz` : t('qualityMissingTooltipTitle')}`
+                : `${t('analysisRocof')}: ${Number.isFinite(y) ? `${fmt(y, 2)} mHz/s` : t('qualityMissingTooltipTitle')}`,
+              Number.isFinite(Number(value[3])) ? `${t('qualityTooltipFrequency')}: ${fmt(Number(value[3]), 4)} Hz` : '',
+              event ? `${t('qualityTooltipEvent')}: ${rocofEventLabel(event)}` : ''
+            ].filter(Boolean).join('<br>');
+          }
+          return params.seriesName || '';
+        }
+      };
+    }
+
+    function renderRocofAnalysisChart(result) {
+      setQualityZoomResetVisible(false);
+      const range = result.chart.range || { start: 0, end: 86400 };
+      const chartTimeLabel = rocofChartTimeLabel(result);
+      const heatmap = result.chart.heatmap || { labels: [], days: [], cells: [] };
+      const heatmapData = buildRocofHeatmapData(heatmap);
+      const heatmapHeight = Math.max(96, heatmap.days.length * 18);
+      const chartHeight = Math.max(620, 520 + heatmapHeight);
+      $('analysisMainChart').style.height = `${chartHeight}px`;
+      state.oscillationChart.resize();
+      const series = [
+        ...buildRocofDisplaySeries(result),
+        ...buildQualityMarkSeries(result.chart.qualityEvents || []),
+        ...buildRocofEventSeries(result.chart.rocofEvents || []),
+        rocofHeatmapSeries(heatmapData)
+      ];
+      state.oscillationChart.setOption({
+        animation: false,
+        tooltip: rocofChartTooltip(chartTimeLabel, result),
+        legend: { top: 8, type: 'scroll' },
+        grid: [
+          { left: 68, right: 58, top: 58, height: 285 },
+          { left: 68, right: 42, top: 430, height: heatmapHeight }
+        ],
+        xAxis: [
+          {
+            type: 'value',
+            gridIndex: 0,
+            min: range.start,
+            max: range.end,
+            axisLabel: { formatter: value => chartTimeLabel(value, range.end > 86400) }
+          },
+          {
+            type: 'category',
+            gridIndex: 1,
+            data: heatmap.labels,
+            axisLabel: { interval: Math.max(0, Math.floor((heatmap.labels.length || 1) / 8) - 1) }
+          }
+        ],
+        yAxis: [
+          { type: 'value', gridIndex: 0, scale: true, name: 'mHz/s' },
+          { type: 'category', gridIndex: 1, data: heatmap.days, name: '' },
+          { type: 'value', gridIndex: 0, scale: true, name: 'Hz', position: 'right', show: false }
+        ],
+        visualMap: {
+          type: 'piecewise',
+          dimension: 2,
+          seriesIndex: series.length - 1,
+          orient: 'horizontal',
+          left: 'center',
+          top: 374,
+          pieces: [
+            { value: -1, label: t('qualityNoData'), color: '#d1d5db' },
+            { gte: 0, lte: 0.5, label: '0-0.5x', color: '#1f9d55' },
+            { gt: 0.5, lte: 1, label: '0.5-1x', color: '#facc15' },
+            { gt: 1, lte: 2, label: '1-2x', color: '#f97316' },
+            { gt: 2, lte: 5, label: '2-5x', color: '#dc2626' },
+            { gt: 5, label: '>5x', color: '#7f1d1d' }
+          ]
+        },
+        dataZoom: [
+          { type: 'inside', xAxisIndex: [0], filterMode: 'none' },
+          { type: 'slider', xAxisIndex: [0], filterMode: 'none', height: 22, bottom: 14 }
+        ],
+        series
+      }, true);
+      state.oscillationChart.on('click', params => {
+        if (params.seriesName !== t('rocofSeverityHeatmap')) return;
+        const range = heatmapRangeFromValue(params.value);
+        if (!range) return;
+        showRocofDetailWindow(result, range.startSecond, range.endSecond);
+        $('analysisMainChart').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    }
+
+    function buildRocofSecondWindowSeries(result, startSecond, endSecond) {
+      const out = [];
+      for (const item of result.chart.rocofItems || []) {
+        const rocofData = [];
+        const frequencyData = [];
+        const from = Math.max(0, Math.floor(startSecond - item.startSecond));
+        const to = Math.min(item.rocofSeries.length, Math.ceil(endSecond - item.startSecond));
+        for (let i = from; i < to; i += 1) {
+          const x = item.startSecond + i;
+          const rocof = item.rocofSeries[i];
+          const frequency = item.values?.[i];
+          rocofData.push([x, Number.isFinite(rocof) ? Number((rocof * 1000).toFixed(3)) : null, 1, Number.isFinite(frequency) ? Number(frequency.toFixed(6)) : null]);
+          frequencyData.push([x, Number.isFinite(frequency) ? Number(frequency.toFixed(6)) : null, 1]);
+        }
+        out.push({
+          name: `${item.sourceName} · RoCoF 1s`,
+          type: 'line',
+          xAxisIndex: 0,
+          yAxisIndex: 0,
+          data: rocofData,
+          symbol: 'none',
+          connectNulls: false,
+          lineStyle: { width: 1.6, color: item.color || '#101820' },
+          itemStyle: { color: item.color || '#101820' }
+        });
+        out.push({
+          name: `${item.sourceName} · ${t('rocofFrequencyLine')}`,
+          type: 'line',
+          xAxisIndex: 0,
+          yAxisIndex: 2,
+          data: frequencyData,
+          symbol: 'none',
+          connectNulls: false,
+          lineStyle: { width: 1.2, color: 'rgba(15,118,110,.62)' },
+          itemStyle: { color: 'rgba(15,118,110,.62)' }
+        });
+      }
+      return out;
+    }
+
+    function findRocofEventForHighlight(result, startSecond, endSecond, highlight = null) {
+      const events = result.chart?.rocofEvents || [];
+      if (highlight?.type === 'rocof') {
+        const direct = events.find(event => Math.abs(event.startSecond - highlight.startSecond) < 1e-6 && Math.abs(event.endSecond - highlight.endSecond) < 1e-6);
+        if (direct) return direct;
+      }
+      return events.find(event => event.startSecond < endSecond && event.endSecond > startSecond) || null;
+    }
+
+    function buildRocofEventDetailSeries(result, event) {
+      if (!event) return [];
+      const extremeSecond = event.side === 'negative' ? event.minFrequencySecond : event.maxFrequencySecond;
+      const extremeFrequency = event.side === 'negative' ? event.minFrequencyHz : event.maxFrequencyHz;
+      const dots = [
+        [event.startSecond, event.startFrequencyHz, t('rocofStartFrequency')],
+        [extremeSecond, extremeFrequency, event.side === 'negative' ? t('rocofMinFrequency') : t('rocofMaxFrequency')],
+        [event.endFrequencySecond ?? Math.max(event.startSecond, event.endSecond - 1), event.endFrequencyHz, t('rocofEndFrequency')]
+      ].filter(point => Number.isFinite(point[0]) && Number.isFinite(point[1]));
+      return [
+        {
+          name: t('rocofEventBoundary'),
+          type: 'line',
+          xAxisIndex: 0,
+          yAxisIndex: 0,
+          data: [],
+          symbol: 'none',
+          silent: false,
+          lineStyle: { opacity: 0 },
+          markArea: {
+            silent: false,
+            itemStyle: { color: event.side === 'negative' ? 'rgba(23,33,43,.16)' : 'rgba(220,38,38,.18)', borderColor: '#dc2626', borderWidth: 1.6 },
+            data: [[
+              {
+                xAxis: event.startSecond,
+                name: rocofEventShortLabel(event),
+                eventType: 'rocof',
+                eventSide: event.side,
+                eventSourceName: event.sourceName,
+                eventLabel: rocofEventLabel(event),
+                eventStartSecond: event.startSecond,
+                eventEndSecond: event.endSecond,
+                eventDurationSeconds: event.durationSeconds,
+                eventPeakMhzPerSecond: event.peakMhzPerSecond,
+                eventStartFrequencyHz: event.startFrequencyHz,
+                eventEndFrequencyHz: event.endFrequencyHz,
+                eventMinFrequencyHz: event.minFrequencyHz,
+                eventMaxFrequencyHz: event.maxFrequencyHz
+              },
+              { xAxis: event.endSecond }
+            ]]
+          },
+          markLine: {
+            silent: false,
+            symbol: 'none',
+            lineStyle: { color: '#dc2626', type: 'dashed', width: 1.4 },
+            data: [
+              { xAxis: event.startSecond, name: t('eventStart') },
+              { xAxis: event.endSecond, name: t('eventEnd') }
+            ]
+          }
+        },
+        {
+          name: t('rocofFrequencyPoints'),
+          type: 'scatter',
+          xAxisIndex: 0,
+          yAxisIndex: 2,
+          data: dots,
+          symbolSize: 8,
+          itemStyle: { color: '#0f766e' },
+          z: 8
+        }
+      ];
+    }
+
+    function showRocofDetailWindow(result, startSecond, endSecond, highlight = null) {
+      if (!state.oscillationChart || result?.chart?.kind !== 'rocof') return;
+      const range = result.chart.range || { start: 0, end: 86400 };
+      const start = Math.max(range.start, Number(startSecond));
+      const end = Math.min(range.end, Number(endSecond));
+      if (!(end > start)) return;
+      const focusedEvent = findRocofEventForHighlight(result, start, end, highlight);
+      const heatmapData = buildRocofHeatmapData(result.chart.heatmap || { cells: [] });
+      const series = [
+        ...buildRocofSecondWindowSeries(result, start, end),
+        ...buildQualityMarkSeries(result.chart.qualityEvents || [], highlight),
+        ...buildRocofEventSeries(result.chart.rocofEvents || [], focusedEvent || highlight),
+        ...buildRocofEventDetailSeries(result, focusedEvent),
+        rocofHeatmapSeries(heatmapData)
+      ];
+      state.oscillationChart.setOption({
+        xAxis: [{ min: start, max: end }],
+        yAxis: [
+          { type: 'value', gridIndex: 0, scale: true, name: 'mHz/s' },
+          { type: 'category', gridIndex: 1, data: result.chart.heatmap?.days || [], name: '' },
+          { type: 'value', gridIndex: 0, scale: true, name: 'Hz', position: 'right', show: true }
+        ],
+        visualMap: { seriesIndex: series.length - 1 },
+        series
+      }, { replaceMerge: ['series'] });
+      state.oscillationChart.dispatchAction({ type: 'dataZoom', dataZoomIndex: 0, startValue: start, endValue: end });
+      setQualityZoomResetVisible(true);
+    }
+
+    function showRocofFullRange(result = state.analysis.lastResult) {
+      if (!result?.chart || result.chart.kind !== 'rocof') return;
+      renderRocofAnalysisChart(result);
+      const range = result.chart.range || { start: 0, end: 86400 };
+      state.oscillationChart?.dispatchAction({ type: 'dataZoom', dataZoomIndex: 0, startValue: range.start, endValue: range.end });
+      setQualityZoomResetVisible(false);
+    }
+
     function setAnalysisTableHeader(columns) {
       const head = $('analysisEventsHead');
       if (!head) return;
@@ -9988,7 +10935,7 @@
       const def = analysisDefinition(result.type);
       const columns = result.tableColumns || def.tableColumns || [];
       const body = $('analysisEventsBody');
-      body?.closest('table')?.classList.toggle('stats-table', result.type === 'stats' || result.type === 'events');
+      body?.closest('table')?.classList.toggle('stats-table', result.type === 'stats' || result.type === 'events' || result.type === 'rocof');
       $('analysisTableTitle').textContent = result.tableTitle || result.title || t(def.titleKey);
       $('analysisTableDescription').textContent = result.description || t(def.descriptionKey);
       setAnalysisTableHeader(columns);
@@ -10028,6 +10975,8 @@
           showStatsDetailWindow(result, start, end, { startSecond: eventStart, endSecond: eventEnd, type: row.dataset.drilldownType });
         } else if (result.chart?.kind === 'bandViolation') {
           showBandViolationDetailWindow(result, start, end, { startSecond: eventStart, endSecond: eventEnd, type: row.dataset.drilldownType });
+        } else if (result.chart?.kind === 'rocof') {
+          showRocofDetailWindow(result, start, end, { startSecond: eventStart, endSecond: eventEnd, type: row.dataset.drilldownType });
         } else {
           state.oscillationChart?.dispatchAction({ type: 'dataZoom', startValue: start, endValue: end });
         }
@@ -10120,10 +11069,17 @@
           dateRange: dateList,
           timeWindowSeconds: [windowBounds.start, windowBounds.end],
           alignment: $('analysisAlignment')?.value || state.settings.alignmentMode,
-          resolution: (type === 'quality' || type === 'stats' || type === 'events') ? '1s' : ($('analysisResolution')?.value || 'auto'),
+          resolution: (type === 'quality' || type === 'stats' || type === 'events' || type === 'rocof') ? '1s' : ($('analysisResolution')?.value || 'auto'),
           bandHz: (type === 'stats' || type === 'events')
             ? [Number($('statsBandMinHz')?.value || 49.90), Number($('statsBandMaxHz')?.value || 50.10)]
-            : [Number($('bandMin').value), Number($('bandMax').value)]
+            : [Number($('bandMin').value), Number($('bandMax').value)],
+          rocof: type === 'rocof'
+            ? {
+                method: rocofMethodValue(),
+                thresholdMhzPerSecond: rocofThresholdMhzPerSecond(),
+                minEventSeconds: rocofMinimumDurationSeconds()
+              }
+            : undefined
         },
         sampling,
         sources: [sourceLabel(source, 'report')],
@@ -10586,7 +11542,8 @@
       else if (normalizedPath === 'daily' && dailyDate) hashPath = `#/daily/${encodeURIComponent(dailyDate)}`;
 
       const source = routeSourceAlias(patch.source ?? getAnalysisSource()) || getAnalysisSource();
-      const resolution = routeResolutionAlias(patch.resolution ?? $('analysisResolution')?.value) || $('analysisResolution')?.value;
+      const rawResolution = routeResolutionAlias(patch.resolution ?? $('analysisResolution')?.value) || $('analysisResolution')?.value || 'auto';
+      const resolution = resolveAnalysisResolution(analysis, rawResolution);
       const routeParams = {
         lang: patch.lang ?? lang,
         date: patch.date ?? $('analysisDateSelect')?.value ?? $('dateSelect')?.value,
@@ -11424,7 +12381,13 @@
         resolution10s: '10 saniyelik',
         resolutionMinute: 'Dakikalık',
         resolutionHour: 'Saatlik',
-        rocofThresholdLabel: 'RoCoF eşiği',
+        rocofThresholdLabel: 'RoCoF eşiği (mHz/s)',
+        rocofMethodLabel: 'RoCoF yöntemi',
+        rocofMethodCentral: 'Merkezi Fark',
+        rocofMethodFiltered: 'Filtreli Türev',
+        rocofMethodRegression: 'Hareketli Regresyon',
+        rocofPreFilterLabel: 'Ön filtre süresi (sn)',
+        rocofRegressionWindowLabel: 'Regresyon pencere süresi (sn)',
         analysisGroupQuality: 'Veri Kalitesi',
         analysisGroupFrequency: 'Frekans Kalitesi',
         analysisGroupEvents: 'Olay Analizi',
@@ -11508,11 +12471,11 @@
         tableMetric: 'Metrik',
         tableValue: 'Değer',
         tableFrequency: 'Frekans',
-        rocofPeak: 'Tepe Hz/s',
+        rocofPeak: 'Tepe RoCoF',
         limitQuality: 'Coverage % unique valid timestamp / expected seconds olarak hesaplanır. Good Quality %, geçersiz, yinelenen timestamp ve YD/RV eşiğini aşan ardışık aynı frekans aralıklarını ayrıca düşer.',
         limitStats: 'Temel istatistikler olay nedeni çıkarmaz; yalnız dağılımı özetler.',
         limitEvents: 'Missing, invalid, yinelenen timestamp ve YD/RV olarak işaretlenen saniyeler bant ihlali hesabına dahil edilmez; kalite boşluğu olayları böler.',
-        limitRocof: 'RoCoF saniyelik ve filtreli seri gerektirir; seyrek örnekleme hatalı tepe üretebilir.',
+        limitRocof: 'RoCoF, Missing/Invalid/Yinelenen Zaman/YD elendikten sonra kalan 1 saniyelik Good Quality seriyle hesaplanır; kalite boşlukları türev veya regresyon pencereleriyle köprülenmez.',
         limitPsd: 'PSD bantları Nyquist sınırının altında ve aynı örnekleme varsayımıyla yorumlanmalıdır.',
         limitSpectrogram: 'Spektrogram kısa süreli pencerelere duyarlıdır; dakikalık/saatlik veri uygun değildir.',
         limitOscillation: 'Osilasyon adayları doğrulama bulgusudur; kaynak kalitesi ve filtre parametresi sonucu etkiler.',
@@ -11731,10 +12694,54 @@
         classNeedsReview: 'İnceleme gerekli',
         classCommonMode: 'Ortak mod',
         classUncertain: 'Belirsiz',
-        rocofMaxPositive: 'Maks. pozitif',
-        rocofMaxNegative: 'Maks. negatif',
+        rocofMaxPositive: 'Maks. pozitif RoCoF',
+        rocofMaxPositiveHelp: 'Seçilen dönemde Good Quality saniyelik veriden hesaplanan en yüksek pozitif frekans değişim hızı.',
+        rocofMaxNegative: 'Maks. negatif RoCoF',
+        rocofMaxNegativeHelp: 'Seçilen dönemde Good Quality saniyelik veriden hesaplanan en düşük negatif frekans değişim hızı.',
         rocofRms: 'RoCoF RMS',
+        rocofRmsHelp: 'Good Quality RoCoF örneklerinin kare ortalama karekök değeri.',
         rocofEvents: 'RoCoF olayı',
+        rocofEventCountHelp: 'Pozitif veya negatif eşiği aşan kesintisiz RoCoF olay sayısı.',
+        rocofTotalDuration: 'Eşik Üstü Süre',
+        rocofTotalDurationHelp: 'RoCoF değerinin tanımlı pozitif veya negatif eşiğin dışında kaldığı toplam süre.',
+        rocofEventType: 'Tür',
+        rocofEventTypeHelp: 'R+ pozitif RoCoF, R- negatif RoCoF olayıdır.',
+        rocofDurationHelp: 'RoCoF eşiği aşımının kesintisiz sürdüğü süre.',
+        rocofPeakHelp: 'Olay içindeki en büyük mutlak RoCoF tepe değeri; mHz/s cinsinden gösterilir.',
+        rocofStartHz: 'Başlangıç Hz',
+        rocofStartHzHelp: 'RoCoF olayının başladığı saniyedeki frekans.',
+        rocofExtremeHz: 'Min/Maks Hz',
+        rocofExtremeHzHelp: 'R- olayında minimum, R+ olayında maksimum frekans ve zamanı.',
+        rocofPositiveShort: 'R+',
+        rocofNegativeShort: 'R-',
+        rocofPositiveLegend: 'R+ / Pozitif RoCoF',
+        rocofNegativeLegend: 'R- / Negatif RoCoF',
+        rocofPositiveFull: 'Pozitif RoCoF Olayı',
+        rocofNegativeFull: 'Negatif RoCoF Olayı',
+        rocofSeverityHeatmap: '15 dk RoCoF Şiddet Heatmap',
+        rocofSeverityRatio: 'Eşiğe göre şiddet',
+        rocofPeakAbs: 'Tepe |RoCoF|',
+        rocofPositiveDuration: 'R+ süresi',
+        rocofNegativeDuration: 'R- süresi',
+        rocofPositiveCount: 'R+ olay sayısı',
+        rocofNegativeCount: 'R- olay sayısı',
+        rocofThresholdMhz: 'RoCoF eşiği',
+        rocofThresholdHelp: 'Arayüzde mHz/s olarak girilir, hesaplama çekirdeğine Hz/s olarak aktarılır.',
+        rocofMeanAbs: 'Ortalama |RoCoF|',
+        rocofMeanAbsHelp: 'Good Quality RoCoF örneklerinin mutlak değer ortalaması.',
+        rocofGoodUsed: 'Kullanılan Good Quality örnek',
+        rocofGoodUsedHelp: 'Missing, invalid, duplicate timestamp ve YD/RV çıkarıldıktan sonra kalan saniyelik frekans örnekleri.',
+        rocofUnavailable: 'Kalite nedeniyle elenen örnek',
+        rocofUnavailableHelp: 'RoCoF hesabına girmeyen Missing, Invalid, Duplicate Timestamp veya YD/RV örnekleri.',
+        rocofMethod: 'Yöntem',
+        rocofMethodHelp: 'Central Difference, Filtered Derivative veya Moving Regression seçimine göre 1 saniyelik Good Quality seriden türev hesaplanır.',
+        rocofFrequencyLine: 'Frekans 1s',
+        rocofFrequencyPoints: 'RoCoF frekans noktaları',
+        rocofEventBoundary: 'RoCoF olay sınırı',
+        rocofStartFrequency: 'Başlangıç frekansı',
+        rocofEndFrequency: 'Bitiş frekansı',
+        rocofMinFrequency: 'Minimum frekans',
+        rocofMaxFrequency: 'Maksimum frekans',
         dominantFrequency: 'Baskın frekans',
         spectralPower: 'Spektral güç',
         noiseFloor: 'Gürültü tabanı',
@@ -11749,7 +12756,7 @@
         rmsDeviation: 'RMS sapma',
         oscConfidence: 'Güven skoru',
         methodQuality: 'Kapsama ve kalite metrikleri her zaman saniyelik ham/canonical zaman ekseni üzerinden hesaplanır; grafik uzun aralıkta 15 dakikalık görsel özet kullanabilir.',
-        methodRocof: 'RoCoF ardışık saniyelik frekans farklarından Hz/s cinsinden hesaplanır.',
+        methodRocof: 'RoCoF analizi 1 saniyelik canonical Good Quality frekans verisi üzerinde çalışır; Missing, Invalid, Duplicate Timestamp ve YD/RV örnekleri dışlanır. Görsel özet uzun aralıklarda azaltılabilir, olay tespiti saniyelik kalır.',
         methodPsd: 'Welch PSD, gün içindeki baskın düşük frekanslı bileşeni ve gürültü tabanını özetler.',
         methodSpectrogram: 'Spektrogram, 10 dakikalık pencerelerde baskın frekansın zamanla değişimini gösterir.',
         methodCrossCorrelation: 'Çapraz korelasyon, Türkiye ve Kıta Avrupası serileri arasındaki en güçlü gecikmeli benzerliği arar.',
@@ -11829,7 +12836,13 @@
         resolution10s: '10-second',
         resolutionMinute: 'Minutely',
         resolutionHour: 'Hourly',
-        rocofThresholdLabel: 'RoCoF threshold',
+        rocofThresholdLabel: 'RoCoF threshold (mHz/s)',
+        rocofMethodLabel: 'RoCoF method',
+        rocofMethodCentral: 'Central Difference',
+        rocofMethodFiltered: 'Filtered Derivative',
+        rocofMethodRegression: 'Moving Regression',
+        rocofPreFilterLabel: 'Pre-filter duration (s)',
+        rocofRegressionWindowLabel: 'Regression window (s)',
         analysisGroupQuality: 'Data Quality',
         analysisGroupFrequency: 'Frequency Quality',
         analysisGroupEvents: 'Event Analysis',
@@ -11913,11 +12926,11 @@
         tableMetric: 'Metric',
         tableValue: 'Value',
         tableFrequency: 'Frequency',
-        rocofPeak: 'Peak Hz/s',
+        rocofPeak: 'Peak RoCoF',
         limitQuality: 'Coverage % is unique valid timestamp / expected seconds. Good Quality % separately excludes invalid samples, duplicate timestamps, and repeated-value runs that meet the configured RV threshold.',
         limitStats: 'Basic statistics summarize distribution only and do not infer event causes.',
         limitEvents: 'Seconds marked as Missing, Invalid, Duplicate Timestamp, or RV are excluded from band-violation detection; quality gaps split events.',
-        limitRocof: 'RoCoF requires second-level filtered data; sparse sampling can create false peaks.',
+        limitRocof: 'RoCoF is computed from one-second Good Quality data after excluding Missing, Invalid, Duplicate Timestamp, and RV samples; quality gaps are not bridged by derivative or regression windows.',
         limitPsd: 'PSD bands must remain below Nyquist and share the same sampling assumption.',
         limitSpectrogram: 'Spectrogram is sensitive to short windows; minutely/hourly data is unsuitable.',
         limitOscillation: 'Oscillation candidates require validation; data quality and filter settings affect results.',
@@ -12136,10 +13149,54 @@
         classNeedsReview: 'Needs review',
         classCommonMode: 'Common mode',
         classUncertain: 'Uncertain',
-        rocofMaxPositive: 'Max positive',
-        rocofMaxNegative: 'Max negative',
+        rocofMaxPositive: 'Max positive RoCoF',
+        rocofMaxPositiveHelp: 'Highest positive rate of frequency change computed from Good Quality one-second data in the selected period.',
+        rocofMaxNegative: 'Max negative RoCoF',
+        rocofMaxNegativeHelp: 'Lowest negative rate of frequency change computed from Good Quality one-second data in the selected period.',
         rocofRms: 'RoCoF RMS',
+        rocofRmsHelp: 'Root mean square value of the Good Quality RoCoF samples.',
         rocofEvents: 'RoCoF events',
+        rocofEventCountHelp: 'Count of continuous RoCoF events crossing the positive or negative threshold.',
+        rocofTotalDuration: 'Threshold Duration',
+        rocofTotalDurationHelp: 'Total time where RoCoF remains outside the configured positive or negative threshold.',
+        rocofEventType: 'Type',
+        rocofEventTypeHelp: 'R+ is a positive RoCoF event; R- is a negative RoCoF event.',
+        rocofDurationHelp: 'Continuous duration of the RoCoF threshold crossing.',
+        rocofPeakHelp: 'Largest absolute RoCoF peak inside the event, shown in mHz/s.',
+        rocofStartHz: 'Start Hz',
+        rocofStartHzHelp: 'Frequency at the second where the RoCoF event starts.',
+        rocofExtremeHz: 'Min/Max Hz',
+        rocofExtremeHzHelp: 'Minimum frequency for an R- event or maximum frequency for an R+ event, with its timestamp.',
+        rocofPositiveShort: 'R+',
+        rocofNegativeShort: 'R-',
+        rocofPositiveLegend: 'R+ / Positive RoCoF',
+        rocofNegativeLegend: 'R- / Negative RoCoF',
+        rocofPositiveFull: 'Positive RoCoF Event',
+        rocofNegativeFull: 'Negative RoCoF Event',
+        rocofSeverityHeatmap: '15-min RoCoF Severity Heatmap',
+        rocofSeverityRatio: 'Severity vs threshold',
+        rocofPeakAbs: 'Peak |RoCoF|',
+        rocofPositiveDuration: 'R+ duration',
+        rocofNegativeDuration: 'R- duration',
+        rocofPositiveCount: 'R+ event count',
+        rocofNegativeCount: 'R- event count',
+        rocofThresholdMhz: 'RoCoF threshold',
+        rocofThresholdHelp: 'Entered as mHz/s in the UI and passed to the core as Hz/s.',
+        rocofMeanAbs: 'Mean |RoCoF|',
+        rocofMeanAbsHelp: 'Mean absolute value of the Good Quality RoCoF samples.',
+        rocofGoodUsed: 'Good Quality samples used',
+        rocofGoodUsedHelp: 'One-second frequency samples left after excluding Missing, Invalid, Duplicate Timestamp, and RV.',
+        rocofUnavailable: 'Samples excluded by quality',
+        rocofUnavailableHelp: 'Missing, Invalid, Duplicate Timestamp, or RV samples not used by RoCoF.',
+        rocofMethod: 'Method',
+        rocofMethodHelp: 'Central Difference, Filtered Derivative, or Moving Regression computes the derivative from one-second Good Quality data.',
+        rocofFrequencyLine: 'Frequency 1s',
+        rocofFrequencyPoints: 'RoCoF frequency points',
+        rocofEventBoundary: 'RoCoF event boundary',
+        rocofStartFrequency: 'Start frequency',
+        rocofEndFrequency: 'End frequency',
+        rocofMinFrequency: 'Minimum frequency',
+        rocofMaxFrequency: 'Maximum frequency',
         dominantFrequency: 'Dominant frequency',
         spectralPower: 'Spectral power',
         noiseFloor: 'Noise floor',
@@ -12154,7 +13211,7 @@
         rmsDeviation: 'RMS deviation',
         oscConfidence: 'Confidence score',
         methodQuality: 'Coverage and quality metrics are always computed on the raw/canonical one-second time axis; long charts may use a 15-minute visual summary.',
-        methodRocof: 'RoCoF is computed from adjacent second-level frequency differences in Hz/s.',
+        methodRocof: 'RoCoF analysis runs on one-second canonical Good Quality frequency data; Missing, Invalid, Duplicate Timestamp, and RV samples are excluded. Long visual views may be summarized, while event detection remains one-second based.',
         methodPsd: 'Welch PSD summarizes the dominant low-frequency component and noise floor within the day.',
         methodSpectrogram: 'The spectrogram tracks dominant frequency changes across 10-minute windows.',
         methodCrossCorrelation: 'Cross-correlation searches for the strongest delayed similarity between Türkiye and Continental Europe.',

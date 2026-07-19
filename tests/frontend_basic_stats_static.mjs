@@ -66,7 +66,7 @@ assert.match(html, /id=["']repeatedValueSeconds["'][^>]+value=["']15["']/, "Basi
 assert.match(html, /stats:[\s\S]{0,260}?parameterKeys:\s*\[['"]statsBand['"],\s*['"]yd['"]\]/, "Basic Stats exposes the shared YD/RV threshold setting");
 assert.doesNotMatch(html, /repeatedValueSeconds[\s\S]{0,120}(?:\|\||\?\?)\s*(?:5|10)\b/, "Basic Stats/Data Coverage YD/RV threshold must not fall back to 5s or 10s");
 assert.match(html, /statsBandMinHz:\s*49\.90[\s\S]{0,80}statsBandMaxHz:\s*50\.10/, "Basic Stats saved defaults use 49.90/50.10 Hz");
-assert.match(html, /const\s+LIMITED_DATE_MODE_ANALYSES\s*=\s*new Set\(\[['"]quality['"],\s*['"]stats['"],\s*['"]events['"]\]\)/, "Basic Stats, Data Coverage, and Band Violation share restricted date modes");
+assert.match(html, /const\s+LIMITED_DATE_MODE_ANALYSES\s*=\s*new Set\(\[['"]quality['"],\s*['"]stats['"],\s*['"]events['"],\s*['"]rocof['"]\]\)/, "Basic Stats, Data Coverage, Band Violation, and RoCoF share restricted date modes");
 assert.match(html, /function syncAnalysisDateControlState\(/, "Basic Stats date controls have an explicit active/passive sync");
 assert.match(html, /resolveAnalysisDates[\s\S]{0,500}LIMITED_DATE_MODE_ANALYSES\.has\(type\)[\s\S]{0,500}mode\s*===\s*['"]range['"][\s\S]{0,500}analysisStartDate/, "Basic Stats range mode uses start/end dates explicitly through the shared limited-date-mode set");
 assert.match(html, /statsHeatmap:\s*['"]15 dk RMS Sapma['"][\s\S]*statsHeatmap:\s*['"]15-min RMS Deviation['"]/, "Basic Stats heatmap label is localized");

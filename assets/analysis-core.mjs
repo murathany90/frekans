@@ -311,24 +311,28 @@ export function computeRocof(values, {
   windowSeconds = 5,
   preFilterSeconds = 5,
   thresholdHzPerSecond = 0.01,
-  minEventSeconds = 1
+  minEventSeconds = 1,
+  startSecond = 0
 } = {}) {
   const n = values?.length || 0;
   const dt = Math.max(EPSILON, Number(sampleIntervalSeconds) || 1);
+  const normalizedMethod = method === "centralDifference" ? "central" : method;
   const rocof = new Float64Array(n);
   rocof.fill(NaN);
 
-  if (method === "movingRegression") {
+  if (normalizedMethod === "movingRegression") {
     const radius = Math.max(1, Math.floor((windowSeconds / dt) / 2));
     for (let i = radius; i < n - radius; i += 1) {
+      const from = i - radius;
+      const to = i + radius;
+      if (!allFinite(values, from, to)) continue;
       let count = 0;
       let sumT = 0;
       let sumY = 0;
       let sumTT = 0;
       let sumTY = 0;
-      for (let j = i - radius; j <= i + radius; j += 1) {
+      for (let j = from; j <= to; j += 1) {
         const y = values[j];
-        if (!Number.isFinite(y)) continue;
         const t = (j - i) * dt;
         count += 1;
         sumT += t;
@@ -340,31 +344,40 @@ export function computeRocof(values, {
       if (count >= 3 && Math.abs(denom) > EPSILON) rocof[i] = (count * sumTY - sumT * sumY) / denom;
     }
   } else {
-    const source = method === "filteredDerivative" ? movingAverage(values, Math.max(1, Math.round(preFilterSeconds / dt))) : values;
+    const source = normalizedMethod === "filteredDerivative" ? movingAverage(values, Math.max(1, Math.round(preFilterSeconds / dt))) : values;
     for (let i = 0; i < n; i += 1) {
-      const prevIndex = method === "simple" ? i - 1 : i - 1;
-      const nextIndex = method === "simple" ? i : i + 1;
+      const prevIndex = normalizedMethod === "simple" ? i - 1 : i - 1;
+      const nextIndex = normalizedMethod === "simple" ? i : i + 1;
       if (prevIndex < 0 || nextIndex >= n) continue;
+      if (!Number.isFinite(values[i]) || !Number.isFinite(values[prevIndex]) || !Number.isFinite(values[nextIndex])) continue;
       const a = source[prevIndex];
+      const c = source[i];
       const b = source[nextIndex];
-      if (!Number.isFinite(a) || !Number.isFinite(b)) continue;
+      if (!Number.isFinite(a) || !Number.isFinite(c) || !Number.isFinite(b)) continue;
       rocof[i] = (b - a) / ((nextIndex - prevIndex) * dt);
     }
   }
 
   const clean = finiteValues(rocof);
   const abs = clean.map(Math.abs);
-  const events = thresholdEvents(rocof, thresholdHzPerSecond, minEventSeconds, dt);
+  const events = thresholdEvents(rocof, thresholdHzPerSecond, minEventSeconds, dt, values, startSecond);
   return {
     series: rocof,
-    method,
+    method: normalizedMethod,
     sampleIntervalSeconds: dt,
     maxPositive: clean.length ? Math.max(...clean) : NaN,
     maxNegative: clean.length ? Math.min(...clean) : NaN,
     meanAbsolute: abs.length ? abs.reduce((a, b) => a + b, 0) / abs.length : NaN,
     rms: abs.length ? Math.sqrt(clean.reduce((sum, v) => sum + v * v, 0) / abs.length) : NaN,
+    sampleCount: n,
+    rocofSampleCount: clean.length,
+    unavailableSamples: n - clean.length,
     thresholdEventCount: events.length,
     thresholdSeconds: events.reduce((sum, event) => sum + event.durationSeconds, 0),
+    positiveEventCount: events.filter(event => event.side === "positive").length,
+    negativeEventCount: events.filter(event => event.side === "negative").length,
+    positiveSeconds: events.filter(event => event.side === "positive").reduce((sum, event) => sum + event.durationSeconds, 0),
+    negativeSeconds: events.filter(event => event.side === "negative").reduce((sum, event) => sum + event.durationSeconds, 0),
     events
   };
 }
@@ -1075,26 +1088,96 @@ function countBandViolationEvents(values, minHz, maxHz) {
   return { count, longestSeconds };
 }
 
-function thresholdEvents(series, threshold, minEventSeconds, sampleIntervalSeconds) {
+function allFinite(values, start, end) {
+  if (start < 0 || end >= (values?.length || 0)) return false;
+  for (let i = start; i <= end; i += 1) {
+    if (!Number.isFinite(values[i])) return false;
+  }
+  return true;
+}
+
+function rocofFrequencyStats(values, startIndex, endIndex, sampleIntervalSeconds, startSecond) {
+  let minFrequencyHz = Infinity;
+  let maxFrequencyHz = -Infinity;
+  let minFrequencyIndex = startIndex;
+  let maxFrequencyIndex = startIndex;
+  for (let i = startIndex; i <= endIndex; i += 1) {
+    const value = values[i];
+    if (!Number.isFinite(value)) continue;
+    if (value < minFrequencyHz) {
+      minFrequencyHz = value;
+      minFrequencyIndex = i;
+    }
+    if (value > maxFrequencyHz) {
+      maxFrequencyHz = value;
+      maxFrequencyIndex = i;
+    }
+  }
+  return {
+    startFrequencyHz: Number.isFinite(values[startIndex]) ? values[startIndex] : NaN,
+    startFrequencySecond: startSecond + startIndex * sampleIntervalSeconds,
+    endFrequencyHz: Number.isFinite(values[endIndex]) ? values[endIndex] : NaN,
+    endFrequencySecond: startSecond + endIndex * sampleIntervalSeconds,
+    minFrequencyHz: Number.isFinite(minFrequencyHz) ? minFrequencyHz : NaN,
+    minFrequencySecond: startSecond + minFrequencyIndex * sampleIntervalSeconds,
+    maxFrequencyHz: Number.isFinite(maxFrequencyHz) ? maxFrequencyHz : NaN,
+    maxFrequencySecond: startSecond + maxFrequencyIndex * sampleIntervalSeconds
+  };
+}
+
+function thresholdEvents(series, threshold, minEventSeconds, sampleIntervalSeconds, values = [], startSecond = 0) {
   const events = [];
   let start = null;
+  let side = null;
   let peak = 0;
+  const limit = Math.abs(Number(threshold) || 0);
+  const closeRun = endIndex => {
+    if (start === null || !side) return;
+    const durationSeconds = (endIndex - start + 1) * sampleIntervalSeconds;
+    if (durationSeconds >= minEventSeconds) {
+      const frequencyStats = rocofFrequencyStats(values, start, endIndex, sampleIntervalSeconds, startSecond);
+      events.push({
+        type: "rocof",
+        eventType: "rocof",
+        side,
+        startSecond: startSecond + start * sampleIntervalSeconds,
+        endSecond: startSecond + (endIndex + 1) * sampleIntervalSeconds,
+        durationSeconds,
+        peakHzPerSecond: peak,
+        peakMhzPerSecond: peak * 1000,
+        value: peak,
+        classification: side,
+        shortLabel: side === "positive" ? "R+" : "R-",
+        ...frequencyStats
+      });
+    }
+    start = null;
+    side = null;
+    peak = 0;
+  };
   for (let i = 0; i <= series.length; i += 1) {
     const value = series[i];
-    const over = Number.isFinite(value) && Math.abs(value) >= threshold;
-    if (over && start === null) {
+    const currentSide = Number.isFinite(value)
+      ? value > limit ? "positive" : value < -limit ? "negative" : null
+      : null;
+    if (currentSide && start === null) {
       start = i;
+      side = currentSide;
       peak = value;
-    } else if (over) {
-      if (Math.abs(value) > Math.abs(peak)) peak = value;
-    } else if (start !== null) {
-      const end = i - 1;
-      const durationSeconds = (end - start + 1) * sampleIntervalSeconds;
-      if (durationSeconds >= minEventSeconds) {
-        events.push({ startSecond: start * sampleIntervalSeconds, endSecond: end * sampleIntervalSeconds, durationSeconds, peakHzPerSecond: peak });
-      }
-      start = null;
+      continue;
     }
+    if (currentSide && currentSide === side) {
+      if (side === "positive" ? value > peak : value < peak) peak = value;
+      continue;
+    }
+    if (currentSide && currentSide !== side) {
+      closeRun(i - 1);
+      start = i;
+      side = currentSide;
+      peak = value;
+      continue;
+    }
+    closeRun(i - 1);
   }
   return events;
 }
@@ -1145,16 +1228,14 @@ function movingAverage(values, windowSamples) {
   out.fill(NaN);
   const radius = Math.max(0, Math.floor(windowSamples / 2));
   for (let i = 0; i < n; i += 1) {
+    const from = i - radius;
+    const to = i + radius;
+    if (!allFinite(values, from, to)) continue;
     let sum = 0;
-    let count = 0;
-    for (let j = Math.max(0, i - radius); j <= Math.min(n - 1, i + radius); j += 1) {
-      const value = values[j];
-      if (Number.isFinite(value)) {
-        sum += value;
-        count += 1;
-      }
+    for (let j = from; j <= to; j += 1) {
+      sum += values[j];
     }
-    if (count) out[i] = sum / count;
+    out[i] = sum / (to - from + 1);
   }
   return out;
 }

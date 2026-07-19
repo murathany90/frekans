@@ -37,6 +37,10 @@ async function currentRouteState(page) {
     analysisType: document.querySelector("#analysisTypeSelect")?.value || "",
     source: document.querySelector("#analysisSourceSelect")?.value || "",
     resolution: document.querySelector("#analysisResolution")?.value || "",
+    effectiveResolution: window.resolveAnalysisResolution?.(
+      document.querySelector("#analysisTypeSelect")?.value || "stats",
+      document.querySelector("#analysisResolution")?.value || "auto"
+    ) || document.querySelector("#analysisResolution")?.value || "",
     lang: document.documentElement.getAttribute("data-current-lang") || "",
     legend: window.echarts?.getInstanceByDom(document.querySelector("#frequencyChart"))?.getOption?.()?.legend?.[0]?.selected || {},
     zoom: window.echarts?.getInstanceByDom(document.querySelector("#frequencyChart"))?.getOption?.()?.dataZoom?.[0] || {}
@@ -68,7 +72,10 @@ try {
     await page.waitForFunction(() => window.location.hash.startsWith("#/analysis/rocof"));
     await page.selectOption("#analysisSourceSelect", "tr");
     await page.locator("details.analysis-advanced-panel").evaluate(node => { node.open = true; });
-    await page.selectOption("#analysisResolution", "1s");
+    const resolutionHidden = await page.locator('[data-param-key="resolution"]').evaluate(node => node.hidden);
+    if (!resolutionHidden) {
+      throw new Error("RoCoF should hide the user-facing resolution selector and lock analysis to 1s.");
+    }
     state = await currentRouteState(page);
     if (!/^#\/analysis\/rocof\?/.test(state.hash) || !state.hash.includes("source=turkiye") || !state.hash.includes("resolution=1s")) {
       throw new Error(`Analysis route did not serialize analysis/source/resolution: ${JSON.stringify(state)}`);
@@ -83,7 +90,7 @@ try {
     await page.goBack();
     await page.waitForFunction(() => document.querySelector(".tab-button.active")?.dataset.tab === "tab-oscillation");
     state = await currentRouteState(page);
-    if (state.analysisType !== "rocof" || state.source !== "tr" || state.resolution !== "1s") {
+    if (state.analysisType !== "rocof" || state.source !== "tr" || state.effectiveResolution !== "1s") {
       throw new Error(`Back navigation did not restore analysis route: ${JSON.stringify(state)}`);
     }
 
@@ -111,7 +118,7 @@ try {
     await page.goto(appUrl("#/analysis/rocof?source=turkiye&resolution=1s&lang=en"), { waitUntil: "networkidle" });
     await page.waitForFunction(() => document.querySelector(".tab-button.active")?.dataset.tab === "tab-oscillation");
     const state = await currentRouteState(page);
-    if (state.analysisType !== "rocof" || state.source !== "tr" || state.resolution !== "1s" || state.lang !== "en") {
+    if (state.analysisType !== "rocof" || state.source !== "tr" || state.effectiveResolution !== "1s" || state.lang !== "en") {
       throw new Error(`Direct analysis route did not apply selections: ${JSON.stringify(state)}`);
     }
     await page.close();
