@@ -35,6 +35,29 @@ def test_write_status_records_prompt2_success_schema(tmp_path):
     assert status["lastSuccessfulTeiasDataDate"] == "2026-07-10"
 
 
+def test_write_status_records_teias_source_lag_fields(tmp_path):
+    write_status(
+        tmp_path,
+        {
+            "processed": [{"date": "2026-07-13", "status": "complete", "qualityScore": 100}],
+            "missing": ["2026-07-15"],
+            "failed": [],
+            "attemptedDate": "2026-07-15",
+            "workflowRunAt": "2026-07-17T08:30:00Z",
+            "latestDiscoveredDate": "2026-07-14",
+            "discoveredDates": ["2026-07-13", "2026-07-14"],
+            "catchUpPublishedDates": ["2026-07-14"],
+        },
+    )
+
+    status = read_status(tmp_path)
+
+    assert status["sourceLatestTeiasDataDate"] == "2026-07-14"
+    assert status["teiasPublishedButMissingDates"] == ["2026-07-14"]
+    assert status["teiasNotYetPublishedDates"] == ["2026-07-15"]
+    assert status["lastTeiasCatchUpDates"] == ["2026-07-14"]
+
+
 def test_write_status_records_prompt2_failure_schema_and_preserves_success(tmp_path):
     (tmp_path / "status.json").write_text(
         json.dumps(

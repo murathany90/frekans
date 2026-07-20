@@ -1,50 +1,56 @@
 {
-  "updatedAtUtc": "2026-07-19T16:25:18Z",
+  "updatedAtUtc": "2026-07-17T09:11:01Z",
   "lastWorkflowResult": "success",
-  "lastSuccessfulTeiasCheckUtc": "2026-07-19T16:09:03Z",
+  "lastSuccessfulTeiasCheckUtc": "2026-07-17T09:11:01Z",
   "lastSuccessfulTeiasDataDate": "2026-07-14",
   "lastTeiasLookback": [
     "2026-07-15",
     "2026-07-16",
-    "2026-07-17",
-    "2026-07-18",
-    "2026-07-19"
+    "2026-07-17"
   ],
-  "missingDayCount": 5,
+  "missingDayCount": 3,
   "qualityWarnings": [],
   "lastErrorMessage": null,
   "lastErrorAtUtc": null,
-  "lastSuccessfulNetztransparenzDataDate": "2026-07-18",
-  "teiasDataDelayDays": 5,
+  "lastSuccessfulNetztransparenzDataDate": "2026-07-15",
+  "teiasDataDelayDays": 3,
   "revisionDates": [],
-  "lastRunAt": "2026-07-19T16:09:03Z",
-  "lastSuccessfulRunAt": "2026-07-19T16:09:03Z",
+  "lastRunAt": "2026-07-17T09:11:01Z",
+  "lastSuccessfulRunAt": "2026-07-17T09:11:01Z",
   "lastFailedRunAt": "2026-07-15T20:02:10Z",
   "lastSuccessfulDataDate": "2026-07-14",
-  "lastAttemptedDataDate": "2026-07-19",
+  "lastAttemptedDataDate": "2026-07-17",
   "status": "success",
   "missingDates": [
     "2026-07-15",
     "2026-07-16",
-    "2026-07-17",
-    "2026-07-18",
-    "2026-07-19"
+    "2026-07-17"
   ],
   "lastError": null,
   "netztransparenz": {
-    "lastRunAt": "2026-07-19T16:25:18Z",
-    "lastSuccessfulRunAt": "2026-07-19T16:25:18Z",
+    "lastRunAt": "2026-07-16T16:47:25Z",
+    "lastSuccessfulRunAt": "2026-07-16T16:47:25Z",
     "lastFailedRunAt": null,
-    "lastSuccessfulDataDate": "2026-07-18",
-    "lastAttemptedDataDate": "2026-07-19",
-    "latestPublishedDate": "2026-07-18",
+    "lastSuccessfulDataDate": "2026-07-15",
+    "lastAttemptedDataDate": "2026-07-16",
+    "latestPublishedDate": "2026-07-15",
     "status": "not_yet_published",
     "sourceMethod": "official_zip",
     "missingDates": [],
     "notYetPublishedDates": [
-      "2026-07-19"
+      "2026-07-16"
     ],
     "invalidDates": [],
     "lastError": null
-  }
+  },
+  "sourceLatestTeiasDataDate": "2026-07-14",
+  "teiasPublishedButMissingDates": [],
+  "teiasNotYetPublishedDates": [
+    "2026-07-15",
+    "2026-07-16",
+    "2026-07-17"
+  ],
+  "lastTeiasCatchUpDates": [],
+  "teiasDiscoveryCount": 2395,
+  "teiasSkippedExistingFailures": []
 }
