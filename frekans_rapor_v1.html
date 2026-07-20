@@ -8886,7 +8886,7 @@
         source: event.sourceName,
         type: rocofEventShortLabel(event),
         start: statsSecondLabel(dateList, event.startSecond),
-        end: statsSecondLabel(dateList, event.endExclusiveSecond || event.lastViolationSecond || event.endSecond),
+        end: statsSecondLabel(dateList, event.lastViolationSecond || event.endSecond),
         duration: durationText(event.durationSeconds || 0),
         peak: rocofMhzText(event.peakHzPerSecond),
         startHz: statsValueText(event.startFrequencyHz, 4, ' Hz'),
