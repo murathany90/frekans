@@ -8854,6 +8854,7 @@
         goodUsed,
         sampleCount,
         qualityUnavailable: Math.max(0, sampleCount - goodUsed),
+        methodUnavailable: Math.max(0, goodUsed - rocofSampleCount),
         positiveEventCount: positiveEvents.length,
         negativeEventCount: negativeEvents.length,
         positiveSeconds,
@@ -8996,42 +8997,44 @@
         tooltip: helpKey ? t(helpKey) : '',
         ...extra
       });
+      const markPoints = aggregate.events.map(e => {
+        const isNegative = e.peakHzPerSecond < 0;
+        const peakFreq = isNegative ? e.minFrequencyHz : e.maxFrequencyHz;
+        return {
+          coord: [e.startSecond, e.peakHzPerSecond * 1000],
+          name: 'Peak RoCoF',
+          symbol: 'circle',
+          symbolSize: 8,
+          itemStyle: { color: isNegative ? 'var(--blue)' : 'var(--red)', borderColor: '#fff', borderWidth: 1.5 },
+          tooltip: {
+            formatter: () => `
+              <div style="font-weight:600; margin-bottom:4px;">Peak RoCoF</div>
+              <div style="font-size:0.9em; color:#666;">${t('qualityTooltipDateTime')}: ${statsSecondLabel(dateList, e.startSecond)}</div>
+              <div style="font-size:0.9em; color:#666;">RoCoF: ${fmt(e.peakHzPerSecond * 1000, 2)} mHz/s</div>
+              <div style="font-size:0.9em; color:#666;">${t('qualityTooltipFrequency')}: ${fmt(peakFreq, 3)} Hz</div>
+            `
+          }
+        };
+      });
       return {
         type,
         title: t(analysisDefinition('rocof').titleKey),
-        description: t(analysisDefinition('rocof').descriptionKey) + `
-          <details style="margin-top: 15px; font-size: 0.9em; background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--line);">
-            <summary style="cursor: pointer; font-weight: 600; color: var(--navy);">Detaylı Metrikler ve Örnek Analizi</summary>
-            <table style="width: 100%; margin-top: 10px; border-collapse: collapse; text-align: left;">
-              <tbody>
-                <tr>
-                  <td style="padding: 4px;"><strong>Yöntem:</strong> ${escapeHtml(rocofMethodLabel(options.method))}</td>
-                  <td style="padding: 4px;"><strong>RoCoF Eşiği:</strong> ${escapeHtml(rocofMhzValueText(thresholdMhzPerSecond))}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 4px;"><strong>Ortalama |RoCoF|:</strong> ${escapeHtml(rocofMhzText(aggregate.meanAbsolute))}</td>
-                  <td style="padding: 4px;"><strong>RMS:</strong> ${escapeHtml(rocofMhzText(aggregate.rms))}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 4px;"><strong>R+ Olay Sayısı:</strong> ${aggregate.positiveEventCount || 0}</td>
-                  <td style="padding: 4px;"><strong>R+ Süresi:</strong> ${durationText(aggregate.positiveSeconds || 0)}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 4px;"><strong>R- Olay Sayısı:</strong> ${aggregate.negativeEventCount || 0}</td>
-                  <td style="padding: 4px;"><strong>R- Süresi:</strong> ${durationText(aggregate.negativeSeconds || 0)}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 4px;"><strong>Kullanılan (Good Quality) Örnek:</strong> ${(aggregate.goodUsed || 0).toLocaleString()}</td>
-                  <td style="padding: 4px;"><strong>Kalite Hatası Nedeniyle Eksik:</strong> ${(aggregate.qualityUnavailable || 0).toLocaleString()}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 4px;"><strong>RoCoF Hesaplanabilen Örnek:</strong> ${(aggregate.rocofSampleCount || 0).toLocaleString()}</td>
-                  <td style="padding: 4px;"><strong>Pencere Nedeniyle Elenen:</strong> ${(aggregate.unavailableSamples || 0).toLocaleString()}</td>
-                </tr>
-              </tbody>
-            </table>
-          </details>
-        `,
+        tableTitle: t('rocofEventsTitle'),
+        description: t(analysisDefinition('rocof').descriptionKey),
+        rocofDetailsData: {
+          method: escapeHtml(rocofMethodLabel(options.method)),
+          threshold: escapeHtml(rocofMhzValueText(thresholdMhzPerSecond)),
+          meanAbs: escapeHtml(rocofMhzText(aggregate.meanAbsolute)),
+          rms: escapeHtml(rocofMhzText(aggregate.rms)),
+          positiveEventCount: aggregate.positiveEventCount || 0,
+          positiveDuration: durationText(aggregate.positiveSeconds || 0),
+          negativeEventCount: aggregate.negativeEventCount || 0,
+          negativeDuration: durationText(aggregate.negativeSeconds || 0),
+          goodUsed: (aggregate.goodUsed || 0).toLocaleString(),
+          qualityUnavailable: (aggregate.qualityUnavailable || 0).toLocaleString(),
+          rocofSampleCount: (aggregate.rocofSampleCount || 0).toLocaleString(),
+          methodUnavailable: (aggregate.methodUnavailable || 0).toLocaleString()
+        },
         metadata: analysisMetadata('rocof', source, current, dateList, sampling),
         rocofMeta: {
           ...aggregate,
@@ -9070,26 +9073,7 @@
           range,
           thresholdMhzPerSecond,
           method: options.method,
-          markPoints: aggregate.events.map(e => {
-            const isNegative = e.peakHzPerSecond < 0;
-            const peakSec = isNegative ? e.minFrequencySecond : e.maxFrequencySecond;
-            const peakFreq = isNegative ? e.minFrequencyHz : e.maxFrequencyHz;
-            return {
-              coord: [e.startSecond, e.peakHzPerSecond * 1000],
-              name: 'Peak RoCoF',
-              symbol: 'circle',
-              symbolSize: 8,
-              itemStyle: { color: isNegative ? 'var(--blue)' : 'var(--red)', borderColor: '#fff', borderWidth: 1.5 },
-              tooltip: {
-                formatter: () => `
-                  <div style="font-weight:600; margin-bottom:4px;">Peak RoCoF</div>
-                  <div style="font-size:0.9em; color:#666;">Zaman: ${statsSecondLabel(dateList, e.startSecond)}</div>
-                  <div style="font-size:0.9em; color:#666;">RoCoF: ${fmt(e.peakHzPerSecond * 1000, 2)} mHz/s</div>
-                  <div style="font-size:0.9em; color:#666;">Frekans: ${fmt(peakFreq, 3)} Hz</div>
-                `
-              }
-            };
-          })
+          markPoints
         },
         methodology: t('methodRocof'),
         limitations: t('limitRocof')
@@ -9469,6 +9453,66 @@
       }).join('');
     }
 
+    function renderRocofDetailSummary(result) {
+      if (result.type !== 'rocof') {
+        const existing = $('rocofDetailSummary');
+        if (existing) existing.remove();
+        return;
+      }
+      const anchor = $('analysisDetailSummary') || $('analysisResultCards');
+      if (!anchor) return;
+      let summary = $('rocofDetailSummary');
+      if (!summary) {
+        summary = document.createElement('details');
+        summary.id = 'rocofDetailSummary';
+        summary.style.marginTop = '15px';
+        summary.style.fontSize = '0.9em';
+        summary.style.background = 'var(--bg)';
+        summary.style.padding = '12px';
+        summary.style.borderRadius = '8px';
+        summary.style.border = '1px solid var(--line)';
+        anchor.insertAdjacentElement('afterend', summary);
+      }
+      const data = result.rocofDetailsData;
+      if (!data) {
+        summary.innerHTML = '';
+        summary.hidden = true;
+        return;
+      }
+      summary.hidden = false;
+      summary.innerHTML = `
+        <summary style="cursor: pointer; font-weight: 600; color: var(--navy);">${t('rocofDetailsSummaryTitle', 'Detaylı Metrikler ve Örnek Analizi')}</summary>
+        <table style="width: 100%; margin-top: 10px; border-collapse: collapse; text-align: left;">
+          <tbody>
+            <tr>
+              <td style="padding: 4px;"><strong>${t('rocofMethod')}:</strong> ${data.method}</td>
+              <td style="padding: 4px;"><strong>${t('rocofThresholdMhz')}:</strong> ${data.threshold}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px;"><strong>${t('rocofMeanAbs')}:</strong> ${data.meanAbs}</td>
+              <td style="padding: 4px;"><strong>${t('rocofRms')}:</strong> ${data.rms}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px;"><strong>${t('rocofPositiveCount')}:</strong> ${data.positiveEventCount}</td>
+              <td style="padding: 4px;"><strong>${t('rocofPositiveDuration')}:</strong> ${data.positiveDuration}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px;"><strong>${t('rocofNegativeCount')}:</strong> ${data.negativeEventCount}</td>
+              <td style="padding: 4px;"><strong>${t('rocofNegativeDuration')}:</strong> ${data.negativeDuration}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px;"><strong>${t('rocofGoodUsed')}:</strong> ${data.goodUsed}</td>
+              <td style="padding: 4px;"><strong>${t('rocofUnavailable')}:</strong> ${data.qualityUnavailable}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px;"><strong>${t('rocofSampleCountLabel', 'RoCoF Hesaplanabilen Örnek')}:</strong> ${data.rocofSampleCount}</td>
+              <td style="padding: 4px;"><strong>${t('rocofMethodUnavailable', 'Yöntem/pencere nedeniyle hesaplanamayan')}:</strong> ${data.methodUnavailable}</td>
+            </tr>
+          </tbody>
+        </table>
+      `;
+    }
+
     function heatmapRangeFromValue(value) {
       if (!Array.isArray(value)) return null;
       const startSecond = Number(value[3]);
@@ -9481,6 +9525,7 @@
       $('oscChartTitle').textContent = result.title;
       renderAnalysisCards(result);
       renderAnalysisDetailSummary(result);
+      renderRocofDetailSummary(result);
       $('oscCountTag').textContent = result.type === 'stats' || result.type === 'events'
         ? t('statsBandViolationCount', { count: result.events.length })
         : t('findingsCount', { count: result.events.length });
@@ -10764,13 +10809,20 @@
       const chartHeight = Math.max(620, 520 + heatmapHeight);
       $('analysisMainChart').style.height = `${chartHeight}px`;
       state.oscillationChart.resize();
-      const series = [
+      const baseSeries = [
         ...buildRocofDisplaySeries(result),
         ...buildQualityMarkSeries(result.chart.qualityEvents || []),
-        ...buildRocofEventSeries(result.chart.rocofEvents || []),
-        rocofHeatmapSeries(heatmapData),
-        { type: 'line', name: 'Peak RoCoF', data: [], markPoint: { data: result.chart.markPoints || [] }, tooltip: { trigger: 'item' }, symbol: 'none' }
+        ...buildRocofEventSeries(result.chart.rocofEvents || [])
       ];
+      const heatmapIndex = baseSeries.length;
+      const series = [
+        ...baseSeries,
+        rocofHeatmapSeries(heatmapData)
+      ];
+      if (result.chart.markPoints && result.chart.markPoints.length > 0) {
+        series.push({ type: 'line', name: 'Peak RoCoF', data: [], markPoint: { data: result.chart.markPoints }, tooltip: { trigger: 'item' }, symbol: 'none' });
+      }
+
       state.oscillationChart.setOption({
         animation: false,
         tooltip: rocofChartTooltip(chartTimeLabel, result),
@@ -10802,7 +10854,7 @@
         visualMap: {
           type: 'piecewise',
           dimension: 2,
-          seriesIndex: series.length - 1,
+          seriesIndex: heatmapIndex,
           orient: 'horizontal',
           left: 'center',
           top: 374,
@@ -11008,7 +11060,8 @@
       setAnalysisTableHeader(columns);
       const rows = result.tableRows || analysisEventsToRows(result.events || []);
       if (!rows.length) {
-        body.innerHTML = `<tr><td colspan="${Math.max(1, columns.length)}" class="empty-state">${t('analysisNoTableRows')}</td></tr>`;
+        const noEventsMsg = result.type === 'rocof' ? t('rocofNoEvents') : t('analysisNoTableRows');
+        body.innerHTML = `<tr><td colspan="${Math.max(1, columns.length)}" class="empty-state">${noEventsMsg}</td></tr>`;
         return;
       }
       body.innerHTML = rows.map(row => {
@@ -12522,7 +12575,7 @@
         analysisEventsTitle: 'Bant İhlali Özeti',
         analysisEventsDesc: 'Good Quality saniyelik frekans verisinde 49.90-50.10 Hz bandı dışındaki olaylar listelenir.',
         analysisRocofTitle: 'RoCoF Bulguları',
-        analysisRocofDesc: 'Frekans değişim hızı olayları ve tepe Hz/s değerleri raporlanır.',
+        analysisRocofDesc: 'RoCoF eşik olayları ve tepe RoCoF değerleri (mHz/s) raporlanır.',
         analysisPsdTitle: 'Welch PSD Spektral Özeti',
         analysisPsdDesc: 'Güç spektral yoğunluğu ve baskın düşük frekanslı bileşenler incelenir.',
         analysisSpectrogramTitle: 'Spektrogram Zaman-Frekans Özeti',
@@ -12783,10 +12836,12 @@
         rocofExtremeHzHelp: 'R- olayında minimum, R+ olayında maksimum frekans ve zamanı.',
         rocofPositiveShort: 'R+',
         rocofNegativeShort: 'R-',
-        rocofPositiveLegend: 'R+ / Pozitif RoCoF',
-        rocofNegativeLegend: 'R- / Negatif RoCoF',
+        rocofPositiveLegend: 'Pozitif RoCoF',
+        rocofNegativeLegend: 'Negatif RoCoF',
         rocofPositiveFull: 'Pozitif RoCoF Olayı',
         rocofNegativeFull: 'Negatif RoCoF Olayı',
+        rocofEventsTitle: 'RoCoF Olayları',
+        rocofNoEvents: 'Seçili RoCoF eşiği ve minimum olay süresi kriterlerini karşılayan olay bulunamadı.',
         rocofSeverityHeatmap: '15 dk RoCoF Şiddet Heatmap',
         rocofSeverityRatio: 'Eşiğe göre şiddet',
         rocofPeakAbs: 'Tepe |RoCoF|',
@@ -12979,7 +13034,7 @@
         analysisEventsTitle: 'Band Violation Summary',
         analysisEventsDesc: 'Events outside the 49.90-50.10 Hz band are listed from Good Quality one-second frequency data.',
         analysisRocofTitle: 'RoCoF Findings',
-        analysisRocofDesc: 'Frequency rate-of-change events and peak Hz/s values are reported.',
+        analysisRocofDesc: 'RoCoF threshold events and peak RoCoF values (mHz/s) are reported.',
         analysisPsdTitle: 'Welch PSD Spectral Summary',
         analysisPsdDesc: 'Power spectral density and dominant low-frequency components are inspected.',
         analysisSpectrogramTitle: 'Spectrogram Time-Frequency Summary',
@@ -13238,10 +13293,12 @@
         rocofExtremeHzHelp: 'Minimum frequency for an R- event or maximum frequency for an R+ event, with its timestamp.',
         rocofPositiveShort: 'R+',
         rocofNegativeShort: 'R-',
-        rocofPositiveLegend: 'R+ / Positive RoCoF',
-        rocofNegativeLegend: 'R- / Negative RoCoF',
+        rocofPositiveLegend: 'Positive RoCoF',
+        rocofNegativeLegend: 'Negative RoCoF',
         rocofPositiveFull: 'Positive RoCoF Event',
         rocofNegativeFull: 'Negative RoCoF Event',
+        rocofEventsTitle: 'RoCoF Events',
+        rocofNoEvents: 'No RoCoF events met the selected threshold and minimum duration criteria.',
         rocofSeverityHeatmap: '15-min RoCoF Severity Heatmap',
         rocofSeverityRatio: 'Severity vs threshold',
         rocofPeakAbs: 'Peak |RoCoF|',
