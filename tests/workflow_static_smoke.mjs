@@ -4,8 +4,8 @@ const dailyWorkflow = readFileSync(".github/workflows/teias_daily_update.yml", "
 const deployWorkflow = readFileSync(".github/workflows/deploy_pages.yml", "utf8");
 
 const requiredDailySnippets = [
-  'cron: "15,45 7-15 * * *"',
-  "python scripts/fetch_teias.py --lookback-days 21 --catch-up-published --catch-up-days 45 --discovery-retries 5 --discovery-timeout 90 --discovery-delay 3 --download-retries 5 --download-timeout 180",
+  'cron: "15 7,9,12,15 * * *"',
+  "python scripts/fetch_teias.py --lookback-days 14 --discovery-retries 5 --discovery-timeout 90 --discovery-delay 3 --download-retries 5 --download-timeout 180",
   "automation/teias-update",
   "TEİAŞ veri güncelleme sorunu",
   "issues.listForRepo",

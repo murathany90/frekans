@@ -15,7 +15,7 @@ if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from scripts.discover_teias import TeiasEntry, discover_teias_entries
-from scripts.normalize_frequency import ACTIVE_STATUSES, build_manifest, iter_meta_files, parse_teias_csv, write_day_outputs
+from scripts.normalize_frequency import build_manifest, parse_teias_csv, write_day_outputs
 
 
 def parse_iso_date(value: str) -> date:
@@ -50,43 +50,6 @@ def select_entries(args: argparse.Namespace, entries: list[TeiasEntry]) -> tuple
         else:
             missing.append(iso)
     return selected, missing
-
-
-def latest_active_local_date(data_root: Path, source: str = "teias") -> str | None:
-    latest: str | None = None
-    for meta_path in iter_meta_files(data_root, source):
-        try:
-            meta = json.loads(meta_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            continue
-        if meta.get("status") not in ACTIVE_STATUSES:
-            continue
-        local_date = str(meta.get("localDate") or "")
-        if local_date and (latest is None or local_date > latest):
-            latest = local_date
-    return latest
-
-
-def published_catch_up_entries(data_root: Path, entries: list[TeiasEntry], max_days: int = 45) -> list[TeiasEntry]:
-    latest_local = latest_active_local_date(data_root)
-    latest_discovered = entries[-1].local_date if entries else None
-    if not latest_local or not latest_discovered or latest_discovered <= latest_local:
-        return []
-
-    start = parse_iso_date(latest_local) + timedelta(days=1)
-    end = parse_iso_date(latest_discovered)
-    if max_days > 0:
-        start = max(start, end - timedelta(days=max_days - 1))
-
-    by_date = {entry.local_date: entry for entry in entries}
-    return [by_date[day.isoformat()] for day in date_range(start, end) if day.isoformat() in by_date]
-
-
-def merge_selected_entries(selected: list[TeiasEntry], extra: list[TeiasEntry]) -> list[TeiasEntry]:
-    by_date = {entry.local_date: entry for entry in selected}
-    for entry in extra:
-        by_date.setdefault(entry.local_date, entry)
-    return [by_date[key] for key in sorted(by_date)]
 
 
 def download_entry(entry: TeiasEntry, timeout: int = 60, retries: int = 3) -> tuple[bytes, int]:
@@ -186,16 +149,6 @@ def write_status(data_root: Path, summary: dict) -> None:
     data_delay_days = None
     if latest_success:
         data_delay_days = (datetime.now(UTC).date() - parse_iso_date(latest_success)).days
-    source_latest_teias = summary.get("latestDiscoveredDate") or previous.get("sourceLatestTeiasDataDate")
-    discovered_dates = sorted(set(summary.get("discoveredDates") or []))
-    published_but_missing = [
-        local_date
-        for local_date in discovered_dates
-        if source_latest_teias
-        and latest_success
-        and latest_success < local_date <= source_latest_teias
-    ]
-    not_yet_published = [local_date for local_date in summary.get("missing", []) if local_date not in discovered_dates]
     failed_messages = summary.get("failed", [])
     has_failed = bool(failed_messages)
     has_success_this_run = bool([item for item in summary.get("processed", []) if item.get("status") not in ("dry_run", "error")])
@@ -225,12 +178,6 @@ def write_status(data_root: Path, summary: dict) -> None:
         "lastWorkflowResult": prompt2_status,
         "lastSuccessfulTeiasCheckUtc": run_at if not has_failed else previous.get("lastSuccessfulTeiasCheckUtc"),
         "lastSuccessfulTeiasDataDate": latest_success,
-        "sourceLatestTeiasDataDate": source_latest_teias,
-        "teiasPublishedButMissingDates": published_but_missing,
-        "teiasNotYetPublishedDates": not_yet_published,
-        "lastTeiasCatchUpDates": summary.get("catchUpPublishedDates", []),
-        "teiasSkippedExistingFailures": summary.get("skippedExistingFailures", []),
-        "teiasDiscoveryCount": summary.get("discoveredCount"),
         "lastSuccessfulNetztransparenzDataDate": latest_netz,
         "teiasDataDelayDays": data_delay_days,
         "lastTeiasLookback": summary.get("missing", []),
@@ -251,23 +198,16 @@ def run(args: argparse.Namespace) -> dict:
         retry_delay=float(args.discovery_delay),
     )
     selected, missing = select_entries(args, entries)
-    catch_up_entries: list[TeiasEntry] = []
-    if getattr(args, "catch_up_published", False):
-        catch_up_entries = published_catch_up_entries(data_root, entries, max_days=int(args.catch_up_days))
-        selected = merge_selected_entries(selected, catch_up_entries)
     attempted_dates = [entry.local_date for entry in selected] + missing
     summary = {
         "processed": [],
         "missing": missing,
         "failed": [],
-        "skippedExistingFailures": [],
         "attemptedDate": max(attempted_dates, default=None),
         "workflowRunAt": datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         "retryCount": int(args.discovery_retries),
         "discoveredCount": len(entries),
-        "discoveredDates": [entry.local_date for entry in entries],
         "latestDiscoveredDate": entries[-1].local_date if entries else None,
-        "catchUpPublishedDates": [entry.local_date for entry in catch_up_entries],
     }
     for index, entry in enumerate(selected):
         try:
@@ -281,11 +221,7 @@ def run(args: argparse.Namespace) -> dict:
                 )
             )
         except Exception as error:  # noqa: BLE001 - CLI summary should continue across days
-            message = f"{entry.local_date}: {error}"
-            if existing_meta_hash(data_root, entry):
-                summary["skippedExistingFailures"].append(message)
-            else:
-                summary["failed"].append(message)
+            summary["failed"].append(f"{entry.local_date}: {error}")
         if not args.dry_run and index < len(selected) - 1:
             time.sleep(float(args.request_delay))
     if not args.dry_run:
@@ -300,8 +236,6 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--start")
     parser.add_argument("--end")
     parser.add_argument("--lookback-days", type=int)
-    parser.add_argument("--catch-up-published", action="store_true")
-    parser.add_argument("--catch-up-days", type=int, default=45)
     parser.add_argument("--latest", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--output-root", default="data")
@@ -314,22 +248,10 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def printable_summary(summary: dict) -> dict:
-    printable = {**summary}
-    discovered_dates = printable.get("discoveredDates")
-    if isinstance(discovered_dates, list):
-        printable["discoveredDates"] = {
-            "count": len(discovered_dates),
-            "first": discovered_dates[0] if discovered_dates else None,
-            "latest": discovered_dates[-1] if discovered_dates else None,
-        }
-    return printable
-
-
 def main() -> int:
     args = build_parser().parse_args()
     summary = run(args)
-    print(json.dumps(printable_summary(summary), ensure_ascii=False, indent=2))
+    print(json.dumps(summary, ensure_ascii=False, indent=2))
     return 1 if summary.get("failed") else 0
 
 
