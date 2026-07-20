@@ -6745,7 +6745,7 @@
       if (durationInput) {
         durationInput.min = isRocof ? '1' : '10';
         durationInput.step = isRocof ? '1' : '10';
-        if (isRocof && Number(durationInput.value || 0) > 10) durationInput.value = '2';
+        if (isRocof && Number(durationInput.value || 0) > 10) durationInput.value = '5';
         if (!isRocof && Number(durationInput.value || 0) < 10) durationInput.value = String(state.settings.minDuration || 30);
       }
       updateQualityControlVisibility();
