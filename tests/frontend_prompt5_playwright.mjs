@@ -21,7 +21,7 @@ const analyses = [
   ["rocof", /RoCoF Analiz Sonuçları/, /RoCoF Analysis Results/],
   ["psd", /Welch Güç Spektral Yoğunluğu/, /Welch Power Spectral Density/],
   ["spectrogram", /Spektrogram — Zaman-Frekans Analizi/, /Spectrogram — Time-Frequency Analysis/],
-  ["oscillation", /Osilasyon Adayı Bulguları/, /Oscillation Candidate Findings/],
+  ["oscillation", /Salınım Adayı Tespiti/, /Oscillation Candidate Detection/],
   ["crossCorrelation", /Çapraz Korelasyon Özeti/, /Cross-Correlation Summary/],
   ["coherence", /Koherens ve Faz Özeti/, /Coherence and Phase Summary/],
   ["trend", /Uzun Dönem Trend Özeti/, /Long-Term Trend Summary/]

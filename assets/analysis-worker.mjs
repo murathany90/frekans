@@ -2,6 +2,7 @@ import {
   computeCrossCorrelation,
   computeCrossPowerSpectralDensity,
   computeMagnitudeSquaredCoherence,
+  computeOscillationCandidates,
   computeRocof,
   computeStftSpectrogram,
   computeWelchPsd
@@ -52,6 +53,7 @@ function runAnalysis(type, payload, parameters) {
   if (type === "crossPsd") return computeCrossPowerSpectralDensity(a, b, parameters);
   if (type === "crossCorrelation") return computeCrossCorrelation(a, b, parameters);
   if (type === "rocof") return computeRocof(series, parameters);
+  if (type === "oscillation") return computeOscillationCandidates(series, parameters);
   throw new Error(`Unknown analysis type: ${type}`);
 }
 
@@ -63,7 +65,7 @@ export function typed(value) {
 }
 
 export function spectrogramTransfers(result) {
-  if (!result || result.method !== "stft-spectrogram") return [];
+  if (!result || (result.method !== "stft-spectrogram" && result.method !== "oscillation-candidates")) return [];
   const transfers = [];
   if (ArrayBuffer.isView(result.powerValues) && result.powerValues.buffer instanceof ArrayBuffer) transfers.push(result.powerValues.buffer);
   if (ArrayBuffer.isView(result.timeBins) && result.timeBins.buffer instanceof ArrayBuffer) transfers.push(result.timeBins.buffer);
@@ -72,5 +74,10 @@ export function spectrogramTransfers(result) {
   if (ArrayBuffer.isView(result.frequencyBins) && result.frequencyBins.buffer instanceof ArrayBuffer) transfers.push(result.frequencyBins.buffer);
   if (ArrayBuffer.isView(result.validityByTime) && result.validityByTime.buffer instanceof ArrayBuffer) transfers.push(result.validityByTime.buffer);
   if (ArrayBuffer.isView(result.imputedSamplesByTime) && result.imputedSamplesByTime.buffer instanceof ArrayBuffer) transfers.push(result.imputedSamplesByTime.buffer);
+  if (ArrayBuffer.isView(result.filtered) && result.filtered.buffer instanceof ArrayBuffer) transfers.push(result.filtered.buffer);
+  if (ArrayBuffer.isView(result.filteredSeries) && result.filteredSeries.buffer instanceof ArrayBuffer && result.filteredSeries.buffer !== result.filtered?.buffer) transfers.push(result.filteredSeries.buffer);
+  if (ArrayBuffer.isView(result.envelopeMilliHz) && result.envelopeMilliHz.buffer instanceof ArrayBuffer) transfers.push(result.envelopeMilliHz.buffer);
+  if (ArrayBuffer.isView(result.positiveEnvelopeMilliHz) && result.positiveEnvelopeMilliHz.buffer instanceof ArrayBuffer && result.positiveEnvelopeMilliHz.buffer !== result.envelopeMilliHz?.buffer) transfers.push(result.positiveEnvelopeMilliHz.buffer);
+  if (ArrayBuffer.isView(result.negativeEnvelopeMilliHz) && result.negativeEnvelopeMilliHz.buffer instanceof ArrayBuffer) transfers.push(result.negativeEnvelopeMilliHz.buffer);
   return transfers;
 }

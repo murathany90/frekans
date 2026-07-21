@@ -1796,6 +1796,52 @@
 
     .event-row { cursor: pointer; }
     .event-row.critical { background: #fff1f1; }
+    .analysis-row-detail td {
+      background: #f8fbfd;
+      color: #35536a;
+      white-space: normal;
+    }
+    .analysis-row-detail details {
+      max-width: 100%;
+    }
+    .analysis-row-detail summary {
+      cursor: pointer;
+      color: var(--navy);
+      font-weight: 900;
+      overflow-wrap: anywhere;
+    }
+    .analysis-row-detail dl {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 8px;
+      margin: 10px 0 0;
+    }
+    .analysis-row-detail dt {
+      color: var(--muted);
+      font-size: .74rem;
+      font-weight: 800;
+    }
+    .analysis-row-detail dd {
+      margin: 3px 0 0;
+      color: var(--navy);
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+    .oscillation-damping-panel {
+      border: 1px solid rgba(27, 107, 156, .22);
+      border-radius: 8px;
+      background: #fff;
+      margin-top: 10px;
+      padding: 10px;
+    }
+    .oscillation-damping-panel strong {
+      color: var(--navy);
+      display: block;
+      margin-bottom: 8px;
+    }
+    .oscillation-damping-panel dl {
+      margin: 0;
+    }
 
     .settings-grid {
       display: grid;
@@ -2813,7 +2859,7 @@
                 <option value="spectrogram" data-i18n="analysisSpectrogram">Spektrogram</option>
               </optgroup>
               <optgroup label="Osilasyon Analizi" data-i18n-label="analysisGroupOscillation">
-                <option value="oscillation" data-i18n="analysisOscillation">Osilasyon adayı</option>
+                <option value="oscillation" data-i18n="analysisOscillation">Salınım Adayı Tespiti</option>
               </optgroup>
               <optgroup label="Türkiye–Kıta Avrupası Ortak Analizi" data-i18n-label="analysisGroupJoint">
                 <option value="crossCorrelation" data-i18n="analysisCrossCorrelation">Çapraz korelasyon</option>
@@ -2909,9 +2955,10 @@
             <div class="field" data-param-key="statsBand"><label for="statsBandMaxHz" data-i18n="statsBandMaxLabel">İstatistik üst bandı (Hz)</label><input id="statsBandMaxHz" type="number" min="49" max="51" step="0.001" value="50.10" /></div>
             <div class="field" data-param-key="band" data-spectral-primary="true"><label id="bandMinControlLabel" for="bandMin" data-i18n="bandMinLabel">Alt bant (Hz)</label><input id="bandMin" type="number" min="0" max="0.45" step="0.01" value="0.10" /></div>
             <div class="field" data-param-key="band" data-spectral-primary="true"><label id="bandMaxControlLabel" for="bandMax" data-i18n="bandMaxLabel">Üst bant (Hz)</label><input id="bandMax" type="number" min="0.001" max="0.5" step="0.01" value="0.20" /></div>
-            <div class="field" data-param-key="threshold"><label for="oscThreshold" data-i18n="oscThresholdLabel">Eşik (mHz)</label><input id="oscThreshold" type="number" min="0.1" max="200" step="0.5" value="10" /></div>
-            <div class="field" data-param-key="window" data-spectral-primary="true"><label id="windowSecControlLabel" for="windowSec" data-i18n="windowSecLabel">Pencere (sn)</label><input id="windowSec" type="number" min="8" max="3600" step="1" value="256" /></div>
-            <div class="field" data-param-key="window"><label id="stepSecControlLabel" for="stepSec" data-i18n="stepSecLabel">Adım (sn)</label><input id="stepSec" type="number" min="1" max="3600" step="1" value="128" /></div>
+            <div class="field" data-param-key="threshold"><label for="oscThreshold" data-i18n="oscThresholdLabel">Filtrelenmiş genlik olay eşiği (mHz)</label><input id="oscThreshold" type="number" min="0.1" max="200" step="0.5" value="10" /></div>
+            <div class="field" data-param-key="thresholdMode"><label for="oscThresholdMode" data-i18n="oscThresholdModeLabel">Eşik modu</label><select id="oscThresholdMode"><option value="fixed" data-i18n="oscThresholdModeFixed">Sabit eşik</option><option value="adaptive" data-i18n="oscThresholdModeAdaptive">MAD tabanlı adaptif eşik</option></select></div>
+            <div class="field" data-param-key="window" data-spectral-primary="true"><label id="windowSecControlLabel" for="windowSec" data-i18n="windowSecLabel">RMS değerlendirme penceresi (sn)</label><input id="windowSec" type="number" min="8" max="3600" step="1" value="256" /></div>
+            <div class="field" data-param-key="window"><label id="stepSecControlLabel" for="stepSec" data-i18n="stepSecLabel">Analiz pencere adımı (sn)</label><input id="stepSec" type="number" min="1" max="3600" step="1" value="128" /></div>
             <div class="field" data-param-key="spectralWindow"><label for="spectralWindowType" data-i18n="spectralWindowTypeLabel">Pencere fonksiyonu</label><select id="spectralWindowType"><option value="hann">Hann</option><option value="hamming">Hamming</option><option value="rectangular" data-i18n="spectralWindowRectangular">Dikdörtgen</option></select></div>
             <div class="field" data-param-key="spectralDetrend"><label for="spectralDetrend" data-i18n="spectralDetrendLabel">Segment trend çıkarma</label><select id="spectralDetrend"><option value="constant" data-i18n="spectralDetrendConstant">Sabit ortalama</option><option value="linear" data-i18n="spectralDetrendLinear">Doğrusal</option><option value="none" data-i18n="spectralDetrendNone">Yok</option></select></div>
             <div class="field" data-param-key="spectralValid"><label for="spectralMinValidRatioPct" data-i18n="spectralMinValidRatioLabel">Minimum geçerli örnek oranı (%)</label><input id="spectralMinValidRatioPct" type="number" min="0" max="100" step="1" value="75" /></div>
@@ -2923,7 +2970,7 @@
             <div class="field" data-param-key="spectralDisplay"><label for="spectralDisplayTimezone" data-i18n="spectralDisplayTimezoneLabel">Zaman dilimi gösterimi</label><select id="spectralDisplayTimezone"><option value="source" data-i18n="spectralDisplayTimezoneSource">Kaynak zaman dilimi</option><option value="Europe/Istanbul" data-i18n="spectralDisplayTimezoneTr">Türkiye saati</option><option value="UTC" data-i18n="spectralDisplayTimezoneUtc">UTC</option></select></div>
             <div class="field" data-param-key="spectralPeakAdvanced"><label for="spectralSignificantSnrDb" data-i18n="spectralSignificantSnrDbLabel">Anlamlı tepe SNR (dB)</label><input id="spectralSignificantSnrDb" type="number" min="0" max="40" step="0.5" value="6" /></div>
             <div class="field" data-param-key="spectralPeakAdvanced"><label for="spectralWeakSnrDb" data-i18n="spectralWeakSnrDbLabel">Zayıf tepe SNR (dB)</label><input id="spectralWeakSnrDb" type="number" min="0" max="40" step="0.5" value="3" /></div>
-            <div class="field" data-param-key="filter"><label for="filterTaps" data-i18n="filterTapsLabel">FIR kademe</label><input id="filterTaps" type="number" min="31" max="401" step="2" value="101" /></div>
+            <div class="field" data-param-key="filter"><label for="filterTaps" data-i18n="filterTapsLabel">FIR katsayı sayısı</label><input id="filterTaps" type="number" min="31" max="401" step="2" value="101" /></div>
             <div class="field" data-param-key="duration"><label for="minDuration" data-i18n="minDurationLabel">Minimum olay süresi (sn)</label><input id="minDuration" type="number" min="1" max="1800" step="1" value="5" /></div>
             <div class="field" data-param-key="yd"><label for="repeatedValueSeconds" data-i18n="qualityRepeatedThresholdLabel">Yinelenen değer eşiği (sn)</label><input id="repeatedValueSeconds" type="number" min="1" max="3600" step="1" value="15" /></div>
             <div class="field" data-param-key="rocofMethod"><label for="rocofMethod" data-i18n="rocofMethodLabel">RoCoF hesaplama yöntemi</label><select id="rocofMethod"><option value="central" data-i18n="rocofMethodCentral">Merkezî fark — çevrimdışı</option><option value="filteredDerivative" data-i18n="rocofMethodFiltered">Hareketli ortalama filtreli merkezî fark</option><option value="movingRegression" data-i18n="rocofMethodRegression">Kayan pencereli doğrusal regresyon</option></select></div>
@@ -2961,14 +3008,14 @@
       <div class="panel">
         <div class="section-title">
           <div>
-            <h3 id="analysisTableTitle" data-i18n="sectionOscResults">Osilasyon Bulguları</h3>
+            <h3 id="analysisTableTitle" data-i18n="sectionOscResults">Analiz Sonuçları</h3>
             <p id="analysisTableDescription" data-i18n="oscResultsDesc">Bir satıra tıklayarak grafiği ilgili zaman aralığına yakınlaştırabilirsiniz.</p>
           </div>
         </div>
         <div class="table-wrap">
           <table>
             <thead id="analysisEventsHead">
-              <tr><th data-i18n="oscThNo">No</th><th data-i18n="oscThStart">Başlangıç</th><th data-i18n="oscThEnd">Bitiş</th><th data-i18n="oscThDuration">Süre</th><th data-i18n="oscThPeak">Tepe genlik</th><th data-i18n="oscThRms">RMS</th><th data-i18n="oscThDominant">Baskın frekans</th><th data-i18n="oscThWindow">Pencere</th><th id="eventSourceMeanHead" data-i18n="oscThSourceMean">Türkiye ort.</th><th id="eventSourceRangeHead" data-i18n="oscThSourceRange">Türkiye min–maks</th><th data-i18n="oscThClass">Sınıflandırma</th></tr>
+              <tr><th data-i18n="oscThStart">Başlangıç</th><th data-i18n="oscThEnd">Bitiş</th><th data-i18n="oscThDuration">Süre</th><th data-i18n="oscThPeak">Tepe genliği (mHz)</th><th data-i18n="oscThRms">RMS genliği (mHz)</th><th data-i18n="oscThDominant">Baskın frekans</th><th data-i18n="oscThPeriod">Periyot</th><th data-i18n="spectralSnrDb">SNR dB</th><th data-i18n="oscThClass">Aday türü</th><th data-i18n="oscThConfidence">Aday güven skoru</th><th data-i18n="oscThDampingRatio">Damping oranı</th><th data-i18n="spectralDataQuality">Veri kalitesi</th></tr>
             </thead>
             <tbody id="analysisEventsBody"><tr><td colspan="11" class="empty-state" data-i18n="oscNoAnalysis">Henüz analiz yapılmadı.</td></tr></tbody>
           </table>
@@ -3642,6 +3689,28 @@
     });
     const DEFAULT_WELCH_PARAMETERS = window.FrequencyAnalysisCore?.DEFAULT_WELCH_PARAMETERS || FALLBACK_WELCH_PARAMETERS;
     const DEFAULT_SPECTROGRAM_PARAMETERS = window.FrequencyAnalysisCore?.DEFAULT_SPECTROGRAM_PARAMETERS || FALLBACK_SPECTROGRAM_PARAMETERS;
+    const FALLBACK_OSCILLATION_PARAMETERS = Object.freeze({
+      minFrequencyHz: 0.10,
+      maxFrequencyHz: 0.20,
+      thresholdMode: 'fixed',
+      enterThresholdMilliHz: 10,
+      exitThresholdMilliHz: 7,
+      minimumEventSeconds: 30,
+      minimumCycles: 3,
+      mergeGapSeconds: 20,
+      filterOrder: 100,
+      filterPhaseMode: 'zero-phase',
+      rmsWindowSeconds: 60,
+      spectralWindowSeconds: 256,
+      spectralStepSeconds: 64,
+      minimumSnrDb: 3,
+      minimumProminence: 0.02,
+      minimumValidRatio: 0.75,
+      gapHandlingMethod: 'reject',
+      dampingEnabled: false,
+      dampingMethod: 'envelope-regression'
+    });
+    const DEFAULT_OSCILLATION_PARAMETERS = window.FrequencyAnalysisCore?.DEFAULT_OSCILLATION_PARAMETERS || FALLBACK_OSCILLATION_PARAMETERS;
 
     function rocofDefaultParameters() {
       return window.FrequencyAnalysisCore?.DEFAULT_ROCOF_PARAMETERS || DEFAULT_ROCOF_PARAMETERS;
@@ -3670,6 +3739,10 @@
       return core?.DEFAULT_WELCH_PARAMETERS || DEFAULT_WELCH_PARAMETERS;
     }
 
+    function oscillationDefaultParameters() {
+      return window.FrequencyAnalysisCore?.DEFAULT_OSCILLATION_PARAMETERS || DEFAULT_OSCILLATION_PARAMETERS;
+    }
+
     const DEFAULT_SETTINGS = {
       alignmentMode: 'utcAuto',
       teiasUtcOffset: 3,
@@ -3686,13 +3759,14 @@
       graphMin: 49.90,
       graphMax: 50.10,
       chartStepSeconds: 5,
-      bandMin: 0.10,
-      bandMax: 0.20,
+      bandMin: DEFAULT_OSCILLATION_PARAMETERS.minFrequencyHz,
+      bandMax: DEFAULT_OSCILLATION_PARAMETERS.maxFrequencyHz,
       statsBandMinHz: 49.90,
       statsBandMaxHz: 50.10,
-      thresholdMhz: 10,
-      windowSec: 120,
-      stepSec: 10,
+      thresholdMhz: DEFAULT_OSCILLATION_PARAMETERS.enterThresholdMilliHz,
+      oscillationThresholdMode: DEFAULT_OSCILLATION_PARAMETERS.thresholdMode,
+      windowSec: DEFAULT_OSCILLATION_PARAMETERS.rmsWindowSeconds,
+      stepSec: DEFAULT_OSCILLATION_PARAMETERS.spectralStepSeconds,
       spectralWindowType: DEFAULT_WELCH_PARAMETERS.windowType,
       spectralDetrend: DEFAULT_WELCH_PARAMETERS.detrend,
       spectralMinValidRatioPct: DEFAULT_WELCH_PARAMETERS.minValidRatio * 100,
@@ -3705,8 +3779,8 @@
       spectralDisplayTimezone: 'source',
       spectralSignificantSnrDb: 6,
       spectralWeakSnrDb: 3,
-      filterTaps: 101,
-      minDuration: 30,
+      filterTaps: DEFAULT_OSCILLATION_PARAMETERS.filterOrder + 1,
+      minDuration: DEFAULT_OSCILLATION_PARAMETERS.minimumEventSeconds,
       rocofMethod: DEFAULT_ROCOF_PARAMETERS.method,
       rocofThresholdMhzPerSecond: hzPerSecondToMhzPerSecond(DEFAULT_ROCOF_PARAMETERS.thresholdHzPerSecond),
       rocofPreFilterSeconds: DEFAULT_ROCOF_PARAMETERS.preFilterSeconds,
@@ -3915,11 +3989,24 @@
         descriptionKey: 'analysisOscillationDesc',
         allowedSources: ['tr', 'de', 'both', 'diff', 'common', 'differential'],
         allowedResolutions: ['1s'],
-        parameterKeys: ['band', 'threshold', 'window', 'filter', 'duration'],
+        parameterKeys: ['band', 'threshold', 'thresholdMode', 'window', 'step', 'filter', 'duration'],
         requiresPairedSeries: false,
         minSampleIntervalSeconds: 1,
         preferredResolution: '1s',
-        tableColumns: [{ key: 'no', labelKey: 'oscThNo' }, { key: 'start', labelKey: 'oscThStart' }, { key: 'end', labelKey: 'oscThEnd' }, { key: 'duration', labelKey: 'oscThDuration' }, { key: 'peak', labelKey: 'oscThPeak' }, { key: 'rms', labelKey: 'oscThRms' }, { key: 'frequency', labelKey: 'oscThDominant' }, { key: 'windows', labelKey: 'oscThWindow' }, { key: 'mean', labelKey: 'oscThSourceMean' }, { key: 'range', labelKey: 'oscThSourceRange' }, { key: 'classification', labelKey: 'oscThClass' }],
+        tableColumns: [
+          { key: 'start', labelKey: 'oscThStart' },
+          { key: 'end', labelKey: 'oscThEnd' },
+          { key: 'duration', labelKey: 'oscThDuration' },
+          { key: 'peak', labelKey: 'oscThPeak' },
+          { key: 'rms', labelKey: 'oscThRms' },
+          { key: 'frequency', labelKey: 'oscThDominant' },
+          { key: 'period', labelKey: 'oscThPeriod' },
+          { key: 'snrDb', labelKey: 'spectralSnrDb', helpKey: 'spectralSnrHelp' },
+          { key: 'classification', labelKey: 'oscThClass' },
+          { key: 'confidence', labelKey: 'oscThConfidence', helpKey: 'oscillationConfidenceHelp' },
+          { key: 'dampingRatio', labelKey: 'oscThDampingRatio', helpKey: 'oscillationDampingHelp' },
+          { key: 'quality', labelKey: 'spectralDataQuality' }
+        ],
         methodKey: 'methodOscillation',
         limitationsKey: 'limitOscillation'
       },
@@ -4152,6 +4239,29 @@
           profile: 'Analysis profiles do not change this threshold.'
         }
       },
+      thresholdMode: {
+        engineParameter: 'thresholdMode',
+        unit: null,
+        controlIds: ['oscThresholdMode'],
+        tr: {
+          label: 'Eşik modu',
+          meaning: 'Sabit eşik kullanıcı değerini doğrudan kullanır; adaptif mod gürültü tabanını MAD ile okuyup giriş/çıkış eşiklerini güvenli biçimde yükseltebilir.',
+          increase: 'Adaptif mod dalgalı gürültü tabanında yanlış pozitifleri azaltabilir.',
+          decrease: 'Sabit mod aynı ayarı farklı günlerde aynen uygular ve geriye uyumlu davranıştır.',
+          risk: 'Adaptif eşik, çok zayıf ama gerçek bir adayı bastırabilir; sonucu eşik metadata’sıyla birlikte okuyun.',
+          recommended: 'Geriye uyumluluk için sabit eşik.',
+          profile: 'Analiz profilleri eşik modunu değiştirmez.'
+        },
+        en: {
+          label: 'Threshold mode',
+          meaning: 'Fixed threshold uses the user value directly; adaptive mode reads the noise floor with MAD and can safely raise enter/exit thresholds.',
+          increase: 'Adaptive mode can reduce false positives when the noise floor changes.',
+          decrease: 'Fixed mode applies the same setting across days and is the backward-compatible behavior.',
+          risk: 'Adaptive thresholding can suppress a very weak real candidate; read it together with threshold metadata.',
+          recommended: 'Fixed threshold for backward compatibility.',
+          profile: 'Analysis profiles do not change threshold mode.'
+        }
+      },
       window: {
         engineParameter: 'windowSec, segmentSeconds, maxLagSeconds',
         unit: 's',
@@ -4204,7 +4314,7 @@
         controlIds: ['filterTaps'],
         tr: {
           label: 'Bant geçiren filtre uzunluğu',
-          meaning: 'Osilasyon adayını çıkarmak için kullanılan FIR filtrenin katsayı sayısını belirler.',
+          meaning: 'Salınım adayını çıkarmak için kullanılan FIR filtrenin katsayı sayısını belirler.',
           increase: 'Bant seçiciliği artabilir, ancak kenar etkisi ve gecikme uzar.',
           decrease: 'Filtre daha hızlı tepki verir, fakat bant ayrımı zayıflayabilir.',
           risk: 'Çok kısa filtre gürültüyü geçirir; çok uzun filtre kısa olayları bozabilir.',
@@ -4599,6 +4709,18 @@
         tr: ['Hysteresis', 'Olay giriş ve çıkış eşiklerini ayırma yöntemidir.', 'Eşik çevresindeki titreşimin tek olayı parçalamasını azaltır.'],
         en: ['Hysteresis', 'Separates event enter and exit thresholds.', 'It reduces fragmentation around the threshold.']
       },
+      bandPassFilter: {
+        tr: ['Bant geçiren filtre', 'Sinyalin yalnız seçilen frekans bandındaki bileşenini geçirir.', 'Bant çok dar seçilirse aday kaçabilir; çok geniş seçilirse gürültü ve komşu modlar olaya karışabilir.'],
+        en: ['Band-pass filter', 'Passes only the component inside the selected frequency band.', 'A too-narrow band can miss a candidate; a too-wide band can mix noise and neighboring modes into the event.']
+      },
+      firFilter: {
+        tr: ['FIR filtre', 'Sonlu sayıda katsayıyla çalışan, bant geçiren bileşeni üreten dijital filtredir.', 'Daha fazla katsayı bant seçiciliğini artırabilir ancak kenar kaybını ve grup gecikmesini büyütür.'],
+        en: ['FIR filter', 'A digital filter with a finite number of coefficients that produces the band-pass component.', 'More taps can improve band selectivity but increase edge loss and group delay.']
+      },
+      minimumCycles: {
+        tr: ['Minimum çevrim', 'Adayın baskın frekansında tamamlaması gereken en az salınım sayısıdır.', 'Kısa genlik sıçramalarının gerçek salınım adayı gibi raporlanmasını azaltır.'],
+        en: ['Minimum cycles', 'Minimum number of oscillation cycles required at the candidate dominant frequency.', 'It reduces reporting short amplitude bursts as real oscillation candidates.']
+      },
       fft: {
         tr: ['FFT', 'Fast Fourier Transform; sinyali frekans bileşenlerine ayırır.', 'Segment ve pencere seçimi gerçek ayırma gücünü belirler.'],
         en: ['FFT', 'Fast Fourier Transform; decomposes a signal into frequency components.', 'Segment and window choices determine true separation power.']
@@ -4662,6 +4784,34 @@
       qFactor: {
         tr: ['Q factor', 'Tepe frekansının bant genişliğine oranıdır.', 'Yüksek Q daha dar ve odaklı bir bileşene işaret edebilir.'],
         en: ['Q factor', 'Ratio of peak frequency to bandwidth.', 'Higher Q can indicate a narrower, more focused component.']
+      },
+      heuristicConfidence: {
+        tr: ['Heuristik güven skoru', 'Kapsama, SNR, süre, bant enerjisi, belirginlik ve boşluk cezasından oluşan açıklanabilir aday skorudur.', 'Kalibre edilmiş istatistiksel olasılık değildir; düşük bileşen hangi varsayımın zayıf olduğunu gösterir.'],
+        en: ['Heuristic confidence', 'An explainable candidate score assembled from coverage, SNR, duration, band energy, prominence, and gap penalty.', 'It is not a calibrated statistical probability; weak components show which assumption is fragile.']
+      },
+      ringdown: {
+        tr: ['Sönümlenen salınım', 'Genliği zamanla azalan modal salınım adayıdır.', 'Damping tahmini yalnız yeterli çevrim, SNR ve fit kalitesi varsa bu tür adaylarda gösterilir.'],
+        en: ['Ringdown', 'A modal oscillation candidate whose amplitude decays over time.', 'Damping is shown only for this type when enough cycles, SNR, and fit quality are available.']
+      },
+      forcedOscillation: {
+        tr: ['Zorlanmış salınım', 'Dış kaynakla sürekli besleniyor gibi görünen salınım adayıdır.', 'Yaklaşık sıfır damping bu durumda otomatik sistem kararsızlığı anlamına gelmez.'],
+        en: ['Forced oscillation', 'An oscillation candidate that appears continuously driven by an external source.', 'Near-zero damping in this case does not automatically mean system instability.']
+      },
+      dampingRatio: {
+        tr: ['Damping oranı', 'Genlik zarfındaki üstel azalma veya büyümeden türetilen boyutsuz sönüm ölçüsüdür.', 'Negatif değer büyüyen modal davranışa işaret edebilir; forced veya belirsiz adaylarda raporlanmaz.'],
+        en: ['Damping ratio', 'A dimensionless damping measure derived from exponential decay or growth of the amplitude envelope.', 'Negative values can indicate growing modal behavior; it is not reported for forced or indeterminate candidates.']
+      },
+      negativeDamping: {
+        tr: ['Negatif damping', 'Modelin genlik zarfında büyüme eğilimi bulmasıdır.', 'Gürültü, kısa veri veya çok modlu sinyal bunu yanıltabilir; fit kalitesi ve çevrim sayısıyla birlikte okunmalıdır.'],
+        en: ['Negative damping', 'A fitted growth tendency in the amplitude envelope.', 'Noise, short data, or multimodal content can make it misleading; read it with fit quality and cycle count.']
+      },
+      timeConstant: {
+        tr: ['Zaman sabiti', 'Üstel zarfın yaklaşık e kat değişmesi için gereken süredir.', 'Büyük zaman sabiti yavaş sönüm veya sürekli zorlanmış davranışla karışabilir.'],
+        en: ['Time constant', 'Time required for the exponential envelope to change by about a factor of e.', 'A large time constant can be confused with slow damping or sustained forcing.']
+      },
+      fitQuality: {
+        tr: ['Fit kalitesi', 'Damping modelinin ölçülen zarfı ne kadar iyi açıkladığını gösteren R² ve hata ölçüleridir.', 'Zayıf fit olduğunda damping değeri gösterilmez veya teknik ayrıntıda uyarıyla verilir.'],
+        en: ['Fit quality', 'R² and error measures showing how well the damping model explains the measured envelope.', 'When fit is weak, damping is hidden or reported with an unavailable reason.']
       },
       confidenceInterval: {
         tr: ['Confidence interval', 'Welch ortalamasındaki istatistiksel belirsizlik bandıdır.', 'Geniş bant, tepe büyüklüğü yorumunda daha fazla temkin gerektirir.'],
@@ -4891,31 +5041,31 @@
         }
       },
       oscillation: {
-        parameterKeys: ['date', 'alignment', 'band', 'threshold', 'window', 'step', 'filter', 'duration'],
-        glossary: ['threshold', 'duration', 'snr', 'confidenceInterval', 'bandwidth', 'windowFunction'],
+        parameterKeys: ['date', 'alignment', 'band', 'threshold', 'thresholdMode', 'window', 'step', 'filter', 'duration'],
+        glossary: ['bandPassFilter', 'firFilter', 'rms', 'snr', 'prominence', 'minimumCycles', 'ridge', 'heuristicConfidence', 'ringdown', 'forcedOscillation', 'dampingRatio', 'negativeDamping', 'timeConstant', 'fitQuality'],
         tr: {
-          title: 'Osilasyon Adayı Bulguları',
-          summary: 'Seçili frekans bandında bant geçiren filtre ve kayan pencere eşiğiyle olası osilasyon adaylarını listeler. Confidence alanı fiziksel olasılık değil, veri kalitesi, süre, genlik ve destekleyici ölçütlerden türetilmiş açıklanabilir bir skordur.',
-          what: ['Aday frekans, genlik, süre, SNR ve güven skoru birlikte hesaplanır.', 'Bant geçiren filtre yalnız seçili frekans aralığındaki bileşene odaklanır.'],
+          title: 'Salınım Adayı Tespiti',
+          summary: 'Seçili frekans bandında bant geçiren FIR filtre, genlik zarfı, histerezis, kısa boşluk birleştirme ve minimum çevrim denetimiyle olası salınım adaylarını listeler. Heuristik güven skoru fiziksel olasılık değildir; veri kalitesi, süre, SNR, bant enerjisi, belirginlik ve boşluk cezasından türetilir.',
+          what: ['Aday frekans, tepe genliği, RMS genliği, süre, SNR, belirginlik ve güven bileşenleri birlikte hesaplanır.', 'Bant geçiren filtre yalnız seçili frekans aralığındaki bileşene odaklanır; kenar kaybı ve etkin filtre değerleri sonuçta ayrıca raporlanır.', 'Damping tahmini yalnız uygun sönümlenen veya büyüyen modal adaylarda, yeterli çevrim ve fit kalitesi varsa gösterilir.'],
           when: ['Salınım araştırması', 'Welch/Spektrogram sonrası aday aralık çıkarma', 'Olay inceleme'],
-          results: ['Yüksek genlik ve uzun süre daha güçlü aday gösterebilir.', 'SNR düşükse aday gürültü düzeyine yakın olabilir.', 'Güven skoru tek başına olasılık değildir ve diğer metriklerle okunmalıdır.'],
-          chart: ['Grafik filtrelenmiş bileşen ve aday zaman aralıklarını gösterir.', 'Eşik çizgisi aday başlangıcını ve bitişini yorumlamaya yardım eder.', 'Eksik veri varsa aday güveni düşebilir.'],
-          table: ['Her satır bir aday osilasyon aralığıdır.', 'Süre, tepe, RMS, baskın frekans ve sınıf birlikte okunmalıdır.', 'Satıra tıklama ilgili zaman aralığına yakınlaştırır.'],
-          mistakes: ['Confidence değeri doğrudan olasılık değildir.', 'Filtre bandı yanlışsa aday kaçabilir.', 'Kısa yüksek genlik tek başına kalıcı salınım kanıtı değildir.'],
-          ai: ['Aday frekansı Welch ve Spektrogram’da çapraz kontrol edin.', 'Aday iki kaynakta da görünüyorsa Koherens ve Faz analiziyle destek arayın.', 'Düşük güvenli adaylarda bant ve eşik ayarlarını yeniden değerlendirin.'],
-          math: ['Motor bant geçiren FIR filtre ve kayan pencere eşikleme kullanır.', 'Minimum süre ve birleştirme boşluğu aday parçalarının rapora girip girmeyeceğini belirler.']
+          results: ['Yüksek genlik ve uzun süre daha güçlü aday gösterebilir, ancak minimum çevrim ve SNR koşulları birlikte okunmalıdır.', 'Sürekli zorlanan adaylarda yaklaşık sıfır damping sistem kararsızlığı anlamına gelmeyebilir.', 'Güven skoru tek başına olasılık değildir ve bileşenleriyle birlikte yorumlanmalıdır.'],
+          chart: ['Grafik bant geçiren bileşeni, pozitif/negatif genlik zarfını, giriş/çıkış eşiklerini ve aday bölgelerini birlikte gösterir.', 'Aday başlangıç/bitiş işaretleri olay sınırını; zarf ve eşik çizgileri histerezis davranışını okumaya yardım eder.', 'Eksik veri boşluğu adayları birleştirmez; veri kalitesi tooltip içinde ayrıca gösterilir.'],
+          table: ['Her satır bir salınım adayı aralığıdır.', 'Süre, tepe, RMS, baskın frekans, SNR, aday türü, güven skoru ve veri kalitesi birlikte okunmalıdır.', 'Satıra tıklama ilgili zaman aralığına yakınlaştırır; filtre, pencere, harmonik, fit ve boşluk ayrıntıları açılır satırda yer alır.'],
+          mistakes: ['Güven skorunu kalibre edilmiş olasılık gibi okumayın.', 'Filtre bandı yanlışsa aday kaçabilir veya komşu mod gürültüyle karışabilir.', 'Kısa yüksek genlik tek başına kalıcı salınım kanıtı değildir.', 'Damping oranı yalnız uygun ringdown olaylarında tahmin edilir. Sürekli veya dış kaynakla zorlanan salınımlarda yaklaşık sıfır damping değeri sistem kararsızlığı anlamına gelmeyebilir.'],
+          ai: ['Aday frekansı Welch ve Spektrogram’da çapraz kontrol edin.', 'Aday iki kaynakta da görünüyorsa Koherens ve Faz analiziyle destek arayın.', 'Düşük güvenli adaylarda bant, eşik, minimum çevrim ve veri kalitesini yeniden değerlendirin.'],
+          math: ['Motor bant geçiren FIR filtre, zarf tabanlı histerezis, kısa sonlu boşluk birleştirme ve minimum çevrim koşulu kullanır.', 'Damping modeli x(t) = c + A exp(sigma t) cos(2 pi fd t + phi) biçiminde yorumlanır; bu sürümde pratik tahmin zarf regresyonundan türetilir.']
         },
         en: {
-          title: 'Oscillation Candidate Findings',
-          summary: 'Lists possible oscillation candidates in the selected frequency band using a band-pass filter and sliding-window thresholding. Confidence is not a physical probability; it is an explainable score derived from data quality, duration, amplitude, and supporting metrics.',
-          what: ['Candidate frequency, amplitude, duration, SNR, and confidence score are evaluated together.', 'The band-pass filter focuses on components inside the selected frequency range.'],
+          title: 'Oscillation Candidate Detection',
+          summary: 'Lists possible oscillation candidates in the selected frequency band using a band-pass FIR filter, amplitude envelope, hysteresis, short-gap merging, and minimum-cycle checks. Heuristic confidence is not a physical probability; it is derived from data quality, duration, SNR, band energy, prominence, and gap penalty.',
+          what: ['Candidate frequency, peak amplitude, RMS amplitude, duration, SNR, prominence, and confidence components are evaluated together.', 'The band-pass filter focuses on the selected frequency range; edge loss and effective filter values are reported separately.', 'Damping is estimated only for suitable decaying or growing modal candidates when enough cycles and fit quality are available.'],
           when: ['Oscillation investigation', 'Extracting candidate intervals after Welch/Spectrogram', 'Incident review'],
-          results: ['Higher amplitude and longer duration can indicate a stronger candidate.', 'Low SNR means the candidate may be near noise level.', 'Confidence is not probability and should be read with other metrics.'],
-          chart: ['The chart shows the filtered component and candidate time intervals.', 'The threshold line helps interpret candidate start and end.', 'Missing data can reduce candidate confidence.'],
-          table: ['Each row is one candidate oscillation interval.', 'Read duration, peak, RMS, dominant frequency, and class together.', 'Clicking a row zooms the related time interval.'],
-          mistakes: ['Confidence is not direct probability.', 'A wrong filter band can miss a candidate.', 'A short high-amplitude burst alone does not prove a persistent oscillation.'],
-          ai: ['Cross-check candidate frequency in Welch and Spectrogram.', 'If the candidate appears in both sources, look for support in Coherence and Phase.', 'For low-confidence candidates, revisit band and threshold settings.'],
-          math: ['The engine uses a band-pass FIR filter and sliding-window thresholding.', 'Minimum duration and merge gap determine whether candidate fragments enter the report.']
+          results: ['Higher amplitude and longer duration can indicate a stronger candidate, but minimum cycles and SNR must be read together.', 'Near-zero damping in a sustained forced candidate may not indicate system instability.', 'Confidence is not probability and should be interpreted through its components.'],
+          chart: ['The chart shows the band-pass component, positive/negative amplitude envelope, enter/exit thresholds, and candidate regions together.', 'Start/end markers show event boundaries; envelope and threshold lines make hysteresis behavior visible.', 'Missing-data gaps are not merged across; data quality is also shown in the tooltip.'],
+          table: ['Each row is one oscillation candidate interval.', 'Read duration, peak, RMS, dominant frequency, SNR, candidate type, confidence, and data quality together.', 'Clicking a row zooms the related time interval; filter, window, harmonic, fit, and gap details are in the expandable row.'],
+          mistakes: ['Do not read heuristic confidence as calibrated probability.', 'A wrong filter band can miss a candidate or mix a neighboring mode with noise.', 'A short high-amplitude burst alone does not prove a persistent oscillation.', 'Damping ratio is estimated only for suitable ringdown events. In sustained or externally forced oscillations, a near-zero damping value may not indicate system instability.'],
+          ai: ['Cross-check candidate frequency in Welch and Spectrogram.', 'If the candidate appears in both sources, look for support in Coherence and Phase.', 'For low-confidence candidates, revisit band, thresholds, minimum cycles, and data quality.'],
+          math: ['The engine uses a band-pass FIR filter, envelope hysteresis, short finite-gap merging, and minimum-cycle checks.', 'The damping model is interpreted as x(t) = c + A exp(sigma t) cos(2 pi fd t + phi); this version derives the practical estimate from envelope regression.']
         }
       },
       crossCorrelation: {
@@ -5877,10 +6027,6 @@
       const parserBlob = new Blob([$('parserWorkerSource').textContent], { type: 'text/javascript' });
       state.parserWorker = new Worker(URL.createObjectURL(parserBlob));
       state.parserWorker.onmessage = handleParserMessage;
-
-      const oscBlob = new Blob([$('oscWorkerSource').textContent], { type: 'text/javascript' });
-      state.oscWorker = new Worker(URL.createObjectURL(oscBlob));
-      state.oscWorker.onmessage = handleOscWorkerMessage;
     }
 
     function initDropZones() {
@@ -8467,6 +8613,7 @@
       if (key === 'duration') return `${Number($('minDuration')?.value || state.settings.minDuration || 0)} ${secondsUnitShort()}`;
       if (key === 'band') return `${fmt(Number($('bandMin')?.value || 0), 3)}–${fmt(Number($('bandMax')?.value || 0), 3)} Hz`;
       if (key === 'threshold') return `${fmt(Number($('oscThreshold')?.value || state.settings.thresholdMhz || 0), 1)} mHz`;
+      if (key === 'thresholdMode') return localizedEnumValue('oscThresholdMode');
       if (key === 'window') return `${Number($('windowSec')?.value || state.settings.windowSec || 0)} ${secondsUnitShort()}`;
       if (key === 'step') return `${Number($('stepSec')?.value || state.settings.stepSec || 0)} ${secondsUnitShort()}`;
       if (key === 'filter') return `${Number($('filterTaps')?.value || state.settings.filterTaps || 0)}`;
@@ -9612,12 +9759,6 @@
           throw new Error(t('analysisNoCommonDate'));
         }
         updateOscillationSourceUi();
-        if (type === 'oscillation') {
-          if (!isCurrentAnalysisRun(runToken)) return;
-          delegatedToWorker = true;
-          calculateOscillation();
-          return;
-        }
         const workerResult = shouldUseAnalysisWorker(type) ? await runAnalysisWorker(type, source, current, analysisInput) : null;
         if (!isCurrentAnalysisRun(runToken)) return;
         const result = computeAnalysisResult(type, source, current, dateList, workerResult, analysisInput);
@@ -9675,10 +9816,10 @@
         state.analysis.worker.terminate();
         state.analysis.worker = null;
       }
-      if (state.oscWorker) state.oscWorker.terminate();
-      const oscBlob = new Blob([$('oscWorkerSource').textContent], { type: 'text/javascript' });
-      state.oscWorker = new Worker(URL.createObjectURL(oscBlob));
-      state.oscWorker.onmessage = handleOscWorkerMessage;
+      if (state.oscWorker) {
+        state.oscWorker.terminate();
+        state.oscWorker = null;
+      }
       state.analysis.running = false;
       $('analysisRunBtn').disabled = false;
       $('analysisSourceSelect').disabled = false;
@@ -9691,7 +9832,7 @@
     }
 
     function shouldUseAnalysisWorker(type) {
-      return ['psd', 'spectrogram', 'coherence', 'crossCorrelation'].includes(type);
+      return ['psd', 'spectrogram', 'coherence', 'crossCorrelation', 'oscillation'].includes(type);
     }
 
     function prepareAnalysisInput(type, source, current, validation = validateAnalysisSelection(type, source, $('analysisResolution')?.value || 'auto')) {
@@ -9834,6 +9975,37 @@
       const maxHzInput = Number($('bandMax').value);
       const minHz = Number.isFinite(minHzInput) ? minHzInput : 0.05;
       const maxHz = Number.isFinite(maxHzInput) ? maxHzInput : 0.25;
+      if (type === 'oscillation') {
+        const defaults = oscillationDefaultParameters();
+        return {
+          sampleRateHz,
+          sampleIntervalSeconds,
+          nominalHz: state.settings.nominalFrequency,
+          minFrequencyHz: minHz,
+          maxFrequencyHz: maxHz,
+          thresholdMode: $('oscThresholdMode')?.value || state.settings.oscillationThresholdMode || defaults.thresholdMode,
+          enterThresholdMilliHz: Number($('oscThreshold')?.value || defaults.enterThresholdMilliHz),
+          exitThresholdMilliHz: Math.min(
+            Number($('oscThreshold')?.value || defaults.enterThresholdMilliHz),
+            Number(defaults.exitThresholdMilliHz ?? Number($('oscThreshold')?.value || defaults.enterThresholdMilliHz))
+          ),
+          minimumEventSeconds: Number($('minDuration')?.value || defaults.minimumEventSeconds),
+          minimumCycles: defaults.minimumCycles,
+          mergeGapSeconds: defaults.mergeGapSeconds,
+          filterOrder: Math.max(2, Number($('filterTaps')?.value || defaults.filterOrder + 1) - 1),
+          filterPhaseMode: defaults.filterPhaseMode,
+          rmsWindowSeconds: Number($('windowSec')?.value || defaults.rmsWindowSeconds),
+          spectralWindowSeconds: Math.max(8, Number($('windowSec')?.value || defaults.spectralWindowSeconds)),
+          spectralStepSeconds: Number($('stepSec')?.value || defaults.spectralStepSeconds),
+          minimumSnrDb: defaults.minimumSnrDb,
+          minimumProminence: defaults.minimumProminence,
+          minimumValidRatio: defaults.minimumValidRatio,
+          gapHandlingMethod: defaults.gapHandlingMethod,
+          dampingEnabled: true,
+          dampingMethod: defaults.dampingMethod,
+          source
+        };
+      }
       const defaults = spectralDefaultParameters(type);
       const segmentSeconds = Number($('windowSec')?.value || defaults.segmentSeconds || 256);
       const stepSeconds = Number($('stepSec')?.value || defaults.stepSeconds || Math.max(1, segmentSeconds / 2));
@@ -9881,6 +10053,7 @@
       if (type === 'psd') return core.computeWelchPsd(payload.series, parameters);
       if (type === 'spectrogram') return core.computeStftSpectrogram(payload.series, parameters);
       if (type === 'rocof') return core.computeRocof(payload.series, parameters);
+      if (type === 'oscillation') return core.computeOscillationCandidates(payload.series, parameters);
       if (type === 'crossCorrelation') return core.computeCrossCorrelation(payload.a, payload.b, parameters);
       if (type === 'coherence') {
         return {
@@ -11731,6 +11904,7 @@
       if (type === 'stats') return computeStatsAnalysisResult(type, source, current, dateList);
       if (type === 'events') return computeBandViolationAnalysisResult(type, source, current, dateList);
       if (type === 'rocof') return computeRocofAnalysisResult(type, source, current, dateList);
+      if (type === 'oscillation') return buildOscillationAnalysisResult(type, source, current, dateList, workerResult, analysisInput);
       const prepared = analysisInput || prepareAnalysisInput(type, source, current);
       const series = prepared.series;
       const sampleIntervalSeconds = prepared.sampling?.intervalSeconds || 1;
@@ -12647,6 +12821,10 @@
         renderRocofAnalysisChart(result);
         return;
       }
+      if (result.chart.kind === 'oscillationCandidates') {
+        renderOscillationCandidateChart(result);
+        return;
+      }
       if (result.chart.kind === 'welch') {
         renderWelchAnalysisChart(result);
         return;
@@ -12759,6 +12937,132 @@
           { name: t('spectralNoiseFloor'), type: 'line', data: noiseData, symbol: 'none', lineStyle: { width: 1.2, type: 'dashed', color: '#7d8b99' } },
           { name: t('spectralConfidence95'), type: 'line', data: confidenceLower, symbol: 'none', lineStyle: { width: 1, type: 'dotted', color: '#8a6fbd' } },
           { name: t('spectralConfidence95'), type: 'line', data: confidenceUpper, symbol: 'none', lineStyle: { width: 1, type: 'dotted', color: '#8a6fbd' } }
+        ]
+      }, true);
+    }
+
+    function oscillationChartTimeLabel(value) {
+      return secondToTime(Math.round(Number(value) || 0)).slice(0, 8);
+    }
+
+    function oscillationSeriesData(values, { scale = 1, step = 1, offset = 0 } = {}) {
+      const data = [];
+      const stride = Math.max(1, Math.round(step));
+      for (let index = 0; index < (values?.length || 0); index += stride) {
+        const value = Number(values[index]);
+        data.push([index + offset, Number.isFinite(value) ? Number((value * scale).toFixed(6)) : null]);
+      }
+      return data;
+    }
+
+    function renderOscillationCandidateChart(result) {
+      setQualityZoomResetVisible(false);
+      const chart = result.chart || {};
+      const candidates = chart.candidates || [];
+      const range = chart.range || { start: 0, end: 86400 };
+      const step = Math.max(1, Math.round(Number($('chartStep')?.value || state.settings.chartStepSeconds || 1)));
+      const filteredName = t('oscFilteredName', {
+        source: chart.sourceName || sourceLabel(chart.source),
+        f1: fmt(chart.parameters?.minFrequencyHz ?? chart.parameters?.f1 ?? 0, 2),
+        f2: fmt(chart.parameters?.maxFrequencyHz ?? chart.parameters?.f2 ?? 0, 2)
+      });
+      const positiveEnvelopeName = t('oscillationPositiveEnvelope');
+      const negativeEnvelopeName = t('oscillationNegativeEnvelope');
+      const markAreas = candidates.map(candidate => ([
+        {
+          xAxis: candidate.startSecond,
+          name: oscillationCandidateTypeLabel(candidate.candidateType),
+          itemStyle: { color: candidate.candidateType === 'ringdown' ? 'rgba(27,107,156,.13)' : candidate.candidateType === 'growing' ? 'rgba(220,38,38,.12)' : 'rgba(179,116,0,.12)' }
+        },
+        { xAxis: candidate.endSecond }
+      ]));
+      const eventLines = candidates.flatMap(candidate => ([
+        {
+          xAxis: candidate.startSecond,
+          name: t('eventStart'),
+          label: { formatter: t('eventStart') },
+          lineStyle: { color: '#176b9c', type: 'dashed' }
+        },
+        {
+          xAxis: candidate.endSecond,
+          name: t('eventEnd'),
+          label: { formatter: t('eventEnd') },
+          lineStyle: { color: '#b37400', type: 'dashed' }
+        }
+      ]));
+      state.oscillationChart.setOption({
+        animation: false,
+        color: ['#c83c3c', '#176b9c', '#176b9c', '#8f5a00'],
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: { type: 'cross' },
+          formatter: params => {
+            const second = Math.round(params?.[0]?.value?.[0] ?? 0);
+            const candidate = candidates.find(item => second >= item.startSecond && second <= item.endSecond);
+            const rows = (params || []).map(item => {
+              const value = item.value?.[1];
+              return `${item.marker}${item.seriesName}: ${Number.isFinite(value) ? `${fmt(value, 3)} mHz` : '—'}`;
+            });
+            if (candidate) {
+              rows.push(`${t('oscThDominant')}: ${fmt(candidate.dominantHz, 4)} Hz`);
+              rows.push(`${t('oscillationPeriod')}: ${secondsValue(candidate.periodSeconds, 2)}`);
+              rows.push(`${t('spectralSnrDb')}: ${fmt(candidate.snrDb, 2)} dB`);
+              rows.push(`${t('oscThClass')}: ${oscillationCandidateTypeLabel(candidate.candidateType)}`);
+              rows.push(`${t('oscillationHeuristicConfidence')}: ${fmt(candidate.confidenceScore, 0)}/100`);
+              if (candidate.damping?.dampingStatus === 'available') rows.push(`${t('oscThDampingRatio')}: ${oscillationDampingText(candidate.damping)}`);
+              rows.push(`${t('spectralDataQuality')}: ${percent(candidate.dataQuality?.validRatio || 0)}`);
+            }
+            return `<strong>${oscillationChartTimeLabel(second)}</strong><br>${rows.join('<br>')}`;
+          }
+        },
+        legend: {
+          top: 8,
+          type: 'scroll',
+          data: [filteredName, positiveEnvelopeName, negativeEnvelopeName]
+        },
+        grid: { left: 68, right: 50, top: 58, bottom: 72 },
+        xAxis: { type: 'value', min: range.start, max: range.end, name: t('xAxisOsc'), axisLabel: { formatter: oscillationChartTimeLabel, hideOverlap: true } },
+        yAxis: { type: 'value', name: t('yAxisBand'), scale: true, splitLine: { lineStyle: { color: '#e5edf2' } } },
+        dataZoom: [{ type: 'inside', filterMode: 'none' }, { type: 'slider', filterMode: 'none', height: 22, bottom: 18 }],
+        series: [
+          {
+            name: filteredName,
+            type: 'line',
+            data: oscillationSeriesData(chart.filtered, { scale: 1000, step }),
+            symbol: 'none',
+            connectNulls: false,
+            progressive: 12000,
+            lineStyle: { width: 1.5 },
+            markArea: { silent: false, itemStyle: { color: 'rgba(27,107,156,.10)' }, data: markAreas },
+            markLine: {
+              silent: true,
+              symbol: 'none',
+              data: [
+                { yAxis: chart.enterThresholdMilliHz, name: t('oscillationEnterThreshold') },
+                { yAxis: -chart.enterThresholdMilliHz, name: t('oscillationEnterThreshold') },
+                { yAxis: chart.exitThresholdMilliHz, name: t('oscillationExitThreshold'), lineStyle: { type: 'dotted' } },
+                { yAxis: -chart.exitThresholdMilliHz, name: t('oscillationExitThreshold'), lineStyle: { type: 'dotted' } },
+                ...eventLines
+              ],
+              lineStyle: { type: 'dashed', color: '#b37400' }
+            }
+          },
+          {
+            name: positiveEnvelopeName,
+            type: 'line',
+            data: oscillationSeriesData(chart.envelopeMilliHz, { scale: 1, step }),
+            symbol: 'none',
+            connectNulls: false,
+            lineStyle: { width: 1.1, color: '#176b9c' }
+          },
+          {
+            name: negativeEnvelopeName,
+            type: 'line',
+            data: oscillationSeriesData(chart.negativeEnvelopeMilliHz, { scale: 1, step }),
+            symbol: 'none',
+            connectNulls: false,
+            lineStyle: { width: 1.1, color: '#176b9c', type: 'dotted' }
+          }
         ]
       }, true);
     }
@@ -14503,9 +14807,12 @@
             const icon = row.metricHelp ? '<span class="metric-info-icon" aria-hidden="true">&#9432;</span>' : '';
             return `<td><span class="metric-name" tabindex="0"${kindAttr} data-tooltip="${escapeHtml(row.tooltip)}" aria-label="${escapeHtml(`${cell}: ${row.tooltip}`)}"><span class="metric-label">${escapeHtml(cell)}</span>${icon}</span></td>`;
           }
-          return `<td>${cell}</td>`;
+          return `<td>${escapeHtml(cell)}</td>`;
         }).join('');
-        return `<tr class="${clickable ? 'event-row' : ''}" ${attrs}>${cells}</tr>`;
+        const detail = row.detailHtml
+          ? `<tr class="analysis-row-detail"><td colspan="${Math.max(1, columns.length)}">${row.detailHtml}</td></tr>`
+          : '';
+        return `<tr class="${clickable ? 'event-row' : ''}" ${attrs}>${cells}</tr>${detail}`;
       }).join('');
       body.querySelectorAll('.event-row').forEach(row => row.addEventListener('click', () => {
         const range = result.chart?.range || { start: 0, end: 86400 };
@@ -14532,6 +14839,7 @@
           showRocofDetailWindow(result, start, end, { startSecond: eventStart, endSecond: eventEnd, type: row.dataset.drilldownType });
         } else {
           state.oscillationChart?.dispatchAction({ type: 'dataZoom', startValue: start, endValue: end });
+          if (result.chart?.kind === 'oscillationCandidates') setQualityZoomResetVisible(true);
         }
         $('analysisMainChart').scrollIntoView({ behavior: 'smooth', block: 'center' });
       }));
@@ -14689,6 +14997,205 @@
       return events;
     }
 
+    function oscillationParameterMetadata(result = {}) {
+      const params = result.parameters || result.meta || {};
+      return {
+        minFrequencyHz: params.minFrequencyHz ?? params.f1,
+        maxFrequencyHz: params.maxFrequencyHz ?? params.f2,
+        thresholdMode: params.thresholdMode ?? result.thresholdMode ?? 'fixed',
+        enterThresholdMilliHz: result.enterThresholdMilliHz ?? params.enterThresholdMilliHz ?? params.threshold,
+        exitThresholdMilliHz: result.exitThresholdMilliHz ?? params.exitThresholdMilliHz ?? params.exitThreshold,
+        minimumEventSeconds: params.minimumEventSeconds,
+        minimumCycles: params.minimumCycles,
+        mergeGapSeconds: params.mergeGapSeconds,
+        requestedFilterOrder: params.requestedFilterOrder,
+        effectiveFilterOrder: params.effectiveFilterOrder,
+        filterTapCount: params.filterTapCount ?? params.taps,
+        filterPhaseMode: params.filterPhaseMode,
+        groupDelaySeconds: params.groupDelaySeconds,
+        edgeDiscardSeconds: params.edgeDiscardSeconds,
+        requestedWindowSeconds: params.requestedWindowSeconds,
+        effectiveWindowSeconds: params.effectiveWindowSeconds,
+        rmsWindowSeconds: params.rmsWindowSeconds ?? params.windowSec,
+        spectralWindowSeconds: params.spectralWindowSeconds,
+        spectralStepSeconds: params.spectralStepSeconds ?? params.stepSec,
+        minimumSnrDb: params.minimumSnrDb,
+        minimumProminence: params.minimumProminence,
+        minimumValidRatio: params.minimumValidRatio,
+        gapHandlingMethod: params.gapHandlingMethod,
+        dampingEnabled: params.dampingEnabled,
+        dampingMethod: params.dampingMethod,
+        adjustmentApplied: params.adjustmentApplied,
+        adjustmentReason: params.adjustmentReason
+      };
+    }
+
+    function oscillationCandidateTypeLabel(type) {
+      const key = {
+        ringdown: 'oscillationCandidateTypeRingdown',
+        sustained_forced: 'oscillationCandidateTypeSustainedForced',
+        growing: 'oscillationCandidateTypeGrowing',
+        burst: 'oscillationCandidateTypeBurst',
+        frequency_drifting: 'oscillationCandidateTypeFrequencyDrifting',
+        indeterminate: 'oscillationCandidateTypeIndeterminate'
+      }[type] || 'oscillationCandidateTypeIndeterminate';
+      return t(key);
+    }
+
+    function oscillationDampingText(damping = {}) {
+      if (damping.dampingStatus !== 'available' || !Number.isFinite(Number(damping.dampingRatioPercent))) {
+        return t('oscillationDampingUnavailableShort');
+      }
+      return `${fmt(damping.dampingRatioPercent, 2)}%`;
+    }
+
+    function oscillationDampingStatusText(damping = {}) {
+      if (damping.dampingStatus === 'available') return t('oscillationDampingAvailable');
+      return damping.dampingUnavailableReason ? `${t('oscillationDampingUnavailable')}: ${damping.dampingUnavailableReason}` : t('oscillationDampingUnavailable');
+    }
+
+    function oscillationDetailHtml(candidate = {}, meta = {}) {
+      const confidence = candidate.confidenceComponents || {};
+      const damping = candidate.damping || {};
+      const filter = candidate.filter || {};
+      const row = (label, value) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`;
+      const dampingPanel = damping.dampingStatus === 'available'
+        ? `<div class="oscillation-damping-panel">
+            <strong>${escapeHtml(t('oscillationDampingPanelTitle'))}</strong>
+            <dl>
+              ${row(t('oscThDampingRatio'), oscillationDampingText(damping))}
+              ${row(t('oscillationTimeConstant'), secondsValue(damping.timeConstantSeconds, 1))}
+              ${row(t('oscillationFitR2'), fmt(damping.fitR2, 3))}
+              ${row(t('oscillationFittedCycleCount'), fmt(damping.fittedCycleCount, 1))}
+            </dl>
+          </div>`
+        : '';
+      return `
+        <details>
+          <summary>${escapeHtml(t('oscillationTechnicalDetails'))}</summary>
+          ${dampingPanel}
+          <dl>
+            ${row(t('oscillationFilterParameters'), `${filter.filterPhaseMode || meta.filterPhaseMode || '—'} · ${filter.filterTapCount || meta.filterTapCount || '—'} ${t('oscillationTapsUnit')}`)}
+            ${row(t('oscillationWindowAndStep'), `${secondsValue(meta.rmsWindowSeconds ?? meta.requestedWindowSeconds, 0)} / ${secondsValue(meta.spectralStepSeconds, 0)}`)}
+            ${row(t('oscillationNoiseFloor'), fmt(candidate.noiseFloor, 6))}
+            ${row(t('spectralPeakProminence'), fmt(candidate.peakProminenceRatio, 4))}
+            ${row(t('oscillationBandEnergyRatio'), percent(candidate.bandEnergyRatio || 0))}
+            ${row(t('coherence'), fmt(candidate.confidenceComponents?.coherenceContribution ? candidate.confidenceComponents.coherenceContribution / 6 : 0, 3))}
+            ${row(t('oscillationHarmonics'), (candidate.harmonics || []).length ? (candidate.harmonics || []).map(item => `${item.harmonic}x ${fmt(item.detectedFrequencyHz, 4)} Hz`).join(', ') : t('tagNone'))}
+            ${row(t('oscillationFitQuality'), `${t('oscillationFitR2')}: ${fmt(damping.fitR2, 3)} · NRMSE: ${fmt(damping.fitNrmse, 3)}`)}
+            ${row(t('oscillationMissingImputed'), `${candidate.dataQuality?.missingCount || 0} / ${candidate.dataQuality?.imputedCount || 0}`)}
+            ${row(t('oscillationEdgeLoss'), secondsValue(meta.edgeDiscardSeconds || 0, 0))}
+            ${row(t('oscillationConfidenceComponents'), [
+              `coverage ${fmt(confidence.coverageContribution, 1)}`,
+              `snr ${fmt(confidence.snrContribution, 1)}`,
+              `duration ${fmt(confidence.durationContribution, 1)}`,
+              `band ${fmt(confidence.bandEnergyContribution, 1)}`,
+              `prominence ${fmt(confidence.prominenceContribution, 1)}`,
+              `gap ${fmt(confidence.gapPenalty, 1)}`
+            ].join(', '))}
+            ${row(t('oscillationDampingStatus'), oscillationDampingStatusText(damping))}
+          </dl>
+        </details>
+      `;
+    }
+
+    function buildOscillationAnalysisResult(type, source, current, dateList, workerResult, analysisInput) {
+      const core = window.FrequencyAnalysisCore;
+      const prepared = analysisInput || prepareAnalysisInput(type, source, current);
+      const computed = workerResult || core.computeOscillationCandidates(prepared.series, workerAnalysisParameters('oscillation'));
+      const meta = oscillationParameterMetadata(computed);
+      const metadata = analysisMetadata('oscillation', source, current, dateList, prepared.sampling);
+      metadata.parameters.oscillation = meta;
+      const candidates = Array.from(computed.candidates || []);
+      const best = candidates[0] || {};
+      const tableRows = candidates.map(candidate => ({
+        start: secondToTime(candidate.startSecond),
+        end: secondToTime(candidate.endSecond),
+        duration: durationText(candidate.durationSeconds || 0),
+        peak: `${fmt(candidate.peakAmplitudeMhz, 2)} mHz`,
+        rms: `${fmt(candidate.peakRmsMhz ?? candidate.rmsAmplitudeMhz, 2)} mHz`,
+        frequency: `${fmt(candidate.dominantHz ?? candidate.dominantFrequencyHz, 4)} Hz`,
+        period: Number.isFinite(candidate.periodSeconds) ? secondsValue(candidate.periodSeconds, 2) : '—',
+        snrDb: `${fmt(candidate.snrDb, 2)} dB`,
+        classification: oscillationCandidateTypeLabel(candidate.candidateType || candidate.classification),
+        confidence: `${fmt(candidate.confidenceScore ?? candidate.confidence, 0)}/100`,
+        dampingRatio: oscillationDampingText(candidate.damping),
+        quality: percent(candidate.dataQuality?.validRatio || 0),
+        source: sourceLabel(source),
+        startSecond: candidate.startSecond,
+        endSecond: candidate.endSecond,
+        detailHtml: oscillationDetailHtml(candidate, meta),
+        candidateType: candidate.candidateType,
+        dampingStatus: candidate.damping?.dampingStatus
+      }));
+      return {
+        type,
+        title: analysisResultTitle(type, source, dateList, computed),
+        tableTitle: t(analysisDefinition(type).titleKey),
+        description: t(analysisDefinition(type).descriptionKey),
+        metadata,
+        oscillationMeta: {
+          ...computed,
+          filtered: undefined,
+          filteredSeries: undefined,
+          envelopeMilliHz: undefined,
+          positiveEnvelopeMilliHz: undefined,
+          negativeEnvelopeMilliHz: undefined,
+          parameters: meta,
+          candidateCount: candidates.length,
+          rejectedCandidateCount: computed.rejectedCandidateCount || 0
+        },
+        candidates,
+        cards: [
+          { label: t('eventCount'), value: numberText(candidates.length), tooltip: t('oscillationEventCountHelp') },
+          { label: t('oscThPeak'), value: best.peakAmplitudeMhz ? `${fmt(best.peakAmplitudeMhz, 2)} mHz` : '—', tooltip: t('oscillationPeakHelp'), startSecond: best.startSecond, endSecond: best.endSecond, drilldownType: 'oscillation' },
+          { label: t('oscThDominant'), value: best.dominantHz ? `${fmt(best.dominantHz, 4)} Hz` : '—', tooltip: t('oscillationDominantHelp') },
+          { label: t('oscillationHeuristicConfidence'), value: Number.isFinite(best.confidenceScore) ? `${fmt(best.confidenceScore, 0)}/100` : '—', tooltip: t('oscillationConfidenceHelp') },
+          { label: t('oscThDampingRatio'), value: oscillationDampingText(best.damping), tooltip: t('oscillationDampingHelp') },
+          { label: t('oscillationFilterSummary'), value: `${meta.effectiveFilterOrder ?? '—'} / ${meta.filterTapCount ?? '—'}`, tooltip: t('oscillationFilterHelp') }
+        ],
+        detailRows: [
+          { label: t('spectralSampleRate'), value: `${fmt(computed.sampleRateHz, 5)} Hz`, tooltip: t('analysisSamplingFallback') },
+          { label: t('oscillationRequestedEffectiveFilter'), value: `${meta.requestedFilterOrder ?? '—'} / ${meta.effectiveFilterOrder ?? '—'}`, tooltip: t('oscillationFilterHelp') },
+          { label: t('oscillationFilterTapCount'), value: `${meta.filterTapCount ?? '—'} ${t('oscillationTapsUnit')}`, tooltip: t('oscillationFilterHelp') },
+          { label: t('oscillationGroupDelay'), value: secondsValue(meta.groupDelaySeconds || 0, 1), tooltip: t('oscillationGroupDelayHelp') },
+          { label: t('oscillationEdgeLoss'), value: secondsValue(meta.edgeDiscardSeconds || 0, 1), tooltip: t('oscillationEdgeLossHelp') },
+          { label: t('oscillationMinimumCycles'), value: `${fmt(meta.minimumCycles, 1)}`, tooltip: t('oscillationMinimumCyclesHelp') },
+          { label: t('oscillationRejectedCandidates'), value: numberText(computed.rejectedCandidateCount || 0), tooltip: t('oscillationRejectedHelp') }
+        ],
+        events: candidates.map(candidate => ({
+          start: candidate.startSecond,
+          end: candidate.endSecond,
+          startSecond: candidate.startSecond,
+          endSecond: candidate.endSecond,
+          type: t('analysisOscillation'),
+          value: candidate.peakAmplitudeMhz,
+          classification: oscillationCandidateTypeLabel(candidate.candidateType),
+          candidateType: candidate.candidateType,
+          confidenceScore: candidate.confidenceScore,
+          damping: candidate.damping
+        })),
+        tableRows,
+        exportRows: tableRows,
+        chart: {
+          kind: 'oscillationCandidates',
+          source,
+          sourceName: sourceLabel(source),
+          rawSeries: Array.from(prepared.series || []),
+          filtered: computed.filtered || computed.filteredSeries || [],
+          envelopeMilliHz: computed.envelopeMilliHz || computed.positiveEnvelopeMilliHz || [],
+          negativeEnvelopeMilliHz: computed.negativeEnvelopeMilliHz || [],
+          candidates,
+          range: { start: 0, end: (prepared.series?.length || 0) * (computed.sampleIntervalSeconds || 1) },
+          enterThresholdMilliHz: computed.enterThresholdMilliHz,
+          exitThresholdMilliHz: computed.exitThresholdMilliHz,
+          parameters: meta
+        },
+        methodology: t('methodOscillation'),
+        limitations: t('limitOscillation')
+      };
+    }
+
     function finiteValues(series) {
       return Array.from(series || []).filter(Number.isFinite);
     }
@@ -14816,6 +15323,40 @@
           []
         );
       }
+      if (result.type === 'oscillation') {
+        const meta = result.metadata?.parameters?.oscillation || result.oscillationMeta?.parameters || {};
+        rows.push(
+          ['parameter', 'value', 'unit'],
+          ['buildCommitSha', result.metadata?.buildCommitSha ?? '', ''],
+          ['buildTimeUtc', result.metadata?.buildTimeUtc ?? '', ''],
+          ['minFrequencyHz', meta.minFrequencyHz ?? '', 'Hz'],
+          ['maxFrequencyHz', meta.maxFrequencyHz ?? '', 'Hz'],
+          ['thresholdMode', meta.thresholdMode ?? '', ''],
+          ['enterThresholdMilliHz', meta.enterThresholdMilliHz ?? '', 'mHz'],
+          ['exitThresholdMilliHz', meta.exitThresholdMilliHz ?? '', 'mHz'],
+          ['minimumEventSeconds', meta.minimumEventSeconds ?? '', 's'],
+          ['minimumCycles', meta.minimumCycles ?? '', 'cycles'],
+          ['mergeGapSeconds', meta.mergeGapSeconds ?? '', 's'],
+          ['requestedFilterOrder', meta.requestedFilterOrder ?? '', 'order'],
+          ['effectiveFilterOrder', meta.effectiveFilterOrder ?? '', 'order'],
+          ['filterTapCount', meta.filterTapCount ?? '', 'taps'],
+          ['filterPhaseMode', meta.filterPhaseMode ?? '', ''],
+          ['groupDelaySeconds', meta.groupDelaySeconds ?? '', 's'],
+          ['edgeDiscardSeconds', meta.edgeDiscardSeconds ?? '', 's'],
+          ['requestedWindowSeconds', meta.requestedWindowSeconds ?? '', 's'],
+          ['effectiveWindowSeconds', meta.effectiveWindowSeconds ?? '', 's'],
+          ['spectralWindowSeconds', meta.spectralWindowSeconds ?? '', 's'],
+          ['spectralStepSeconds', meta.spectralStepSeconds ?? '', 's'],
+          ['minimumSnrDb', meta.minimumSnrDb ?? '', 'dB'],
+          ['minimumProminence', meta.minimumProminence ?? '', 'ratio'],
+          ['minimumValidRatio', meta.minimumValidRatio ?? '', 'ratio'],
+          ['gapHandlingMethod', meta.gapHandlingMethod ?? '', ''],
+          ['dampingEnabled', meta.dampingEnabled ?? '', 'boolean'],
+          ['dampingMethod', meta.dampingMethod ?? '', ''],
+          ['adjustmentReason', meta.adjustmentReason ?? '', ''],
+          []
+        );
+      }
       const eventRows = columns.length && tableRows.length
         ? [
             columns.map(column => t(column.labelKey)),
@@ -14920,6 +15461,8 @@
         if (!saved.spectralDisplayTimezone) merged.spectralDisplayTimezone = DEFAULT_SETTINGS.spectralDisplayTimezone;
         if (!Number.isFinite(Number(saved.spectralSignificantSnrDb))) merged.spectralSignificantSnrDb = DEFAULT_SETTINGS.spectralSignificantSnrDb;
         if (!Number.isFinite(Number(saved.spectralWeakSnrDb))) merged.spectralWeakSnrDb = DEFAULT_SETTINGS.spectralWeakSnrDb;
+        const oscillationDefaults = oscillationDefaultParameters();
+        if (!['fixed', 'adaptive'].includes(saved.oscillationThresholdMode)) merged.oscillationThresholdMode = oscillationDefaults.thresholdMode;
         return merged;
       } catch { return { ...DEFAULT_SETTINGS }; }
     }
@@ -14951,6 +15494,7 @@
       if ($('statsBandMinHz')) $('statsBandMinHz').value = s.statsBandMinHz ?? 49.90;
       if ($('statsBandMaxHz')) $('statsBandMaxHz').value = s.statsBandMaxHz ?? 50.10;
       $('oscThreshold').value = s.thresholdMhz;
+      if ($('oscThresholdMode')) $('oscThresholdMode').value = s.oscillationThresholdMode || oscillationDefaultParameters().thresholdMode;
       $('windowSec').value = s.windowSec;
       $('stepSec').value = s.stepSec;
       $('filterTaps').value = s.filterTaps;
@@ -15004,6 +15548,7 @@
         statsBandMinHz: Number($('statsBandMinHz')?.value || 49.90),
         statsBandMaxHz: Number($('statsBandMaxHz')?.value || 50.10),
         thresholdMhz: Number($('oscThreshold').value),
+        oscillationThresholdMode: $('oscThresholdMode')?.value || oscillationDefaultParameters().thresholdMode,
         windowSec: Number($('windowSec').value),
         stepSec: Number($('stepSec').value),
         spectralWindowType: $('spectralWindowType')?.value || spectralDefaultParameters('psd').windowType,
@@ -15413,28 +15958,34 @@
         netz: 'Kıta Avrupası',
         bandMinLabel: 'Alt bant (Hz)',
         bandMaxLabel: 'Üst bant (Hz)',
-        oscThresholdLabel: 'Genlik eşiği (mHz)',
-        windowSecLabel: 'Pencere (sn)',
-        stepSecLabel: 'Adım (sn)',
-        filterTapsLabel: 'FIR kademe (tek)',
+        oscThresholdLabel: 'Filtrelenmiş genlik olay eşiği (mHz)',
+        oscThresholdModeLabel: 'Eşik modu',
+        oscThresholdModeFixed: 'Sabit eşik',
+        oscThresholdModeAdaptive: 'MAD tabanlı adaptif eşik',
+        windowSecLabel: 'RMS değerlendirme penceresi (sn)',
+        stepSecLabel: 'Analiz pencere adımı (sn)',
+        filterTapsLabel: 'FIR katsayı sayısı',
         minDurationLabel: 'Minimum olay süresi (sn)',
         oscCalculateBtn: 'Hesaplama Yap',
         oscStatusDefault: 'Tarih ve kaynak seçin.',
         oscChartTitle: 'Seçilen Kaynağın Bant Geçiren Bileşeni ve Bulgular',
         oscCountTag: '0 bulgu',
-        sectionOscResults: 'Osilasyon Bulguları',
+        sectionOscResults: 'Analiz Sonuçları',
         oscResultsDesc: 'Bir satıra tıklayarak grafiği ilgili zaman aralığına yakınlaştırabilirsiniz.',
         oscThNo: 'No',
         oscThStart: 'Başlangıç',
         oscThEnd: 'Bitiş',
         oscThDuration: 'Süre',
-        oscThPeak: 'Tepe genlik',
-        oscThRms: 'RMS',
+        oscThPeak: 'Tepe genliği (mHz)',
+        oscThRms: 'RMS genliği (mHz)',
         oscThDominant: 'Baskın frekans',
         oscThWindow: 'Pencere',
-        oscThSourceMean: 'Türkiye ort.',
-        oscThSourceRange: 'Türkiye min–maks',
-        oscThClass: 'Sınıflandırma',
+        oscThPeriod: 'Periyot',
+        oscThSourceMean: 'Kaynak ortalaması',
+        oscThSourceRange: 'Kaynak min–maks',
+        oscThClass: 'Aday türü',
+        oscThConfidence: 'Aday güven skoru',
+        oscThDampingRatio: 'Damping oranı',
         oscNoAnalysis: 'Henüz osilasyon analizi yapılmadı.',
         sectionDataLoad: 'Veri Yükleme',
         clearDataBtn: 'Yüklenen Verileri Temizle',
@@ -15566,7 +16117,7 @@
         metricCorrHelp: 'Saatlik eşlenmiş örneklerin korelasyonu. Birimsiz.',
         unitlessUnit: 'birimsiz',
         // Oscillation chart labels
-        oscFilteredName: '{source} eşik üstü {f1}–{f2} Hz bileşeni',
+        oscFilteredName: '{source} bant geçiren {f1}–{f2} Hz bileşeni',
         oscTrReal: 'Türkiye gerçek frekansı',
         oscDeReal: 'Kıta Avrupası gerçek frekansı',
         oscLegendHint: 'Varsayılan pasif, göstermek için tıklayın',
@@ -15648,7 +16199,7 @@
         oscSourceChanged: '{source} analiz kaynağı seçildi. Yeni kaynak için "Çalıştır" düğmesine basın.',
         oscCalculating: '%{percent} • {stage}',
         oscError: 'Osilasyon analizi hatası: {msg}',
-        oscDone: '{source} frekansı analizi tamamlandı. {count} eşik üstü bulgu aralığı tespit edildi.',
+        oscDone: '{source} frekansı analizi tamamlandı. {count} salınım adayı aralığı tespit edildi.',
         oscEventEmpty: 'Seçilen bant ve eşik için {source} frekansında bulgu tespit edilmedi.',
         oscNoFindings: 'Seçilen eşik için {source} frekansında osilasyon bulgusu tespit edilmedi',
         // Classification
@@ -15738,28 +16289,34 @@
         netz: 'Continental Europe',
         bandMinLabel: 'Lower band (Hz)',
         bandMaxLabel: 'Upper band (Hz)',
-        oscThresholdLabel: 'Amplitude threshold (mHz)',
-        windowSecLabel: 'Window (sec)',
-        stepSecLabel: 'Step (sec)',
-        filterTapsLabel: 'FIR taps (odd)',
+        oscThresholdLabel: 'Filtered amplitude event threshold (mHz)',
+        oscThresholdModeLabel: 'Threshold mode',
+        oscThresholdModeFixed: 'Fixed threshold',
+        oscThresholdModeAdaptive: 'MAD-based adaptive threshold',
+        windowSecLabel: 'RMS evaluation window (s)',
+        stepSecLabel: 'Analysis window step (s)',
+        filterTapsLabel: 'FIR tap count',
         minDurationLabel: 'Minimum event duration (s)',
         oscCalculateBtn: 'Run Analysis',
         oscStatusDefault: 'Select a date and source.',
         oscChartTitle: 'Bandpass Component and Findings of Selected Source',
         oscCountTag: '0 findings',
-        sectionOscResults: 'Oscillation Findings',
+        sectionOscResults: 'Analysis Results',
         oscResultsDesc: 'Click a row to zoom the chart to that time interval.',
         oscThNo: 'No',
         oscThStart: 'Start',
         oscThEnd: 'End',
         oscThDuration: 'Duration',
-        oscThPeak: 'Peak amplitude',
-        oscThRms: 'RMS',
+        oscThPeak: 'Peak amplitude (mHz)',
+        oscThRms: 'RMS amplitude (mHz)',
         oscThDominant: 'Dominant freq.',
         oscThWindow: 'Window',
-        oscThSourceMean: 'Türkiye mean',
-        oscThSourceRange: 'Türkiye min–max',
-        oscThClass: 'Classification',
+        oscThPeriod: 'Period',
+        oscThSourceMean: 'Source mean',
+        oscThSourceRange: 'Source min-max',
+        oscThClass: 'Candidate type',
+        oscThConfidence: 'Candidate confidence score',
+        oscThDampingRatio: 'Damping ratio',
         oscNoAnalysis: 'No oscillation analysis performed yet.',
         sectionDataLoad: 'Data Loading',
         clearDataBtn: 'Clear Loaded Data',
@@ -15891,7 +16448,7 @@
         metricCorrHelp: 'Hourly correlation of paired samples. Unitless.',
         unitlessUnit: 'unitless',
         // Oscillation chart labels
-        oscFilteredName: '{source} bandpass {f1}–{f2} Hz component',
+        oscFilteredName: '{source} band-pass {f1}–{f2} Hz component',
         oscTrReal: 'Türkiye actual frequency',
         oscDeReal: 'Continental Europe actual frequency',
         oscLegendHint: 'Disabled by default, click to show',
@@ -15973,7 +16530,7 @@
         oscSourceChanged: '{source} selected as analysis source. Click "Run Analysis" for the new source.',
         oscCalculating: '%{percent} • {stage}',
         oscError: 'Oscillation analysis error: {msg}',
-        oscDone: '{source} analysis complete. {count} above-threshold events detected.',
+        oscDone: '{source} analysis complete. {count} oscillation candidate intervals detected.',
         oscEventEmpty: 'No findings detected in {source} frequency for the selected band and threshold.',
         oscNoFindings: 'No oscillation findings detected in {source} frequency for the selected threshold',
         // Classification
@@ -16032,7 +16589,7 @@
         tabReports: 'Raporlar',
         tabSettings: 'Veri',
         sectionOscillation: 'Analiz Laboratuvarı',
-        sectionOscResults: 'Analiz Bulguları',
+        sectionOscResults: 'Analiz Sonuçları',
         oscNoAnalysis: 'Henüz analiz yapılmadı.',
         oscStatusDefault: 'Tarih ve kaynak seçin.',
         analysisStatusDefault: 'Tarih ve kaynak seçin.',
@@ -16081,7 +16638,7 @@
         analysisRocof: 'RoCoF',
         analysisPsd: 'Welch PSD',
         analysisSpectrogram: 'Spektrogram',
-        analysisOscillation: 'Osilasyon adayı',
+        analysisOscillation: 'Salınım Adayı Tespiti',
         analysisCrossCorrelation: 'Çapraz korelasyon',
         analysisCoherence: 'Koherens ve faz',
         analysisTrend: 'Günlük trend',
@@ -16166,8 +16723,8 @@
         analysisPsdDesc: 'Analiz çalıştırıldığında güç spektral yoğunluğu, baskın spektral tepeler ve bant güçleri burada gösterilecektir.',
         analysisSpectrogramTitle: 'Spektrogram — Zaman-Frekans Analizi',
         analysisSpectrogramDesc: 'Analiz çalıştırıldığında frekans içeriğinin zaman içindeki değişimi burada gösterilecektir.',
-        analysisOscillationTitle: 'Osilasyon Adayı Bulguları',
-        analysisOscillationDesc: 'Band geçiren bileşen üzerinden aday osilasyon aralıkları listelenir.',
+        analysisOscillationTitle: 'Salınım Adayı Tespiti',
+        analysisOscillationDesc: 'Bant geçiren bileşen üzerinden aday salınım aralıkları, zarf, eşik, güven skoru ve uygun olaylarda damping tahminiyle listelenir.',
         analysisCrossCorrelationTitle: 'Çapraz Korelasyon Özeti',
         analysisCrossCorrelationDesc: 'Türkiye ve Kıta Avrupası serileri arasındaki gecikmeli benzerlik ölçülür.',
         analysisCoherenceTitle: 'Koherens ve Faz Özeti',
@@ -16184,7 +16741,7 @@
         limitRocof: 'RoCoF, eksik, geçersiz, yinelenen zaman damgası ve YD örnekleri elendikten sonra kalan bir saniyelik iyi kalite seriyle hesaplanır; kalite boşlukları türev veya regresyon pencereleriyle köprülenmez.',
         limitPsd: 'PSD bantları Nyquist sınırının altında ve aynı örnekleme varsayımıyla yorumlanmalıdır.',
         limitSpectrogram: 'Spektrogram kısa süreli pencerelere duyarlıdır; dakikalık/saatlik veri uygun değildir.',
-        limitOscillation: 'Osilasyon adayları doğrulama bulgusudur; kaynak kalitesi ve filtre parametresi sonucu etkiler.',
+        limitOscillation: 'Salınım adayları doğrulama bulgusudur; kaynak kalitesi, filtre parametreleri ve eşik seçimi sonucu etkiler. Damping oranı yalnız uygun ringdown olaylarında tahmin edilir.',
         limitCrossCorrelation: 'Çapraz korelasyon yalnız eşlenmiş iki seri için anlamlıdır.',
         limitCoherence: 'Koherens-faz yorumu eşlenmiş, aynı örnekleme hızındaki serilere bağlıdır.',
         limitTrend: 'Trend görünümü hızlı osilasyonları değil uzun dönem sapma eğilimini gösterir.',
@@ -16636,7 +17193,55 @@
         methodEvents: 'Bant ihlali analizi, 1 saniyelik canonical Good Quality veride alt/üst frekans bandı dışındaki ardışık saniyeleri olay olarak gruplar.',
         methodTrend: 'Trend görünümü saatlik/günlük hata ölçülerini özetler.',
         methodStats: 'Temel istatistikler, Missing/Invalid/Duplicate Timestamp/YD olayları elendikten sonra kalan saniyelik good-quality canonical örneklerin dağılımını hesaplar.',
-        methodOscillation: 'Osilasyon analizi band geçiren FIR filtresi ve kayan pencere eşikleme ile aday aralıkları çıkarır.',
+        methodOscillation: 'Salınım adayı tespiti, bant geçiren FIR filtresi, genlik zarfı, ayrı giriş/çıkış eşikleri, kısa boşluk birleştirme, minimum çevrim kontrolü ve isteğe bağlı damping tahmini kullanır.',
+        oscillationCandidateTypeRingdown: 'Sönümlenen modal salınım',
+        oscillationCandidateTypeSustainedForced: 'Sürekli / zorlanmış salınım',
+        oscillationCandidateTypeGrowing: 'Büyüyen salınım adayı',
+        oscillationCandidateTypeBurst: 'Kısa süreli patlama',
+        oscillationCandidateTypeFrequencyDrifting: 'Frekansı sürüklenen aday',
+        oscillationCandidateTypeIndeterminate: 'Belirsiz aday',
+        oscillationHeuristicConfidence: 'Heuristik aday güven skoru',
+        oscillationConfidenceHelp: 'Bu skor veri kapsaması, SNR, süre, bant enerjisi, tepe belirginliği, eşzamanlı kaynak, koherens ve boşluk cezasından oluşur; kalibre edilmiş istatistiksel olasılık değildir.',
+        oscillationDampingHelp: 'Damping oranı yalnız uygun ringdown veya büyüyen modal adaylarda tahmin edilir; sürekli veya dış kaynakla zorlanan salınımlarda yaklaşık sıfır damping değeri sistem kararsızlığı anlamına gelmeyebilir.',
+        oscillationDampingWarning: 'Damping oranı yalnız uygun ringdown olaylarında tahmin edilir. Sürekli veya dış kaynakla zorlanan salınımlarda yaklaşık sıfır damping değeri sistem kararsızlığı anlamına gelmeyebilir.',
+        oscillationDampingPanelTitle: 'Damping Tahmini',
+        oscillationDampingAvailable: 'Damping hesaplandı',
+        oscillationDampingUnavailable: 'Damping hesaplanmadı',
+        oscillationDampingUnavailableShort: 'Uygun değil',
+        oscillationEventCountHelp: 'Minimum süre, minimum çevrim, SNR, prominence ve veri kalitesi koşullarını geçen aday sayısı.',
+        oscillationPeakHelp: 'Bant geçiren bileşenin pozitif zarfında görülen en yüksek genlik.',
+        oscillationDominantHelp: 'Aday aralığında spektral taramayla bulunan baskın frekans.',
+        oscillationFilterSummary: 'FIR filtre derecesi / katsayı sayısı',
+        oscillationFilterHelp: 'FIR filtre derecesi bandın seçiciliğini belirler; daha yüksek derece daha seçici olabilir ama kenar kaybı ve grup gecikmesini artırır.',
+        oscillationRequestedEffectiveFilter: 'İstenen / etkili FIR filtre derecesi',
+        oscillationFilterTapCount: 'FIR katsayı sayısı',
+        oscillationTapsUnit: 'katsayı',
+        oscillationGroupDelay: 'Grup gecikmesi',
+        oscillationGroupDelayHelp: 'Merkezli FIR filtrede katsayı sayısına bağlı teorik zaman kayması; kenar örnekleri hesap dışı kalır.',
+        oscillationEdgeLoss: 'Filtre kenar kaybı',
+        oscillationEdgeLossHelp: 'Filtre penceresi tam kurulamadığı için başta ve sonda hesaplanamayan süre.',
+        oscillationMinimumCycles: 'Minimum çevrim sayısı',
+        oscillationMinimumCyclesHelp: 'Adayın yalnız kısa bir eşik aşımı değil, seçili bantta yeterli sayıda salınım çevrimi içermesini sağlar.',
+        oscillationRejectedCandidates: 'Reddedilen aday',
+        oscillationRejectedHelp: 'Minimum süre, çevrim, SNR, prominence veya veri kalitesi eşiğini geçmeyen adaylar.',
+        oscillationPositiveEnvelope: 'Pozitif genlik zarfı',
+        oscillationNegativeEnvelope: 'Negatif genlik zarfı',
+        oscillationEnterThreshold: 'Giriş eşiği',
+        oscillationExitThreshold: 'Çıkış eşiği',
+        oscillationPeriod: 'Periyot',
+        oscillationTechnicalDetails: 'Teknik ayrıntıları göster',
+        oscillationFilterParameters: 'Filtre parametreleri',
+        oscillationWindowAndStep: 'Pencere ve adım',
+        oscillationNoiseFloor: 'Gürültü tabanı',
+        oscillationBandEnergyRatio: 'Bant enerji oranı',
+        oscillationHarmonics: 'Harmonikler',
+        oscillationFitQuality: 'Fit kalitesi',
+        oscillationFitR2: 'Fit R²',
+        oscillationTimeConstant: 'Zaman sabiti',
+        oscillationFittedCycleCount: 'Kullanılan çevrim',
+        oscillationMissingImputed: 'Eksik/doldurulan örnek',
+        oscillationConfidenceComponents: 'Güven bileşenleri',
+        oscillationDampingStatus: 'Damping durumu',
         reportLimitations: 'Sonuçlar veri kalitesi, hizalama seçimi, eksik saniyeler ve kaynak revizyonlarından etkilenebilir.',
         reportsTitle: 'Raporlar',
         reportJsonBtn: 'JSON',
@@ -16681,7 +17286,7 @@
         tabReports: 'Reports',
         tabSettings: 'Data',
         sectionOscillation: 'Analysis Lab',
-        sectionOscResults: 'Analysis Findings',
+        sectionOscResults: 'Analysis Results',
         oscNoAnalysis: 'No analysis has been run yet.',
         oscStatusDefault: 'Select a date and source.',
         analysisStatusDefault: 'Select a date and source.',
@@ -16730,7 +17335,7 @@
         analysisRocof: 'RoCoF',
         analysisPsd: 'Welch PSD',
         analysisSpectrogram: 'Spectrogram',
-        analysisOscillation: 'Oscillation candidate',
+        analysisOscillation: 'Oscillation Candidate Detection',
         analysisCrossCorrelation: 'Cross-correlation',
         analysisCoherence: 'Coherence and phase',
         analysisTrend: 'Daily trend',
@@ -16815,8 +17420,8 @@
         analysisPsdDesc: 'When the analysis is run, power spectral density, dominant spectral peaks, and band powers will be shown here.',
         analysisSpectrogramTitle: 'Spectrogram — Time-Frequency Analysis',
         analysisSpectrogramDesc: 'When the analysis is run, frequency content changes over time will be shown here.',
-        analysisOscillationTitle: 'Oscillation Candidate Findings',
-        analysisOscillationDesc: 'Candidate oscillation intervals are listed from the band-pass component.',
+        analysisOscillationTitle: 'Oscillation Candidate Detection',
+        analysisOscillationDesc: 'Candidate oscillation intervals are listed from the band-pass component with envelope, threshold, confidence score, and damping estimates where appropriate.',
         analysisCrossCorrelationTitle: 'Cross-Correlation Summary',
         analysisCrossCorrelationDesc: 'Delayed similarity between Türkiye and Continental Europe is measured.',
         analysisCoherenceTitle: 'Coherence and Phase Summary',
@@ -16833,7 +17438,7 @@
         limitRocof: 'RoCoF is computed from one-second Good Quality data after excluding Missing, Invalid, Duplicate Timestamp, and RV samples; quality gaps are not bridged by derivative or regression windows.',
         limitPsd: 'PSD bands must remain below Nyquist and share the same sampling assumption.',
         limitSpectrogram: 'Spectrogram is sensitive to short windows; minutely/hourly data is unsuitable.',
-        limitOscillation: 'Oscillation candidates require validation; data quality and filter settings affect results.',
+        limitOscillation: 'Oscillation candidates require validation; data quality, filter parameters, and threshold selection affect results. Damping ratio is estimated only for suitable ringdown events.',
         limitCrossCorrelation: 'Cross-correlation is meaningful only for two paired series.',
         limitCoherence: 'Coherence-phase interpretation depends on paired series with the same sampling rate.',
         limitTrend: 'Trend view shows long-term deviation, not fast oscillations.',
@@ -17239,7 +17844,7 @@
         rocofThresholdHelp: 'Entered as mHz/s in the UI and passed to the core as Hz/s.',
         rocofThresholdStrictHelp: 'An event starts when RoCoF is strictly above the positive threshold or strictly below the negative threshold. Values exactly equal to the threshold are not classified as events.',
         rocofScientificWarning: 'These results are offline RoCoF estimates derived from one-second historical frequency data. They must not be treated as protection-relay, PMU, real-time control, or regulatory-compliance measurements.',
-        rocofLegendExplanation: 'R+: frekans yükselişi / positive RoCoF · R−: frekans düşüşü / negative RoCoF',
+        rocofLegendExplanation: 'R+: positive RoCoF · R−: negative RoCoF',
         rocofMeanAbs: 'Mean |RoCoF|',
         rocofMeanAbsHelp: 'Mean absolute value of the Good Quality RoCoF samples.',
         rocofGoodUsed: 'Good Quality samples used',
@@ -17285,7 +17890,55 @@
         methodEvents: 'Band violation analysis groups consecutive one-second canonical Good Quality samples outside the lower/upper frequency band.',
         methodTrend: 'The trend view summarizes hourly and daily error metrics.',
         methodStats: 'Basic statistics describe the distribution of one-second good-quality canonical samples after excluding Missing, Invalid, Duplicate Timestamp, and RV events.',
-        methodOscillation: 'Oscillation analysis uses a band-pass FIR filter and sliding-window thresholding.',
+        methodOscillation: 'Oscillation candidate detection uses a band-pass FIR filter, amplitude envelope, separate enter/exit thresholds, short-gap merging, minimum-cycle checks, and optional damping estimation.',
+        oscillationCandidateTypeRingdown: 'Decaying ringdown',
+        oscillationCandidateTypeSustainedForced: 'Sustained / forced oscillation',
+        oscillationCandidateTypeGrowing: 'Growing oscillation candidate',
+        oscillationCandidateTypeBurst: 'Short burst',
+        oscillationCandidateTypeFrequencyDrifting: 'Frequency-drifting candidate',
+        oscillationCandidateTypeIndeterminate: 'Indeterminate candidate',
+        oscillationHeuristicConfidence: 'Heuristic candidate confidence',
+        oscillationConfidenceHelp: 'This score combines coverage, SNR, duration, band energy, peak prominence, simultaneous source support, coherence, and gap penalty; it is not a calibrated statistical probability.',
+        oscillationDampingHelp: 'Damping ratio is estimated only for suitable ringdown or growing modal candidates; near-zero damping in sustained or externally forced oscillations may not indicate system instability.',
+        oscillationDampingWarning: 'Damping ratio is estimated only for suitable ringdown events. In sustained or externally forced oscillations, a near-zero damping value may not indicate system instability.',
+        oscillationDampingPanelTitle: 'Damping Estimate',
+        oscillationDampingAvailable: 'Damping estimated',
+        oscillationDampingUnavailable: 'Damping not estimated',
+        oscillationDampingUnavailableShort: 'Not applicable',
+        oscillationEventCountHelp: 'Number of candidates that pass minimum duration, minimum cycles, SNR, prominence, and data-quality gates.',
+        oscillationPeakHelp: 'Highest amplitude observed in the positive envelope of the band-pass component.',
+        oscillationDominantHelp: 'Dominant frequency found in the candidate interval by spectral scanning.',
+        oscillationFilterSummary: 'FIR filter order / tap count',
+        oscillationFilterHelp: 'FIR filter order controls band selectivity; a higher order can be more selective but increases edge loss and group delay.',
+        oscillationRequestedEffectiveFilter: 'Requested / effective FIR filter order',
+        oscillationFilterTapCount: 'FIR tap count',
+        oscillationTapsUnit: 'taps',
+        oscillationGroupDelay: 'Group delay',
+        oscillationGroupDelayHelp: 'The theoretical time shift of the centered FIR filter; edge samples are excluded.',
+        oscillationEdgeLoss: 'Filter edge loss',
+        oscillationEdgeLossHelp: 'Time at the beginning and end where the filter window cannot be fully evaluated.',
+        oscillationMinimumCycles: 'Minimum cycles',
+        oscillationMinimumCyclesHelp: 'Ensures the candidate contains enough oscillation cycles in the selected band, not only a short threshold crossing.',
+        oscillationRejectedCandidates: 'Rejected candidates',
+        oscillationRejectedHelp: 'Candidates that fail minimum duration, cycles, SNR, prominence, or data-quality gates.',
+        oscillationPositiveEnvelope: 'Positive amplitude envelope',
+        oscillationNegativeEnvelope: 'Negative amplitude envelope',
+        oscillationEnterThreshold: 'Enter threshold',
+        oscillationExitThreshold: 'Exit threshold',
+        oscillationPeriod: 'Period',
+        oscillationTechnicalDetails: 'Show technical details',
+        oscillationFilterParameters: 'Filter parameters',
+        oscillationWindowAndStep: 'Window and step',
+        oscillationNoiseFloor: 'Noise floor',
+        oscillationBandEnergyRatio: 'Band energy ratio',
+        oscillationHarmonics: 'Harmonics',
+        oscillationFitQuality: 'Fit quality',
+        oscillationFitR2: 'Fit R²',
+        oscillationTimeConstant: 'Time constant',
+        oscillationFittedCycleCount: 'Fitted cycles',
+        oscillationMissingImputed: 'Missing/imputed samples',
+        oscillationConfidenceComponents: 'Confidence components',
+        oscillationDampingStatus: 'Damping status',
         reportLimitations: 'Results may be affected by data quality, alignment mode, missing seconds, and source revisions.',
         reportsTitle: 'Reports',
         reportJsonBtn: 'JSON',

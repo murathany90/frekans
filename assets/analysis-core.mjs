@@ -33,11 +33,36 @@ export const DEFAULT_SPECTROGRAM_PARAMETERS = Object.freeze({
   scale: "log"
 });
 
+export const DEFAULT_OSCILLATION_PARAMETERS = Object.freeze({
+  minFrequencyHz: 0.10,
+  maxFrequencyHz: 0.20,
+  thresholdMode: "fixed",
+  enterThresholdMilliHz: 10,
+  exitThresholdMilliHz: 7,
+  minimumEventSeconds: 30,
+  minimumCycles: 3,
+  mergeGapSeconds: 20,
+  filterOrder: 100,
+  filterPhaseMode: "zero-phase",
+  rmsWindowSeconds: 60,
+  spectralWindowSeconds: 256,
+  spectralStepSeconds: 64,
+  minimumSnrDb: 3,
+  minimumProminence: 0.02,
+  minimumValidRatio: 0.75,
+  gapHandlingMethod: "reject",
+  dampingEnabled: false,
+  dampingMethod: "envelope-regression"
+});
+
 const ALLOWED_SPECTRAL_WINDOWS = new Set(["hann", "hamming", "rectangular"]);
 const ALLOWED_SPECTRAL_DETRENDS = new Set(["constant", "linear", "none"]);
 const ALLOWED_SPECTRAL_SCALES = new Set(["linear", "log"]);
 const ALLOWED_SPECTRAL_AVERAGING = new Set(["mean", "median"]);
 const ALLOWED_GAP_HANDLING = new Set(["segment-mean", "reject", "short-gap-linear"]);
+const ALLOWED_OSCILLATION_THRESHOLD_MODES = new Set(["fixed", "adaptive"]);
+const ALLOWED_OSCILLATION_FILTER_PHASE_MODES = new Set(["zero-phase", "centered", "causal"]);
+const ALLOWED_OSCILLATION_DAMPING_METHODS = new Set(["envelope-regression", "log-decrement", "damped-sinusoid-fit", "matrix-pencil"]);
 const DEFAULT_SPECTROGRAM_MAX_CELLS = 1_500_000;
 const DEFAULT_SPECTRAL_PEAK_CLASSIFICATION = Object.freeze({
   significantSnrDb: 6,
@@ -1137,6 +1162,766 @@ export function computeOscillationConfidence({
     score: Math.max(0, Math.min(100, Math.round(score))),
     factors: { coverageRatio, snr, durationSeconds, bandEnergyRatio, peakProminence, simultaneousSources, coherence, hasGaps }
   };
+}
+
+export function normalizeOscillationParameters(options = {}, length = 0) {
+  const defaults = DEFAULT_OSCILLATION_PARAMETERS;
+  const sampleRateHz = finitePositive(options.sampleRateHz, DEFAULT_SAMPLE_RATE_HZ);
+  const sampleIntervalSeconds = finitePositive(options.sampleIntervalSeconds, 1 / sampleRateHz);
+  const nyquistHz = sampleRateHz / 2;
+  const minFrequencyHz = Number(options.minFrequencyHz ?? options.bandMin ?? defaults.minFrequencyHz);
+  const maxFrequencyHz = Number(options.maxFrequencyHz ?? options.bandMax ?? defaults.maxFrequencyHz);
+  if (!Number.isFinite(minFrequencyHz) || !Number.isFinite(maxFrequencyHz) || minFrequencyHz <= 0 || minFrequencyHz >= maxFrequencyHz) {
+    throw new Error("Invalid oscillation frequency band: expected 0 < minFrequencyHz < maxFrequencyHz.");
+  }
+  if (maxFrequencyHz >= nyquistHz - 1e-12) {
+    throw new Error(`Invalid oscillation maxFrequencyHz: expected maxFrequencyHz below Nyquist (${nyquistHz} Hz).`);
+  }
+  const thresholdMode = String(options.thresholdMode ?? defaults.thresholdMode).toLowerCase();
+  if (!ALLOWED_OSCILLATION_THRESHOLD_MODES.has(thresholdMode)) {
+    throw new Error("Invalid oscillation thresholdMode: expected fixed or adaptive.");
+  }
+  const requestedEnter = Number(options.enterThresholdMilliHz ?? options.thresholdMhz ?? options.thresholdMilliHz ?? defaults.enterThresholdMilliHz);
+  const requestedExit = Number(options.exitThresholdMilliHz ?? Math.min(requestedEnter, defaults.exitThresholdMilliHz));
+  const minimumEventSeconds = finitePositive(options.minimumEventSeconds ?? options.minDuration ?? defaults.minimumEventSeconds, defaults.minimumEventSeconds, sampleIntervalSeconds);
+  const minimumCycles = finitePositive(options.minimumCycles ?? defaults.minimumCycles, defaults.minimumCycles, 0);
+  const mergeGapSeconds = Number.isFinite(Number(options.mergeGapSeconds))
+    ? Math.max(0, Number(options.mergeGapSeconds))
+    : defaults.mergeGapSeconds;
+  const requestedFilterOrder = Math.round(Number(options.filterOrder ?? (
+    options.filterTaps !== undefined ? Number(options.filterTaps) - 1 : defaults.filterOrder
+  )));
+  let effectiveFilterOrder = Math.max(2, Number.isFinite(requestedFilterOrder) ? requestedFilterOrder : defaults.filterOrder);
+  if (effectiveFilterOrder % 2 !== 0) effectiveFilterOrder += 1;
+  const maxOrderFromData = length ? Math.max(2, Math.min(effectiveFilterOrder, Math.max(2, Math.floor((length - 1) / 2) * 2))) : effectiveFilterOrder;
+  const adjustedForLength = maxOrderFromData !== effectiveFilterOrder;
+  effectiveFilterOrder = maxOrderFromData;
+  const filterTapCount = effectiveFilterOrder + 1;
+  const filterPhaseMode = String(options.filterPhaseMode ?? defaults.filterPhaseMode).toLowerCase();
+  if (!ALLOWED_OSCILLATION_FILTER_PHASE_MODES.has(filterPhaseMode)) {
+    throw new Error("Invalid oscillation filterPhaseMode: expected zero-phase, centered, or causal.");
+  }
+  const groupDelaySeconds = effectiveFilterOrder / (2 * sampleRateHz);
+  const edgeDiscardSeconds = filterPhaseMode === "causal" ? groupDelaySeconds : groupDelaySeconds;
+  const rmsWindowSeconds = finitePositive(options.rmsWindowSeconds ?? options.windowSec ?? defaults.rmsWindowSeconds, defaults.rmsWindowSeconds, sampleIntervalSeconds);
+  const spectralWindowSeconds = finitePositive(options.spectralWindowSeconds ?? options.windowSec ?? defaults.spectralWindowSeconds, defaults.spectralWindowSeconds, sampleIntervalSeconds * 8);
+  const spectralStepSeconds = finitePositive(options.spectralStepSeconds ?? options.stepSec ?? defaults.spectralStepSeconds, defaults.spectralStepSeconds, sampleIntervalSeconds);
+  const effectiveRmsWindowSamples = Math.max(1, Math.round(rmsWindowSeconds * sampleRateHz));
+  const effectiveSpectralWindowSamples = Math.max(8, Math.round(spectralWindowSeconds * sampleRateHz));
+  const effectiveSpectralStepSamples = Math.max(1, Math.min(effectiveSpectralWindowSamples, Math.round(spectralStepSeconds * sampleRateHz)));
+  const minimumSnrDb = Number(options.minimumSnrDb ?? defaults.minimumSnrDb);
+  const minimumProminence = Number(options.minimumProminence ?? defaults.minimumProminence);
+  const minimumValidRatio = Number(options.minimumValidRatio ?? defaults.minimumValidRatio);
+  if (!Number.isFinite(minimumValidRatio) || minimumValidRatio < 0 || minimumValidRatio > 1) {
+    throw new Error("Invalid oscillation minimumValidRatio: expected 0 <= minimumValidRatio <= 1.");
+  }
+  const gapHandlingMethod = String(options.gapHandlingMethod ?? defaults.gapHandlingMethod).toLowerCase();
+  if (!ALLOWED_GAP_HANDLING.has(gapHandlingMethod)) {
+    throw new Error("Invalid oscillation gapHandlingMethod: expected reject, segment-mean, or short-gap-linear.");
+  }
+  const dampingMethod = String(options.dampingMethod ?? defaults.dampingMethod).toLowerCase();
+  if (!ALLOWED_OSCILLATION_DAMPING_METHODS.has(dampingMethod)) {
+    throw new Error("Invalid oscillation dampingMethod.");
+  }
+  const adjustmentReasons = [];
+  if (requestedFilterOrder !== effectiveFilterOrder) adjustmentReasons.push("filter-order-adjusted-to-even-safe-length");
+  if (adjustedForLength) adjustmentReasons.push("filter-order-limited-by-data-length");
+  if (effectiveSpectralStepSamples !== Math.round(spectralStepSeconds * sampleRateHz)) adjustmentReasons.push("spectral-step-limited-to-window");
+  const enterThresholdMilliHz = Math.max(0, Number.isFinite(requestedEnter) ? requestedEnter : defaults.enterThresholdMilliHz);
+  const exitThresholdMilliHz = Math.max(0, Math.min(
+    enterThresholdMilliHz,
+    Number.isFinite(requestedExit) ? requestedExit : defaults.exitThresholdMilliHz
+  ));
+  return {
+    ...defaults,
+    sampleRateHz,
+    sampleIntervalSeconds,
+    nyquistHz,
+    nominalHz: Number.isFinite(Number(options.nominalHz)) ? Number(options.nominalHz) : DEFAULT_NOMINAL_HZ,
+    minFrequencyHz,
+    maxFrequencyHz,
+    thresholdMode,
+    enterThresholdMilliHz,
+    exitThresholdMilliHz,
+    requestedEnterThresholdMilliHz: enterThresholdMilliHz,
+    requestedExitThresholdMilliHz: exitThresholdMilliHz,
+    minimumEventSeconds,
+    minimumCycles,
+    mergeGapSeconds,
+    requestedFilterOrder,
+    effectiveFilterOrder,
+    filterTapCount,
+    filterPhaseMode,
+    groupDelaySeconds,
+    edgeDiscardSeconds,
+    requestedWindowSeconds: rmsWindowSeconds,
+    effectiveWindowSeconds: effectiveRmsWindowSamples / sampleRateHz,
+    effectiveWindowSamples: effectiveRmsWindowSamples,
+    rmsWindowSeconds,
+    rmsWindowSamples: effectiveRmsWindowSamples,
+    spectralWindowSeconds,
+    spectralStepSeconds,
+    effectiveSpectralWindowSeconds: effectiveSpectralWindowSamples / sampleRateHz,
+    effectiveSpectralWindowSamples,
+    effectiveSpectralStepSeconds: effectiveSpectralStepSamples / sampleRateHz,
+    effectiveSpectralStepSamples,
+    minimumSnrDb: Number.isFinite(minimumSnrDb) ? minimumSnrDb : defaults.minimumSnrDb,
+    minimumProminence: Number.isFinite(minimumProminence) ? minimumProminence : defaults.minimumProminence,
+    minimumValidRatio,
+    gapHandlingMethod,
+    maxInterpolationGapSamples: Math.max(1, Math.round(Number(options.maxInterpolationGapSamples ?? 2))),
+    dampingEnabled: Boolean(options.dampingEnabled ?? defaults.dampingEnabled),
+    dampingMethod,
+    adjustmentApplied: adjustmentReasons.length > 0,
+    adjustmentReason: adjustmentReasons.join("; ") || "none",
+    adjustmentReasonCodes: adjustmentReasons
+  };
+}
+
+export function computeOscillationCandidates(series, options = {}) {
+  const input = ArrayBuffer.isView(series) ? Float64Array.from(series) : Float64Array.from(series || []);
+  const params = normalizeOscillationParameters(options, input.length);
+  if (input.length < Math.max(params.filterTapCount + 8, Math.round(params.minimumEventSeconds * params.sampleRateHz))) {
+    throw new Error("Data too short for oscillation candidate detection.");
+  }
+  const deviation = normalizeOscillationSeries(input, params.nominalHz);
+  const validMask = new Uint8Array(deviation.length);
+  let originalValidCount = 0;
+  for (let i = 0; i < deviation.length; i += 1) {
+    if (Number.isFinite(deviation[i])) {
+      validMask[i] = 1;
+      originalValidCount += 1;
+    }
+  }
+  const coeffs = oscillationBandpassFir(params.minFrequencyHz, params.maxFrequencyHz, params.filterTapCount, params.sampleRateHz);
+  const filtered = applyOscillationFir(deviation, coeffs, params);
+  const envelopeMhz = oscillationEnvelope(filtered, params);
+  const adaptiveThreshold = oscillationAdaptiveThreshold(envelopeMhz);
+  const enterThresholdMilliHz = params.thresholdMode === "adaptive"
+    ? Math.max(params.enterThresholdMilliHz, adaptiveThreshold.enterThresholdMilliHz)
+    : params.enterThresholdMilliHz;
+  const exitThresholdMilliHz = params.thresholdMode === "adaptive"
+    ? Math.min(enterThresholdMilliHz, Math.max(params.exitThresholdMilliHz, adaptiveThreshold.exitThresholdMilliHz))
+    : params.exitThresholdMilliHz;
+  const thresholded = detectOscillationRegions(envelopeMhz, validMask, {
+    ...params,
+    enterThresholdMilliHz,
+    exitThresholdMilliHz
+  });
+  const mergedRegions = mergeOscillationRegions(thresholded.regions, validMask, params);
+  const candidates = [];
+  const rejectedCandidates = [];
+  for (const region of mergedRegions) {
+    const candidate = buildOscillationCandidate(region, deviation, filtered, envelopeMhz, validMask, {
+      ...params,
+      enterThresholdMilliHz,
+      exitThresholdMilliHz
+    });
+    if (
+      candidate.durationSeconds + EPSILON >= params.minimumEventSeconds
+      && candidate.cycleCount + EPSILON >= params.minimumCycles
+      && candidate.snrDb + EPSILON >= params.minimumSnrDb
+      && candidate.peakProminenceRatio + EPSILON >= params.minimumProminence
+      && candidate.dataQuality.validRatio + EPSILON >= params.minimumValidRatio
+    ) {
+      candidates.push(candidate);
+    } else {
+      candidate.rejectedReason = [
+        candidate.durationSeconds + EPSILON < params.minimumEventSeconds ? "minimum-duration" : "",
+        candidate.cycleCount + EPSILON < params.minimumCycles ? "minimum-cycles" : "",
+        candidate.snrDb + EPSILON < params.minimumSnrDb ? "minimum-snr" : "",
+        candidate.peakProminenceRatio + EPSILON < params.minimumProminence ? "minimum-prominence" : "",
+        candidate.dataQuality.validRatio + EPSILON < params.minimumValidRatio ? "minimum-valid-ratio" : ""
+      ].filter(Boolean).join(",");
+      rejectedCandidates.push(candidate);
+    }
+  }
+  candidates.sort((a, b) => b.confidenceScore - a.confidenceScore || a.startSecond - b.startSecond);
+  candidates.forEach((candidate, index) => {
+    candidate.rank = index + 1;
+    candidate.no = index + 1;
+  });
+  const calculatedCount = countFinite(filtered);
+  const edgeDiscardCount = Math.min(deviation.length, Math.round(params.edgeDiscardSeconds * params.sampleRateHz) * 2);
+  const qualityGapDiscardCount = Math.max(0, originalValidCount - calculatedCount - edgeDiscardCount);
+  return {
+    method: "oscillation-candidates",
+    sampleRateHz: params.sampleRateHz,
+    sampleIntervalSeconds: params.sampleIntervalSeconds,
+    units: "Hz deviation, mHz amplitude",
+    filtered,
+    filteredSeries: filtered,
+    envelopeMilliHz: envelopeMhz,
+    positiveEnvelopeMilliHz: envelopeMhz,
+    negativeEnvelopeMilliHz: Float64Array.from(envelopeMhz, value => Number.isFinite(value) ? -value : NaN),
+    enterThresholdMilliHz,
+    exitThresholdMilliHz,
+    thresholdMilliHz: enterThresholdMilliHz,
+    thresholdMode: params.thresholdMode,
+    candidates,
+    events: candidates,
+    rejectedCandidates,
+    rejectedCandidateCount: rejectedCandidates.length,
+    candidateCount: candidates.length,
+    originalValidCount,
+    calculatedCount,
+    edgeDiscardCount,
+    qualityGapDiscardCount,
+    filterWindowDiscardCount: qualityGapDiscardCount,
+    regressionWindowDiscardCount: 0,
+    methodDiscardCount: Math.max(0, input.length - calculatedCount),
+    missingCount: input.length - originalValidCount,
+    dataQuality: {
+      totalSamples: input.length,
+      originalValidCount,
+      calculatedCount,
+      missingCount: input.length - originalValidCount,
+      edgeDiscardCount,
+      qualityGapDiscardCount
+    },
+    parameters: {
+      ...params,
+      enterThresholdMilliHz,
+      exitThresholdMilliHz,
+      adaptiveThreshold,
+      requestedFilterOrder: params.requestedFilterOrder,
+      effectiveFilterOrder: params.effectiveFilterOrder,
+      filterTapCount: params.filterTapCount,
+      groupDelaySeconds: params.groupDelaySeconds,
+      edgeDiscardSeconds: params.edgeDiscardSeconds,
+      requestedWindowSeconds: params.requestedWindowSeconds,
+      effectiveWindowSeconds: params.effectiveWindowSeconds,
+      adjustmentReason: params.adjustmentReason
+    },
+    meta: {
+      taps: params.filterTapCount,
+      filterTapCount: params.filterTapCount,
+      requestedFilterOrder: params.requestedFilterOrder,
+      effectiveFilterOrder: params.effectiveFilterOrder,
+      groupDelaySeconds: params.groupDelaySeconds,
+      edgeDiscardSeconds: params.edgeDiscardSeconds,
+      windowSec: params.rmsWindowSeconds,
+      stepSec: params.spectralStepSeconds,
+      threshold: enterThresholdMilliHz,
+      exitThreshold: exitThresholdMilliHz,
+      f1: params.minFrequencyHz,
+      f2: params.maxFrequencyHz,
+      requestedWindowSeconds: params.requestedWindowSeconds,
+      effectiveWindowSeconds: params.effectiveWindowSeconds,
+      adjustmentReason: params.adjustmentReason
+    }
+  };
+}
+
+function normalizeOscillationSeries(values, nominalHz) {
+  const finite = [];
+  for (const value of values || []) {
+    const numeric = Number(value);
+    if (Number.isFinite(numeric)) finite.push(numeric);
+  }
+  const center = percentile(finite, 0.5);
+  const looksLikeFrequency = Number.isFinite(center) && Math.abs(center - nominalHz) < 5;
+  const out = new Float64Array(values.length);
+  for (let i = 0; i < values.length; i += 1) {
+    const value = Number(values[i]);
+    out[i] = Number.isFinite(value) ? value - (looksLikeFrequency ? nominalHz : 0) : NaN;
+  }
+  return out;
+}
+
+function oscillationBandpassFir(f1, f2, taps, sampleRateHz) {
+  const h = new Float64Array(taps);
+  const mid = (taps - 1) / 2;
+  for (let n = 0; n < taps; n += 1) {
+    const m = n - mid;
+    const high = m === 0 ? 2 * f2 / sampleRateHz : Math.sin(2 * Math.PI * f2 * m / sampleRateHz) / (Math.PI * m);
+    const low = m === 0 ? 2 * f1 / sampleRateHz : Math.sin(2 * Math.PI * f1 * m / sampleRateHz) / (Math.PI * m);
+    const hamming = 0.54 - 0.46 * Math.cos(2 * Math.PI * n / Math.max(1, taps - 1));
+    h[n] = (high - low) * hamming;
+  }
+  return h;
+}
+
+function applyOscillationFir(data, coeffs, params) {
+  const n = data.length;
+  const taps = coeffs.length;
+  const half = (taps - 1) >> 1;
+  const out = new Float64Array(n);
+  out.fill(NaN);
+  const invalidPrefix = new Uint32Array(n + 1);
+  for (let i = 0; i < n; i += 1) {
+    invalidPrefix[i + 1] = invalidPrefix[i] + (Number.isFinite(data[i]) ? 0 : 1);
+  }
+  const first = params.filterPhaseMode === "causal" ? taps - 1 : half;
+  const last = params.filterPhaseMode === "causal" ? n : n - half;
+  for (let i = first; i < last; i += 1) {
+    const left = params.filterPhaseMode === "causal" ? i - taps + 1 : i - half;
+    const right = left + taps;
+    if (left < 0 || right > n) continue;
+    if (invalidPrefix[right] - invalidPrefix[left] > 0) continue;
+    let acc = 0;
+    for (let k = 0; k < taps; k += 1) acc += data[left + k] * coeffs[k];
+    out[i] = acc;
+  }
+  return out;
+}
+
+function oscillationEnvelope(filtered, params) {
+  const n = filtered.length;
+  const out = new Float64Array(n);
+  out.fill(NaN);
+  const periodSamples = Math.max(3, Math.round(params.sampleRateHz / Math.max(params.minFrequencyHz, EPSILON)));
+  const windowSamples = Math.max(3, Math.min(Math.round(params.rmsWindowSamples || periodSamples), Math.round(periodSamples * 2)));
+  const radius = Math.floor(windowSamples / 2);
+  const prefixSum = new Float64Array(n + 1);
+  const prefixCount = new Uint32Array(n + 1);
+  for (let i = 0; i < n; i += 1) {
+    const value = filtered[i];
+    prefixSum[i + 1] = prefixSum[i] + (Number.isFinite(value) ? Math.abs(value) * 1000 : 0);
+    prefixCount[i + 1] = prefixCount[i] + (Number.isFinite(value) ? 1 : 0);
+  }
+  for (let i = 0; i < n; i += 1) {
+    const left = Math.max(0, i - radius);
+    const right = Math.min(n, i + radius + 1);
+    const count = prefixCount[right] - prefixCount[left];
+    if (count < Math.max(1, Math.ceil((right - left) * 0.7))) continue;
+    out[i] = (prefixSum[right] - prefixSum[left]) / count * Math.PI / 2;
+  }
+  return out;
+}
+
+function oscillationAdaptiveThreshold(envelopeMhz) {
+  const clean = [];
+  for (const value of envelopeMhz || []) {
+    if (Number.isFinite(value)) clean.push(value);
+  }
+  const medianValue = percentile(clean, 0.5);
+  const deviations = clean.map(value => Math.abs(value - medianValue));
+  const mad = percentile(deviations, 0.5);
+  const sigma = 1.4826 * (mad || 0);
+  return {
+    medianMilliHz: medianValue,
+    madMilliHz: mad,
+    enterThresholdMilliHz: (Number.isFinite(medianValue) ? medianValue : 0) + 4 * sigma,
+    exitThresholdMilliHz: (Number.isFinite(medianValue) ? medianValue : 0) + 2 * sigma
+  };
+}
+
+function detectOscillationRegions(envelopeMhz, validMask, params) {
+  const regions = [];
+  let current = null;
+  const close = endIndex => {
+    if (!current) return;
+    current.endIndex = Math.max(current.startIndex, endIndex);
+    regions.push(current);
+    current = null;
+  };
+  for (let i = 0; i < envelopeMhz.length; i += 1) {
+    const valid = Boolean(validMask[i]) && Number.isFinite(envelopeMhz[i]);
+    if (!valid) {
+      close(i - 1);
+      continue;
+    }
+    const value = envelopeMhz[i];
+    if (!current) {
+      if (value > params.enterThresholdMilliHz) {
+        current = { startIndex: i, endIndex: i, peakEnvelopeMilliHz: value };
+      }
+    } else if (value >= params.exitThresholdMilliHz) {
+      current.endIndex = i;
+      current.peakEnvelopeMilliHz = Math.max(current.peakEnvelopeMilliHz, value);
+    } else {
+      close(i - 1);
+    }
+  }
+  close(envelopeMhz.length - 1);
+  return { regions };
+}
+
+function mergeOscillationRegions(regions, validMask, params) {
+  if (!regions.length) return [];
+  const out = [];
+  let current = { ...regions[0] };
+  for (let index = 1; index < regions.length; index += 1) {
+    const next = regions[index];
+    const gapSamples = next.startIndex - current.endIndex - 1;
+    const gapSeconds = gapSamples / params.sampleRateHz;
+    if (gapSeconds <= params.mergeGapSeconds && gapHasOnlyFiniteQuality(validMask, current.endIndex + 1, next.startIndex)) {
+      current.endIndex = next.endIndex;
+      current.peakEnvelopeMilliHz = Math.max(current.peakEnvelopeMilliHz, next.peakEnvelopeMilliHz);
+    } else {
+      out.push(current);
+      current = { ...next };
+    }
+  }
+  out.push(current);
+  return out;
+}
+
+function gapHasOnlyFiniteQuality(validMask, start, endExclusive) {
+  for (let i = Math.max(0, start); i < Math.min(validMask.length, endExclusive); i += 1) {
+    if (!validMask[i]) return false;
+  }
+  return true;
+}
+
+function buildOscillationCandidate(region, deviation, filtered, envelopeMhz, validMask, params) {
+  const start = region.startIndex;
+  const end = region.endIndex;
+  const sampleIntervalSeconds = params.sampleIntervalSeconds;
+  const segment = filtered.slice(start, end + 1);
+  const envelopeSegment = envelopeMhz.slice(start, end + 1);
+  const dominant = dominantFrequencyScan(segment, {
+    sampleRateHz: params.sampleRateHz,
+    minHz: params.minFrequencyHz,
+    maxHz: params.maxFrequencyHz,
+    stepHz: Math.max(0.001, 1 / Math.max(16, segment.length * 2))
+  });
+  const durationSeconds = (end - start + 1) * sampleIntervalSeconds;
+  const finiteFiltered = finiteArray(segment);
+  const finiteEnvelope = finiteArray(envelopeSegment);
+  const peakAmplitudeMhz = maxArrayFinite(finiteEnvelope);
+  const peakRmsMhz = rmsFinite(finiteFiltered) * 1000;
+  const snrLinear = dominant.snr;
+  const snrDb = ratioToDb(snrLinear);
+  const noiseFloor = dominant.noiseFloor;
+  const peakProminence = Math.max(0, dominant.power - noiseFloor);
+  const peakProminenceRatio = peakProminence / Math.max(Math.abs(dominant.power), EPSILON);
+  const supportDurationSeconds = oscillationRawSupportSeconds(deviation, start, end, params.exitThresholdMilliHz, params.sampleIntervalSeconds);
+  const cycleCount = Math.min(durationSeconds, supportDurationSeconds || durationSeconds) * dominant.frequencyHz;
+  const ridge = oscillationRidge(filtered, start, end, params);
+  const envelopeFit = fitLogEnvelope(envelopeMhz, start, end, params);
+  const dataQuality = oscillationCandidateQuality(validMask, start, end);
+  const harmonics = oscillationHarmonics(filtered, start, end, dominant.frequencyHz, params);
+  const candidateType = classifyOscillationCandidate({
+    durationSeconds,
+    supportDurationSeconds,
+    cycleCount,
+    snrDb,
+    ridge,
+    envelopeFit,
+    harmonics,
+    eventCoverageRatio: durationSeconds / Math.max(sampleIntervalSeconds, filtered.length * sampleIntervalSeconds),
+    peakAmplitudeMhz,
+    thresholdMilliHz: params.enterThresholdMilliHz
+  });
+  const confidenceComponents = oscillationConfidenceComponents({
+    dataQuality,
+    snrDb,
+    durationSeconds,
+    bandEnergyRatio: Math.min(1, Math.max(0, peakProminenceRatio)),
+    peakProminenceRatio,
+    simultaneousSources: Boolean(params.simultaneousSources),
+    coherence: Number(params.coherence || 0),
+    hasGaps: dataQuality.missingCount > 0,
+    candidateType
+  });
+  const confidenceScore = Math.max(0, Math.min(100, Math.round(Object.values(confidenceComponents).reduce((sum, value) => sum + value, 0))));
+  const damping = estimateOscillationDamping({
+    candidateType,
+    envelopeFit,
+    ridge,
+    dominantHz: dominant.frequencyHz,
+    durationSeconds,
+    cycleCount,
+    snrDb,
+    dataQuality,
+    params
+  });
+  return {
+    start: start * sampleIntervalSeconds,
+    end: end * sampleIntervalSeconds,
+    startSecond: start * sampleIntervalSeconds,
+    endSecond: end * sampleIntervalSeconds,
+    durationSeconds,
+    peakAmplitudeMhz,
+    peakRmsMhz,
+    rmsAmplitudeMhz: peakRmsMhz,
+    dominantHz: dominant.frequencyHz,
+    dominantFrequencyHz: dominant.frequencyHz,
+    periodSeconds: dominant.frequencyHz > 0 ? 1 / dominant.frequencyHz : Infinity,
+    windows: Math.max(1, ridge.windowCount),
+    snr: snrLinear,
+    snrLinear,
+    snrDb,
+    noiseFloor,
+    peakProminence,
+    peakProminenceRatio,
+    bandEnergyRatio: Math.min(1, Math.max(0, peakProminenceRatio)),
+    cycleCount,
+    minimumCycles: params.minimumCycles,
+    minimumCyclesSatisfied: cycleCount + EPSILON >= params.minimumCycles,
+    candidateType,
+    classification: candidateType,
+    confidenceScore,
+    confidence: confidenceScore,
+    confidenceComponents,
+    confidenceFactors: confidenceComponents,
+    dataQuality,
+    ridge,
+    harmonics,
+    damping,
+    filter: {
+      requestedFilterOrder: params.requestedFilterOrder,
+      effectiveFilterOrder: params.effectiveFilterOrder,
+      filterTapCount: params.filterTapCount,
+      filterPhaseMode: params.filterPhaseMode,
+      groupDelaySeconds: params.groupDelaySeconds,
+      edgeDiscardSeconds: params.edgeDiscardSeconds
+    },
+    windowsMetadata: {
+      requestedWindowSeconds: params.requestedWindowSeconds,
+      effectiveWindowSeconds: params.effectiveWindowSeconds,
+      spectralWindowSeconds: params.spectralWindowSeconds,
+      spectralStepSeconds: params.spectralStepSeconds
+    }
+  };
+}
+
+function oscillationRawSupportSeconds(deviation, start, end, exitThresholdMilliHz, sampleIntervalSeconds) {
+  let count = 0;
+  const thresholdHz = Math.max(0, Number(exitThresholdMilliHz) || 0) / 1000;
+  for (let i = start; i <= end; i += 1) {
+    const value = deviation[i];
+    if (Number.isFinite(value) && Math.abs(value) > thresholdHz) count += 1;
+  }
+  return count * sampleIntervalSeconds;
+}
+
+function oscillationCandidateQuality(validMask, start, end) {
+  let validCount = 0;
+  let missingCount = 0;
+  for (let i = start; i <= end; i += 1) {
+    if (validMask[i]) validCount += 1;
+    else missingCount += 1;
+  }
+  const total = Math.max(0, end - start + 1);
+  return {
+    totalSamples: total,
+    validCount,
+    missingCount,
+    imputedCount: 0,
+    validRatio: total ? validCount / total : 0,
+    gapHandlingMethod: "reject"
+  };
+}
+
+function oscillationRidge(filtered, start, end, params) {
+  const points = [];
+  const frequencies = [];
+  const step = Math.max(1, params.effectiveSpectralStepSamples);
+  const length = Math.max(8, Math.min(params.effectiveSpectralWindowSamples, end - start + 1));
+  for (let cursor = start; cursor + length - 1 <= end; cursor += step) {
+    const segment = filtered.slice(cursor, cursor + length);
+    const dominant = dominantFrequencyScan(segment, {
+      sampleRateHz: params.sampleRateHz,
+      minHz: params.minFrequencyHz,
+      maxHz: params.maxFrequencyHz,
+      stepHz: Math.max(0.001, 1 / Math.max(16, length * 2))
+    });
+    const snrDb = ratioToDb(dominant.snr);
+    if (Number.isFinite(dominant.frequencyHz)) frequencies.push(dominant.frequencyHz);
+    points.push({
+      timeSecond: (cursor + length / 2) * params.sampleIntervalSeconds,
+      frequencyHz: dominant.frequencyHz,
+      snrDb,
+      significant: snrDb >= params.minimumSnrDb
+    });
+  }
+  if (!points.length) {
+    const dominant = dominantFrequencyScan(filtered.slice(start, end + 1), {
+      sampleRateHz: params.sampleRateHz,
+      minHz: params.minFrequencyHz,
+      maxHz: params.maxFrequencyHz
+    });
+    frequencies.push(dominant.frequencyHz);
+    points.push({ timeSecond: (start + end) * params.sampleIntervalSeconds / 2, frequencyHz: dominant.frequencyHz, snrDb: ratioToDb(dominant.snr), significant: true });
+  }
+  const minFrequencyHz = minArrayFinite(frequencies);
+  const maxFrequencyHz = maxArrayFinite(frequencies);
+  const continuityRatio = points.length ? points.filter(point => point.significant).length / points.length : 0;
+  return {
+    points,
+    windowCount: points.length,
+    continuityRatio,
+    minFrequencyHz,
+    maxFrequencyHz,
+    medianFrequencyHz: percentile(frequencies, 0.5),
+    frequencyDriftHz: Number.isFinite(maxFrequencyHz) && Number.isFinite(minFrequencyHz) ? maxFrequencyHz - minFrequencyHz : 0,
+    stable: !(Number.isFinite(maxFrequencyHz) && Number.isFinite(minFrequencyHz)) || maxFrequencyHz - minFrequencyHz <= Math.max(0.015, (params.maxFrequencyHz - params.minFrequencyHz) * 0.25)
+  };
+}
+
+function oscillationHarmonics(filtered, start, end, dominantHz, params) {
+  const out = [];
+  if (!Number.isFinite(dominantHz) || dominantHz <= 0) return out;
+  for (let factor = 2; factor <= 3; factor += 1) {
+    const target = dominantHz * factor;
+    if (target >= params.maxFrequencyHz || target >= params.nyquistHz) continue;
+    const scan = dominantFrequencyScan(filtered.slice(start, end + 1), {
+      sampleRateHz: params.sampleRateHz,
+      minHz: Math.max(params.minFrequencyHz, target - 0.01),
+      maxHz: Math.min(params.maxFrequencyHz, target + 0.01),
+      stepHz: 0.001
+    });
+    out.push({ harmonic: factor, targetFrequencyHz: target, detectedFrequencyHz: scan.frequencyHz, snrDb: ratioToDb(scan.snr) });
+  }
+  return out;
+}
+
+function classifyOscillationCandidate({ durationSeconds, cycleCount, snrDb, ridge, envelopeFit, harmonics, eventCoverageRatio, peakAmplitudeMhz, thresholdMilliHz }) {
+  if (ridge.frequencyDriftHz > Math.max(0.02, Math.abs(ridge.medianFrequencyHz || 0) * 0.2)) return "frequency_drifting";
+  if (cycleCount < 3 || snrDb < 0) return "indeterminate";
+  if (envelopeFit.fitR2 >= 0.35 && envelopeFit.slopePerSecond < -0.0012) return "ringdown";
+  if (envelopeFit.fitR2 >= 0.25 && envelopeFit.slopePerSecond > 0.0012) return "growing";
+  if (durationSeconds < 120 || eventCoverageRatio < 0.25 || peakAmplitudeMhz > thresholdMilliHz * 3.5 && durationSeconds < 240) return "burst";
+  if (ridge.stable && ridge.continuityRatio >= 0.55 && snrDb >= 3) return "sustained_forced";
+  if ((harmonics || []).some(item => item.snrDb >= snrDb - 3)) return "indeterminate";
+  return "indeterminate";
+}
+
+function oscillationConfidenceComponents({
+  dataQuality,
+  snrDb,
+  durationSeconds,
+  bandEnergyRatio,
+  peakProminenceRatio,
+  simultaneousSources,
+  coherence,
+  hasGaps,
+  candidateType
+}) {
+  const coverageContribution = 24 * clamp01(dataQuality.validRatio);
+  const snrContribution = 20 * clamp01((snrDb + 3) / 18);
+  const durationContribution = 16 * clamp01(durationSeconds / 300);
+  const bandEnergyContribution = 14 * clamp01(bandEnergyRatio);
+  const prominenceContribution = 12 * clamp01(peakProminenceRatio * 4);
+  const simultaneousSourceContribution = simultaneousSources ? 8 : 0;
+  const coherenceContribution = 6 * clamp01(coherence);
+  const gapPenalty = hasGaps ? -15 : 0;
+  const typePenalty = candidateType === "indeterminate" ? -8 : 0;
+  return {
+    coverageContribution,
+    snrContribution,
+    durationContribution,
+    bandEnergyContribution,
+    prominenceContribution,
+    simultaneousSourceContribution,
+    coherenceContribution,
+    gapPenalty,
+    typePenalty
+  };
+}
+
+function estimateOscillationDamping({ candidateType, envelopeFit, ridge, dominantHz, durationSeconds, cycleCount, snrDb, dataQuality, params }) {
+  const base = {
+    dampedFrequencyHz: dominantHz,
+    dampingConstantPerSecond: NaN,
+    dampingRatio: NaN,
+    dampingRatioPercent: NaN,
+    timeConstantSeconds: NaN,
+    halfLifeSeconds: NaN,
+    fitR2: envelopeFit.fitR2,
+    fitNrmse: envelopeFit.fitNrmse,
+    fittedCycleCount: cycleCount,
+    dampingMethod: params.dampingMethod,
+    dampingStatus: "unavailable",
+    dampingUnavailableReason: ""
+  };
+  if (!params.dampingEnabled) return { ...base, dampingUnavailableReason: "damping-disabled" };
+  if (candidateType === "sustained_forced") return { ...base, dampingUnavailableReason: "continuous-forced-candidate" };
+  if (candidateType !== "ringdown" && candidateType !== "growing") return { ...base, dampingUnavailableReason: "candidate-type-not-modal" };
+  if (cycleCount < 3) return { ...base, dampingUnavailableReason: "minimum-three-cycles-not-met" };
+  if (snrDb < params.minimumSnrDb) return { ...base, dampingUnavailableReason: "insufficient-snr" };
+  if (dataQuality.validRatio < params.minimumValidRatio) return { ...base, dampingUnavailableReason: "high-missing-data" };
+  if (!ridge.stable) return { ...base, dampingUnavailableReason: "frequency-unstable" };
+  if (!Number.isFinite(envelopeFit.slopePerSecond) || envelopeFit.fitR2 < 0.2) {
+    return { ...base, dampingUnavailableReason: "insufficient-fit-quality" };
+  }
+  const sigma = envelopeFit.slopePerSecond;
+  const omega = 2 * Math.PI * Math.max(EPSILON, dominantHz);
+  const dampingRatio = -sigma / Math.sqrt(omega * omega + sigma * sigma);
+  return {
+    ...base,
+    dampingConstantPerSecond: sigma,
+    dampingRatio,
+    dampingRatioPercent: dampingRatio * 100,
+    timeConstantSeconds: Math.abs(sigma) > EPSILON ? 1 / Math.abs(sigma) : Infinity,
+    halfLifeSeconds: Math.abs(sigma) > EPSILON ? Math.log(2) / Math.abs(sigma) : Infinity,
+    fitR2: envelopeFit.fitR2,
+    fitNrmse: envelopeFit.fitNrmse,
+    fittedCycleCount: cycleCount,
+    dampingStatus: "available",
+    dampingUnavailableReason: ""
+  };
+}
+
+function fitLogEnvelope(envelopeMhz, start, end, params) {
+  let n = 0;
+  let sumX = 0;
+  let sumY = 0;
+  let sumXX = 0;
+  let sumXY = 0;
+  const points = [];
+  for (let i = start; i <= end; i += 1) {
+    const value = envelopeMhz[i];
+    if (!Number.isFinite(value) || value <= EPSILON) continue;
+    const x = (i - start) * params.sampleIntervalSeconds;
+    const y = Math.log(value);
+    points.push({ x, y });
+    n += 1;
+    sumX += x;
+    sumY += y;
+    sumXX += x * x;
+    sumXY += x * y;
+  }
+  const denom = n * sumXX - sumX * sumX;
+  if (n < 3 || Math.abs(denom) < EPSILON) {
+    return { slopePerSecond: NaN, intercept: NaN, fitR2: 0, fitNrmse: NaN, pointCount: n };
+  }
+  const slope = (n * sumXY - sumX * sumY) / denom;
+  const intercept = (sumY - slope * sumX) / n;
+  const meanY = sumY / n;
+  let ssTot = 0;
+  let ssRes = 0;
+  let rmse = 0;
+  for (const point of points) {
+    const predicted = intercept + slope * point.x;
+    const residual = point.y - predicted;
+    ssRes += residual * residual;
+    ssTot += (point.y - meanY) * (point.y - meanY);
+    rmse += residual * residual;
+  }
+  const fitR2 = ssTot > EPSILON ? Math.max(0, 1 - ssRes / ssTot) : 0;
+  const fitNrmse = Math.sqrt(rmse / n) / Math.max(EPSILON, Math.abs(meanY));
+  return { slopePerSecond: slope, intercept, fitR2, fitNrmse, pointCount: n };
+}
+
+function finiteArray(values) {
+  const out = [];
+  for (const value of values || []) {
+    if (Number.isFinite(value)) out.push(value);
+  }
+  return out;
+}
+
+function countFinite(values) {
+  let count = 0;
+  for (const value of values || []) {
+    if (Number.isFinite(value)) count += 1;
+  }
+  return count;
+}
+
+function rmsFinite(values) {
+  let sum = 0;
+  let count = 0;
+  for (const value of values || []) {
+    if (!Number.isFinite(value)) continue;
+    sum += value * value;
+    count += 1;
+  }
+  return count ? Math.sqrt(sum / count) : NaN;
 }
 
 function computeWelchCrossSpectra(a, b, options = {}) {
@@ -2425,6 +3210,7 @@ function emptyStats() {
 }
 
 export const FrequencyAnalysisCore = {
+  DEFAULT_OSCILLATION_PARAMETERS,
   DEFAULT_ROCOF_PARAMETERS,
   DEFAULT_SPECTROGRAM_PARAMETERS,
   DEFAULT_WELCH_PARAMETERS,
@@ -2433,6 +3219,7 @@ export const FrequencyAnalysisCore = {
   computeCrossCorrelation,
   computeCrossPowerSpectralDensity,
   computeMagnitudeSquaredCoherence,
+  computeOscillationCandidates,
   computeOscillationConfidence,
   computeRocof,
   computeStftSpectrogram,
@@ -2444,6 +3231,7 @@ export const FrequencyAnalysisCore = {
   estimatePhaseDifference,
   hzPerSecondToMhzPerSecond,
   mHzPerSecondToHzPerSecond,
+  normalizeOscillationParameters,
   normalizeSpectralOptions,
   prepareSegment,
   normalizeRocofParameters
