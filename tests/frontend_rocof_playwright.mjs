@@ -316,13 +316,12 @@ try {
   await page.waitForFunction(() => !document.querySelector("#qualityZoomResetBtn").hidden);
   await page.locator("#qualityZoomResetBtn").click();
 
-  const helpText = await page.evaluate(() => {
-    const target = [...document.querySelectorAll("#analysisEventsHead .metric-name")]
-      .find(item => /RoCoF|mHz/.test(item.getAttribute("data-tooltip") || item.textContent || ""));
-    target.dispatchEvent(new PointerEvent("pointerenter", { bubbles: true }));
-    return document.querySelector("#appTooltip")?.textContent || "";
-  });
-  assert(/RoCoF|mHz/.test(helpText));
+  await page.click("#analysisInfoToggle");
+  await page.waitForSelector("#analysisInfoPanel:not(.hidden)");
+  const helpText = await page.locator("#analysisInfoPanel").textContent();
+  assert(/RoCoF|mHz\/s|R\+|R−/.test(helpText || ""));
+  await page.keyboard.press("Escape");
+  await page.waitForFunction(() => document.querySelector("#analysisInfoPanel")?.classList.contains("hidden"));
 
   for (const width of [360, 390, 768]) {
     await page.setViewportSize({ width, height: 820 });

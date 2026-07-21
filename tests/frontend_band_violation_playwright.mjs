@@ -247,12 +247,12 @@ try {
   await page.waitForFunction(() => !document.querySelector("#qualityZoomResetBtn").hidden);
   await page.locator("#qualityZoomResetBtn").click();
 
-  const tooltipText = await page.evaluate(() => {
-    const icon = document.querySelector("#analysisEventsHead .metric-info-icon");
-    icon.dispatchEvent(new PointerEvent("pointerenter", { bubbles: true }));
-    return document.querySelector("#appTooltip").textContent;
-  });
-  assert(tooltipText.includes("Kaynak") || tooltipText.includes("ölçüm"));
+  await page.locator("#analysisInfoToggle").click();
+  await page.waitForSelector("#analysisInfoPanel:not(.hidden)");
+  const helpText = await page.locator("#analysisInfoPanel").textContent();
+  assert(/Bant İhlali|eşik|ihlal|Band Violation|threshold/i.test(helpText || ""));
+  await page.keyboard.press("Escape");
+  await page.waitForFunction(() => document.querySelector("#analysisInfoPanel")?.classList.contains("hidden"));
 
   for (const width of [360, 390, 768]) {
     await page.setViewportSize({ width, height: 820 });

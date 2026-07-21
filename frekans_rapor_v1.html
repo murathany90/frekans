@@ -1231,43 +1231,284 @@
       font-size: .74rem;
     }
     .analysis-info-toggle {
-      width: 42px;
-      min-width: 42px;
+      width: 44px;
+      min-width: 44px;
+      min-height: 44px;
       padding: 0;
       border-radius: 10px;
       font-weight: 950;
       font-family: Georgia, "Times New Roman", serif;
       font-style: italic;
     }
-    .analysis-info-panel {
-      position: absolute;
-      right: 0;
-      top: calc(100% + 8px);
-      z-index: 75;
-      width: min(470px, 72vw);
-      max-width: calc(100vw - 32px);
-      display: grid;
-      gap: 8px;
-      padding: 10px;
-      border: 1px solid var(--line);
-      border-left: 4px solid var(--cyan);
-      border-radius: 8px;
-      background: #fff;
-      box-shadow: 0 16px 36px rgba(13, 47, 79, .18);
+    .analysis-info-panel,
+    .analysis-help-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 140;
+      display: flex;
+      justify-content: flex-end;
+      align-items: stretch;
+      padding: 18px;
+      background: rgba(8, 25, 43, .38);
       color: var(--navy);
     }
-    .analysis-info-panel.hidden { display: none; }
+    .analysis-info-panel.hidden,
+    .analysis-help-modal.hidden { display: none; }
+    .analysis-help-dialog {
+      width: min(780px, calc(100vw - 36px));
+      max-height: calc(100vh - 36px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 24px 70px rgba(8, 25, 43, .26);
+    }
+    .analysis-help-header {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px 14px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+    }
+    .analysis-help-eyebrow {
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: .76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .analysis-help-header h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      line-height: 1.2;
+    }
+    .analysis-help-header p {
+      margin: 6px 0 0;
+      max-width: 62ch;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .analysis-help-close {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0 12px;
+      font-size: 1.35rem;
+      line-height: 1;
+    }
+    .analysis-help-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+    .analysis-help-lang {
+      min-height: 44px;
+      padding: 0 12px;
+      white-space: nowrap;
+    }
+    .analysis-action-field .analysis-help-close,
+    .analysis-action-field .analysis-help-lang {
+      min-height: 44px;
+    }
+    .analysis-help-scroll {
+      overflow: auto;
+      overscroll-behavior: contain;
+      padding: 14px 18px 18px;
+    }
+    .analysis-help-meta-grid,
+    .analysis-help-dynamic-grid,
+    .analysis-help-card-grid,
+    .analysis-help-result-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 10px;
+    }
+    .analysis-help-meta-grid {
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
     .analysis-info-item {
       display: grid;
       gap: 3px;
       font-size: .82rem;
       line-height: 1.35;
+      min-width: 0;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--bg);
     }
     .analysis-info-item strong {
       font-size: .72rem;
       text-transform: uppercase;
       letter-spacing: .04em;
       color: var(--muted);
+    }
+    .analysis-info-item span,
+    .analysis-help-card,
+    .analysis-help-section-panel,
+    .analysis-help-glossary-list {
+      overflow-wrap: anywhere;
+      word-break: normal;
+    }
+    .analysis-help-dynamic {
+      margin-bottom: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: linear-gradient(180deg, #fbfdff, #f3f9fd);
+    }
+    .analysis-help-dynamic h4,
+    .analysis-help-according h4 {
+      margin: 0 0 8px;
+      font-size: .92rem;
+    }
+    .analysis-help-dynamic-item,
+    .analysis-help-card {
+      min-width: 0;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .analysis-help-card .label,
+    .analysis-help-card dt,
+    .analysis-help-dynamic-item .label {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: .76rem;
+      font-weight: 800;
+    }
+    .analysis-help-card .value,
+    .analysis-help-card dd,
+    .analysis-help-dynamic-item .value {
+      margin: 0;
+      font-weight: 700;
+    }
+    .analysis-help-sections {
+      display: grid;
+      gap: 10px;
+    }
+    .analysis-help-section {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+    .analysis-help-section-toggle {
+      width: 100%;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      border: 0;
+      background: #f8fbfd;
+      color: var(--navy);
+      cursor: pointer;
+      font: inherit;
+      font-weight: 850;
+      text-align: left;
+    }
+    .analysis-help-section-toggle::after {
+      content: "▾";
+      flex: 0 0 auto;
+      transition: transform .15s ease;
+    }
+    .analysis-help-section-toggle[aria-expanded="false"]::after {
+      transform: rotate(-90deg);
+    }
+    .analysis-help-section-panel {
+      padding: 12px 14px 14px;
+      line-height: 1.5;
+    }
+    .analysis-help-section-panel[hidden] { display: none; }
+    .analysis-help-section-panel p { margin: 0 0 8px; }
+    .analysis-help-section-panel ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+    .analysis-help-section-panel li { margin: 4px 0; }
+    .analysis-help-card dl {
+      display: grid;
+      gap: 7px;
+      margin: 8px 0 0;
+    }
+    .analysis-help-card code {
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .analysis-help-according {
+      margin: 0 0 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--cyan);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .analysis-help-glossary-controls {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .analysis-help-glossary-controls input {
+      width: 100%;
+      min-height: 38px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    .analysis-help-alpha {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .analysis-help-alpha button {
+      min-width: 36px;
+      min-height: 36px;
+      padding: 5px 9px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--navy);
+      cursor: pointer;
+      font-weight: 750;
+    }
+    .analysis-help-alpha button.is-active {
+      border-color: var(--blue);
+      background: var(--blue);
+      color: #fff;
+    }
+    .analysis-help-glossary-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+    }
+    .analysis-help-glossary-list div {
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--bg);
+    }
+    .analysis-help-glossary-list dt {
+      margin-bottom: 4px;
+      font-weight: 850;
+    }
+    .analysis-help-glossary-list dd {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
     }
     .analysis-controls.compact { grid-template-columns: repeat(3, minmax(140px, 1fr)); }
     .spectral-quick-controls {
@@ -1832,6 +2073,33 @@
       .oscillation-controls { grid-template-columns: 1fr 1fr; }
       .analysis-controls,
       .analysis-controls.compact { grid-template-columns: 1fr; }
+      .analysis-help-modal,
+      .analysis-info-panel {
+        align-items: flex-end;
+        justify-content: center;
+        padding: max(10px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) 0 max(8px, env(safe-area-inset-left));
+      }
+      .analysis-help-dialog {
+        width: 100%;
+        max-width: 100%;
+        max-height: min(92dvh, 760px);
+        border-radius: 14px 14px 0 0;
+      }
+      .analysis-help-header {
+        padding: 12px 12px 10px;
+      }
+      .analysis-help-header h3 {
+        font-size: 1rem;
+      }
+      .analysis-help-scroll {
+        padding: 12px;
+      }
+      .analysis-help-meta-grid,
+      .analysis-help-dynamic-grid,
+      .analysis-help-card-grid,
+      .analysis-help-result-grid {
+        grid-template-columns: 1fr;
+      }
       .spectral-quick-controls,
       .spectral-detail-grid,
       .spectral-row-detail dl { grid-template-columns: 1fr; }
@@ -2563,18 +2831,38 @@
               <button class="btn btn-secondary" id="analysisCancelBtn" type="button" data-i18n="analysisCancelBtn">İptal</button>
               <button class="btn btn-secondary analysis-info-toggle" id="analysisInfoToggle" type="button" aria-label="Analiz bilgi notları" aria-expanded="false" aria-controls="analysisInfoPanel" title="Analiz bilgi notları">i</button>
             </div>
-            <div id="analysisInfoPanel" class="analysis-info-panel hidden" role="region" aria-live="polite">
-              <div class="analysis-info-item">
-                <strong data-i18n="analysisInfoCompatibilityTitle">Uyumluluk</strong>
-                <span id="analysisInfoCompatibility"></span>
-              </div>
-              <div class="analysis-info-item">
-                <strong data-i18n="analysisInfoStatusTitle">Durum</strong>
-                <span id="analysisInfoStatus"></span>
-              </div>
-              <div class="analysis-info-item">
-                <strong data-i18n="analysisInfoSamplingTitle">Örnekleme</strong>
-                <span id="analysisInfoSampling"></span>
+            <div id="analysisInfoPanel" class="analysis-help-modal analysis-info-panel hidden" role="dialog" aria-modal="true" aria-labelledby="analysisHelpTitle" aria-describedby="analysisHelpSummary" aria-hidden="true">
+              <div class="analysis-help-dialog" role="document" tabindex="-1">
+                <header class="analysis-help-header">
+                  <div class="analysis-help-heading">
+                    <div id="analysisHelpEyebrow" class="analysis-help-eyebrow" data-i18n="analysisHelpEyebrow">Analiz yardım merkezi</div>
+                    <h3 id="analysisHelpTitle">Analiz bilgi notları</h3>
+                    <p id="analysisHelpSummary">Seçili analiz için yöntem, parametre ve sonuç yorumlama rehberi.</p>
+                  </div>
+                  <div class="analysis-help-actions">
+                    <button class="btn btn-light analysis-help-lang" id="analysisHelpLangToggle" type="button" aria-label="Dil seçimi">TR | EN</button>
+                    <button class="btn btn-secondary analysis-help-close" id="analysisHelpCloseBtn" type="button" aria-label="Kapat" title="Kapat">×</button>
+                  </div>
+                </header>
+                <div class="analysis-help-scroll">
+                  <div class="analysis-help-meta-grid" aria-label="Analiz durumu">
+                    <div class="analysis-info-item">
+                      <strong data-i18n="analysisInfoCompatibilityTitle">Uyumluluk</strong>
+                      <span id="analysisInfoCompatibility"></span>
+                    </div>
+                    <div class="analysis-info-item">
+                      <strong data-i18n="analysisInfoStatusTitle">Durum</strong>
+                      <span id="analysisInfoStatus"></span>
+                    </div>
+                    <div class="analysis-info-item">
+                      <strong data-i18n="analysisInfoSamplingTitle">Örnekleme</strong>
+                      <span id="analysisInfoSampling"></span>
+                    </div>
+                  </div>
+                  <section id="analysisHelpDynamic" class="analysis-help-dynamic"></section>
+                  <section id="analysisHelpAccordingToResult" class="analysis-help-according" hidden></section>
+                  <div id="analysisHelpBody" class="analysis-help-body"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -2624,11 +2912,11 @@
             <div class="field" data-param-key="threshold"><label for="oscThreshold" data-i18n="oscThresholdLabel">Eşik (mHz)</label><input id="oscThreshold" type="number" min="0.1" max="200" step="0.5" value="10" /></div>
             <div class="field" data-param-key="window" data-spectral-primary="true"><label id="windowSecControlLabel" for="windowSec" data-i18n="windowSecLabel">Pencere (sn)</label><input id="windowSec" type="number" min="8" max="3600" step="1" value="256" /></div>
             <div class="field" data-param-key="window"><label id="stepSecControlLabel" for="stepSec" data-i18n="stepSecLabel">Adım (sn)</label><input id="stepSec" type="number" min="1" max="3600" step="1" value="128" /></div>
-            <div class="field" data-param-key="spectralWindow"><label for="spectralWindowType" data-i18n="spectralWindowTypeLabel">Pencere fonksiyonu</label><select id="spectralWindowType"><option value="hann">Hann</option><option value="hamming">Hamming</option><option value="rectangular">Rectangular</option></select></div>
+            <div class="field" data-param-key="spectralWindow"><label for="spectralWindowType" data-i18n="spectralWindowTypeLabel">Pencere fonksiyonu</label><select id="spectralWindowType"><option value="hann">Hann</option><option value="hamming">Hamming</option><option value="rectangular" data-i18n="spectralWindowRectangular">Dikdörtgen</option></select></div>
             <div class="field" data-param-key="spectralDetrend"><label for="spectralDetrend" data-i18n="spectralDetrendLabel">Segment trend çıkarma</label><select id="spectralDetrend"><option value="constant" data-i18n="spectralDetrendConstant">Sabit ortalama</option><option value="linear" data-i18n="spectralDetrendLinear">Doğrusal</option><option value="none" data-i18n="spectralDetrendNone">Yok</option></select></div>
             <div class="field" data-param-key="spectralValid"><label for="spectralMinValidRatioPct" data-i18n="spectralMinValidRatioLabel">Minimum geçerli örnek oranı (%)</label><input id="spectralMinValidRatioPct" type="number" min="0" max="100" step="1" value="75" /></div>
             <div class="field" data-param-key="spectralScale"><label for="spectralScale" data-i18n="spectralScaleLabel">Güç ölçeği</label><select id="spectralScale"><option value="linear" data-i18n="spectralScaleLinear">Lineer</option><option value="log" data-i18n="spectralScaleLog">Log</option></select></div>
-            <div class="field" data-param-key="spectralAveraging"><label for="spectralAveraging" data-i18n="spectralAveragingLabel">Welch ortalaması</label><select id="spectralAveraging"><option value="mean" data-i18n="spectralAveragingMean">Mean</option><option value="median" data-i18n="spectralAveragingMedian">Median</option></select></div>
+            <div class="field" data-param-key="spectralAveraging"><label for="spectralAveraging" data-i18n="spectralAveragingLabel">Welch ortalaması</label><select id="spectralAveraging"><option value="mean" data-i18n="spectralAveragingMean">Aritmetik ortalama</option><option value="median" data-i18n="spectralAveragingMedian">Medyan ortalama</option></select></div>
             <div class="field" data-param-key="spectralPeaks"><label for="spectralMaxPeaks" data-i18n="spectralMaxPeaksLabel">Spektral tepe sayısı</label><input id="spectralMaxPeaks" type="number" min="1" max="20" step="1" value="5" /></div>
             <div class="field" data-param-key="spectralCells"><label for="spectralMaxCells" data-i18n="spectralMaxCellsLabel">Maksimum spektrogram hücresi</label><input id="spectralMaxCells" type="number" min="10000" max="5000000" step="10000" value="1500000" /></div>
             <div class="field" data-param-key="spectralDisplay" data-spectral-primary="true"><label for="spectralDisplaySummary" data-i18n="spectralDisplaySummaryLabel">Görüntü özeti</label><select id="spectralDisplaySummary"><option value="detailed" data-i18n="spectralDisplayDetailed">Ayrıntılı</option><option value="15m" data-i18n="spectralDisplay15m">15 dakika</option><option value="1h" data-i18n="spectralDisplay1h">1 saat</option></select></div>
@@ -3678,6 +3966,1044 @@
         limitationsKey: 'limitTrend'
       }
     };
+
+    const ANALYSIS_HELP_PARAMETER_DEFINITIONS = {
+      date: {
+        engineParameter: 'dateMode, dateRange, timeWindowSeconds',
+        unit: 'date/time',
+        controlIds: ['analysisDateMode', 'analysisStartDate', 'analysisEndDate', 'analysisStartHour', 'analysisEndHour'],
+        tr: {
+          label: 'Tarih modu ve zaman aralığı',
+          meaning: 'Analize hangi günlerin ve gün içi saat aralığının gireceğini belirler.',
+          increase: 'Aralık genişledikçe daha fazla örnek incelenir ve uzun dönem davranış daha iyi görünür.',
+          decrease: 'Aralık daraldıkça olay inceleme hızlanır ve belirli saatlere odaklanılır.',
+          risk: 'Çok kısa aralıklar bazı analizlerde yetersiz örnek üretir; çok uzun aralıklar hesap süresini artırır.',
+          recommended: 'Tek gün veya incelenen olayın etrafındaki kısa aralık.',
+          profile: 'Spektral profiller hesap yöntemini değiştirir; tarih aralığı kullanıcı seçimidir.'
+        },
+        en: {
+          label: 'Date mode and time range',
+          meaning: 'Controls which days and intraday time span enter the analysis.',
+          increase: 'A wider range includes more samples and makes longer behavior visible.',
+          decrease: 'A narrower range runs faster and focuses on a specific incident period.',
+          risk: 'Very short ranges can leave too few samples; very long ranges increase compute time.',
+          recommended: 'Single day or a short range around the event under review.',
+          profile: 'Spectral profiles change analysis settings; the date range remains user selected.'
+        }
+      },
+      alignment: {
+        engineParameter: 'alignment',
+        unit: 'time-zone rule',
+        controlIds: ['analysisAlignment'],
+        tr: {
+          label: 'Zaman eşleştirme',
+          meaning: 'Farklı kaynakların zaman damgalarını ortak karşılaştırma eksenine getirir.',
+          increase: 'Daha elle ayarlı eşleştirme özel veri setlerinde kontrol sağlar.',
+          decrease: 'Otomatik UTC eşleştirme genel karşılaştırmada daha az kullanıcı hatası üretir.',
+          risk: 'Yanlış eşleştirme korelasyon, koherens ve ortak seri sonuçlarını kaydırabilir.',
+          recommended: 'Otomatik UTC; kaynak zaman dilimleri doğrulanmışsa aynı yerel saat.',
+          profile: 'Analiz profilleri bu alanı değiştirmez.'
+        },
+        en: {
+          label: 'Time alignment',
+          meaning: 'Places source timestamps on a common comparison axis.',
+          increase: 'More manual alignment gives control for special data sets.',
+          decrease: 'Automatic UTC alignment reduces user error in general comparison.',
+          risk: 'Wrong alignment can shift correlation, coherence, and paired-series results.',
+          recommended: 'Automatic UTC; same local time only when source time zones are verified.',
+          profile: 'Analysis profiles do not change this field.'
+        }
+      },
+      resolution: {
+        engineParameter: 'resolution, sampleRateHz',
+        unit: 's',
+        controlIds: ['analysisResolution'],
+        tr: {
+          label: 'Çözünürlük',
+          meaning: 'Analize giren serinin örnek aralığını seçer; gelişmiş analizlerde saniyelik veri gerekir.',
+          increase: 'Daha seyrek çözünürlük uzun dönem özeti hızlandırır.',
+          decrease: 'Saniyelik çözünürlük hızlı değişimleri ve spektral içeriği korur.',
+          risk: 'Dakikalık veya saatlik veri RoCoF, Welch, Spektrogram ve olay analizinde fiziksel ayrıntıyı kaybettirir.',
+          recommended: 'RoCoF, olay, spektral ve osilasyon analizlerinde 1 saniye.',
+          profile: 'Spektral profiller 1 saniyelik kaynak veriyi korur.'
+        },
+        en: {
+          label: 'Resolution',
+          meaning: 'Selects the sample interval entering the analysis; advanced methods require one-second data.',
+          increase: 'Coarser resolution speeds up long-term summaries.',
+          decrease: 'One-second resolution preserves fast changes and spectral content.',
+          risk: 'Minute or hourly data loses physical detail for RoCoF, Welch, Spectrogram, and event analysis.',
+          recommended: 'One second for RoCoF, events, spectral, and oscillation analysis.',
+          profile: 'Spectral profiles keep the one-second source series.'
+        }
+      },
+      yd: {
+        engineParameter: 'repeatedValueSeconds',
+        unit: 's',
+        controlIds: ['repeatedValueSeconds'],
+        tr: {
+          label: 'Yinelenen değer eşiği',
+          meaning: 'Aynı frekans değerinin kaç saniye tekrarlanırsa kalite sorunu sayılacağını belirler.',
+          increase: 'Daha uzun eşik küçük düz platoları tolere eder.',
+          decrease: 'Daha kısa eşik olası donmuş veriyi daha erken işaretler.',
+          risk: 'Çok düşük eşik doğal yuvarlama tekrarlarını dışlayabilir; çok yüksek eşik donmuş veriyi kaçırabilir.',
+          recommended: '15 saniye.',
+          profile: 'Analiz profilleri bu kalite eşiğini değiştirmez.'
+        },
+        en: {
+          label: 'Repeated-value threshold',
+          meaning: 'Sets how many repeated seconds of the same frequency are treated as a quality issue.',
+          increase: 'A longer threshold tolerates short flat plateaus.',
+          decrease: 'A shorter threshold flags possible frozen data earlier.',
+          risk: 'Too low can reject natural rounded repeats; too high can miss frozen data.',
+          recommended: '15 seconds.',
+          profile: 'Analysis profiles do not change this quality threshold.'
+        }
+      },
+      statsBand: {
+        engineParameter: 'bandMinHz, bandMaxHz',
+        unit: 'Hz',
+        controlIds: ['statsBandMinHz', 'statsBandMaxHz'],
+        tr: {
+          label: 'İstatistik bant sınırları',
+          meaning: 'Temel istatistik ve bant ihlali için beklenen frekans aralığını tanımlar.',
+          increase: 'Bant genişlerse daha az ihlal görünür.',
+          decrease: 'Bant daralırsa küçük sapmalar da ihlal sayılabilir.',
+          risk: 'Yanlış bant, normal işletmeyi sorunlu veya gerçek sapmayı önemsiz gösterebilir.',
+          recommended: '49,90-50,10 Hz.',
+          profile: 'Analiz profilleri bu sınırları değiştirmez.'
+        },
+        en: {
+          label: 'Statistics band limits',
+          meaning: 'Defines the expected frequency range for basic statistics and band violations.',
+          increase: 'A wider band reports fewer violations.',
+          decrease: 'A narrower band can classify small deviations as violations.',
+          risk: 'Wrong limits can mark normal operation as problematic or hide real deviations.',
+          recommended: '49.90-50.10 Hz.',
+          profile: 'Analysis profiles do not change these limits.'
+        }
+      },
+      duration: {
+        engineParameter: 'minDurationSeconds, minEventSeconds',
+        unit: 's',
+        controlIds: ['minDuration'],
+        tr: {
+          label: 'Minimum olay süresi',
+          meaning: 'Olayın rapora girmesi için sürmesi gereken en kısa zamanı belirler.',
+          increase: 'Kısa ve gürültü benzeri olaylar elenir.',
+          decrease: 'Daha kısa geçişler de olay listesine alınır.',
+          risk: 'Çok yüksek değer kısa gerçek olayları gizleyebilir; çok düşük değer tabloyu kalabalıklaştırır.',
+          recommended: 'Bant ve RoCoF için 5-30 saniye; osilasyon için 30 saniye.',
+          profile: 'Analiz profilleri bu alanı otomatik değiştirmez.'
+        },
+        en: {
+          label: 'Minimum event duration',
+          meaning: 'Sets the shortest duration required before an event is reported.',
+          increase: 'Short noise-like events are filtered out.',
+          decrease: 'Shorter transitions enter the event list.',
+          risk: 'Too high can hide short real events; too low can clutter the table.',
+          recommended: '5-30 seconds for band/RoCoF, 30 seconds for oscillation.',
+          profile: 'Analysis profiles do not automatically change this field.'
+        }
+      },
+      band: {
+        engineParameter: 'minHz, maxHz',
+        unit: 'Hz',
+        controlIds: ['bandMin', 'bandMax'],
+        tr: {
+          label: 'Analiz frekans bandı',
+          meaning: 'Spektral, osilasyon ve koherens yorumunun odaklanacağı frekans aralığını seçer.',
+          increase: 'Üst sınır yükseldikçe daha hızlı salınımlar da görünür.',
+          decrease: 'Daha dar bant belirli salınımlara odaklanır.',
+          risk: 'Nyquist üstü yorumlanamaz; çok dar bant gerçek tepeyi dışarıda bırakabilir.',
+          recommended: '0,10-0,20 Hz veya bilinen olay bandı.',
+          profile: 'Spektral profiller bant değerini değiştirmez.'
+        },
+        en: {
+          label: 'Analysis frequency band',
+          meaning: 'Selects the frequency interval used for spectral, oscillation, and coherence interpretation.',
+          increase: 'A higher upper bound includes faster oscillations.',
+          decrease: 'A narrower band focuses on specific oscillations.',
+          risk: 'Values above Nyquist are not interpretable; too narrow a band can exclude the true peak.',
+          recommended: '0.10-0.20 Hz or the known event band.',
+          profile: 'Spectral profiles do not change the band.'
+        }
+      },
+      threshold: {
+        engineParameter: 'thresholdMhz',
+        unit: 'mHz',
+        controlIds: ['oscThreshold'],
+        tr: {
+          label: 'Osilasyon genlik eşiği',
+          meaning: 'Filtrelenmiş bileşenin aday sayılması için gereken genlik düzeyini belirler.',
+          increase: 'Yalnız daha güçlü adaylar kalır.',
+          decrease: 'Daha zayıf ve gürültüye yakın adaylar da listelenir.',
+          risk: 'Çok düşük eşik yanlış pozitifleri, çok yüksek eşik kaçırılan adayları artırabilir.',
+          recommended: '10 mHz.',
+          profile: 'Analiz profilleri bu eşiği değiştirmez.'
+        },
+        en: {
+          label: 'Oscillation amplitude threshold',
+          meaning: 'Sets the filtered-component amplitude required to become a candidate.',
+          increase: 'Only stronger candidates remain.',
+          decrease: 'Weaker and noise-adjacent candidates are also listed.',
+          risk: 'Too low increases false positives; too high can miss candidates.',
+          recommended: '10 mHz.',
+          profile: 'Analysis profiles do not change this threshold.'
+        }
+      },
+      window: {
+        engineParameter: 'windowSec, segmentSeconds, maxLagSeconds',
+        unit: 's',
+        controlIds: ['windowSec'],
+        tr: {
+          label: 'Pencere / segment süresi',
+          meaning: 'Osilasyon penceresi veya spektral segment süresi olarak kullanılır; çapraz korelasyonda motor gecikme sınırı 30 saniyedir.',
+          increase: 'Spektralde frekans ayrımı iyileşir; osilasyonda daha uzun süreklilik aranır.',
+          decrease: 'Zamansal değişimler daha hızlı görünür, ancak frekans ayrımı zayıflar.',
+          risk: 'Çok kısa pencere düşük frekansları ayıramaz; çok uzun pencere kısa olayları yayabilir.',
+          recommended: 'Spektral analizde Dengeli profil; osilasyonda 120 saniye.',
+          profile: 'Hızlı daha kısa, Dengeli güvenli orta, Ayrıntılı daha uzun segment/adım seçer.'
+        },
+        en: {
+          label: 'Window / segment duration',
+          meaning: 'Used as oscillation window or spectral segment duration; cross-correlation uses a 30-second engine lag limit.',
+          increase: 'Frequency separation improves for spectral analysis; oscillation detection requires longer persistence.',
+          decrease: 'Time changes appear sooner, but frequency separation weakens.',
+          risk: 'Too short cannot separate low frequencies; too long can smear short events.',
+          recommended: 'Balanced profile for spectral analysis; 120 seconds for oscillation.',
+          profile: 'Fast uses shorter, Balanced safe middle, Detailed longer segment/step settings.'
+        }
+      },
+      step: {
+        engineParameter: 'stepSeconds, stepSec',
+        unit: 's',
+        controlIds: ['stepSec'],
+        tr: {
+          label: 'Pencere adımı',
+          meaning: 'Komşu pencerelerin başlangıçları arasındaki süreyi belirler.',
+          increase: 'Hesap hızlanır ve daha az pencere üretilir.',
+          decrease: 'Zaman ayrıntısı artar, örtüşme ve hesap yükü yükselir.',
+          risk: 'Çok büyük adım kısa olayları atlayabilir; çok küçük adım bağımsız olmayan çok sayıda pencere üretir.',
+          recommended: 'Spektrogramda 64 saniye, Welch PSD’de 128 saniye.',
+          profile: 'Hızlı büyük adım, Dengeli orta adım, Ayrıntılı daha küçük adım kullanır.'
+        },
+        en: {
+          label: 'Window step',
+          meaning: 'Sets the time distance between neighboring window starts.',
+          increase: 'Computation is faster and produces fewer windows.',
+          decrease: 'Time detail increases, with more overlap and compute load.',
+          risk: 'Too large can skip short events; too small produces many non-independent windows.',
+          recommended: '64 seconds for Spectrogram, 128 seconds for Welch PSD.',
+          profile: 'Fast uses a larger step, Balanced a middle step, Detailed a smaller step.'
+        }
+      },
+      filter: {
+        engineParameter: 'filterTaps',
+        unit: 'taps',
+        controlIds: ['filterTaps'],
+        tr: {
+          label: 'Bant geçiren filtre uzunluğu',
+          meaning: 'Osilasyon adayını çıkarmak için kullanılan FIR filtrenin katsayı sayısını belirler.',
+          increase: 'Bant seçiciliği artabilir, ancak kenar etkisi ve gecikme uzar.',
+          decrease: 'Filtre daha hızlı tepki verir, fakat bant ayrımı zayıflayabilir.',
+          risk: 'Çok kısa filtre gürültüyü geçirir; çok uzun filtre kısa olayları bozabilir.',
+          recommended: '101 tap.',
+          profile: 'Analiz profilleri bu filtreyi değiştirmez.'
+        },
+        en: {
+          label: 'Band-pass filter length',
+          meaning: 'Sets the FIR filter tap count used to extract oscillation candidates.',
+          increase: 'Band selectivity can improve, but edge effect and delay increase.',
+          decrease: 'The filter reacts faster, but band separation can weaken.',
+          risk: 'Too short passes noise; too long can distort short events.',
+          recommended: '101 taps.',
+          profile: 'Analysis profiles do not change this filter.'
+        }
+      },
+      rocofMethod: {
+        engineParameter: 'method',
+        unit: null,
+        controlIds: ['rocofMethod'],
+        tr: {
+          label: 'RoCoF hesaplama yöntemi',
+          meaning: 'Merkezî fark, filtreli merkezî fark veya kayan regresyon yaklaşımını seçer.',
+          increase: 'Regresyon/filtreli yöntemler daha yumuşak sonuç verebilir.',
+          decrease: 'Merkezî fark ani değişimleri daha doğrudan gösterir.',
+          risk: 'Farklı yöntemler aynı veride farklı tepe büyüklüğü üretebilir; yöntem etiketiyle yorumlanmalıdır.',
+          recommended: 'Merkezî fark — çevrimdışı.',
+          profile: 'Analiz profilleri RoCoF yöntemini değiştirmez.'
+        },
+        en: {
+          label: 'RoCoF estimation method',
+          meaning: 'Selects centered difference, filtered centered difference, or sliding regression.',
+          increase: 'Regression/filtered methods can produce smoother estimates.',
+          decrease: 'Centered difference shows abrupt changes more directly.',
+          risk: 'Different methods can produce different peak magnitudes on the same data; interpret with the method label.',
+          recommended: 'Centered difference — offline.',
+          profile: 'Analysis profiles do not change the RoCoF method.'
+        }
+      },
+      rocofThreshold: {
+        engineParameter: 'thresholdHzPerSecond',
+        unit: 'mHz/s UI, Hz/s engine',
+        controlIds: ['rocofThreshold'],
+        tr: {
+          label: 'RoCoF olay eşiği',
+          meaning: 'Olay başlangıcı için pozitif ve negatif RoCoF sınırını belirler; UI mHz/s, motor Hz/s kullanır.',
+          increase: 'Daha az ve daha şiddetli olay raporlanır.',
+          decrease: 'Daha küçük değişimler olay sayılabilir.',
+          risk: 'Eşiğe tam eşit değerler olay değildir; çok düşük eşik tabloyu gürültüyle doldurabilir.',
+          recommended: '10 mHz/s.',
+          profile: 'Analiz profilleri bu eşiği değiştirmez.'
+        },
+        en: {
+          label: 'RoCoF event threshold',
+          meaning: 'Sets positive and negative RoCoF limits for event start; UI uses mHz/s and the engine uses Hz/s.',
+          increase: 'Fewer and more severe events are reported.',
+          decrease: 'Smaller changes can be classified as events.',
+          risk: 'Values exactly equal to the threshold are not events; too low can fill the table with noise.',
+          recommended: '10 mHz/s.',
+          profile: 'Analysis profiles do not change this threshold.'
+        }
+      },
+      rocofPrefilter: {
+        engineParameter: 'preFilterSeconds',
+        unit: 's',
+        controlIds: ['rocofPreFilterSeconds'],
+        tr: {
+          label: 'Hareketli ortalama pencere süresi',
+          meaning: 'Filtreli merkezî fark yönteminde türevden önce kullanılan ortalama penceresidir.',
+          increase: 'Gürültü azalır, ani değişimler yumuşar.',
+          decrease: 'Ani değişimler daha keskin kalır.',
+          risk: 'Çok uzun pencere kısa olayları bastırabilir; etkili örnek sayısı tek pencereye ayarlanır.',
+          recommended: '5 saniye.',
+          profile: 'Analiz profilleri bu pencereyi değiştirmez.'
+        },
+        en: {
+          label: 'Moving-average window duration',
+          meaning: 'The averaging window used before the derivative in filtered centered difference.',
+          increase: 'Noise decreases and abrupt changes are smoothed.',
+          decrease: 'Abrupt changes remain sharper.',
+          risk: 'Too long can suppress short events; effective samples are adjusted to an odd window.',
+          recommended: '5 seconds.',
+          profile: 'Analysis profiles do not change this window.'
+        }
+      },
+      rocofRegression: {
+        engineParameter: 'windowSeconds',
+        unit: 's',
+        controlIds: ['rocofRegressionWindowSeconds'],
+        tr: {
+          label: 'Kayan regresyon pencere süresi',
+          meaning: 'Kayan doğrusal regresyonda eğimin hesaplandığı penceredir.',
+          increase: 'Gürültüye dayanım artar, kısa ani olaylar yayılabilir.',
+          decrease: 'Kısa olaylar daha görünür olur, belirsizlik artabilir.',
+          risk: 'Çift veya örnek aralığına uymayan girişler etkili tek örnek penceresine ayarlanır.',
+          recommended: '5 saniye.',
+          profile: 'Analiz profilleri bu pencereyi değiştirmez.'
+        },
+        en: {
+          label: 'Sliding regression window duration',
+          meaning: 'The window over which slope is estimated in sliding linear regression.',
+          increase: 'Noise robustness improves, but short abrupt events can smear.',
+          decrease: 'Short events become more visible, with more uncertainty.',
+          risk: 'Even or sample-mismatched inputs are adjusted to an effective odd sample window.',
+          recommended: '5 seconds.',
+          profile: 'Analysis profiles do not change this window.'
+        }
+      },
+      spectralWindow: {
+        engineParameter: 'windowType',
+        unit: null,
+        controlIds: ['spectralWindowType'],
+        tr: {
+          label: 'Pencere fonksiyonu',
+          meaning: 'FFT’ye giren segmentin kenarlarını ağırlıklandırır ve sızıntıyı etkiler.',
+          increase: 'Daha güçlü sızıntı azaltma yan lobları düşürür.',
+          decrease: 'Dikdörtgen pencere daha keskin ama daha sızıntılı olabilir.',
+          risk: 'Yanlış pencere yakın tepeleri veya güç seviyesini yanıltıcı gösterebilir.',
+          recommended: 'Hann.',
+          profile: 'Hızlı, Dengeli ve Ayrıntılı profiller varsayılan pencereyi Hann tutar.'
+        },
+        en: {
+          label: 'Window function',
+          meaning: 'Weights segment edges before the FFT and affects spectral leakage.',
+          increase: 'Stronger leakage reduction lowers side lobes.',
+          decrease: 'A rectangular window can look sharper but leak more energy.',
+          risk: 'The wrong window can mislead nearby peaks or power levels.',
+          recommended: 'Hann.',
+          profile: 'Fast, Balanced, and Detailed profiles keep the default Hann window.'
+        }
+      },
+      spectralDetrend: {
+        engineParameter: 'detrend',
+        unit: null,
+        controlIds: ['spectralDetrend'],
+        tr: {
+          label: 'Segment trend çıkarma',
+          meaning: 'Her segmentten sabit ortalama veya doğrusal trend çıkarır.',
+          increase: 'Daha güçlü trend çıkarma düşük frekanslı sürüklenmeyi azaltabilir.',
+          decrease: 'Ham seviye korunur, ancak yavaş kayma spektruma sızabilir.',
+          risk: 'Aşırı trend çıkarma gerçek düşük frekanslı bileşeni zayıflatabilir.',
+          recommended: 'Sabit ortalama.',
+          profile: 'Spektral profiller varsayılanı sabit ortalama tutar.'
+        },
+        en: {
+          label: 'Segment detrending',
+          meaning: 'Removes a constant mean or linear trend from each segment.',
+          increase: 'Stronger detrending can reduce low-frequency drift.',
+          decrease: 'Raw level is preserved, but slow drift can leak into the spectrum.',
+          risk: 'Over-detrending can weaken real low-frequency content.',
+          recommended: 'Constant mean.',
+          profile: 'Spectral profiles keep the default constant-mean detrending.'
+        }
+      },
+      spectralValid: {
+        engineParameter: 'minValidRatio',
+        unit: '%',
+        controlIds: ['spectralMinValidRatioPct'],
+        tr: {
+          label: 'Minimum geçerli örnek oranı',
+          meaning: 'Bir segmentin kabul edilmesi için gereken geçerli örnek yüzdesidir.',
+          increase: 'Daha düşük kaliteli pencereler reddedilir.',
+          decrease: 'Daha fazla pencere kullanılır, ama doldurma etkisi artabilir.',
+          risk: 'Çok düşük değer eksik veriden güç üretebilir; çok yüksek değer çok pencere reddedebilir.',
+          recommended: '%75.',
+          profile: 'Profiller varsayılan kalite eşiğini %75 tutar.'
+        },
+        en: {
+          label: 'Minimum valid samples per segment',
+          meaning: 'The valid-sample percentage required for a segment to be accepted.',
+          increase: 'Lower-quality windows are rejected.',
+          decrease: 'More windows are used, but imputation influence can grow.',
+          risk: 'Too low can create power from missing data; too high can reject many windows.',
+          recommended: '75%.',
+          profile: 'Profiles keep the default quality threshold at 75%.'
+        }
+      },
+      spectralScale: {
+        engineParameter: 'scale',
+        unit: 'linear or dB',
+        controlIds: ['spectralScale'],
+        tr: {
+          label: 'Güç ölçeği',
+          meaning: 'PSD’nin lineer güç veya dB re 1 Hz²/Hz olarak gösterileceğini belirler.',
+          increase: 'Logaritmik ölçek zayıf bileşenleri görünür kılar.',
+          decrease: 'Lineer ölçek gerçek güç oranlarını daha doğrudan gösterir.',
+          risk: 'dB görünüm küçük farkları büyütülmüş algılatabilir.',
+          recommended: 'Welch için lineer, Spektrogram için logaritmik.',
+          profile: 'Profiller analiz türünün varsayılan güç ölçeğini uygular.'
+        },
+        en: {
+          label: 'Power scale',
+          meaning: 'Controls whether PSD is shown as linear power or dB re 1 Hz²/Hz.',
+          increase: 'Log scale makes weak components more visible.',
+          decrease: 'Linear scale shows true power ratios more directly.',
+          risk: 'dB display can make small differences look large.',
+          recommended: 'Linear for Welch, logarithmic for Spectrogram.',
+          profile: 'Profiles apply the default scale for the selected analysis.'
+        }
+      },
+      spectralAveraging: {
+        engineParameter: 'averaging',
+        unit: null,
+        controlIds: ['spectralAveraging'],
+        tr: {
+          label: 'Welch ortalaması',
+          meaning: 'Segment PSD’lerinin aritmetik ortalama veya medyan ile birleştirilmesini seçer.',
+          increase: 'Medyan, tekil uç segmentlerin etkisini azaltabilir.',
+          decrease: 'Aritmetik ortalama toplam güçle daha doğrudan ilişkilidir.',
+          risk: 'Medyan ve ortalama tepe büyüklüğünü farklı gösterebilir.',
+          recommended: 'Aritmetik ortalama.',
+          profile: 'Profiller Welch varsayılanını aritmetik ortalama tutar.'
+        },
+        en: {
+          label: 'Welch averaging',
+          meaning: 'Chooses arithmetic mean or median when combining segment PSDs.',
+          increase: 'Median can reduce the influence of isolated extreme segments.',
+          decrease: 'Arithmetic mean relates more directly to total power.',
+          risk: 'Median and mean can report different peak magnitudes.',
+          recommended: 'Arithmetic mean.',
+          profile: 'Profiles keep Welch default at arithmetic mean.'
+        }
+      },
+      spectralPeaks: {
+        engineParameter: 'maxPeaks',
+        unit: 'count',
+        controlIds: ['spectralMaxPeaks'],
+        tr: {
+          label: 'Spektral tepe sayısı',
+          meaning: 'Welch sonucunda raporlanacak en fazla tepe sayısıdır.',
+          increase: 'Daha fazla aday görünür.',
+          decrease: 'Yalnız en baskın tepeler listelenir.',
+          risk: 'Çok yüksek değer gürültü düzeyindeki tepeleri öne çıkarabilir.',
+          recommended: '5 tepe.',
+          profile: 'Profiller varsayılan tepe sayısını korur.'
+        },
+        en: {
+          label: 'Spectral peak count',
+          meaning: 'The maximum number of peaks reported in the Welch result.',
+          increase: 'More candidates become visible.',
+          decrease: 'Only the dominant peaks are listed.',
+          risk: 'Too high can promote noise-level peaks.',
+          recommended: '5 peaks.',
+          profile: 'Profiles keep the default peak count.'
+        }
+      },
+      spectralCells: {
+        engineParameter: 'maxCells',
+        unit: 'cells',
+        controlIds: ['spectralMaxCells'],
+        tr: {
+          label: 'Maksimum spektrogram hücresi',
+          meaning: 'Spektrogram matrisinin tarayıcı belleğinde kontrolsüz büyümesini önler.',
+          increase: 'Daha uzun veya daha ayrıntılı görünüm denenebilir.',
+          decrease: 'Bellek kullanımı düşer, daha fazla istek reddedilebilir.',
+          risk: 'Çok yüksek değer zayıf cihazlarda belleği zorlayabilir.',
+          recommended: '1.500.000 hücre.',
+          profile: 'Hızlı daha az hücre üretir; Ayrıntılı hücre sayısını artırabilir.'
+        },
+        en: {
+          label: 'Maximum spectrogram cells',
+          meaning: 'Prevents the spectrogram matrix from growing without memory control.',
+          increase: 'Longer or more detailed views can be attempted.',
+          decrease: 'Memory use drops and more requests can be rejected.',
+          risk: 'Too high can stress memory on weaker devices.',
+          recommended: '1,500,000 cells.',
+          profile: 'Fast produces fewer cells; Detailed can increase cell count.'
+        }
+      },
+      spectralDisplay: {
+        engineParameter: 'displaySummaryMode',
+        unit: 'view mode',
+        controlIds: ['spectralDisplaySummary', 'spectralDisplayTimezone'],
+        tr: {
+          label: 'Sonuç özeti ve zaman gösterimi',
+          meaning: 'Grafik ve tablo özetleme düzeyini, ayrıca gösterim zaman dilimini ayarlar.',
+          increase: 'Daha ayrıntılı özet daha fazla kayıt gösterir.',
+          decrease: '15 dakika veya 1 saat görünümü uzun sonuçları daha okunur kılar.',
+          risk: 'Bu seçenek hesap çözünürlüğünü değiştirmez; yalnız görüntüleme/özetleme düzeyini değiştirir.',
+          recommended: 'Ayrıntılı görünüm; uzun aralıkta 15 dakika veya 1 saat.',
+          profile: 'Profiller hesap ayarını seçer; bu alan sunum yoğunluğunu yönetir.'
+        },
+        en: {
+          label: 'Result summary and time display',
+          meaning: 'Sets chart/table summarization level and display time zone.',
+          increase: 'Detailed summary shows more records.',
+          decrease: '15-minute or 1-hour display makes long results easier to read.',
+          risk: 'This option does not change calculation resolution; it only changes display/summarization.',
+          recommended: 'Detailed view; 15 minutes or 1 hour for long ranges.',
+          profile: 'Profiles choose compute settings; this field manages presentation density.'
+        }
+      },
+      spectralPeakAdvanced: {
+        engineParameter: 'significantPeakSnrDb, weakPeakSnrDb',
+        unit: 'dB',
+        controlIds: ['spectralSignificantSnrDb', 'spectralWeakSnrDb'],
+        tr: {
+          label: 'Tepe sınıflandırma eşikleri',
+          meaning: 'Spektral tepelerin anlamlı, zayıf veya gürültü düzeyinde etiketlenmesini belirler.',
+          increase: 'Anlamlı sınıfına girmek zorlaşır.',
+          decrease: 'Daha fazla tepe anlamlı veya zayıf kabul edilir.',
+          risk: 'Çok düşük eşik gürültüyü anlamlı gösterebilir; çok yüksek eşik gerçek adayları zayıf bırakabilir.',
+          recommended: 'Anlamlı 6 dB, zayıf 3 dB.',
+          profile: 'Profiller varsayılan sınıflandırma eşiklerini korur.'
+        },
+        en: {
+          label: 'Peak classification thresholds',
+          meaning: 'Controls whether spectral peaks are labeled significant, weak, or noise-level.',
+          increase: 'It becomes harder to enter the significant class.',
+          decrease: 'More peaks are treated as significant or weak.',
+          risk: 'Too low can label noise as meaningful; too high can leave real candidates weak.',
+          recommended: 'Significant 6 dB, weak 3 dB.',
+          profile: 'Profiles keep the default classification thresholds.'
+        }
+      }
+    };
+
+    const ANALYSIS_HELP_GLOSSARY = {
+      availability: {
+        tr: ['Availability', 'Verinin beklenen zaman aralığında erişilebilir olma durumudur.', 'Bu analizde düşük availability, eksik gün veya kaynak kesintisi nedeniyle sonuç güvenini azaltır.'],
+        en: ['Availability', 'Whether data is available for the expected time range.', 'Low availability lowers confidence because missing days or source outages can bias the result.']
+      },
+      coverage: {
+        tr: ['Coverage', 'Beklenen örneklerin ne kadarının kullanılabilir olduğunu gösterir.', 'Düşük coverage, istatistik ve olay sayılarının eksik veriyle sınırlı yorumlanması gerektiğini belirtir.'],
+        en: ['Coverage', 'Shows how many expected samples are usable.', 'Low coverage means statistics and event counts must be interpreted with missing-data limitations.']
+      },
+      validSample: {
+        tr: ['Valid sample', 'Zaman damgası ve frekans değeri kalite kurallarını geçen örnektir.', 'Geçerli örnek sayısı azaldıkça hesap güveni düşer.'],
+        en: ['Valid sample', 'A sample whose timestamp and frequency value pass quality rules.', 'Fewer valid samples reduce confidence in the computation.']
+      },
+      missingSample: {
+        tr: ['Missing sample', 'Beklenen saniyede veri bulunmamasıdır.', 'Boşluklar olayları bölebilir ve spektral güç yorumunu etkileyebilir.'],
+        en: ['Missing sample', 'A missing value at an expected second.', 'Gaps can split events and affect spectral power interpretation.']
+      },
+      imputation: {
+        tr: ['Imputation', 'Kabul edilen kısa boşlukları hesap için geçici değerle doldurma işlemidir.', 'Doldurulan örnek arttıkça sonuç daha temkinli okunmalıdır.'],
+        en: ['Imputation', 'Temporary filling of accepted short gaps for calculation.', 'More imputed samples require more cautious interpretation.']
+      },
+      duplicate: {
+        tr: ['Duplicate', 'Aynı zaman damgasında birden fazla kayıt bulunmasıdır.', 'Tekrarlı zamanlar kalite puanını düşürür ve veri akışında sorun işaret edebilir.'],
+        en: ['Duplicate', 'More than one record at the same timestamp.', 'Duplicate timestamps reduce quality and can indicate a data pipeline issue.']
+      },
+      mean: {
+        tr: ['Mean', 'Aritmetik ortalamadır.', 'Kısa süreli olayları gizleyebileceği için yüzdelik ve ekstrem değerlerle birlikte okunmalıdır.'],
+        en: ['Mean', 'The arithmetic average.', 'It can hide short events, so compare it with percentiles and extremes.']
+      },
+      median: {
+        tr: ['Median', 'Sıralı değerlerin orta noktasıdır.', 'Uç değerlere ortalamadan daha az duyarlıdır.'],
+        en: ['Median', 'The middle value after sorting.', 'It is less sensitive to extremes than the mean.']
+      },
+      standardDeviation: {
+        tr: ['Standard deviation', 'Değerlerin ortalama çevresindeki yayılımını ölçer.', 'Yüksek değer değişkenliğin arttığını gösterebilir.'],
+        en: ['Standard deviation', 'Measures spread around the mean.', 'A high value can indicate increased variability.']
+      },
+      percentile: {
+        tr: ['Percentile', 'Dağılımın belirli yüzdesinin altında kalan değerdir.', 'Uç davranışı tek minimum/maksimuma göre daha dengeli anlatır.'],
+        en: ['Percentile', 'A value below which a given percentage of samples falls.', 'It describes tails more robustly than a single min/max.']
+      },
+      iqr: {
+        tr: ['IQR', '75. ve 25. yüzdelikler arasındaki farktır.', 'Merkez dağılım genişliğini uç değerlere daha az duyarlı ölçer.'],
+        en: ['IQR', 'Difference between the 75th and 25th percentiles.', 'It measures central spread with less sensitivity to extremes.']
+      },
+      rms: {
+        tr: ['RMS', 'Karekök ortalama kare değeridir.', 'Sapma enerjisini özetler; tek başına olay nedeni göstermez.'],
+        en: ['RMS', 'Root mean square value.', 'It summarizes deviation energy but does not identify a cause by itself.']
+      },
+      bandViolation: {
+        tr: ['Band violation', 'Frekansın seçilen alt/üst bandın dışına çıkmasıdır.', 'Süre ve tekrar sayısıyla birlikte değerlendirilmelidir.'],
+        en: ['Band violation', 'Frequency moving outside the selected lower/upper band.', 'Interpret it together with duration and recurrence.']
+      },
+      threshold: {
+        tr: ['Threshold', 'Bir olay veya sınıf için sınır değerdir.', 'Eşiğin seçimi olay sayısını doğrudan etkiler.'],
+        en: ['Threshold', 'A boundary value for an event or class.', 'Threshold choice directly affects event counts.']
+      },
+      duration: {
+        tr: ['Duration', 'Olayın sürdüğü zamandır.', 'Kısa çok sayıda olay, tek uzun olaydan farklı yorumlanır.'],
+        en: ['Duration', 'The time span of an event.', 'Many short events differ from one long event.']
+      },
+      rocof: {
+        tr: ['RoCoF', 'Rate of Change of Frequency; frekans değişim hızıdır.', 'Bu uygulamada çevrimdışı tarihsel tahmindir; gerçek zamanlı koruma ölçümü değildir.'],
+        en: ['RoCoF', 'Rate of Change of Frequency.', 'Here it is an offline historical estimate, not a real-time protection measurement.']
+      },
+      centeredDifference: {
+        tr: ['Centered difference', 'Bir noktanın iki yanındaki örneklerle türev tahminidir.', 'Kenar ve kalite boşluklarında hesap üretmez.'],
+        en: ['Centered difference', 'Derivative estimate using samples on both sides of a point.', 'It does not produce values at edges or across quality gaps.']
+      },
+      slidingRegression: {
+        tr: ['Sliding regression', 'Kayan pencerede doğrusal eğim hesaplar.', 'Gürültüyü azaltabilir, kısa olayları yayabilir.'],
+        en: ['Sliding regression', 'Computes a linear slope in a sliding window.', 'It can reduce noise but smear short events.']
+      },
+      hysteresis: {
+        tr: ['Hysteresis', 'Olay giriş ve çıkış eşiklerini ayırma yöntemidir.', 'Eşik çevresindeki titreşimin tek olayı parçalamasını azaltır.'],
+        en: ['Hysteresis', 'Separates event enter and exit thresholds.', 'It reduces fragmentation around the threshold.']
+      },
+      fft: {
+        tr: ['FFT', 'Fast Fourier Transform; sinyali frekans bileşenlerine ayırır.', 'Segment ve pencere seçimi gerçek ayırma gücünü belirler.'],
+        en: ['FFT', 'Fast Fourier Transform; decomposes a signal into frequency components.', 'Segment and window choices determine true separation power.']
+      },
+      psd: {
+        tr: ['PSD', 'Power Spectral Density; gücün frekansa göre yoğunluğudur.', 'Tepe büyüklüğü veri kalitesi, pencere ve ortalama yöntemiyle birlikte okunur.'],
+        en: ['PSD', 'Power Spectral Density, signal power per frequency.', 'Peak magnitude should be read with data quality, window, and averaging method.']
+      },
+      welch: {
+        tr: ['Welch', 'Segment PSD’lerini ortalayarak spektrum tahmin eden yöntemdir.', 'Gürültüyü azaltır ancak zaman içindeki sürekliliği tek başına göstermez.'],
+        en: ['Welch', 'A method that estimates spectrum by averaging segment PSDs.', 'It reduces noise but does not by itself show time continuity.']
+      },
+      segment: {
+        tr: ['Segment', 'FFT’ye gönderilen zaman penceresidir.', 'Daha uzun segment frekans ayrımını iyileştirir ancak zamansal değişimleri daha geç gösterir.'],
+        en: ['Segment', 'The time window sent to the FFT.', 'A longer segment improves frequency separation but shows time changes later.']
+      },
+      windowFunction: {
+        tr: ['Window function', 'Segment kenarlarını ağırlıklandıran fonksiyondur.', 'Spektral sızıntı ve tepe genişliğini etkiler.'],
+        en: ['Window function', 'A function that weights segment edges.', 'It affects spectral leakage and peak width.']
+      },
+      hann: {
+        tr: ['Hann', 'Yaygın kullanılan yumuşak pencere fonksiyonudur.', 'Sızıntıyı azaltır, tepeyi biraz genişletebilir.'],
+        en: ['Hann', 'A common smooth window function.', 'It reduces leakage and can slightly widen peaks.']
+      },
+      hamming: {
+        tr: ['Hamming', 'Yan lobları azaltan pencere fonksiyonudur.', 'Bazı tepelerde Hann’dan farklı sızıntı dengesi verebilir.'],
+        en: ['Hamming', 'A window function that reduces side lobes.', 'It can balance leakage differently from Hann.']
+      },
+      overlap: {
+        tr: ['Overlap', 'Komşu pencerelerin ortak örnek kullanmasıdır.', 'Zaman izini yumuşatır ancak bağımsız pencere sayısını azaltır.'],
+        en: ['Overlap', 'Reuse of samples between neighboring windows.', 'It smooths time traces but reduces independent window count.']
+      },
+      zeroPadding: {
+        tr: ['Zero-padding', 'FFT uzunluğunu sıfır ekleyerek büyütmedir.', 'Eğriyi daha sık örnekler ancak gerçek frekans ayırma gücünü artırmaz.'],
+        en: ['Zero-padding', 'Extending FFT length by adding zeros.', 'It samples the curve more densely but does not improve true frequency separation.']
+      },
+      nyquist: {
+        tr: ['Nyquist', 'Örnekleme hızının yarısı olan en yüksek yorumlanabilir frekanstır.', 'Üst bant Nyquist’i aşarsa sonuç fiziksel olarak yorumlanamaz.'],
+        en: ['Nyquist', 'The highest interpretable frequency, half the sample rate.', 'Results above Nyquist cannot be interpreted physically.']
+      },
+      frequencyBin: {
+        tr: ['Frequency bin', 'FFT çıktısındaki ayrık frekans noktasıdır.', 'Bin aralığı grafikteki örnekleme sıklığını gösterir.'],
+        en: ['Frequency bin', 'A discrete frequency point in the FFT output.', 'Bin spacing shows sampling density in the chart.']
+      },
+      effectiveSpectralResolution: {
+        tr: ['Effective spectral resolution', 'Segment ve pencerenin ayırabildiği yaklaşık gerçek frekans genişliğidir.', 'Yakın tepeleri ayırırken FFT bin aralığından daha anlamlıdır.'],
+        en: ['Effective spectral resolution', 'Approximate true frequency width separated by the segment/window.', 'It is more meaningful than FFT bin spacing for nearby peaks.']
+      },
+      snr: {
+        tr: ['SNR', 'Signal-to-noise ratio; tepenin gürültü tabanına oranıdır.', 'Yüksek SNR tepenin daha belirgin olduğunu gösterebilir ama tek başına fiziksel kanıt değildir.'],
+        en: ['SNR', 'Signal-to-noise ratio, peak level relative to the noise floor.', 'High SNR can indicate a clearer peak but is not physical proof alone.']
+      },
+      prominence: {
+        tr: ['Prominence', 'Tepenin çevresindeki tabandan ne kadar ayrıştığını gösterir.', 'Düşük belirginlik kararsız veya gürültüye yakın tepeye işaret edebilir.'],
+        en: ['Prominence', 'How far a peak rises above its local background.', 'Low prominence can indicate an unstable or noise-adjacent peak.']
+      },
+      bandwidth: {
+        tr: ['Bandwidth', 'Tepenin kapladığı yaklaşık frekans genişliğidir.', 'Geniş bant daha dağınık salınım veya çözünürlük etkisi gösterebilir.'],
+        en: ['Bandwidth', 'Approximate frequency width occupied by a peak.', 'A wide band can indicate a diffuse oscillation or resolution effect.']
+      },
+      qFactor: {
+        tr: ['Q factor', 'Tepe frekansının bant genişliğine oranıdır.', 'Yüksek Q daha dar ve odaklı bir bileşene işaret edebilir.'],
+        en: ['Q factor', 'Ratio of peak frequency to bandwidth.', 'Higher Q can indicate a narrower, more focused component.']
+      },
+      confidenceInterval: {
+        tr: ['Confidence interval', 'Welch ortalamasındaki istatistiksel belirsizlik bandıdır.', 'Geniş bant, tepe büyüklüğü yorumunda daha fazla temkin gerektirir.'],
+        en: ['Confidence interval', 'Statistical uncertainty band around Welch averaging.', 'A wider band requires more caution when reading peak magnitude.']
+      },
+      parseval: {
+        tr: ['Parseval', 'Zaman alanı gücü ile frekans alanı gücü tutarlılığıdır.', 'Büyük hata ölçekleme veya eksik veri sorununa işaret edebilir.'],
+        en: ['Parseval', 'Consistency between time-domain and frequency-domain power.', 'Large error can indicate scaling or missing-data issues.']
+      },
+      stft: {
+        tr: ['STFT', 'Short-Time Fourier Transform; kayan pencerelerle spektrum hesaplar.', 'Zaman ve frekans ayrıntısı segment/adım seçimiyle dengelenir.'],
+        en: ['STFT', 'Short-Time Fourier Transform, spectrum over sliding windows.', 'Time and frequency detail are balanced by segment and step choices.']
+      },
+      spectrogram: {
+        tr: ['Spectrogram', 'STFT sonuçlarını zaman-frekans renk haritası olarak gösterir.', 'Süreklilik ve veri kalitesi birlikte okunmalıdır.'],
+        en: ['Spectrogram', 'Shows STFT results as a time-frequency color map.', 'Continuity and data quality must be interpreted together.']
+      },
+      ridge: {
+        tr: ['Ridge', 'Her zaman penceresinde baskın frekans izidir.', 'Kesintisiz sırt kalıcı salınıma işaret edebilir, ama SNR ile doğrulanmalıdır.'],
+        en: ['Ridge', 'The dominant-frequency track across time windows.', 'A continuous ridge can indicate persistence, but should be checked with SNR.']
+      },
+      timeFrequencyRegion: {
+        tr: ['Time-frequency region', 'Belirli zaman ve frekans aralığında anlamlı görünen bölgedir.', 'Kısa parçalar birleştirme ve süreklilik kurallarıyla süzülür.'],
+        en: ['Time-frequency region', 'A meaningful-looking area over a time and frequency interval.', 'Short fragments are filtered by merge and continuity rules.']
+      },
+      lag: {
+        tr: ['Lag', 'Bir serinin diğerine göre zaman kaymasıdır.', 'Pozitif/negatif işaret kaynak sırası ile birlikte yorumlanır.'],
+        en: ['Lag', 'Time shift of one series relative to another.', 'Positive/negative sign must be read with source order.']
+      },
+      crossCorrelation: {
+        tr: ['Cross-correlation', 'İki serinin farklı gecikmelerde benzerliğini ölçer.', 'Yüksek değer nedensellik veya güç akışı kanıtlamaz.'],
+        en: ['Cross-correlation', 'Measures similarity of two series at different lags.', 'A high value does not prove causality or power flow.']
+      },
+      coherence: {
+        tr: ['Coherence', 'İki serinin belirli frekansta ortak hareket gücünü ölçer.', 'Yeterli spektral güç olmadan faz yorumu güvenilir olmayabilir.'],
+        en: ['Coherence', 'Measures frequency-specific common movement between two series.', 'Phase can be unreliable without enough spectral power.']
+      },
+      phase: {
+        tr: ['Phase', 'Aynı frekanstaki bileşenler arasındaki açı farkıdır.', 'Sarmalama ve düşük güç fazı yanıltabilir.'],
+        en: ['Phase', 'Angle difference between components at the same frequency.', 'Wrapping and low power can make phase misleading.']
+      },
+      phaseWrapping: {
+        tr: ['Phase wrapping', 'Fazın -180° ile +180° çevresinde sarılmasıdır.', 'Sıçrama gibi görünen farklar gerçek ani değişim olmayabilir.'],
+        en: ['Phase wrapping', 'Phase wrapping around -180° and +180°.', 'Apparent jumps may not be real abrupt changes.']
+      },
+      dailyAggregation: {
+        tr: ['Daily aggregation', 'Saniyelik verinin günlük/saatlik özetlere indirgenmesidir.', 'Uzun dönem eğilimi gösterir, hızlı olayları saklayabilir.'],
+        en: ['Daily aggregation', 'Reduction of second-level data into daily/hourly summaries.', 'It shows long-term trend and can hide fast events.']
+      },
+      trend: {
+        tr: ['Trend', 'Zaman içinde yönlü değişim eğilimidir.', 'Kapsama düşükse eğilim yanıltıcı olabilir.'],
+        en: ['Trend', 'Directional change over time.', 'Trend can be misleading when coverage is low.']
+      },
+      rollingAverage: {
+        tr: ['Rolling average', 'Kayan zaman penceresiyle hesaplanan ortalamadır.', 'Gürültüyü azaltır ama kısa sapmaları yumuşatır.'],
+        en: ['Rolling average', 'Average computed over a moving time window.', 'It reduces noise but smooths short deviations.']
+      }
+    };
+
+    const ANALYSIS_HELP_CONTENT = {
+      quality: {
+        parameterKeys: ['date', 'alignment', 'yd'],
+        glossary: ['availability', 'coverage', 'validSample', 'missingSample', 'duplicate', 'imputation'],
+        tr: {
+          title: 'Veri Kapsama ve Kalite Özeti',
+          summary: 'Seçilen kaynakta beklenen örneklerin ne kadarının güvenilir biçimde kullanılabildiğini gösterir. Eksik, geçersiz, yinelenen ve doldurulmuş veri durumları ileri analizlere başlamadan önce riskleri görünür kılar. Bu analiz veri kaynağının sağlıklı olup olmadığını gösterir; frekans olayının fiziksel nedenini kanıtlamaz.',
+          what: ['Veri kapsama analizi, beklenen saniyelik örnek sayısı ile kullanılabilir örnek sayısını karşılaştırır.', 'Kalite sorunu görülen dönemlerde spektral, RoCoF veya korelasyon sonuçları daha temkinli yorumlanmalıdır.'],
+          when: ['Günlük kalite kontrolü', 'Veri eksikliği kontrolü', 'İki kaynak karşılaştırması öncesi güvenilirlik kontrolü'],
+          results: ['Kapsama oranı beklenen örneğe göre veri varlığını gösterir; düşük oran eksik dönemleri işaret edebilir.', 'İyi kalite oranı geçersiz frekans, yinelenen zaman damgası ve yinelenen değer eşiğini de dikkate alır.', 'Doldurulmuş veri sayısı arttığında ileri analizlerin belirsizliği artabilir.'],
+          chart: ['Isı haritası zaman içindeki kalite yoğunluğunu gösterir.', 'Yakınlaştırma kalite sorununun hangi saniyelere denk geldiğini incelemek için kullanılır.', 'Eksik veya reddedilmiş aralıklar sonraki analizlerde yapay ölçüm gibi üretilmez.'],
+          table: ['Tablodaki satırlar kalite metrikleri ve sorunlu zaman aralıklarını temsil eder.', 'Öncelik düşük kapsama, uzun boşluk, yinelenen değer ve geçersiz örnek satırlarındadır.', 'Satıra tıklamak ilgili zaman aralığını ham grafikte incelemeye yardımcı olur.'],
+          mistakes: ['Yüksek kapsama, tüm örneklerin iyi kalite olduğu anlamına gelmez.', 'Tek bir düşük kalite günü uzun dönem eğilimi temsil etmeyebilir.', 'Eksik veri gerçek ölçüm gibi yorumlanmamalıdır.'],
+          ai: ['Kapsama düşükse aynı dönem için kaynak karşılaştırmasını kontrol edin.', 'Uzun boşluk varsa RoCoF ve spektral analizden önce tarih aralığını daraltın.', 'Yinelenen değer artmışsa ham zaman serisini yakınlaştırarak veri donması ihtimalini inceleyin.'],
+          math: ['Kapsama yüzdesi benzersiz geçerli zaman damgası / beklenen saniye olarak hesaplanır.', 'İyi kalite hesabı geçersiz frekans, yinelenen zaman damgası ve yinelenen değer koşullarını ayrıca düşer.']
+        },
+        en: {
+          title: 'Data Coverage and Quality Summary',
+          summary: 'Shows how much of the expected data is available and reliable for the selected source. Missing, invalid, duplicate, and imputed data are made visible before advanced analysis. This analysis describes data health; it does not prove the physical cause of a frequency event.',
+          what: ['Coverage analysis compares expected second-level samples with usable samples.', 'When quality issues are present, spectral, RoCoF, or correlation results need more cautious interpretation.'],
+          when: ['Daily quality control', 'Missing-data inspection', 'Reliability check before comparing two sources'],
+          results: ['Coverage ratio reflects data availability against expected samples; low values can indicate missing periods.', 'Good Quality ratio also accounts for invalid frequency, duplicate timestamps, and repeated-value thresholding.', 'More imputed data increases uncertainty in downstream analyses.'],
+          chart: ['The heatmap shows quality density over time.', 'Zoom helps inspect the exact seconds where quality issues occur.', 'Missing or rejected intervals are not invented as real measurements in later analyses.'],
+          table: ['Rows represent quality metrics and problematic time intervals.', 'Focus first on low coverage, long gaps, repeated values, and invalid samples.', 'Clicking a row helps inspect the same time range in the raw chart.'],
+          mistakes: ['High coverage does not mean every sample is Good Quality.', 'One low-quality day may not represent the long-term trend.', 'Missing data must not be interpreted as real measurements.'],
+          ai: ['If coverage is low, compare the same period across sources.', 'If a long gap exists, narrow the date range before RoCoF or spectral analysis.', 'If repeated values increase, zoom into the raw series to inspect possible frozen data.'],
+          math: ['Coverage is unique valid timestamp count divided by expected seconds.', 'Good Quality additionally excludes invalid frequency, duplicate timestamps, and repeated-value runs.']
+        }
+      },
+      stats: {
+        parameterKeys: ['date', 'alignment', 'statsBand', 'yd'],
+        glossary: ['mean', 'median', 'standardDeviation', 'percentile', 'iqr', 'rms', 'bandViolation'],
+        tr: {
+          title: 'Temel Frekans İstatistikleri',
+          summary: 'Seçilen iyi kalite frekans serisinin merkezini, yayılımını ve uç değerlerini özetler. Günlük durumun normal dağılıma yakın mı, yoksa sapma ve uç değer ağırlıklı mı olduğunu anlamaya yardım eder. Ortalama değer tek başına kısa süreli olayları kanıtlamaz veya dışlamaz.',
+          what: ['Ortalama, medyan, minimum, maksimum, standart sapma, yüzdelikler, IQR ve RMS sapma birlikte hesaplanır.', 'Bant dışı süre, seçilen alt/üst frekans sınırlarına göre yorumlanır.'],
+          when: ['Günlük kalite kontrolü', 'Olay inceleme öncesi genel dağılım özeti', 'Uzun dönem eğilim analizi için başlangıç kontrolü'],
+          results: ['Ortalama nominal frekansa yakınsa genel merkez davranışı sakindir.', 'Standart sapma, IQR ve RMS artışı daha değişken bir gün gösterebilir.', 'Minimum/maksimum değerler veri kalitesi ve bant ihlali tablosuyla birlikte okunmalıdır.'],
+          chart: ['Grafik iyi kalite saniyelik frekansın dağılımını ve bant ilişkisini gösterir.', 'İşaretli uç değerler tek başına arıza kanıtı değildir.', 'Yakınlaştırma kısa ihlal aralıklarını ortalama içinde kaybolmadan görmeyi sağlar.'],
+          table: ['Tablo her istatistik metriğinin değerini ve birimini gösterir.', 'Yüzdelikler ve IQR, uç değerlere daha dayanıklı dağılım okuması sağlar.', 'Bant dışı süre satırları olay analiziyle karşılaştırılmalıdır.'],
+          mistakes: ['Ortalama değer kısa süreli ihlalleri gizleyebilir.', 'Minimum veya maksimum tek örnek veri hatası olabilir.', 'Düşük standart sapma, olay olmadığı anlamına gelmez.'],
+          ai: ['RMS yüksekse bant ihlali aralıklarını kontrol edin.', 'Ortalama kaymışsa günlük eğilim analizinde önceki günlerle karşılaştırın.', 'Uç değer varsa ham grafikte aynı saniyeyi inceleyin.'],
+          math: ['İstatistikler eksik, geçersiz, yinelenen zaman damgası ve yinelenen değer örnekleri çıkarılmış iyi kalite seri üzerinde hesaplanır.', 'Bant dışı süre seçili istatistik bant sınırlarına göre saniye bazında sayılır.']
+        },
+        en: {
+          title: 'Basic Frequency Statistics',
+          summary: 'Summarizes center, spread, and extremes of the selected Good Quality frequency series. It helps judge whether the day is centered and stable or dominated by deviations and extremes. The mean alone neither proves nor rules out short events.',
+          what: ['Mean, median, minimum, maximum, standard deviation, percentiles, IQR, and RMS deviation are computed together.', 'Out-of-band duration is interpreted against the selected lower/upper frequency limits.'],
+          when: ['Daily quality control', 'General distribution summary before incident review', 'Initial check for long-term trend analysis'],
+          results: ['A mean close to nominal frequency suggests calm center behavior.', 'Higher standard deviation, IQR, and RMS can indicate a more variable day.', 'Minimum/maximum values should be read with data quality and band-violation tables.'],
+          chart: ['The chart shows Good Quality second-level frequency and its relation to the band.', 'Marked extremes are not fault evidence by themselves.', 'Zoom helps short violation intervals remain visible despite averages.'],
+          table: ['The table lists each statistic with value and unit.', 'Percentiles and IQR provide a more robust distribution view than extremes alone.', 'Out-of-band duration rows should be compared with event analysis.'],
+          mistakes: ['The mean can hide short violations.', 'A minimum or maximum can be a single bad sample.', 'Low standard deviation does not prove no event occurred.'],
+          ai: ['If RMS is high, inspect band-violation intervals.', 'If the mean shifted, compare previous days in Daily Trend.', 'If an extreme appears, inspect the same second on the raw chart.'],
+          math: ['Statistics are computed on the Good Quality series after removing missing, invalid, duplicate, and repeated-value samples.', 'Out-of-band duration is counted per second using the selected statistics band limits.']
+        }
+      },
+      events: {
+        parameterKeys: ['date', 'alignment', 'statsBand', 'duration', 'yd'],
+        glossary: ['bandViolation', 'threshold', 'duration', 'validSample', 'missingSample'],
+        tr: {
+          title: 'Bant İhlali Özeti',
+          summary: 'Frekansın seçilen alt veya üst bandın dışına çıktığı sürekli aralıkları listeler. Kısa ve çok sayıda ihlal ile tek uzun ihlal farklı işletme sorularına işaret edebilir. Sonuç yalnız seçili bant ve kalite filtresi içinde anlamlıdır.',
+          what: ['Alt ve üst eşikler, iyi kalite saniyelik örneklerde olay gruplamak için kullanılır.', 'Eksik veya kalite dışı saniyeler olayları birleştirmez; boşluklar olay sınırı sayılır.'],
+          when: ['Olay inceleme', 'Günlük kalite kontrolü', 'Bant dışı kalma süresi raporu'],
+          results: ['Toplam ihlal süresi bandın dışında geçirilen zamanı gösterir.', 'En uzun ihlal süreklilik açısından önceliklidir.', 'Pozitif ve negatif ihlal yönleri ayrı yorumlanmalıdır.'],
+          chart: ['Bant çizgileri eşik sınırlarını, işaretli aralıklar ihlal sürelerini gösterir.', 'Zoom ile olay başlangıç ve bitişi ham seri üzerinde incelenebilir.', 'Kalite boşlukları olay sürekliliği gibi kabul edilmez.'],
+          table: ['Her satır bir sürekli bant ihlali aralığıdır.', 'Varsayılan önem süresi ve aşım büyüklüğüyle değerlendirilir.', 'Satıra tıklayınca grafik ilgili zaman aralığına yakınlaşır.'],
+          mistakes: ['Kısa çok sayıda olay tek uzun olayla aynı anlama gelmez.', 'Eşik seçimi değiştirilirse olay sayısı da değişir.', 'Eksik veri üzerinden ihlal süresi tamamlanmış gibi okunmamalıdır.'],
+          ai: ['En uzun ihlali temel istatistik uç değerleriyle karşılaştırın.', 'RoCoF olaylarıyla aynı zamanlara denk gelip gelmediğini kontrol edin.', 'Eşik çok hassassa minimum olay süresini artırarak gürültüyü ayırın.'],
+          math: ['Olaylar seçili bandın dışında kalan ardışık iyi kalite saniyelerden oluşur.', 'Minimum olay süresinin altında kalan geçişler rapor tablosuna alınmaz.']
+        },
+        en: {
+          title: 'Band Violation Summary',
+          summary: 'Lists continuous intervals where frequency leaves the selected lower or upper band. Many short violations and one long violation answer different operational questions. Results are meaningful only within the selected band and quality filter.',
+          what: ['Lower and upper thresholds group events from Good Quality second-level samples.', 'Missing or non-quality seconds do not merge events; gaps become event boundaries.'],
+          when: ['Incident review', 'Daily quality control', 'Out-of-band duration reporting'],
+          results: ['Total violation duration shows time spent outside the band.', 'The longest violation is important for persistence.', 'Positive and negative violation directions should be interpreted separately.'],
+          chart: ['Band lines show thresholds and marked ranges show violation intervals.', 'Zoom helps inspect event start and end on the raw series.', 'Quality gaps are not treated as event continuity.'],
+          table: ['Each row is one continuous band-violation interval.', 'Default priority comes from duration and exceedance magnitude.', 'Clicking a row zooms the chart to the related time range.'],
+          mistakes: ['Many short events are not equivalent to one long event.', 'Changing the threshold changes event count.', 'Missing data must not be read as completed violation duration.'],
+          ai: ['Compare the longest violation with basic-statistics extremes.', 'Check whether RoCoF events occur at the same time.', 'If the threshold is too sensitive, increase minimum duration to separate noise.'],
+          math: ['Events consist of consecutive Good Quality seconds outside the selected band.', 'Transitions shorter than minimum event duration are not listed.']
+        }
+      },
+      rocof: {
+        parameterKeys: ['date', 'alignment', 'rocofMethod', 'rocofThreshold', 'duration', 'rocofPrefilter', 'rocofRegression', 'yd'],
+        glossary: ['rocof', 'centeredDifference', 'slidingRegression', 'hysteresis', 'threshold', 'duration'],
+        tr: {
+          title: 'RoCoF Analiz Sonuçları',
+          summary: 'RoCoF, frekansın saniye başına değişim hızını tahmin eder ve eşik aşımı olaylarını R+ ve R− olarak ayırır. Bu sonuç çevrimdışı tarihsel veri analizidir; koruma rölesi, PMU veya gerçek zamanlı mevzuat ölçümü değildir.',
+          what: ['Merkezî fark, filtreli merkezî fark ve kayan regresyon seçenekleri iyi kalite bir saniyelik seri üzerinde çalışır.', 'İstenen ve etkili pencere değerleri birlikte raporlanır.'],
+          when: ['Ani frekans değişimi inceleme', 'Bant ihlali başlangıcını açıklayıcı ek kontrol', 'İki kaynakta hızlı değişim karşılaştırması'],
+          results: ['R+ frekans yükselişi, R− frekans düşüşü yönündeki RoCoF olayını gösterir.', 'Tepe |RoCoF| / eşik oranı olay şiddetini gösterir.', 'Eşiğe tam eşit değerler olay sayılmaz; yalnız sıkı aşım olay başlatır.'],
+          chart: ['X ekseni zaman, Y ekseni mHz/s cinsinden RoCoF değeridir.', 'Pozitif ve negatif eşikler olay sınırlarını; tepe işaretçileri olay içindeki en yüksek mutlak değeri gösterir.', 'Kalite boşlukları türev penceresiyle köprülenmez.'],
+          table: ['Her satır bir R+ veya R− olay aralığıdır.', 'Süre, tepe RoCoF, başlangıç frekansı ve ekstrem frekans birlikte okunmalıdır.', 'Satıra tıklamak olay çevresini ham frekans ve RoCoF grafiğinde yakınlaştırır.'],
+          mistakes: ['RoCoF merkezî fark yöntemi gerçek zamanlı ölçüm değildir.', 'Tek tepe değeri olayın nedeni hakkında kesin sonuç vermez.', 'Kalite boşluğu üzerinden yapay türev üretilmediği unutulmamalıdır.'],
+          ai: ['RoCoF olayı varsa aynı aralıkta bant ihlali ve ham zaman serisini kontrol edin.', 'Filtreli veya regresyon yöntemi seçildiyse etkili pencereyi raporda doğrulayın.', 'R+ ve R− olaylarının ardışık gelmesi veri kalitesi veya sistem salınımı açısından incelenebilir.'],
+          math: ['RoCoF birimi UI’da mHz/s, hesap motorunda Hz/s olarak kullanılır.', 'Olay, RoCoF pozitif eşiğin üstüne çıktığında veya negatif eşiğin altına düştüğünde başlar.']
+        },
+        en: {
+          title: 'RoCoF Analysis Results',
+          summary: 'RoCoF estimates rate of change of frequency per second and separates threshold events as R+ and R−. This result is an offline historical-data analysis; it is not a protection-relay, PMU, real-time, or regulatory measurement.',
+          what: ['Centered difference, filtered centered difference, and sliding regression run on the Good Quality one-second series.', 'Requested and effective window values are reported together.'],
+          when: ['Abrupt frequency-change review', 'Supplementary check around band-violation starts', 'Fast-change comparison across sources'],
+          results: ['R+ means rising frequency and R− means falling frequency.', 'Peak |RoCoF| / threshold indicates event severity.', 'Values exactly equal to the threshold are not events; only strict exceedance starts an event.'],
+          chart: ['X axis is time and Y axis is RoCoF in mHz/s.', 'Positive/negative thresholds mark event boundaries; peak markers show the largest absolute value inside an event.', 'Quality gaps are not bridged by derivative windows.'],
+          table: ['Each row is one R+ or R− event interval.', 'Read duration, peak RoCoF, start frequency, and extreme frequency together.', 'Clicking a row zooms the raw frequency and RoCoF chart around the event.'],
+          mistakes: ['Centered-difference RoCoF is not a real-time measurement.', 'A single peak value does not prove the event cause.', 'No artificial derivative is produced across quality gaps.'],
+          ai: ['If a RoCoF event appears, inspect band violations and the raw series in the same interval.', 'When filtered or regression methods are selected, verify the effective window in the report.', 'Consecutive R+ and R− events can be checked for data quality or system oscillation.'],
+          math: ['RoCoF uses mHz/s in the UI and Hz/s inside the engine.', 'An event starts when RoCoF is strictly above the positive threshold or strictly below the negative threshold.']
+        }
+      },
+      psd: {
+        parameterKeys: ['date', 'alignment', 'resolution', 'band', 'window', 'step', 'spectralWindow', 'spectralDetrend', 'spectralValid', 'spectralScale', 'spectralAveraging', 'spectralPeaks', 'spectralDisplay', 'spectralPeakAdvanced'],
+        glossary: ['psd', 'welch', 'segment', 'fft', 'windowFunction', 'hann', 'hamming', 'overlap', 'zeroPadding', 'frequencyBin', 'effectiveSpectralResolution', 'snr', 'prominence', 'bandwidth', 'qFactor', 'confidenceInterval', 'parseval'],
+        tr: {
+          title: 'Welch Güç Spektral Yoğunluğu (PSD)',
+          summary: 'Welch PSD, seçilen frekans serisindeki gücün frekansa nasıl dağıldığını gösterir. Baskın ve kararlı salınım adaylarını bulmaya yardım eder. Yüksek bir spektral tepe, tek başına fiziksel salınım kanıtı değildir; zaman sürekliliği Spektrogram ile kontrol edilmelidir.',
+          what: ['Seri segmentlere ayrılır, pencere fonksiyonu uygulanır, FFT ile PSD hesaplanır ve segmentler ortalanır.', 'Mean/median Welch seçimi tepe büyüklüğü ve uç segment hassasiyetini etkiler.'],
+          when: ['Salınım araştırması', 'İki kaynak karşılaştırması öncesi baskın frekans bulma', 'Olay incelemede belirli frekans bandı arama'],
+          results: ['Spektral tepeler frekans, periyot, PSD, SNR, belirginlik, bant genişliği ve Q faktörüyle yorumlanır.', 'SNR dB ve doğrusal oran birlikte verilir; tek başına kesin tanı değildir.', 'Güven bandı genişse tepe seviyesine daha temkinli yaklaşılmalıdır.'],
+          chart: ['X ekseni Hz, Y ekseni seçili güç ölçeğidir.', 'Tepe işaretçileri, gürültü tabanı, güven bandı, seçili frekans bandı ve Nyquist işareti birlikte okunur.', 'Spektral hesaplama 1 saniyelik kaynak veri üzerinden yapılır. 15 dakika ve 1 saat seçenekleri yalnız sonuçların görüntüleme/özetleme düzeyini değiştirir.'],
+          table: ['Spektral Tepeler tablosunda her satır bir tepe adayını temsil eder.', 'Varsayılan öncelik SNR, belirginlik ve sınıflandırma gücüdür.', 'Satıra tıklamak grafiği ilgili frekans çevresine yakınlaştırır.'],
+          mistakes: ['FFT sıfır doldurma gerçek frekans ayırma gücünü artırmaz.', 'Yüksek tepe tek başına fiziksel salınım kanıtı değildir.', 'Eksik veri doldurulmuşsa spektral güç etkilenebilir.'],
+          ai: ['Anlamlı tepe varsa aynı frekansı Spektrogram’da arayın.', 'Tepe düşük SNR ise bant aralığını ve veri kalitesini kontrol edin.', 'Yakın iki tepe varsa etkin spektral çözünürlüğün bunları ayırmaya yetip yetmediğini inceleyin.'],
+          math: ['PSD birimi Hz²/Hz, log gösterimde dB re 1 Hz²/Hz olarak raporlanır.', 'Frekans çözünürlüğü kullanılan FFT uzunluğu ve segment süresi metadata’sıyla birlikte verilir.']
+        },
+        en: {
+          title: 'Welch Power Spectral Density (PSD)',
+          summary: 'Welch PSD shows how signal power is distributed across frequency in the selected frequency series. It helps find dominant and steady oscillation candidates. A high spectral peak alone is not proof of a physical oscillation; time continuity should be checked with the Spectrogram.',
+          what: ['The series is split into segments, windowed, transformed with FFT, and segment PSDs are averaged.', 'Mean/median Welch affects peak magnitude and sensitivity to extreme segments.'],
+          when: ['Oscillation investigation', 'Finding dominant frequency before comparing sources', 'Searching a frequency band during incident review'],
+          results: ['Spectral peaks are interpreted with frequency, period, PSD, SNR, prominence, bandwidth, and Q factor.', 'SNR is reported both in dB and as a linear ratio; it is not a diagnosis alone.', 'A wider confidence band requires more caution about peak level.'],
+          chart: ['X axis is Hz and Y axis is the selected power scale.', 'Peak markers, noise floor, confidence band, selected frequency band, and Nyquist marker should be read together.', 'Spectral calculation is performed on the one-second source series. 15-minute and 1-hour options change only display/summarization level.'],
+          table: ['Each Spectral Peaks row represents one peak candidate.', 'Default priority comes from SNR, prominence, and classification strength.', 'Clicking a row zooms the chart around the related frequency.'],
+          mistakes: ['FFT zero-padding does not improve true frequency separation.', 'A high peak alone does not prove a physical oscillation.', 'Imputed missing data can affect spectral power.'],
+          ai: ['If a significant peak appears, search the same frequency in the Spectrogram.', 'If a peak has low SNR, check the band range and data quality.', 'If two peaks are close, inspect whether effective spectral resolution can separate them.'],
+          math: ['PSD unit is Hz²/Hz, and log display is reported as dB re 1 Hz²/Hz.', 'Frequency resolution is reported with the applied FFT length and segment duration metadata.']
+        }
+      },
+      spectrogram: {
+        parameterKeys: ['date', 'alignment', 'resolution', 'band', 'window', 'step', 'spectralWindow', 'spectralDetrend', 'spectralValid', 'spectralScale', 'spectralDisplay', 'spectralCells'],
+        glossary: ['stft', 'spectrogram', 'segment', 'fft', 'frequencyBin', 'overlap', 'zeroPadding', 'nyquist', 'ridge', 'timeFrequencyRegion', 'snr', 'imputation'],
+        tr: {
+          title: 'Spektrogram — Zaman-Frekans Analizi',
+          summary: 'Spektrogram, frekans içeriğinin zaman içinde nasıl değiştiğini renkli zaman-frekans haritası olarak gösterir. Kalıcı salınım izlerini, geçici frekans bileşenlerinden ayırmaya yardım eder. Her zaman penceresindeki en yüksek frekans otomatik olarak anlamlı salınım değildir; SNR, süreklilik ve veri kalitesi birlikte değerlendirilmelidir.',
+          what: ['STFT, seri üzerinde kayan segmentler alır ve her segment için spektrum hesaplar.', 'Ridge, pencereler boyunca baskın frekansın izini gösterir.'],
+          when: ['Zaman içinde değişen frekans inceleme', 'Welch’te bulunan tepenin sürekliliğini doğrulama', 'Veri kalitesi ve doldurma etkisini pencere bazında görme'],
+          results: ['Anlamlı bölgeler süre, baskın frekans, SNR ve güven ile özetlenir.', 'Pencere kalitesi geçerli oran, eksik örnek ve doldurulan örnek sayısıyla okunur.', 'Geçersiz pencereler gri/şeffaf maske ile ayrılır.'],
+          chart: ['X ekseni mutlak zaman, Y ekseni Hz, renk skalası PSD seviyesidir.', 'Dominant ridge sürekli görünüyorsa kalıcı bileşen gösterebilir; kesintiler veri kalitesiyle karşılaştırılmalıdır.', 'Spektral hesaplama 1 saniyelik kaynak veri üzerinden yapılır. 15 dakika ve 1 saat seçenekleri yalnız sonuçların görüntüleme/özetleme düzeyini değiştirir.'],
+          table: ['Anlamlı Bölgeler sekmesi kısa parçaları birleştirilmiş zaman-frekans adaylarını gösterir.', 'Veri Kalitesi sekmesi yalnız sorunlu veya doldurulmuş pencereleri öne çıkarır; sorunsuzsa özet metin gösterilir.', 'Satıra tıklamak spektrogramı ilgili zaman aralığına yakınlaştırır.'],
+          mistakes: ['En yüksek renk her zaman anlamlı salınım değildir.', 'Kısa ridge parçası kalıcı olay kanıtı sayılmamalıdır.', '15 dakika ve 1 saat görünümü yeniden PSD/STFT hesaplamaz.'],
+          ai: ['Sürekli ridge varsa Koherens ve Faz analiziyle iki kaynağı karşılaştırın.', 'Geçersiz pencere yoğunsa tarih aralığını daraltın veya kalite eşiğini artırın.', 'Welch’teki baskın frekansı aynı zaman aralığında arayın.'],
+          math: ['STFT pencereleri window-center referansıyla zamanlanır.', 'Log güç birimi dB re 1 Hz²/Hz olarak raporlanır; renk aralığı yorumunu etkiler.']
+        },
+        en: {
+          title: 'Spectrogram — Time-Frequency Analysis',
+          summary: 'The Spectrogram shows how frequency content changes over time as a color time-frequency map. It helps separate persistent oscillation tracks from transient components. The highest frequency in each time window is not automatically a meaningful oscillation; SNR, continuity, and data quality must be evaluated together.',
+          what: ['STFT takes sliding segments over the series and computes a spectrum for each segment.', 'The ridge tracks dominant frequency across windows.'],
+          when: ['Inspecting frequency changes over time', 'Checking time continuity of a Welch peak', 'Seeing data-quality and imputation effects by window'],
+          results: ['Meaningful regions are summarized by duration, dominant frequency, SNR, and confidence.', 'Window quality is read with valid ratio, missing samples, and imputed sample count.', 'Invalid windows are separated with a gray/transparent mask.'],
+          chart: ['X axis is absolute time, Y axis is Hz, and color is PSD level.', 'A continuous dominant ridge can indicate persistence; interruptions should be compared with data quality.', 'Spectral calculation is performed on the one-second source series. 15-minute and 1-hour options change only display/summarization level.'],
+          table: ['The Meaningful Regions tab shows merged time-frequency candidates rather than every short fragment.', 'The Data Quality tab emphasizes only problematic or imputed windows; if none exist, a summary is shown.', 'Clicking a row zooms the spectrogram to the related time interval.'],
+          mistakes: ['The strongest color is not always a meaningful oscillation.', 'A short ridge fragment should not be treated as a persistent event.', '15-minute and 1-hour views do not recompute PSD/STFT.'],
+          ai: ['If a continuous ridge appears, compare the two sources with Coherence and Phase.', 'If invalid windows dominate, narrow the date range or tighten quality filtering.', 'Search for the dominant Welch frequency in the same time interval.'],
+          math: ['STFT windows are timestamped by window-center reference.', 'Log power is reported as dB re 1 Hz²/Hz; color range affects interpretation.']
+        }
+      },
+      oscillation: {
+        parameterKeys: ['date', 'alignment', 'band', 'threshold', 'window', 'step', 'filter', 'duration'],
+        glossary: ['threshold', 'duration', 'snr', 'confidenceInterval', 'bandwidth', 'windowFunction'],
+        tr: {
+          title: 'Osilasyon Adayı Bulguları',
+          summary: 'Seçili frekans bandında bant geçiren filtre ve kayan pencere eşiğiyle olası osilasyon adaylarını listeler. Confidence alanı fiziksel olasılık değil, veri kalitesi, süre, genlik ve destekleyici ölçütlerden türetilmiş açıklanabilir bir skordur.',
+          what: ['Aday frekans, genlik, süre, SNR ve güven skoru birlikte hesaplanır.', 'Bant geçiren filtre yalnız seçili frekans aralığındaki bileşene odaklanır.'],
+          when: ['Salınım araştırması', 'Welch/Spektrogram sonrası aday aralık çıkarma', 'Olay inceleme'],
+          results: ['Yüksek genlik ve uzun süre daha güçlü aday gösterebilir.', 'SNR düşükse aday gürültü düzeyine yakın olabilir.', 'Güven skoru tek başına olasılık değildir ve diğer metriklerle okunmalıdır.'],
+          chart: ['Grafik filtrelenmiş bileşen ve aday zaman aralıklarını gösterir.', 'Eşik çizgisi aday başlangıcını ve bitişini yorumlamaya yardım eder.', 'Eksik veri varsa aday güveni düşebilir.'],
+          table: ['Her satır bir aday osilasyon aralığıdır.', 'Süre, tepe, RMS, baskın frekans ve sınıf birlikte okunmalıdır.', 'Satıra tıklama ilgili zaman aralığına yakınlaştırır.'],
+          mistakes: ['Confidence değeri doğrudan olasılık değildir.', 'Filtre bandı yanlışsa aday kaçabilir.', 'Kısa yüksek genlik tek başına kalıcı salınım kanıtı değildir.'],
+          ai: ['Aday frekansı Welch ve Spektrogram’da çapraz kontrol edin.', 'Aday iki kaynakta da görünüyorsa Koherens ve Faz analiziyle destek arayın.', 'Düşük güvenli adaylarda bant ve eşik ayarlarını yeniden değerlendirin.'],
+          math: ['Motor bant geçiren FIR filtre ve kayan pencere eşikleme kullanır.', 'Minimum süre ve birleştirme boşluğu aday parçalarının rapora girip girmeyeceğini belirler.']
+        },
+        en: {
+          title: 'Oscillation Candidate Findings',
+          summary: 'Lists possible oscillation candidates in the selected frequency band using a band-pass filter and sliding-window thresholding. Confidence is not a physical probability; it is an explainable score derived from data quality, duration, amplitude, and supporting metrics.',
+          what: ['Candidate frequency, amplitude, duration, SNR, and confidence score are evaluated together.', 'The band-pass filter focuses on components inside the selected frequency range.'],
+          when: ['Oscillation investigation', 'Extracting candidate intervals after Welch/Spectrogram', 'Incident review'],
+          results: ['Higher amplitude and longer duration can indicate a stronger candidate.', 'Low SNR means the candidate may be near noise level.', 'Confidence is not probability and should be read with other metrics.'],
+          chart: ['The chart shows the filtered component and candidate time intervals.', 'The threshold line helps interpret candidate start and end.', 'Missing data can reduce candidate confidence.'],
+          table: ['Each row is one candidate oscillation interval.', 'Read duration, peak, RMS, dominant frequency, and class together.', 'Clicking a row zooms the related time interval.'],
+          mistakes: ['Confidence is not direct probability.', 'A wrong filter band can miss a candidate.', 'A short high-amplitude burst alone does not prove a persistent oscillation.'],
+          ai: ['Cross-check candidate frequency in Welch and Spectrogram.', 'If the candidate appears in both sources, look for support in Coherence and Phase.', 'For low-confidence candidates, revisit band and threshold settings.'],
+          math: ['The engine uses a band-pass FIR filter and sliding-window thresholding.', 'Minimum duration and merge gap determine whether candidate fragments enter the report.']
+        }
+      },
+      crossCorrelation: {
+        parameterKeys: ['date', 'alignment', 'resolution', 'window'],
+        glossary: ['lag', 'crossCorrelation', 'validSample', 'missingSample'],
+        tr: {
+          title: 'Çapraz Korelasyon Özeti',
+          summary: 'Türkiye ve Kıta Avrupası serilerinin farklı gecikmelerde ne kadar benzer hareket ettiğini ölçer. Pozitif veya negatif gecikme kaynak sırasına bağlıdır. Korelasyon ve gecikme nedensellik veya fiziksel enerji akışı kanıtlamaz.',
+          what: ['Eşlenmiş iki iyi kalite seri ortak saniye ekseninde karşılaştırılır.', 'Motor maksimum gecikmeyi 30 saniye sınırında tarar.'],
+          when: ['İki kaynak karşılaştırması', 'Olay zamanlaması farkı inceleme', 'Koherens analizi öncesi genel benzerlik kontrolü'],
+          results: ['Maksimum korelasyon iki serinin en benzer gecikmesini gösterir.', 'Negatif korelasyon ters yönlü hareket ihtimalini işaret edebilir.', 'Ortak örnek sayısı düşükse sonuç güveni azalır.'],
+          chart: ['X ekseni gecikme saniyesi, Y ekseni korelasyon katsayısıdır.', 'Tepe nokta en güçlü benzerliği gösterir.', 'Kaynak sırası gecikme işaretinin yorumunu belirler.'],
+          table: ['Özet satırları en iyi gecikme, mutlak korelasyon ve negatif korelasyonu verir.', 'Satırlar tanı değil, benzerlik ölçüsüdür.', 'Gecikme işareti kaynak sırası ile birlikte okunmalıdır.'],
+          mistakes: ['Korelasyon nedensellik değildir.', 'Yüksek benzerlik fiziksel bağlantı kanıtlamaz.', 'Yanlış zaman eşleştirme gecikmeyi yanıltabilir.'],
+          ai: ['Yüksek korelasyon varsa aynı aralığı ham grafikte karşılaştırın.', 'Belirli frekansta ortak hareket gerekiyorsa Koherens ve Faz’a geçin.', 'Düşük ortak örnek varsa önce kalite analizini kontrol edin.'],
+          math: ['Korelasyon katsayısı -1 ile +1 arasındadır.', 'Hesap eşlenmiş saniyelik seriler üzerinde normalizasyonla yapılır.']
+        },
+        en: {
+          title: 'Cross-Correlation Summary',
+          summary: 'Measures how similarly Türkiye and Continental Europe series move at different lags. Positive or negative lag depends on source order. Correlation and lag do not prove causality or physical energy flow.',
+          what: ['Two paired Good Quality series are compared on a common second-level axis.', 'The engine scans a maximum lag of 30 seconds.'],
+          when: ['Two-source comparison', 'Inspecting event timing differences', 'General similarity check before coherence analysis'],
+          results: ['Maximum correlation indicates the lag with strongest similarity.', 'Negative correlation can indicate opposite-direction movement.', 'Low common sample count reduces confidence.'],
+          chart: ['X axis is lag in seconds and Y axis is correlation coefficient.', 'The peak indicates strongest similarity.', 'Source order determines the sign interpretation.'],
+          table: ['Summary rows report best lag, absolute correlation, and negative correlation.', 'Rows are similarity measures, not diagnosis.', 'Read lag sign together with source order.'],
+          mistakes: ['Correlation is not causation.', 'High similarity does not prove physical connection.', 'Wrong time alignment can mislead lag interpretation.'],
+          ai: ['If correlation is high, compare the same interval on the raw chart.', 'If frequency-specific common movement matters, run Coherence and Phase.', 'If common sample count is low, inspect Coverage first.'],
+          math: ['Correlation coefficient ranges from -1 to +1.', 'The calculation is normalized over paired second-level series.']
+        }
+      },
+      coherence: {
+        parameterKeys: ['date', 'alignment', 'resolution', 'band', 'window'],
+        glossary: ['coherence', 'phase', 'phaseWrapping', 'fft', 'psd', 'segment', 'snr'],
+        tr: {
+          title: 'Koherens ve Faz Özeti',
+          summary: 'İki eşlenmiş serinin belirli frekanslarda ortak hareket edip etmediğini ve faz farkını inceler. Düşük güç bulunan frekanslarda faz yorumu güvenilir olmayabilir; faz yalnız yeterli koherens ve spektral güçle birlikte değerlendirilmelidir.',
+          what: ['Koherens 0-1 arası ortak hareket gücünü, faz ise aynı frekanstaki açı farkını gösterir.', 'Hesap Welch tabanlı çapraz spektrumla yapılır.'],
+          when: ['İki kaynak karşılaştırması', 'Spektrogram ridge’inin iki kaynakta ortak olup olmadığını kontrol', 'Faz ilişkisi araştırması'],
+          results: ['Yüksek koherens ortak frekanslı hareketi gösterebilir.', 'Faz açısı zaman ilişkisi hakkında ipucu verir, ancak sarmalama dikkate alınmalıdır.', 'Düşük SNR veya düşük güçte faz yorumu zayıflar.'],
+          chart: ['X ekseni frekans, Y ekseni koherens veya faz değeridir.', 'Seçili bant ve hedef frekans yorum odağını belirler.', 'Yakın frekanslar etkin çözünürlükle birlikte okunmalıdır.'],
+          table: ['Tablo seçili/tepe frekanstaki koherens ve faz değerini gösterir.', 'Öncelik yüksek koherens ve yeterli spektral güçtedir.', 'Tek satır kesin fiziksel bağlantı kanıtı değildir.'],
+          mistakes: ['Yüksek koherens tek başına fiziksel bağlantı kanıtlamaz.', 'Faz sarmalaması ani yön değişimi gibi görünebilir.', 'Düşük güçte faz yorumlamak yanıltıcıdır.'],
+          ai: ['Yüksek koherens frekansını Welch PSD’de iki kaynak için karşılaştırın.', 'Faz yorumu yapmadan önce veri kalitesi ve SNR değerlerini kontrol edin.', 'Spektrogramda aynı frekansın zaman sürekliliğini arayın.'],
+          math: ['Magnitude-squared coherence çapraz spektrum ve iki autospektrumdan hesaplanır.', 'Faz açısı derece olarak normalize edilir ve -180°/+180° çevresinde sarılabilir.']
+        },
+        en: {
+          title: 'Coherence and Phase Summary',
+          summary: 'Inspects whether two paired series move together at specific frequencies and what phase difference they have. Phase can be unreliable at frequencies with low power; interpret phase only together with sufficient coherence and spectral power.',
+          what: ['Coherence from 0 to 1 measures common movement, while phase shows angle difference at the same frequency.', 'The calculation uses Welch-based cross spectra.'],
+          when: ['Two-source comparison', 'Checking whether a Spectrogram ridge is common across sources', 'Investigating phase relationship'],
+          results: ['High coherence can indicate common frequency-specific movement.', 'Phase angle gives a timing clue, but wrapping matters.', 'Low SNR or low power weakens phase interpretation.'],
+          chart: ['X axis is frequency and Y axis is coherence or phase value.', 'The selected band and target frequency set interpretation focus.', 'Nearby frequencies should be read with effective resolution.'],
+          table: ['The table reports coherence and phase at the selected/peak frequency.', 'Prioritize high coherence with enough spectral power.', 'A single row is not proof of physical connection.'],
+          mistakes: ['High coherence alone does not prove physical connection.', 'Phase wrapping can look like an abrupt direction change.', 'Interpreting phase at low power is misleading.'],
+          ai: ['Compare the high-coherence frequency in Welch PSD for both sources.', 'Check data quality and SNR before interpreting phase.', 'Look for time continuity at the same frequency in the Spectrogram.'],
+          math: ['Magnitude-squared coherence is computed from cross spectrum and two autospectra.', 'Phase angle is normalized in degrees and can wrap around -180°/+180°.']
+        }
+      },
+      trend: {
+        parameterKeys: ['date', 'alignment', 'resolution'],
+        glossary: ['dailyAggregation', 'trend', 'rollingAverage', 'mean', 'median', 'coverage'],
+        tr: {
+          title: 'Uzun Dönem Trend Özeti',
+          summary: 'Günlük veya saatlik özetlerle frekans davranışının zaman içindeki yönünü ve değişimini gösterir. Hızlı salınımları bulmak için değil, genel kayma ve kalite etkisini görmek için uygundur. Eksik kapsamalı günler trendi yanıltabilir.',
+          what: ['Günlük ortalama, medyan, min/maks ve bant ihlali özetleri karşılaştırılır.', 'Hareketli ortalama kısa dalgalanmayı yumuşatarak yönü görünür kılar.'],
+          when: ['Uzun dönem eğilim analizi', 'Veri kapsamı etkisini günler arasında karşılaştırma', 'Günlük kalite kontrol sonrası özet izleme'],
+          results: ['Yönlü değişim bir işletme koşulu veya veri kaynağı değişimini işaret edebilir.', 'Düşük kapsamalı günlerde trend güveni azalır.', 'Bant ihlali süresi günlük ortalamadan farklı bilgi verir.'],
+          chart: ['X ekseni gün veya saat, Y ekseni seçili özet metriktir.', 'Hareketli ortalama genel yönü, tekil noktalar günlük değişkenliği gösterir.', 'Eksik kapsamalı günler ayrı kalite bilgisiyle okunmalıdır.'],
+          table: ['Her satır bir gün veya saat özetidir.', 'RMS sapma, kapsama ve bant ihlali sütunları birlikte değerlendirilir.', 'Satıra tıklama ilgili dönemi daha ayrıntılı analiz için seçmeye yardımcı olur.'],
+          mistakes: ['Trend hızlı osilasyonları göstermez.', 'Eksik kapsamalı günleri normal gün gibi okumak yanıltır.', 'Tek günlük sapma uzun dönem eğilim kanıtı değildir.'],
+          ai: ['Trend değişmişse Temel İstatistikler ve Bant İhlali ile aynı dönemi karşılaştırın.', 'Kapsama düşen günleri Veri Kapsama analizinde inceleyin.', 'Ani kırılma varsa ham günlük grafikte kaynak değişimi olup olmadığını kontrol edin.'],
+          math: ['Trend özetleri dakikalık veya saatlik agregasyonlarla hesaplanır.', 'Hareketli ortalama yönü yumuşatır ancak kısa süreli ihlalleri gizleyebilir.']
+        },
+        en: {
+          title: 'Long-Term Trend Summary',
+          summary: 'Shows direction and change in frequency behavior using daily or hourly summaries. It is meant for general drift and data-quality effects, not fast oscillation detection. Days with low coverage can mislead trend interpretation.',
+          what: ['Daily mean, median, min/max, and band-violation summaries are compared.', 'Rolling average smooths short fluctuation and makes direction visible.'],
+          when: ['Long-term trend analysis', 'Comparing coverage effects across days', 'Summary monitoring after daily quality control'],
+          results: ['Directional change can indicate operating condition or data-source changes.', 'Trend confidence decreases on low-coverage days.', 'Band-violation duration carries different information than daily mean.'],
+          chart: ['X axis is day or hour and Y axis is the selected summary metric.', 'Rolling average shows general direction, while individual points show day-level variability.', 'Low-coverage days should be read with separate quality information.'],
+          table: ['Each row is a day or hour summary.', 'RMS deviation, coverage, and band violation should be evaluated together.', 'Clicking a row helps choose the period for deeper analysis.'],
+          mistakes: ['Trend does not show fast oscillations.', 'Reading low-coverage days as normal days is misleading.', 'One daily deviation does not prove a long-term trend.'],
+          ai: ['If trend changes, compare the same period with Basic Statistics and Band Violation.', 'Inspect low-coverage days in Data Coverage.', 'If a break appears, check the raw daily chart for source changes.'],
+          math: ['Trend summaries use minute or hourly aggregations.', 'Rolling average smooths direction but can hide short violations.']
+        }
+      }
+    };
+
     const CHART_SESSION_STORAGE_KEY = 'frequencyChartSessionState';
     const ROUTE_TAB_TO_PATH = {
       'tab-regions': 'regions',
@@ -3843,6 +5169,10 @@
         workerPending: null,
         runToken: 0,
         activeRunToken: null
+      },
+      analysisHelp: {
+        previousFocus: null,
+        activeGlossaryLetter: 'all'
       },
       analysisCalendarDate: new Date(),
       activeDateRequestController: null,
@@ -4594,6 +5924,12 @@
         event.stopPropagation();
         toggleAnalysisInfoPanel();
       });
+      $('analysisHelpCloseBtn')?.addEventListener('click', () => toggleAnalysisInfoPanel(false));
+      $('analysisHelpLangToggle')?.addEventListener('click', () => setLanguage(lang === 'tr' ? 'en' : 'tr'));
+      $('analysisInfoPanel')?.addEventListener('click', event => {
+        if (event.target === $('analysisInfoPanel')) toggleAnalysisInfoPanel(false);
+      });
+      $('analysisInfoPanel')?.addEventListener('keydown', handleAnalysisHelpModalKeydown);
       $('analysisSourceSelect').addEventListener('change', () => {
         syncAnalysisSource('analysis');
         updateAnalysisAvailability();
@@ -7080,6 +8416,383 @@
       });
     }
 
+    function analysisHelpContent(type = $('analysisTypeSelect')?.value || 'stats') {
+      const key = ANALYSIS_HELP_CONTENT[type] ? type : 'stats';
+      return ANALYSIS_HELP_CONTENT[key][lang] || ANALYSIS_HELP_CONTENT[key].tr;
+    }
+
+    function analysisHelpConfig(type = $('analysisTypeSelect')?.value || 'stats') {
+      return ANALYSIS_HELP_CONTENT[type] || ANALYSIS_HELP_CONTENT.stats;
+    }
+
+    function selectedOptionText(id) {
+      const select = $(id);
+      return select?.selectedOptions?.[0]?.textContent?.trim() || select?.value || '';
+    }
+
+    function localizedEnumValue(controlId, fallback = '') {
+      const value = selectedOptionText(controlId);
+      return value || fallback || '—';
+    }
+
+    function visibleAnalysisHelpParameterKeys(type = $('analysisTypeSelect')?.value || 'stats') {
+      const def = analysisDefinition(type);
+      const configured = analysisHelpConfig(type).parameterKeys || [];
+      const visible = new Set(configured);
+      if (type !== 'rocof') {
+        visible.delete('rocofPrefilter');
+        visible.delete('rocofRegression');
+      } else {
+        const method = $('rocofMethod')?.value || 'central';
+        if (method !== 'filteredDerivative') visible.delete('rocofPrefilter');
+        if (method !== 'movingRegression') visible.delete('rocofRegression');
+      }
+      if (!def.allowedResolutions?.includes('1s') && type !== 'trend') visible.delete('resolution');
+      return [...visible];
+    }
+
+    function currentParameterValue(key, type = $('analysisTypeSelect')?.value || 'stats') {
+      if (key === 'date') {
+        const mode = selectedOptionText('analysisDateMode');
+        const start = $('analysisStartDate')?.value || $('analysisDateSelect')?.value || '—';
+        const end = $('analysisEndDate')?.value || start;
+        const startHour = $('analysisStartHour')?.value || '00:00';
+        const endHour = $('analysisEndHour')?.value || '23:59';
+        return `${mode}: ${start}${end && end !== start ? ` – ${end}` : ''}, ${startHour}–${endHour}`;
+      }
+      if (key === 'alignment') return localizedEnumValue('analysisAlignment');
+      if (key === 'resolution') return localizedEnumValue('analysisResolution');
+      if (key === 'yd') return `${Number($('repeatedValueSeconds')?.value || state.settings.repeatedValueSeconds || 15)} ${secondsUnitShort()}`;
+      if (key === 'statsBand') return `${fmt(Number($('statsBandMinHz')?.value || 49.90), 2)}–${fmt(Number($('statsBandMaxHz')?.value || 50.10), 2)} Hz`;
+      if (key === 'duration') return `${Number($('minDuration')?.value || state.settings.minDuration || 0)} ${secondsUnitShort()}`;
+      if (key === 'band') return `${fmt(Number($('bandMin')?.value || 0), 3)}–${fmt(Number($('bandMax')?.value || 0), 3)} Hz`;
+      if (key === 'threshold') return `${fmt(Number($('oscThreshold')?.value || state.settings.thresholdMhz || 0), 1)} mHz`;
+      if (key === 'window') return `${Number($('windowSec')?.value || state.settings.windowSec || 0)} ${secondsUnitShort()}`;
+      if (key === 'step') return `${Number($('stepSec')?.value || state.settings.stepSec || 0)} ${secondsUnitShort()}`;
+      if (key === 'filter') return `${Number($('filterTaps')?.value || state.settings.filterTaps || 0)}`;
+      if (key === 'rocofMethod') return localizedEnumValue('rocofMethod');
+      if (key === 'rocofThreshold') return `${fmt(Number($('rocofThreshold')?.value || 0), 1)} mHz/s`;
+      if (key === 'rocofPrefilter') return `${Number($('rocofPreFilterSeconds')?.value || 0)} ${secondsUnitShort()}`;
+      if (key === 'rocofRegression') return `${Number($('rocofRegressionWindowSeconds')?.value || 0)} ${secondsUnitShort()}`;
+      if (key === 'spectralWindow') return localizedEnumValue('spectralWindowType');
+      if (key === 'spectralDetrend') return localizedEnumValue('spectralDetrend');
+      if (key === 'spectralValid') return `${fmt(Number($('spectralMinValidRatioPct')?.value || 0), 0)}%`;
+      if (key === 'spectralScale') return localizedEnumValue('spectralScale');
+      if (key === 'spectralAveraging') return localizedEnumValue('spectralAveraging');
+      if (key === 'spectralPeaks') return `${Number($('spectralMaxPeaks')?.value || 0)}`;
+      if (key === 'spectralCells') return numberText(Number($('spectralMaxCells')?.value || 0));
+      if (key === 'spectralDisplay') return `${localizedEnumValue('spectralDisplaySummary')} · ${localizedEnumValue('spectralDisplayTimezone')}`;
+      if (key === 'spectralPeakAdvanced') {
+        return `${t('spectralSignificantSnrDbLabel')}: ${fmt(Number($('spectralSignificantSnrDb')?.value || 0), 1)} dB · ${t('spectralWeakSnrDbLabel')}: ${fmt(Number($('spectralWeakSnrDb')?.value || 0), 1)} dB`;
+      }
+      return type ? '—' : '';
+    }
+
+    function buildAnalysisHelpDynamicItems(type) {
+      const source = sourceLabel(getAnalysisSource());
+      const def = analysisDefinition(type);
+      const items = [
+        { label: t('analysisTypeLabel'), value: t(def.labelKey) },
+        { label: t('analysisSourceLabel'), value: source }
+      ];
+      for (const key of visibleAnalysisHelpParameterKeys(type).slice(0, 6)) {
+        const param = ANALYSIS_HELP_PARAMETER_DEFINITIONS[key]?.[lang] || ANALYSIS_HELP_PARAMETER_DEFINITIONS[key]?.tr;
+        if (!param) continue;
+        items.push({ label: param.label, value: currentParameterValue(key, type) });
+      }
+      if (isSpectralAnalysis(type)) {
+        items.push({
+          label: t('spectralCalculationResolution'),
+          value: lang === 'en'
+            ? '1-second source series; display summary only changes presentation'
+            : '1 saniyelik kaynak veri; görüntü özeti yalnız sunumu değiştirir'
+        });
+      }
+      return items;
+    }
+
+    function buildAnalysisHelpParameterCards(type) {
+      return visibleAnalysisHelpParameterKeys(type).map(key => {
+        const raw = ANALYSIS_HELP_PARAMETER_DEFINITIONS[key] || ANALYSIS_HELP_PARAMETER_DEFINITIONS.date;
+        const info = raw[lang] || raw.tr;
+        const unit = raw.unit || t('unitlessUnit');
+        return `
+          <article class="analysis-help-card" data-help-parameter-card>
+            <span class="label">${escapeHtml(info.label)}</span>
+            <div class="value">${escapeHtml(currentParameterValue(key, type))}</div>
+            <dl>
+              <div><dt>${escapeHtml(t('analysisHelpTechnicalMeaning'))}</dt><dd>${escapeHtml(info.meaning)}</dd></div>
+              <div><dt>${escapeHtml(t('analysisHelpUnit'))}</dt><dd>${escapeHtml(unit)}</dd></div>
+              <div><dt>${escapeHtml(t('analysisHelpIncrease'))}</dt><dd>${escapeHtml(info.increase)}</dd></div>
+              <div><dt>${escapeHtml(t('analysisHelpDecrease'))}</dt><dd>${escapeHtml(info.decrease)}</dd></div>
+              <div><dt>${escapeHtml(t('analysisHelpRisk'))}</dt><dd>${escapeHtml(info.risk)}</dd></div>
+              <div><dt>${escapeHtml(t('analysisHelpRecommended'))}</dt><dd>${escapeHtml(info.recommended)}</dd></div>
+              <div><dt>${escapeHtml(t('analysisHelpProfileBehavior'))}</dt><dd>${escapeHtml(info.profile)}</dd></div>
+              <div><dt>${escapeHtml(t('analysisHelpEngineParameter'))}</dt><dd><code>${escapeHtml(raw.engineParameter)}</code></dd></div>
+            </dl>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function buildAnalysisHelpResultSummary(type) {
+      const result = state.analysis.lastResult;
+      if (!result || result.type !== type) return null;
+      if (type === 'quality') {
+        return [
+          `${t('qualityCoverage')}: ${normalizeAnalysisCard(result.cards?.[0] || []).value || '—'}`,
+          `${t('qualityMissing')}: ${normalizeAnalysisCard(result.cards?.[2] || []).value || '—'}`,
+          lang === 'en' ? 'Inspect missing or repeated periods before advanced analysis.' : 'Gelişmiş analizden önce eksik veya yinelenen dönemleri inceleyin.'
+        ];
+      }
+      if (type === 'stats') {
+        return [
+          `${t('statsMean')}: ${result.stats ? statsValueText(result.stats.mean, 4, ' Hz') : '—'}`,
+          `${t('rmsDeviation')}: ${result.stats ? statsValueText(result.stats.rmsDeviationMhz, 2, ' mHz') : '—'}`,
+          lang === 'en' ? 'Compare extremes with band-violation rows if they stand out.' : 'Uç değerler belirginse bant ihlali satırlarıyla karşılaştırın.'
+        ];
+      }
+      if (type === 'events') {
+        return [
+          `${t('statsBandViolationCount', { count: result.events?.length || 0 })}`,
+          `${t('qualityGood')}: ${result.bandViolationMeta ? durationText(result.bandViolationMeta.goodSeconds || 0) : '—'}`,
+          lang === 'en' ? 'Review the longest event together with raw frequency.' : 'En uzun olayı ham frekansla birlikte inceleyin.'
+        ];
+      }
+      if (type === 'rocof') {
+        const meta = result.rocofMeta || {};
+        return [
+          `${t('rocofPositiveCount')}: ${meta.positiveEventCount || 0}`,
+          `${t('rocofNegativeCount')}: ${meta.negativeEventCount || 0}`,
+          lang === 'en' ? 'Check matching band violations around RoCoF event boundaries.' : 'RoCoF olay sınırlarında bant ihlali eşleşmesini kontrol edin.'
+        ];
+      }
+      if (type === 'psd') {
+        const peaks = result.chart?.welch?.peaks || [];
+        return [
+          t('psdResultDescription', { peaks: peaks.length, used: result.chart?.welch?.acceptedSegmentCount || 0, rejected: result.chart?.welch?.rejectedSegmentCount || 0 }),
+          peaks[0]?.frequencyHz ? `${t('dominantFrequency')}: ${fmt(peaks[0].frequencyHz, 4)} Hz` : '',
+          lang === 'en' ? 'Check whether the same peak persists in the Spectrogram.' : 'Aynı tepenin Spektrogram’da sürekli olup olmadığını kontrol edin.'
+        ].filter(Boolean);
+      }
+      if (type === 'spectrogram') {
+        const spec = result.chart?.spectrogram || {};
+        return [
+          t('spectrogramResultDescription', { windows: spec.acceptedSegmentCount || 0, rejected: spec.rejectedSegmentCount || 0, imputed: spec.imputedWindowCount || 0 }),
+          `${t('spectrogramRidge')}: ${spectrogramDominantFrequencyLabel(spec)}`,
+          lang === 'en' ? 'Use Coherence and Phase if a continuous ridge appears in both sources.' : 'Sürekli ridge iki kaynakta görünüyorsa Koherens ve Faz ile kontrol edin.'
+        ];
+      }
+      if (type === 'oscillation') {
+        return [
+          `${t('findingsCount', { count: result.events?.length || 0 })}`,
+          lang === 'en' ? 'Cross-check candidate frequency in Welch and Spectrogram.' : 'Aday frekansı Welch ve Spektrogram’da çapraz kontrol edin.'
+        ];
+      }
+      if (type === 'crossCorrelation') {
+        return [
+          `${t('bestLag')}: ${result.tableRows?.[0]?.value || '—'}`,
+          `${t('kpiCorrelation')}: ${result.tableRows?.[1]?.value || '—'}`,
+          lang === 'en' ? 'Correlation is a similarity clue, not causality.' : 'Korelasyon benzerlik ipucudur, nedensellik değildir.'
+        ];
+      }
+      if (type === 'coherence') {
+        return [
+          `${t('coherence')}: ${normalizeAnalysisCard(result.cards?.[0] || []).value || '—'}`,
+          `${t('phaseDifference')}: ${normalizeAnalysisCard(result.cards?.[1] || []).value || '—'}`,
+          lang === 'en' ? 'Interpret phase only where power and coherence are sufficient.' : 'Fazı yalnız güç ve koherens yeterliyse yorumlayın.'
+        ];
+      }
+      if (type === 'trend') {
+        return [
+          `${t('qualityCoverage')}: ${normalizeAnalysisCard(result.cards?.[2] || []).value || '—'}`,
+          lang === 'en' ? 'Inspect low-coverage days before treating the trend as stable.' : 'Trendi kararlı yorumlamadan önce düşük kapsamalı günleri inceleyin.'
+        ];
+      }
+      return null;
+    }
+
+    function renderAnalysisHelpAccordingToResult(type) {
+      const box = $('analysisHelpAccordingToResult');
+      if (!box) return;
+      const summary = buildAnalysisHelpResultSummary(type);
+      if (!summary?.length) {
+        box.hidden = true;
+        box.innerHTML = '';
+        return;
+      }
+      box.hidden = false;
+      box.innerHTML = `
+        <h4>${escapeHtml(t('analysisHelpAccordingToResult'))}</h4>
+        <ul>${summary.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+      `;
+    }
+
+    function helpList(items = []) {
+      return `<ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
+    }
+
+    function helpParagraphs(items = []) {
+      return items.map(item => `<p>${escapeHtml(item)}</p>`).join('');
+    }
+
+    function renderResultInterpretationCards(content) {
+      return `<div class="analysis-help-result-grid">${(content.results || []).map(item => `
+        <article class="analysis-help-card">
+          <span class="label">${escapeHtml(t('analysisHelpInterpretationPoint'))}</span>
+          <div class="value">${escapeHtml(item)}</div>
+        </article>
+      `).join('')}</div>`;
+    }
+
+    function renderGlossary(type) {
+      const terms = (analysisHelpConfig(type).glossary || [])
+        .map(key => ({ key, entry: ANALYSIS_HELP_GLOSSARY[key]?.[lang] || ANALYSIS_HELP_GLOSSARY[key]?.tr }))
+        .filter(item => item.entry)
+        .sort((a, b) => a.entry[0].localeCompare(b.entry[0], lang === 'en' ? 'en' : 'tr'));
+      const letters = [...new Set(terms.map(item => item.entry[0].trim().charAt(0).toUpperCase()).filter(Boolean))];
+      return `
+        <div class="analysis-help-glossary-controls">
+          <label for="analysisHelpGlossarySearch">${escapeHtml(t('analysisHelpGlossarySearchLabel'))}</label>
+          <input id="analysisHelpGlossarySearch" type="search" placeholder="${escapeHtml(t('analysisHelpGlossarySearchPlaceholder'))}" autocomplete="off" />
+          <div class="analysis-help-alpha" role="group" aria-label="${escapeHtml(t('analysisHelpAlphabetFilter'))}">
+            <button type="button" class="is-active" data-glossary-letter="all">${escapeHtml(t('analysisHelpAllTerms'))}</button>
+            ${letters.map(letter => `<button type="button" data-glossary-letter="${escapeHtml(letter)}">${escapeHtml(letter)}</button>`).join('')}
+          </div>
+        </div>
+        <dl class="analysis-help-glossary-list">
+          ${terms.map(({ entry }) => `
+            <div data-help-glossary-item data-term="${escapeHtml(entry[0].toLowerCase())}" data-letter="${escapeHtml(entry[0].trim().charAt(0).toUpperCase())}">
+              <dt>${escapeHtml(entry[0])}</dt>
+              <dd>${escapeHtml(entry[1])}</dd>
+              <dd>${escapeHtml(entry[2])}</dd>
+            </div>
+          `).join('')}
+        </dl>
+      `;
+    }
+
+    function renderAnalysisHelpSection(key, html, { open = false } = {}) {
+      const id = `analysis-help-${key}`;
+      return `
+        <section class="analysis-help-section" data-help-section="${escapeHtml(key)}">
+          <button type="button" class="analysis-help-section-toggle" data-help-section-toggle aria-expanded="${open ? 'true' : 'false'}" aria-controls="${id}">
+            <span>${escapeHtml(t(`helpSection${key[0].toUpperCase()}${key.slice(1)}`))}</span>
+          </button>
+          <div id="${id}" class="analysis-help-section-panel" data-help-section-panel ${open ? '' : 'hidden'}>
+            ${html}
+          </div>
+        </section>
+      `;
+    }
+
+    function renderAnalysisHelpModal() {
+      const type = $('analysisTypeSelect')?.value || 'stats';
+      const content = analysisHelpContent(type);
+      const def = analysisDefinition(type);
+      const title = content.title || t(def.titleKey);
+      const titleNode = $('analysisHelpTitle');
+      const summaryNode = $('analysisHelpSummary');
+      if (titleNode) titleNode.textContent = title;
+      if (summaryNode) summaryNode.textContent = content.summary || t(def.descriptionKey);
+      const dynamic = $('analysisHelpDynamic');
+      if (dynamic) {
+        const items = buildAnalysisHelpDynamicItems(type);
+        dynamic.innerHTML = `
+          <h4>${escapeHtml(t('analysisHelpCurrentValues'))}</h4>
+          <div class="analysis-help-dynamic-grid">
+            ${items.map(item => `
+              <div class="analysis-help-dynamic-item">
+                <span class="label">${escapeHtml(item.label)}</span>
+                <span class="value">${escapeHtml(item.value)}</span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+      renderAnalysisHelpAccordingToResult(type);
+      const body = $('analysisHelpBody');
+      if (!body) return;
+      body.innerHTML = `
+        <div class="analysis-help-sections">
+          ${renderAnalysisHelpSection('What', helpParagraphs(content.what || [content.summary]), { open: true })}
+          ${renderAnalysisHelpSection('When', helpList(content.when), { open: false })}
+          ${renderAnalysisHelpSection('Parameters', `<div class="analysis-help-card-grid">${buildAnalysisHelpParameterCards(type)}</div>`, { open: true })}
+          ${renderAnalysisHelpSection('Results', renderResultInterpretationCards(content), { open: true })}
+          ${renderAnalysisHelpSection('AiSuggestions', helpList(content.ai), { open: true })}
+          ${renderAnalysisHelpSection('Chart', helpList(content.chart), { open: false })}
+          ${renderAnalysisHelpSection('Table', helpList(content.table), { open: false })}
+          ${renderAnalysisHelpSection('Mistakes', helpList(content.mistakes), { open: false })}
+          ${renderAnalysisHelpSection('Glossary', renderGlossary(type), { open: false })}
+          ${renderAnalysisHelpSection('MathEngine', helpList([...(content.math || []), t(def.methodKey), t(def.limitationsKey)]), { open: false })}
+        </div>
+      `;
+      bindAnalysisHelpControls(body);
+    }
+
+    function bindAnalysisHelpControls(root = $('analysisHelpBody')) {
+      root?.querySelectorAll('[data-help-section-toggle]').forEach(button => {
+        button.addEventListener('click', () => {
+          const panel = $(button.getAttribute('aria-controls'));
+          const expanded = button.getAttribute('aria-expanded') === 'true';
+          button.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+          if (panel) panel.hidden = expanded;
+        });
+      });
+      const search = $('analysisHelpGlossarySearch');
+      if (search) {
+        search.addEventListener('input', filterAnalysisHelpGlossary);
+      }
+      root?.querySelectorAll('[data-glossary-letter]').forEach(button => {
+        button.addEventListener('click', () => {
+          state.analysisHelp.activeGlossaryLetter = button.dataset.glossaryLetter || 'all';
+          root.querySelectorAll('[data-glossary-letter]').forEach(item => item.classList.toggle('is-active', item === button));
+          filterAnalysisHelpGlossary();
+        });
+      });
+    }
+
+    function filterAnalysisHelpGlossary() {
+      const search = ($('analysisHelpGlossarySearch')?.value || '').trim().toLowerCase();
+      const letter = state.analysisHelp.activeGlossaryLetter || 'all';
+      document.querySelectorAll('[data-help-glossary-item]').forEach(item => {
+        const term = item.dataset.term || '';
+        const text = item.textContent?.toLowerCase() || '';
+        const matchesSearch = !search || term.includes(search) || text.includes(search);
+        const matchesLetter = letter === 'all' || item.dataset.letter === letter;
+        item.hidden = !(matchesSearch && matchesLetter);
+      });
+    }
+
+    function focusableAnalysisHelpElements() {
+      const panel = $('analysisInfoPanel');
+      if (!panel || panel.classList.contains('hidden')) return [];
+      return [...panel.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]
+        .filter(el => !el.disabled && el.offsetParent !== null);
+    }
+
+    function handleAnalysisHelpModalKeydown(event) {
+      const panel = $('analysisInfoPanel');
+      if (!panel || panel.classList.contains('hidden')) return;
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        toggleAnalysisInfoPanel(false);
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const focusables = focusableAnalysisHelpElements();
+      if (!focusables.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
     function syncSpectralQuickControlsFromAdvanced() {
       const pairs = [
         ['bandMin', 'spectralQuickBandMin'],
@@ -7224,9 +8937,27 @@
       const toggle = $('analysisInfoToggle');
       if (!panel || !toggle) return;
       const shouldOpen = typeof force === 'boolean' ? force : panel.classList.contains('hidden');
-      panel.classList.toggle('hidden', !shouldOpen);
-      toggle.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
-      if (shouldOpen) updateAnalysisInfoPanel();
+      if (shouldOpen) {
+        state.analysisHelp.previousFocus = document.activeElement;
+        state.analysisHelp.activeGlossaryLetter = 'all';
+        updateAnalysisInfoPanel();
+        panel.classList.remove('hidden');
+        panel.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('modal-open');
+        toggle.setAttribute('aria-expanded', 'true');
+        renderAnalysisHelpModal();
+        requestAnimationFrame(() => {
+          ($('analysisHelpCloseBtn') || panel.querySelector('.analysis-help-dialog') || panel).focus();
+        });
+        return;
+      }
+      panel.classList.add('hidden');
+      panel.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('modal-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      const previous = state.analysisHelp.previousFocus;
+      if (previous && document.contains(previous)) previous.focus();
+      else toggle.focus();
     }
 
     function updateAnalysisInfoPanel() {
@@ -7239,8 +8970,26 @@
       sampling.textContent = $('analysisSamplingInfo')?.textContent || t('analysisSamplingFallback');
       const toggle = $('analysisInfoToggle');
       if (toggle) {
-        toggle.setAttribute('aria-label', t('analysisInfoButtonLabel'));
-        toggle.setAttribute('title', t('analysisInfoButtonLabel'));
+        const label = t('analysisInfoButtonLabel', { analysis: t(analysisDefinition().labelKey) });
+        toggle.setAttribute('aria-label', label);
+        toggle.setAttribute('title', label);
+      }
+      const close = $('analysisHelpCloseBtn');
+      if (close) {
+        close.setAttribute('aria-label', t('analysisHelpClose'));
+        close.setAttribute('title', t('analysisHelpClose'));
+      }
+      const modalLang = $('analysisHelpLangToggle');
+      if (modalLang) {
+        modalLang.textContent = t('langToggle');
+        modalLang.setAttribute('aria-label', t('langToggle'));
+        modalLang.setAttribute('title', t('langToggle'));
+      }
+      const meta = $('analysisHelpEyebrow');
+      if (meta) meta.textContent = t('analysisHelpEyebrow');
+      const panel = $('analysisInfoPanel');
+      if (panel && !panel.classList.contains('hidden')) {
+        renderAnalysisHelpModal();
       }
     }
 
@@ -10870,6 +12619,7 @@
       renderAnalysisTable(result);
       renderSpectralDetailSummary(result);
       updateAnalysisSamplingInfo(result.metadata?.sampling || state.analysis.sampling);
+      updateAnalysisInfoPanel();
     }
 
     function renderGenericAnalysisChart(result) {
@@ -14370,7 +16120,34 @@
         analysisBandNyquistError: 'Nyquist sınırı aşıldı: üst bant {max} Hz, {resolution} için Nyquist {nyquist} Hz.',
         analysisWindowResolutionError: 'Pencere {window} sn seçilen çözünürlükle anlamlı değil: {resolution}.',
         analysisSamplingInfoText: 'Gerçek örnekleme aralığı: {interval} sn • örnekleme frekansı: {sampleRate} Hz • Nyquist: {nyquist} Hz • analiz edilebilir bant: {maxBand} Hz • yeniden örnekleme: {method} • eksik veri: {missing}',
-        analysisInfoButtonLabel: 'Analiz bilgi notları',
+        analysisInfoButtonLabel: '{analysis} yardımını aç',
+        analysisHelpEyebrow: 'Analiz yardım merkezi',
+        analysisHelpClose: 'Kapat',
+        analysisHelpCurrentValues: 'Güncel seçimler',
+        analysisHelpAccordingToResult: 'Bu sonuca göre',
+        analysisHelpTechnicalMeaning: 'Teknik anlam',
+        analysisHelpUnit: 'Birim',
+        analysisHelpIncrease: 'Artırıldığında',
+        analysisHelpDecrease: 'Azaltıldığında',
+        analysisHelpRisk: 'Risk',
+        analysisHelpRecommended: 'Önerilen başlangıç',
+        analysisHelpProfileBehavior: 'Profil davranışı',
+        analysisHelpEngineParameter: 'Teknik ayrıntı: motor parametresi',
+        analysisHelpInterpretationPoint: 'Yorumlama notu',
+        analysisHelpGlossarySearchLabel: 'Terim sözlüğünde ara',
+        analysisHelpGlossarySearchPlaceholder: 'Terim veya açıklama yazın',
+        analysisHelpAlphabetFilter: 'Alfabetik terim filtresi',
+        analysisHelpAllTerms: 'Tümü',
+        helpSectionWhat: 'Bu analiz neyi gösterir?',
+        helpSectionWhen: 'Ne zaman kullanılmalı?',
+        helpSectionParameters: 'Gelişmiş filtreler nasıl kullanılır?',
+        helpSectionResults: 'Sonuçlar nasıl yorumlanır?',
+        helpSectionChart: 'Grafiği nasıl okumalıyım?',
+        helpSectionTable: 'Tablo nasıl yorumlanır?',
+        helpSectionMistakes: 'Sık yapılan yorumlama hataları',
+        helpSectionAiSuggestions: 'Yapay Zekâ Destekli İnceleme Önerileri',
+        helpSectionGlossary: 'Teknik terimler ve kısaltmalar sözlüğü',
+        helpSectionMathEngine: 'Matematiksel ve motor ayrıntıları',
         analysisInfoCompatibilityTitle: 'Uyumluluk',
         analysisInfoStatusTitle: 'Durum',
         analysisInfoSamplingTitle: 'Örnekleme',
@@ -14992,7 +16769,34 @@
         analysisBandNyquistError: 'Nyquist limit exceeded: upper band {max} Hz, Nyquist for {resolution} is {nyquist} Hz.',
         analysisWindowResolutionError: 'Window {window}s is not meaningful with the selected resolution: {resolution}.',
         analysisSamplingInfoText: 'Actual sample interval: {interval}s • sampling frequency: {sampleRate} Hz • Nyquist: {nyquist} Hz • analyzable band: {maxBand} Hz • resampling: {method} • missing data: {missing}',
-        analysisInfoButtonLabel: 'Analysis information',
+        analysisInfoButtonLabel: 'Open {analysis} help',
+        analysisHelpEyebrow: 'Analysis Help Center',
+        analysisHelpClose: 'Close',
+        analysisHelpCurrentValues: 'Current selections',
+        analysisHelpAccordingToResult: 'Based on this result',
+        analysisHelpTechnicalMeaning: 'Technical meaning',
+        analysisHelpUnit: 'Unit',
+        analysisHelpIncrease: 'When increased',
+        analysisHelpDecrease: 'When decreased',
+        analysisHelpRisk: 'Risk',
+        analysisHelpRecommended: 'Recommended starting point',
+        analysisHelpProfileBehavior: 'Profile behavior',
+        analysisHelpEngineParameter: 'Technical detail: engine parameter',
+        analysisHelpInterpretationPoint: 'Interpretation note',
+        analysisHelpGlossarySearchLabel: 'Search the term glossary',
+        analysisHelpGlossarySearchPlaceholder: 'Type a term or description',
+        analysisHelpAlphabetFilter: 'Alphabetical term filter',
+        analysisHelpAllTerms: 'All',
+        helpSectionWhat: 'What does this analysis show?',
+        helpSectionWhen: 'When should it be used?',
+        helpSectionParameters: 'How should advanced filters be used?',
+        helpSectionResults: 'How should results be interpreted?',
+        helpSectionChart: 'How should I read the chart?',
+        helpSectionTable: 'How should the table be interpreted?',
+        helpSectionMistakes: 'Common interpretation mistakes',
+        helpSectionAiSuggestions: 'AI-Assisted Review Suggestions',
+        helpSectionGlossary: 'Technical terms and abbreviations',
+        helpSectionMathEngine: 'Mathematical and engine details',
         analysisInfoCompatibilityTitle: 'Compatibility',
         analysisInfoStatusTitle: 'Status',
         analysisInfoSamplingTitle: 'Sampling',

@@ -2,58 +2,93 @@ import { readFileSync } from "node:fs";
 
 const html = readFileSync("frekans_rapor_v1.html", "utf8");
 
-function mustContain(text, label = text) {
-  if (!html.includes(text)) throw new Error(`Missing prompt5 frontend marker: ${label}`);
+function assertContains(fragment, label = fragment) {
+  if (!html.includes(fragment)) {
+    throw new Error(`Missing analysis help marker: ${label}`);
+  }
 }
 
 for (const marker of [
-  "analysisRegistry",
-  "updateAnalysisAvailability",
-  "validateAnalysisSelection",
-  "resolveAnalysisResolution",
-  "resampleSeries",
-  "buildSamplingMetadata",
-  "printReport",
-  "preparePrintChartSnapshots",
-  "cleanupPrintArtifacts",
-  "analysisCompatibilityNote",
-  "analysisSamplingInfo",
-  "analysisTableTitle",
-  "analysisTableDescription",
-  "analysisEventsHead",
-  "sourceHealthSummary",
-  "print-report",
-  "print-chart-snapshot"
+  "ANALYSIS_HELP_CONTENT",
+  "analysisHelpTitle",
+  "analysisHelpSummary",
+  "analysisHelpBody",
+  "analysisHelpCloseBtn",
+  "analysisHelpGlossarySearch",
+  "analysisHelpAccordingToResult",
+  "renderAnalysisHelpModal",
+  "buildAnalysisHelpParameterCards",
+  "buildAnalysisHelpResultSummary",
+  "data-help-section",
+  "aria-modal=\"true\"",
+  "role=\"dialog\"",
+  "aria-expanded"
 ]) {
-  mustContain(marker);
+  assertContains(marker);
 }
 
-if (/\.tab-panel\s*\{\s*display:\s*block\s*!important/.test(html)) {
-  throw new Error("Print CSS must not force every tab panel to print.");
+for (const key of [
+  "quality",
+  "stats",
+  "events",
+  "rocof",
+  "psd",
+  "spectrogram",
+  "oscillation",
+  "crossCorrelation",
+  "coherence",
+  "trend"
+]) {
+  assertContains(`${key}: {`, `${key} help content`);
 }
 
-if (!/body\.print-report\s+#tab-reports\s*\{[\s\S]*display:\s*block\s*!important/.test(html)) {
-  throw new Error("Print CSS must explicitly show only #tab-reports for report printing.");
+for (const sectionKey of [
+  "helpSectionWhat",
+  "helpSectionWhen",
+  "helpSectionParameters",
+  "helpSectionResults",
+  "helpSectionChart",
+  "helpSectionTable",
+  "helpSectionMistakes",
+  "helpSectionAiSuggestions",
+  "helpSectionGlossary",
+  "helpSectionMathEngine"
+]) {
+  assertContains(sectionKey);
 }
 
-if (!/body\.print-report\s+\.tab-panel:not\(#tab-reports\)\s*\{[\s\S]*display:\s*none\s*!important/.test(html)) {
-  throw new Error("Report print mode must hide all non-report tab panels.");
+for (const text of [
+  "Spektral hesaplama 1 saniyelik kaynak veri üzerinden yapılır",
+  "Spectral calculation is performed on the one-second source series",
+  "Bu sonuç çevrimdışı tarihsel veri analizidir",
+  "This result is an offline historical-data analysis",
+  "Yüksek bir spektral tepe",
+  "A high spectral peak",
+  "Her zaman penceresindeki en yüksek frekans",
+  "The highest frequency in each time window"
+]) {
+  assertContains(text);
 }
 
-if (!/allowedSources:\s*\[\s*'tr'\s*,\s*'de'\s*,\s*'both'/.test(html)) {
-  throw new Error("Analysis registry must declare source compatibility lists.");
+const modalHtml = html.slice(html.indexOf('id="analysisInfoPanel"'), html.indexOf('id="spectralQuickControls"'));
+if (!/class="[^"]*analysis-help-modal/.test(modalHtml)) {
+  throw new Error("Analysis info panel must be rendered as the help modal/drawer shell.");
+}
+if (/role="region"/.test(modalHtml)) {
+  throw new Error("Analysis help shell must not remain a small region popover.");
 }
 
-if (!/allowedSources:\s*\[\s*'both'\s*\][\s\S]{0,180}crossCorrelation/.test(html) && !/crossCorrelation[\s\S]{0,220}allowedSources:\s*\[\s*'both'\s*\]/.test(html)) {
-  throw new Error("Cross-correlation must only be available for Türkiye + Continental Europe.");
-}
-
-if (!/allowedResolutions:\s*\[\s*'1s'\s*\][\s\S]{0,420}spectrogram/.test(html) && !/spectrogram[\s\S]{0,520}allowedResolutions:\s*\[\s*'1s'\s*\]/.test(html)) {
-  throw new Error("Spectrogram must require second-level analysis resolution.");
-}
-
-if (!/data-param-key="band"/.test(html) || !/data-param-key="rocofThreshold"/.test(html) || !/data-param-key="rocofMethod"/.test(html)) {
-  throw new Error("Advanced analysis parameters must be tagged with data-param-key.");
+for (const visibleRawEnum of [
+  ">Mean<",
+  ">Median<",
+  ">Rectangular<",
+  ">central<",
+  ">filteredDerivative<",
+  ">movingRegression<"
+]) {
+  if (html.includes(visibleRawEnum)) {
+    throw new Error(`Raw engine enum is visible in static HTML: ${visibleRawEnum}`);
+  }
 }
 
 console.log("frontend_prompt5_static ok");

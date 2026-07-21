@@ -62,6 +62,8 @@ try {
   if (!/Veri kapsama|koherens|rnekleme|Nyquist/i.test(infoText || "")) {
     throw new Error(`Analysis info panel does not contain moved guidance: ${infoText}`);
   }
+  await page.keyboard.press("Escape");
+  await page.waitForFunction(() => document.querySelector("#analysisInfoPanel")?.classList.contains("hidden"));
   const qualityControls = await page.evaluate(() => ({
     resolutionHidden: document.querySelector('[data-param-key="resolution"]')?.hidden,
     ydHidden: document.querySelector('[data-param-key="yd"]')?.hidden,
