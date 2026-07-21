@@ -29,7 +29,7 @@ if (workerScope) workerScope.onmessage = event => {
       workerScope.postMessage({ id, status: "cancelled" });
       return;
     }
-    workerScope.postMessage({ id, status: "success", result });
+    workerScope.postMessage({ id, status: "success", result }, spectrogramTransfers(result));
   } catch (error) {
     workerScope.postMessage({ id, status: "error", error: error?.message || String(error) });
   } finally {
@@ -60,4 +60,15 @@ export function typed(value) {
   if (ArrayBuffer.isView(value)) return Float64Array.from(value);
   if (value instanceof ArrayBuffer) return new Float64Array(value);
   return Float64Array.from(value);
+}
+
+export function spectrogramTransfers(result) {
+  if (!result || result.method !== "stft-spectrogram") return [];
+  const transfers = [];
+  if (ArrayBuffer.isView(result.powerValues) && result.powerValues.buffer instanceof ArrayBuffer) transfers.push(result.powerValues.buffer);
+  if (ArrayBuffer.isView(result.timeBins) && result.timeBins.buffer instanceof ArrayBuffer) transfers.push(result.timeBins.buffer);
+  if (ArrayBuffer.isView(result.frequencyBins) && result.frequencyBins.buffer instanceof ArrayBuffer) transfers.push(result.frequencyBins.buffer);
+  if (ArrayBuffer.isView(result.validityByTime) && result.validityByTime.buffer instanceof ArrayBuffer) transfers.push(result.validityByTime.buffer);
+  if (ArrayBuffer.isView(result.imputedSamplesByTime) && result.imputedSamplesByTime.buffer instanceof ArrayBuffer) transfers.push(result.imputedSamplesByTime.buffer);
+  return transfers;
 }

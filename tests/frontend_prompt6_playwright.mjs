@@ -230,8 +230,8 @@ try {
   if (!syntheticQuality.repeatedMarkerNames.length || syntheticQuality.repeatedMarkerNames.some(name => !/^(YD|RV)$/.test(name))) {
     throw new Error(`Chart YD/RV markers must use compact labels: ${JSON.stringify(syntheticQuality.repeatedMarkerNames)}`);
   }
-  if (!/Zoom Sıfırla|Reset Zoom/.test(syntheticQuality.resetLabel) || !/Zoom Sıfırla|Reset Zoom/.test(syntheticQuality.resetAria)) {
-    throw new Error(`Quality reset button label is not compact: ${JSON.stringify({ label: syntheticQuality.resetLabel, aria: syntheticQuality.resetAria })}`);
+  if (!/Görünümü Sıfırla|Reset View/.test(syntheticQuality.resetLabel) || !/Görünümü Sıfırla|Reset View/.test(syntheticQuality.resetAria)) {
+    throw new Error(`Quality reset button label does not match current localization: ${JSON.stringify({ label: syntheticQuality.resetLabel, aria: syntheticQuality.resetAria })}`);
   }
   if (!/Tarih|Date|Saat|Time|Aralık|Interval/i.test(syntheticQuality.summaryTooltip) || !/Frekans|Frequency/i.test(syntheticQuality.summaryTooltip) || !/Durum|Status|Kalite|Quality/i.test(syntheticQuality.summaryTooltip)) {
     throw new Error(`Data Coverage summary tooltip is incomplete: ${syntheticQuality.summaryTooltip}`);

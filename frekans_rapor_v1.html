@@ -2424,11 +2424,17 @@
             <div class="field" data-param-key="alignment"><label for="analysisAlignment" data-i18n="alignmentLabel">Zaman eşleştirme</label><select id="analysisAlignment"><option value="utcAuto" data-i18n="utcAuto">UTC - otomatik</option><option value="sameLocal" data-i18n="sameLocal">Aynı yerel saat</option><option value="manual" data-i18n="manualOption">Manuel</option></select></div>
             <div class="field" data-param-key="statsBand"><label for="statsBandMinHz" data-i18n="statsBandMinLabel">İstatistik alt bandı (Hz)</label><input id="statsBandMinHz" type="number" min="49" max="51" step="0.001" value="49.90" /></div>
             <div class="field" data-param-key="statsBand"><label for="statsBandMaxHz" data-i18n="statsBandMaxLabel">İstatistik üst bandı (Hz)</label><input id="statsBandMaxHz" type="number" min="49" max="51" step="0.001" value="50.10" /></div>
-            <div class="field" data-param-key="band"><label for="bandMin" data-i18n="bandMinLabel">Alt bant (Hz)</label><input id="bandMin" type="number" min="0.01" max="0.45" step="0.01" value="0.10" /></div>
-            <div class="field" data-param-key="band"><label for="bandMax" data-i18n="bandMaxLabel">Üst bant (Hz)</label><input id="bandMax" type="number" min="0.02" max="0.49" step="0.01" value="0.20" /></div>
+            <div class="field" data-param-key="band"><label id="bandMinControlLabel" for="bandMin" data-i18n="bandMinLabel">Alt bant (Hz)</label><input id="bandMin" type="number" min="0" max="0.45" step="0.01" value="0.10" /></div>
+            <div class="field" data-param-key="band"><label id="bandMaxControlLabel" for="bandMax" data-i18n="bandMaxLabel">Üst bant (Hz)</label><input id="bandMax" type="number" min="0.001" max="0.5" step="0.01" value="0.20" /></div>
             <div class="field" data-param-key="threshold"><label for="oscThreshold" data-i18n="oscThresholdLabel">Eşik (mHz)</label><input id="oscThreshold" type="number" min="0.1" max="200" step="0.5" value="10" /></div>
-            <div class="field" data-param-key="window"><label for="windowSec" data-i18n="windowSecLabel">Pencere (sn)</label><input id="windowSec" type="number" min="30" max="900" step="10" value="120" /></div>
-            <div class="field" data-param-key="window"><label for="stepSec" data-i18n="stepSecLabel">Adım (sn)</label><input id="stepSec" type="number" min="1" max="120" step="1" value="10" /></div>
+            <div class="field" data-param-key="window"><label id="windowSecControlLabel" for="windowSec" data-i18n="windowSecLabel">Pencere (sn)</label><input id="windowSec" type="number" min="8" max="3600" step="1" value="256" /></div>
+            <div class="field" data-param-key="window"><label id="stepSecControlLabel" for="stepSec" data-i18n="stepSecLabel">Adım (sn)</label><input id="stepSec" type="number" min="1" max="3600" step="1" value="128" /></div>
+            <div class="field" data-param-key="spectralWindow"><label for="spectralWindowType" data-i18n="spectralWindowTypeLabel">Pencere fonksiyonu</label><select id="spectralWindowType"><option value="hann">Hann</option><option value="hamming">Hamming</option><option value="rectangular">Rectangular</option></select></div>
+            <div class="field" data-param-key="spectralDetrend"><label for="spectralDetrend" data-i18n="spectralDetrendLabel">Segment trend çıkarma</label><select id="spectralDetrend"><option value="constant" data-i18n="spectralDetrendConstant">Sabit ortalama</option><option value="linear" data-i18n="spectralDetrendLinear">Doğrusal</option><option value="none" data-i18n="spectralDetrendNone">Yok</option></select></div>
+            <div class="field" data-param-key="spectralValid"><label for="spectralMinValidRatioPct" data-i18n="spectralMinValidRatioLabel">Minimum geçerli örnek oranı (%)</label><input id="spectralMinValidRatioPct" type="number" min="0" max="100" step="1" value="75" /></div>
+            <div class="field" data-param-key="spectralScale"><label for="spectralScale" data-i18n="spectralScaleLabel">Güç ölçeği</label><select id="spectralScale"><option value="linear" data-i18n="spectralScaleLinear">Lineer</option><option value="log" data-i18n="spectralScaleLog">Log</option></select></div>
+            <div class="field" data-param-key="spectralAveraging"><label for="spectralAveraging" data-i18n="spectralAveragingLabel">Welch ortalaması</label><select id="spectralAveraging"><option value="mean" data-i18n="spectralAveragingMean">Mean</option><option value="median" data-i18n="spectralAveragingMedian">Median</option></select></div>
+            <div class="field" data-param-key="spectralPeaks"><label for="spectralMaxPeaks" data-i18n="spectralMaxPeaksLabel">Spektral tepe sayısı</label><input id="spectralMaxPeaks" type="number" min="1" max="20" step="1" value="5" /></div>
             <div class="field" data-param-key="filter"><label for="filterTaps" data-i18n="filterTapsLabel">FIR kademe</label><input id="filterTaps" type="number" min="31" max="401" step="2" value="101" /></div>
             <div class="field" data-param-key="duration"><label for="minDuration" data-i18n="minDurationLabel">Minimum olay süresi (sn)</label><input id="minDuration" type="number" min="1" max="1800" step="1" value="5" /></div>
             <div class="field" data-param-key="yd"><label for="repeatedValueSeconds" data-i18n="qualityRepeatedThresholdLabel">Yinelenen değer eşiği (sn)</label><input id="repeatedValueSeconds" type="number" min="1" max="3600" step="1" value="15" /></div>
@@ -2456,7 +2462,7 @@
         <div class="chart-wrapper" id="oscChartWrapper">
           <div id="analysisMainChart" class="chart tall"></div>
           <div class="chart-toolbar">
-            <button type="button" class="quality-zoom-reset-btn hidden" id="qualityZoomResetBtn" data-action="resetzoom" data-chart="analysisMainChart" aria-label="Zoom Sıfırla" title="Zoom Sıfırla"><svg class="quality-zoom-reset-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v6h6"/><path d="M8 12h8"/></svg><span id="qualityZoomResetText" class="quality-zoom-reset-text" data-i18n="qualityResetZoomBtn">Zoom Sıfırla</span></button>
+            <button type="button" class="quality-zoom-reset-btn hidden" id="qualityZoomResetBtn" data-action="resetzoom" data-chart="analysisMainChart" aria-label="Görünümü Sıfırla" title="Görünümü Sıfırla"><svg class="quality-zoom-reset-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v6h6"/><path d="M8 12h8"/></svg><span id="qualityZoomResetText" class="quality-zoom-reset-text" data-i18n="qualityResetZoomBtn">Görünümü Sıfırla</span></button>
             <button type="button" aria-label="Tam ekran" title="Tam ekran" data-action="fullscreen" data-chart="analysisMainChart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5"/><path d="M16 3h5v5"/><path d="M21 16v5h-5"/><path d="M8 21H3v-5"/></svg></button>
             <button type="button" aria-label="Grafiği PNG olarak indir" title="Grafiği PNG olarak indir" data-action="download" data-chart="analysisMainChart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg></button>
             <button type="button" aria-label="Yakınlaştırmayı sıfırla" title="Yakınlaştırmayı sıfırla" data-action="resetzoom" data-chart="analysisMainChart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v6h6"/></svg></button>
@@ -3126,6 +3132,28 @@
       windowSeconds: 5
     });
     const DEFAULT_ROCOF_PARAMETERS = window.FrequencyAnalysisCore?.DEFAULT_ROCOF_PARAMETERS || FALLBACK_ROCOF_PARAMETERS;
+    const FALLBACK_WELCH_PARAMETERS = Object.freeze({
+      sampleRateHz: 1,
+      segmentSeconds: 256,
+      stepSeconds: 128,
+      windowType: 'hann',
+      detrend: 'constant',
+      minValidRatio: 0.75,
+      scale: 'linear',
+      averaging: 'mean',
+      maxPeaks: 5
+    });
+    const FALLBACK_SPECTROGRAM_PARAMETERS = Object.freeze({
+      sampleRateHz: 1,
+      segmentSeconds: 256,
+      stepSeconds: 64,
+      windowType: 'hann',
+      detrend: 'constant',
+      minValidRatio: 0.75,
+      scale: 'log'
+    });
+    const DEFAULT_WELCH_PARAMETERS = window.FrequencyAnalysisCore?.DEFAULT_WELCH_PARAMETERS || FALLBACK_WELCH_PARAMETERS;
+    const DEFAULT_SPECTROGRAM_PARAMETERS = window.FrequencyAnalysisCore?.DEFAULT_SPECTROGRAM_PARAMETERS || FALLBACK_SPECTROGRAM_PARAMETERS;
 
     function rocofDefaultParameters() {
       return window.FrequencyAnalysisCore?.DEFAULT_ROCOF_PARAMETERS || DEFAULT_ROCOF_PARAMETERS;
@@ -3146,6 +3174,12 @@
       if (core?.normalizeRocofParameters) return core.normalizeRocofParameters(options);
       const defaults = rocofDefaultParameters();
       return { ...defaults, ...options };
+    }
+
+    function spectralDefaultParameters(type) {
+      const core = window.FrequencyAnalysisCore;
+      if (type === 'spectrogram') return core?.DEFAULT_SPECTROGRAM_PARAMETERS || DEFAULT_SPECTROGRAM_PARAMETERS;
+      return core?.DEFAULT_WELCH_PARAMETERS || DEFAULT_WELCH_PARAMETERS;
     }
 
     const DEFAULT_SETTINGS = {
@@ -3171,6 +3205,12 @@
       thresholdMhz: 10,
       windowSec: 120,
       stepSec: 10,
+      spectralWindowType: DEFAULT_WELCH_PARAMETERS.windowType,
+      spectralDetrend: DEFAULT_WELCH_PARAMETERS.detrend,
+      spectralMinValidRatioPct: DEFAULT_WELCH_PARAMETERS.minValidRatio * 100,
+      spectralScale: DEFAULT_WELCH_PARAMETERS.scale,
+      spectralAveraging: DEFAULT_WELCH_PARAMETERS.averaging,
+      spectralMaxPeaks: DEFAULT_WELCH_PARAMETERS.maxPeaks,
       filterTaps: 101,
       minDuration: 30,
       rocofMethod: DEFAULT_ROCOF_PARAMETERS.method,
@@ -3325,11 +3365,25 @@
         descriptionKey: 'analysisPsdDesc',
         allowedSources: ['tr', 'de', 'both', 'diff', 'common', 'differential'],
         allowedResolutions: ['1s', '10s'],
-        parameterKeys: ['band', 'window'],
+        parameterKeys: ['band', 'window', 'spectralWindow', 'spectralDetrend', 'spectralValid', 'spectralScale', 'spectralAveraging', 'spectralPeaks'],
         requiresPairedSeries: false,
         minSampleIntervalSeconds: 1,
         preferredResolution: '1s',
-        tableColumns: [{ key: 'frequency', labelKey: 'tableFrequency' }, { key: 'power', labelKey: 'spectralPower' }, { key: 'classification', labelKey: 'classification' }],
+        tableTitleKey: 'spectralPeaksTitle',
+        emptyStateKey: 'psdEmptyState',
+        tableColumns: [
+          { key: 'rank', labelKey: 'spectralPeakRank' },
+          { key: 'frequency', labelKey: 'spectralFrequencyHz' },
+          { key: 'period', labelKey: 'spectralPeriodSeconds' },
+          { key: 'psd', labelKey: 'spectralPsdHz2PerHz' },
+          { key: 'psdLevel', labelKey: 'spectralPsdLevel' },
+          { key: 'snrLinear', labelKey: 'spectralSnrLinear' },
+          { key: 'snrDb', labelKey: 'spectralSnrDb' },
+          { key: 'prominence', labelKey: 'spectralPeakProminence' },
+          { key: 'bandwidth', labelKey: 'spectralPeakBandwidth' },
+          { key: 'qualityFactor', labelKey: 'spectralQualityFactor' },
+          { key: 'source', labelKey: 'bandViolationSource' }
+        ],
         methodKey: 'methodPsd',
         limitationsKey: 'limitPsd'
       },
@@ -3339,11 +3393,21 @@
         descriptionKey: 'analysisSpectrogramDesc',
         allowedSources: ['tr', 'de', 'both', 'diff', 'common', 'differential'],
         allowedResolutions: ['1s'],
-        parameterKeys: ['band', 'window'],
+        parameterKeys: ['band', 'window', 'spectralWindow', 'spectralDetrend', 'spectralValid', 'spectralScale'],
         requiresPairedSeries: false,
         minSampleIntervalSeconds: 1,
         preferredResolution: '1s',
-        tableColumns: [{ key: 'time', labelKey: 'timeAxis' }, { key: 'frequency', labelKey: 'tableFrequency' }, { key: 'power', labelKey: 'spectralPower' }],
+        tableTitleKey: 'spectrogramWindowQualityTitle',
+        emptyStateKey: 'spectrogramEmptyState',
+        tableColumns: [
+          { key: 'center', labelKey: 'spectrogramWindowCenter' },
+          { key: 'validRatio', labelKey: 'spectrogramValidRatio' },
+          { key: 'missingCount', labelKey: 'spectrogramMissingSamples' },
+          { key: 'imputedCount', labelKey: 'spectrogramImputedSamples' },
+          { key: 'status', labelKey: 'spectrogramWindowStatus' },
+          { key: 'dominantFrequency', labelKey: 'oscThDominant' },
+          { key: 'peakPsd', labelKey: 'spectrogramPeakPsd' }
+        ],
         methodKey: 'methodSpectrogram',
         limitationsKey: 'limitSpectrogram'
       },
@@ -4332,7 +4396,9 @@
       $('analysisStartDate').addEventListener('change', () => updateUrlState({ start: $('analysisStartDate').value }));
       $('analysisEndDate').addEventListener('change', () => updateUrlState({ end: $('analysisEndDate').value }));
       $('analysisTypeSelect').addEventListener('change', () => {
+        applySpectralDefaultsForType($('analysisTypeSelect').value);
         updateAnalysisAvailability();
+        renderAnalysisEmptyState($('analysisTypeSelect').value);
         updateRoute({ path: 'analysis', analysis: $('analysisTypeSelect').value }, { mode: 'push' });
       });
       $('analysisResolution').addEventListener('change', () => {
@@ -6100,6 +6166,41 @@
       $('analysisResultCards').innerHTML = '';
     }
 
+    function renderAnalysisEmptyState(type = $('analysisTypeSelect')?.value || 'stats') {
+      updateOscillationSourceUi();
+      const def = analysisDefinition(type);
+      const columns = def.tableColumns || [];
+      const emptyKey = def.emptyStateKey || 'oscNoAnalysis';
+      $('analysisMainChart')?.classList.toggle('quality-chart', false);
+      if ($('analysisMainChart')) $('analysisMainChart').style.height = '';
+      setQualityZoomResetVisible(false);
+      if ($('oscChartTitle')) $('oscChartTitle').textContent = t(def.titleKey);
+      if ($('oscCountTag')) $('oscCountTag').textContent = isSpectralAnalysis(type) ? t('spectralNoFindingsTag') : t('oscCountTag');
+      if ($('analysisResultCards')) $('analysisResultCards').innerHTML = '';
+      const summary = $('analysisDetailSummary');
+      if (summary) {
+        summary.innerHTML = '';
+        summary.hidden = true;
+      }
+      const spectralSummary = $('spectralDetailSummary');
+      if (spectralSummary) spectralSummary.remove();
+      const rocofSummary = $('rocofDetailSummary');
+      if (rocofSummary && type !== 'rocof') rocofSummary.remove();
+      const rocofNotice = $('rocofResultNotice');
+      if (rocofNotice && type !== 'rocof') rocofNotice.remove();
+      setAnalysisTableHeader(columns);
+      if ($('analysisTableTitle')) $('analysisTableTitle').textContent = def.tableTitleKey ? t(def.tableTitleKey) : t(def.titleKey);
+      if ($('analysisTableDescription')) $('analysisTableDescription').textContent = t(emptyKey);
+      if ($('analysisEventsBody')) $('analysisEventsBody').innerHTML = `<tr><td colspan="${Math.max(1, columns.length)}" class="empty-state">${t(emptyKey)}</td></tr>`;
+      if (!state.oscillationChart) return;
+      state.oscillationChart.setOption({
+        title: { text: t(emptyKey), left: 'center', top: 'middle', textStyle: { color: '#71808e', fontSize: 14, fontWeight: 500 } },
+        xAxis: { show: false },
+        yAxis: { show: false },
+        series: []
+      }, true);
+    }
+
     function renderKpis(current) {
       const grid = $('kpiGrid');
       const kpiMeta = [
@@ -6141,6 +6242,10 @@
       const showMinMax = $('showMinMaxEnvelope').value === 'yes' && view.mode === 'day';
       const fixed = state.settings.graphScale === 'fixed';
       const detailMode = view.mode !== 'day';
+      if (!detailMode && !Array.isArray(current.minute)) {
+        renderFrequencyEmpty();
+        return;
+      }
       const minMaxButton = document.querySelector('[data-layer="minmax"]');
       if (minMaxButton) minMaxButton.disabled = detailMode;
       const tr = [];
@@ -6470,11 +6575,14 @@
 
     function renderQuarterHeatmap(current) {
       const root = $('quarterHeatmap');
-      if (!current) {
+      if (!current || !Array.isArray(current.quarters)) {
         root.innerHTML = Array.from({ length: 96 }, (_, quarter) => `<div class="quarter-hour" tabindex="0" style="background:#eef3f6">${quarterLabel(quarter)}<br>—</div>`).join('');
         return;
       }
-      const max = Math.max(10, ...current.quarters.map(row => Number.isFinite(row.maeMhz) ? row.maeMhz : 0));
+      let max = 10;
+      for (const row of current.quarters) {
+        if (Number.isFinite(row.maeMhz) && row.maeMhz > max) max = row.maeMhz;
+      }
       root.innerHTML = current.quarters.map(row => {
         const quarter = row.quarter;
         const color = heatColor(row.maeMhz, 0, max, false);
@@ -6540,7 +6648,7 @@
 
     function renderHourBlocks(current) {
       const root = $('hourBlocks');
-      if (!current) {
+      if (!current || !Array.isArray(current.hourly)) {
         root.innerHTML = `<div class="empty-state">${t('hourBlockEmpty')}</div>`;
         return;
       }
@@ -6588,7 +6696,10 @@
         [t('metricBias'), `${fmt(detail.biasMhz, 2)} mHz`, t('metricBiasHelp')],
         [t('metricMae'), `${fmt(detail.maeMhz, 2)} mHz`, t('metricMaeHelp')]
       ].map(([label, value, help]) => `<div class="mobile-hour-card" tabindex="0" data-tooltip="${escapeHtml(help)}" aria-label="${escapeHtml(`${label}: ${help}`)}"><div class="label">${label}</div><div class="value">${value}</div></div>`).join('');
-      const maxMae = Math.max(1, ...current.hourly.map(row => Number.isFinite(row.maeMhz) ? row.maeMhz : 0));
+      let maxMae = 1;
+      for (const row of current.hourly) {
+        if (Number.isFinite(row.maeMhz) && row.maeMhz > maxMae) maxMae = row.maeMhz;
+      }
       const heat = current.hourly.map((row, hour) => {
         const background = heatColor(row.maeMhz, 0, maxMae, false);
         const cls = worst.includes(hour) ? 'hour-heat-cell worst' : 'hour-heat-cell';
@@ -6686,6 +6797,47 @@
       return analysisRegistry[type] || analysisRegistry.stats;
     }
 
+    function isSpectralAnalysis(type = $('analysisTypeSelect')?.value || 'stats') {
+      return type === 'psd' || type === 'spectrogram';
+    }
+
+    function setControlLabel(labelId, key) {
+      const label = $(labelId);
+      if (!label) return;
+      label.dataset.i18n = key;
+      label.textContent = t(key);
+    }
+
+    function updateSpectralControlLabels(type = $('analysisTypeSelect')?.value || 'stats') {
+      const spectral = isSpectralAnalysis(type);
+      setControlLabel('bandMinControlLabel', spectral ? 'spectralMinHzLabel' : 'bandMinLabel');
+      setControlLabel('bandMaxControlLabel', spectral ? 'spectralMaxHzLabel' : 'bandMaxLabel');
+      setControlLabel('windowSecControlLabel', spectral ? 'spectralSegmentSecondsLabel' : 'windowSecLabel');
+      setControlLabel('stepSecControlLabel', spectral ? 'spectralStepSecondsLabel' : 'stepSecLabel');
+      const scale = $('spectralScale');
+      if (scale && spectral && scale.dataset.analysisType !== type) {
+        scale.value = spectralDefaultParameters(type).scale;
+        scale.dataset.analysisType = type;
+      }
+      if (scale && !spectral) delete scale.dataset.analysisType;
+    }
+
+    function applySpectralDefaultsForType(type = $('analysisTypeSelect')?.value || 'stats') {
+      if (!isSpectralAnalysis(type)) return;
+      const defaults = spectralDefaultParameters(type);
+      if ($('windowSec')) $('windowSec').value = defaults.segmentSeconds;
+      if ($('stepSec')) $('stepSec').value = defaults.stepSeconds;
+      if ($('spectralWindowType')) $('spectralWindowType').value = defaults.windowType;
+      if ($('spectralDetrend')) $('spectralDetrend').value = defaults.detrend;
+      if ($('spectralMinValidRatioPct')) $('spectralMinValidRatioPct').value = defaults.minValidRatio * 100;
+      if ($('spectralScale')) {
+        $('spectralScale').value = defaults.scale;
+        $('spectralScale').dataset.analysisType = type;
+      }
+      if ($('spectralAveraging')) $('spectralAveraging').value = defaults.averaging || DEFAULT_WELCH_PARAMETERS.averaging;
+      if ($('spectralMaxPeaks')) $('spectralMaxPeaks').value = defaults.maxPeaks || DEFAULT_WELCH_PARAMETERS.maxPeaks;
+    }
+
     function updateAnalysisSourceOptions() {
       const select = $('analysisSourceSelect');
       if (!select) return getAnalysisSource();
@@ -6776,6 +6928,7 @@
         if (method === 'filteredDerivative') visible.add('rocofPrefilter');
         if (method === 'movingRegression') visible.add('rocofRegression');
       }
+      updateSpectralControlLabels(type);
       document.querySelectorAll('.analysis-controls.compact [data-param-key]').forEach(field => {
         field.hidden = !visible.has(field.dataset.paramKey);
       });
@@ -6885,13 +7038,31 @@
         };
       }
       if (options.checkBand !== false && def.parameterKeys.includes('band')) {
+        const minHz = Number($('bandMin')?.value || 0);
         const maxHz = Number($('bandMax')?.value || 0);
         const windowSeconds = Number($('windowSec')?.value || 0);
-        if (maxHz >= sampling.nyquistHz) {
+        const stepSeconds = Number($('stepSec')?.value || 0);
+        if (!(minHz >= 0 && maxHz > minHz)) {
+          return { valid: false, resolution, sampling, message: t('analysisSpectralRangeError') };
+        }
+        if (maxHz > sampling.nyquistHz) {
           return { valid: false, resolution, sampling, message: t('analysisBandNyquistError', { max: fmt(maxHz, 4), nyquist: fmt(sampling.nyquistHz, 4), resolution: resolutionLabel(resolution) }) };
         }
-        if (windowSeconds && windowSeconds < intervalSeconds * 4) {
+        if (windowSeconds && windowSeconds < intervalSeconds * 8) {
           return { valid: false, resolution, sampling, message: t('analysisWindowResolutionError', { window: windowSeconds, resolution: resolutionLabel(resolution) }) };
+        }
+        if (isSpectralAnalysis(type)) {
+          if (!(stepSeconds > 0 && stepSeconds <= windowSeconds)) {
+            return { valid: false, resolution, sampling, message: t('analysisSpectralStepError') };
+          }
+          const minValidRatio = Number($('spectralMinValidRatioPct')?.value || 75);
+          if (!Number.isFinite(minValidRatio) || minValidRatio < 0 || minValidRatio > 100) {
+            return { valid: false, resolution, sampling, message: t('analysisSpectralValidRatioError') };
+          }
+          const maxPeaks = Number($('spectralMaxPeaks')?.value || 5);
+          if (type === 'psd' && (!Number.isInteger(maxPeaks) || maxPeaks <= 0)) {
+            return { valid: false, resolution, sampling, message: t('analysisSpectralMaxPeaksError') };
+          }
         }
       }
       return { valid: true, resolution, sampling, message: '' };
@@ -7453,22 +7624,39 @@
     }
 
     function workerAnalysisParameters(type) {
+      const source = getAnalysisSource();
       const sampling = state.analysis.sampling || { sampleRateHz: 1, intervalSeconds: 1 };
       const sampleIntervalSeconds = sampling.intervalSeconds || 1;
       const sampleRateHz = sampling.sampleRateHz || (1 / sampleIntervalSeconds);
-      const minHz = Number($('bandMin').value) || 0.05;
-      const maxHz = Number($('bandMax').value) || 0.25;
+      const minHzInput = Number($('bandMin').value);
+      const maxHzInput = Number($('bandMax').value);
+      const minHz = Number.isFinite(minHzInput) ? minHzInput : 0.05;
+      const maxHz = Number.isFinite(maxHzInput) ? maxHzInput : 0.25;
+      const defaults = spectralDefaultParameters(type);
+      const segmentSeconds = Number($('windowSec')?.value || defaults.segmentSeconds || 256);
+      const stepSeconds = Number($('stepSec')?.value || defaults.stepSeconds || Math.max(1, segmentSeconds / 2));
+      const minValidRatio = clamp(Number($('spectralMinValidRatioPct')?.value || defaults.minValidRatio * 100) / 100, 0, 1);
+      const selectedScale = $('spectralScale')?.value || defaults.scale || 'linear';
+      const analysisDate = state.current?.date || $('analysisDateSelect')?.value;
+      const analysisStartEpochMs = analysisDate ? Date.parse(`${analysisDate}T00:00:00Z`) : null;
       const base = {
         sampleRateHz,
         sampleIntervalSeconds,
-        segmentLength: type === 'spectrogram' ? 512 : 512,
-        overlapRatio: type === 'spectrogram' ? 0.75 : 0.5,
-        windowType: 'hann',
-        detrend: 'constant',
+        segmentSeconds,
+        stepSeconds,
+        windowType: $('spectralWindowType')?.value || defaults.windowType || 'hann',
+        detrend: $('spectralDetrend')?.value || defaults.detrend || 'constant',
+        minValidRatio,
+        scale: selectedScale,
+        averaging: $('spectralAveraging')?.value || defaults.averaging || 'mean',
         minHz,
         maxHz,
-        maxPeaks: 5,
-        targetHz: minHz
+        maxPeaks: Math.max(1, Math.round(Number($('spectralMaxPeaks')?.value || defaults.maxPeaks || 5))),
+        targetHz: minHz,
+        gapHandlingMethod: 'segment-mean',
+        maxCells: 1_500_000,
+        analysisStartEpochMs: Number.isFinite(analysisStartEpochMs) ? analysisStartEpochMs : null,
+        analysisTimezone: source === 'de' ? 'Europe/Berlin' : source === 'tr' ? 'Europe/Istanbul' : 'UTC'
       };
       if (type === 'rocof') {
         return normalizeRocofParameters({ ...rocofOptions(), sampleIntervalSeconds });
@@ -9340,6 +9528,7 @@
       if (type === 'psd') {
         const dominant = workerResult || core.computeWelchPsd(series, workerAnalysisParameters('psd'));
         const peak = dominant.peaks?.[0] || dominant;
+        metadata.parameters.spectral = spectralParameterMetadata(dominant);
         return {
           type,
           title: t(analysisDefinition(type).titleKey),
@@ -9348,41 +9537,74 @@
           cards: [
             [t('dominantFrequency'), `${fmt(peak.frequencyHz, 4)} Hz`],
             [t('spectralPower'), `${fmt(peak.psd ?? peak.power, 8)} Hz²/Hz`],
-            [t('noiseFloor'), fmt(dominant.noiseFloor, 2)],
-            [t('snr'), fmt(dominant.snr, 2)],
-            [t('segmentCount'), String(dominant.segmentCount || 0)]
+            [t('spectralSnrLinear'), fmt(dominant.snrLinear, 2)],
+            [t('spectralSnrDb'), `${fmt(dominant.snrDb, 2)} dB`],
+            [t('spectralSegmentUsage'), `${dominant.acceptedSegmentCount || 0}/${dominant.candidateSegmentCount || 0}`],
+            [t('spectralFftLength'), `${dominant.fftLengthSamples} ${t('spectralSamplesUnit')}`]
           ],
+          detailRows: spectralDetailRows(dominant),
+          extraTables: [welchSummaryTable(dominant)],
           events: [],
-          tableRows: (dominant.peaks || [peak]).filter(Boolean).map(item => ({
+          tableTitle: t('spectralPeaksTitle'),
+          tableRows: (dominant.peaks || [peak]).filter(Boolean).map((item, index) => ({
+            rank: item.rank || index + 1,
             frequency: `${fmt(item.frequencyHz, 4)} Hz`,
-            power: fmt(item.psd ?? item.power, 8),
-            classification: t('classNeedsReview')
+            period: Number.isFinite(item.periodSeconds) ? `${fmt(item.periodSeconds, 2)} sn` : '—',
+            psd: fmt(item.psd ?? item.power, 8),
+            psdLevel: `${fmt(item.psdLevelDb, 2)} dB`,
+            snrLinear: fmt(item.snrLinear, 2),
+            snrDb: `${fmt(item.snrDb, 2)} dB`,
+            prominence: fmt(item.peakProminence, 8),
+            bandwidth: `${fmt(item.peakBandwidthHz, 5)} Hz`,
+            qualityFactor: fmt(item.qualityFactor, 2),
+            source: sourceLabel(source),
+            frequencyHz: item.frequencyHz
           })),
-          chart: { kind: 'line', xKind: 'frequency', series: [{ name: t('analysisPsd'), data: dominant.frequencies.map((f, index) => [f, dominant.psd[index]]) }] },
+          chart: { kind: 'welch', xKind: 'frequency', welch: dominant, source, band: [Number($('bandMin').value), Number($('bandMax').value)] },
           methodology: t('methodPsd'),
           limitations: t('limitPsd')
         };
       }
       if (type === 'spectrogram') {
         const spectrogram = workerResult || core.computeStftSpectrogram(series, workerAnalysisParameters('spectrogram'));
+        metadata.parameters.spectral = spectralParameterMetadata(spectrogram);
         return {
           type,
           title: t(analysisDefinition(type).titleKey),
           description: t(analysisDefinition(type).descriptionKey),
           metadata,
           cards: [
-            [t('windowSecLabel'), `${spectrogram.segmentLength} sn`],
+            [t('spectralSegmentSecondsLabel'), `${fmt(spectrogram.requestedSegmentSeconds, 0)} sn`],
+            [t('spectralEffectiveSegment'), `${spectrogram.effectiveSegmentSamples} ${t('spectralSamplesUnit')}`],
             [t('dominantFrequency'), spectrogram.peaksByTime?.length ? `${fmt(spectrogram.peaksByTime[0].frequencyHz, 4)} Hz` : '—'],
-            [t('resolutionLabel'), t('resolutionSecond')],
-            [t('qualityCoverage'), percent(1 - (prepared.sampling?.missingRatio || 0))]
+            [t('spectrogramWindowQualityTitle'), `${spectrogram.acceptedSegmentCount || 0}/${spectrogram.candidateSegmentCount || 0}`],
+            [t('spectrogramImputedSamples'), String(spectrogram.totalImputedSampleCount || 0)],
+            [t('spectrogramPsdUnit'), spectrogram.units || 'Hz²/Hz']
           ],
+          detailRows: spectralDetailRows(spectrogram),
           events: [],
-          tableRows: (spectrogram.peaksByTime || []).slice(0, 12).map(item => ({
-            time: secondToTime(item.timeSecond || item.time || 0),
-            frequency: `${fmt(item.frequencyHz, 4)} Hz`,
-            power: fmt(item.power, 8)
-          })),
-          chart: { kind: 'heatmap', spectrogram },
+          tableTitle: t('spectrogramWindowQualityTitle'),
+          extraTables: spectralExtraTables(spectrogram, source),
+          tableRows: (spectrogram.peaksByTime || []).slice(0, 24).map((item, index) => {
+            const validRatio = Number(spectrogram.validityByTime?.[index]);
+            const imputedCount = Number(spectrogram.imputedSamplesByTime?.[index] || 0);
+            const missingCount = Math.max(0, Math.round((spectrogram.effectiveSegmentSamples || 0) * (1 - (Number.isFinite(validRatio) ? validRatio : 0))));
+            const startSecond = Math.max(0, item.timeSeconds - (spectrogram.effectiveSegmentSeconds || 0) / 2);
+            const endSecond = item.timeSeconds + (spectrogram.effectiveSegmentSeconds || 0) / 2;
+            return {
+              center: secondToTime(item.timeSeconds || 0),
+              validRatio: percent(Number.isFinite(validRatio) ? validRatio : 0),
+              missingCount,
+              imputedCount,
+              status: Number.isFinite(item.frequencyHz) ? t('spectrogramStatusAccepted') : t('spectrogramStatusRejected'),
+              dominantFrequency: Number.isFinite(item.frequencyHz) ? `${fmt(item.frequencyHz, 4)} Hz` : '—',
+              peakPsd: fmt(item.power, 4),
+              startSecond,
+              endSecond,
+              timeIndex: index
+            };
+          }),
+          chart: { kind: 'spectrogram', spectrogram, source },
           methodology: t('methodSpectrogram'),
           limitations: t('limitSpectrogram')
         };
@@ -9482,6 +9704,163 @@
         methodology: t('methodStats'),
         limitations: t('limitStats')
       };
+    }
+
+    function spectralParameterMetadata(result = {}) {
+      const fields = [
+        'sampleRateHz',
+        'requestedSegmentSeconds',
+        'requestedSegmentSamples',
+        'effectiveSegmentSeconds',
+        'effectiveSegmentSamples',
+        'fftLengthSamples',
+        'requestedStepSeconds',
+        'effectiveStepSeconds',
+        'effectiveStepSamples',
+        'overlapSamples',
+        'overlapRatio',
+        'frequencyResolutionHz',
+        'nyquistHz',
+        'adjustmentApplied',
+        'adjustmentReason',
+        'candidateSegmentCount',
+        'acceptedSegmentCount',
+        'rejectedSegmentCount',
+        'imputedSegmentCount',
+        'totalImputedSampleCount',
+        'meanValidRatio',
+        'minimumAcceptedValidRatio',
+        'gapHandlingMethod',
+        'windowType',
+        'detrend',
+        'scale',
+        'averagingMethod',
+        'degreesOfFreedom',
+        'totalBandPower',
+        'parsevalErrorRatio',
+        'analysisStartEpochMs',
+        'analysisTimezone',
+        'timeBinReference',
+        'invalidWindowCount',
+        'imputedWindowCount',
+        'rowCount',
+        'columnCount',
+        'estimatedCellCount',
+        'estimatedBytes'
+      ];
+      return fields.reduce((out, field) => {
+        if (result[field] !== undefined) out[field] = result[field];
+        return out;
+      }, {});
+    }
+
+    function spectralDetailRows(result = {}) {
+      return [
+        { label: t('spectralSampleRate'), value: `${fmt(result.sampleRateHz, 5)} Hz` },
+        { label: t('spectralNyquist'), value: `${fmt(result.nyquistHz, 5)} Hz` },
+        { label: t('spectralRequestedSegment'), value: `${fmt(result.requestedSegmentSeconds, 0)} sn / ${result.requestedSegmentSamples || 0} ${t('spectralSamplesUnit')}` },
+        { label: t('spectralEffectiveSegment'), value: `${fmt(result.effectiveSegmentSeconds, 0)} sn / ${result.effectiveSegmentSamples || 0} ${t('spectralSamplesUnit')}` },
+        { label: t('spectralFftLength'), value: `${result.fftLengthSamples || 0} ${t('spectralSamplesUnit')}` },
+        { label: t('spectralFrequencyResolution'), value: `${fmt(result.frequencyResolutionHz, 6)} Hz` },
+        { label: t('spectralStep'), value: `${fmt(result.effectiveStepSeconds, 0)} sn / ${result.effectiveStepSamples || 0} ${t('spectralSamplesUnit')}` },
+        { label: t('spectralOverlap'), value: `${result.overlapSamples || 0} ${t('spectralSamplesUnit')} / ${percent(result.overlapRatio || 0)}` },
+        { label: t('spectralSegmentCounts'), value: `${result.candidateSegmentCount || 0}/${result.acceptedSegmentCount || 0}/${result.rejectedSegmentCount || 0}` },
+        { label: t('spectralImputationCounts'), value: `${result.imputedSegmentCount || 0} / ${result.totalImputedSampleCount || 0}` },
+        { label: t('spectralWindowTypeLabel'), value: result.windowType || '—' },
+        { label: t('spectralDetrendLabel'), value: result.detrend || '—' },
+        { label: t('spectralAveragingLabel'), value: result.averagingMethod || result.scale || '—' },
+        { label: t('spectralAdjustment'), value: result.adjustmentApplied ? result.adjustmentReason : t('spectralNoAdjustment') }
+      ];
+    }
+
+    function analysisSpectralTableTitle(type) {
+      return type === 'spectrogram' ? t('spectrogramWindowQualityTitle') : t('spectralPeaksTitle');
+    }
+
+    function spectralExtraTables(spectrogram = {}, source) {
+      const peaks = spectrogram.peaksByTime || [];
+      const finitePeaks = peaks.filter(peak => Number.isFinite(peak.frequencyHz));
+      if (!finitePeaks.length) return [];
+      const frequencies = finitePeaks.map(peak => peak.frequencyHz);
+      const powers = finitePeaks.map(peak => peak.power).filter(Number.isFinite);
+      const start = finitePeaks[0].timeSeconds - (spectrogram.effectiveSegmentSeconds || 0) / 2;
+      const end = finitePeaks.at(-1).timeSeconds + (spectrogram.effectiveSegmentSeconds || 0) / 2;
+      const medianFrequency = percentileLocal(frequencies, 0.5);
+      const minFrequency = minFinite(frequencies);
+      const maxFrequency = maxFinite(frequencies);
+      const maxPower = maxFinite(powers);
+      const meanValidRatio = spectrogram.meanValidRatio || 0;
+      return [{
+        title: t('spectrogramTimeFrequencyRegionsTitle'),
+        columns: [
+          { key: 'start', labelKey: 'oscThStart' },
+          { key: 'end', labelKey: 'oscThEnd' },
+          { key: 'duration', labelKey: 'oscThDuration' },
+          { key: 'medianFrequency', labelKey: 'spectrogramMedianFrequency' },
+          { key: 'frequencyRange', labelKey: 'spectrogramFrequencyRange' },
+          { key: 'peakPsd', labelKey: 'spectrogramPeakPsd' },
+          { key: 'snrDb', labelKey: 'spectralSnrDb' },
+          { key: 'ridgeContinuity', labelKey: 'spectrogramRidgeContinuity' },
+          { key: 'validRatio', labelKey: 'spectrogramValidRatio' },
+          { key: 'source', labelKey: 'bandViolationSource' }
+        ],
+        rows: [{
+          start: secondToTime(Math.max(0, start)),
+          end: secondToTime(Math.max(0, end)),
+          duration: durationText(Math.max(0, Math.round(end - start))),
+          medianFrequency: `${fmt(medianFrequency, 4)} Hz`,
+          frequencyRange: `${fmt(minFrequency, 4)}-${fmt(maxFrequency, 4)} Hz`,
+          peakPsd: fmt(maxPower, 4),
+          snrDb: '—',
+          ridgeContinuity: percent(finitePeaks.length / Math.max(1, peaks.length)),
+          validRatio: percent(meanValidRatio),
+          source: sourceLabel(source)
+        }]
+      }];
+    }
+
+    function welchSummaryTable(result = {}) {
+      return {
+        title: t('spectralCalculationSummaryTitle'),
+        columns: [{ key: 'metric', labelKey: 'tableMetric' }, { key: 'value', labelKey: 'tableValue' }],
+        rows: [
+          { metric: t('spectralSampleRate'), value: `${fmt(result.sampleRateHz, 5)} Hz` },
+          { metric: t('spectralNyquist'), value: `${fmt(result.nyquistHz, 5)} Hz` },
+          { metric: t('spectralRequestedSegment'), value: `${fmt(result.requestedSegmentSeconds, 0)} sn / ${result.requestedSegmentSamples || 0} ${t('spectralSamplesUnit')}` },
+          { metric: t('spectralEffectiveSegment'), value: `${fmt(result.effectiveSegmentSeconds, 0)} sn / ${result.effectiveSegmentSamples || 0} ${t('spectralSamplesUnit')}` },
+          { metric: t('spectralFftLength'), value: `${result.fftLengthSamples || 0} ${t('spectralSamplesUnit')}` },
+          { metric: t('spectralFrequencyResolution'), value: `${fmt(result.frequencyResolutionHz, 6)} Hz` },
+          { metric: t('spectralStep'), value: `${fmt(result.effectiveStepSeconds, 0)} sn / ${result.effectiveStepSamples || 0} ${t('spectralSamplesUnit')}` },
+          { metric: t('spectralOverlap'), value: percent(result.overlapRatio || 0) },
+          { metric: t('spectralSegmentCounts'), value: `${result.candidateSegmentCount || 0}/${result.acceptedSegmentCount || 0}/${result.rejectedSegmentCount || 0}` },
+          { metric: t('spectralImputationCounts'), value: `${result.imputedSegmentCount || 0} / ${result.totalImputedSampleCount || 0}` },
+          { metric: t('spectralWindowTypeLabel'), value: result.windowType || '—' },
+          { metric: t('spectralDetrendLabel'), value: result.detrend || '—' },
+          { metric: t('spectralAveragingLabel'), value: result.averagingMethod || '—' }
+        ]
+      };
+    }
+
+    function percentileLocal(values, p) {
+      const sorted = Array.from(values || []).filter(Number.isFinite).sort((a, b) => a - b);
+      if (!sorted.length) return NaN;
+      const pos = (sorted.length - 1) * p;
+      const lo = Math.floor(pos);
+      const hi = Math.ceil(pos);
+      if (lo === hi) return sorted[lo];
+      return sorted[lo] + (sorted[hi] - sorted[lo]) * (pos - lo);
+    }
+
+    function minFinite(values) {
+      let best = Infinity;
+      for (const value of values || []) if (Number.isFinite(value) && value < best) best = value;
+      return best === Infinity ? NaN : best;
+    }
+
+    function maxFinite(values) {
+      let best = -Infinity;
+      for (const value of values || []) if (Number.isFinite(value) && value > best) best = value;
+      return best === -Infinity ? NaN : best;
     }
 
     function normalizeAnalysisCard(card) {
@@ -9657,6 +10036,40 @@
       `;
     }
 
+    function renderSpectralDetailSummary(result) {
+      if (!isSpectralAnalysis(result?.type)) {
+        const existing = $('spectralDetailSummary');
+        if (existing) existing.remove();
+        return;
+      }
+      const anchor = $('analysisDetailSummary') || $('analysisResultCards');
+      if (!anchor) return;
+      let summary = $('spectralDetailSummary');
+      if (!summary) {
+        summary = document.createElement('div');
+        summary.id = 'spectralDetailSummary';
+        summary.className = 'analysis-detail-summary spectral-detail-summary';
+        anchor.insertAdjacentElement('afterend', summary);
+      }
+      const tables = result.extraTables || [];
+      summary.hidden = !tables.length;
+      if (!tables.length) {
+        summary.innerHTML = '';
+        return;
+      }
+      summary.innerHTML = tables.map(table => `
+        <section class="spectral-extra-table">
+          <h4>${escapeHtml(table.title)}</h4>
+          <div class="table-wrap">
+            <table>
+              <thead><tr>${(table.columns || []).map(column => `<th>${escapeHtml(t(column.labelKey))}</th>`).join('')}</tr></thead>
+              <tbody>${(table.rows || []).map(row => `<tr>${(table.columns || []).map(column => `<td>${formatTableCell(row[column.key])}</td>`).join('')}</tr>`).join('')}</tbody>
+            </table>
+          </div>
+        </section>
+      `).join('');
+    }
+
     function heatmapRangeFromValue(value) {
       if (!Array.isArray(value)) return null;
       const startSecond = Number(value[3]);
@@ -9670,9 +10083,12 @@
       renderAnalysisCards(result);
       renderAnalysisDetailSummary(result);
       renderRocofDetailSummary(result);
+      renderSpectralDetailSummary(result);
       $('oscCountTag').textContent = result.type === 'stats' || result.type === 'events'
         ? t('statsBandViolationCount', { count: result.events.length })
-        : t('findingsCount', { count: result.events.length });
+        : isSpectralAnalysis(result.type)
+          ? t('spectralNoFindingsTag')
+          : t('findingsCount', { count: result.events.length });
       renderGenericAnalysisChart(result);
       renderAnalysisTable(result);
       updateAnalysisSamplingInfo(result.metadata?.sampling || state.analysis.sampling);
@@ -9703,6 +10119,14 @@
         renderRocofAnalysisChart(result);
         return;
       }
+      if (result.chart.kind === 'welch') {
+        renderWelchAnalysisChart(result);
+        return;
+      }
+      if (result.chart.kind === 'spectrogram') {
+        renderSpectrogramAnalysisChart(result);
+        return;
+      }
       if (result.chart.kind === 'heatmap') {
         const spectrogram = result.chart.spectrogram;
         const data = [];
@@ -9711,7 +10135,7 @@
             data.push([timeIndex, freqIndex, Number.isFinite(power) ? power : null]);
           });
         });
-        const finite = data.map(item => item[2]).filter(Number.isFinite);
+        const range = finiteHeatmapRange(data);
         state.oscillationChart.setOption({
           animation: false,
           tooltip: {
@@ -9724,7 +10148,7 @@
           grid: { left: 68, right: 68, top: 42, bottom: 72 },
           xAxis: { type: 'category', data: spectrogram.timeBins.map(second => secondToTime(second).slice(0, 5)), name: t('timeAxis') },
           yAxis: { type: 'category', data: spectrogram.frequencyBins.map(freq => fmt(freq, 3)), name: 'Hz' },
-          visualMap: { min: finite.length ? Math.min(...finite) : 0, max: finite.length ? Math.max(...finite) : 1, calculable: true, orient: 'horizontal', left: 'center', bottom: 16 },
+          visualMap: { min: range.min, max: range.max, calculable: true, orient: 'horizontal', left: 'center', bottom: 16 },
           series: [{ name: result.title, type: 'heatmap', data, progressive: 5000 }]
         }, true);
         return;
@@ -9747,6 +10171,168 @@
         dataZoom: [{ type: 'inside', filterMode: 'none' }, { type: 'slider', filterMode: 'none', height: 22, bottom: 18 }],
         series
       }, true);
+    }
+
+    function renderWelchAnalysisChart(result) {
+      const welch = result.chart.welch || {};
+      const frequencies = Array.from(welch.frequencies || []);
+      const psd = Array.from(welch.psd || []);
+      const psdData = frequencies.map((frequency, index) => [frequency, psd[index]]);
+      const lowerFactor = welch.confidenceInterval95?.lowerFactor ?? 1;
+      const upperFactor = welch.confidenceInterval95?.upperFactor ?? 1;
+      const confidenceLower = psdData.map(([frequency, value]) => [frequency, Number.isFinite(value) ? value * lowerFactor : null]);
+      const confidenceUpper = psdData.map(([frequency, value]) => [frequency, Number.isFinite(value) ? value * upperFactor : null]);
+      const noiseData = frequencies.map(frequency => [frequency, welch.noiseFloor]);
+      const peakData = (welch.peaks || []).map(peak => [peak.frequencyHz, peak.psd, peak.periodSeconds]);
+      const band = result.chart.band || [welch.minHz, welch.maxHz];
+      $('analysisMainChart')?.classList.remove('quality-chart');
+      if ($('analysisMainChart')) $('analysisMainChart').style.height = '';
+      setQualityZoomResetVisible(false);
+      state.oscillationChart.setOption({
+        animation: false,
+        tooltip: {
+          trigger: 'axis',
+          formatter: params => {
+            const first = Array.isArray(params) ? params[0] : params;
+            const frequency = Number(first?.value?.[0]);
+            const period = frequency > 0 ? 1 / frequency : NaN;
+            const rows = [`${fmt(frequency, 5)} Hz`, `${t('spectralPeriodSeconds')}: ${fmt(period, 2)} sn`];
+            (Array.isArray(params) ? params : [params]).forEach(item => {
+              const value = Number(item.value?.[1]);
+              rows.push(`${item.marker || ''}${item.seriesName}: ${fmt(value, 8)} ${welch.units || 'Hz²/Hz'}`);
+            });
+            return rows.join('<br>');
+          }
+        },
+        legend: { top: 8, type: 'scroll' },
+        grid: { left: 74, right: 54, top: 66, bottom: 72 },
+        xAxis: { type: 'value', name: 'Hz', min: frequencies[0] ?? 0, max: frequencies.at(-1) ?? welch.nyquistHz, axisLabel: { formatter: value => fmt(value, 3) } },
+        yAxis: { type: welch.scale === 'log' ? 'log' : 'value', scale: true, name: welch.units || 'Hz²/Hz' },
+        dataZoom: [{ type: 'inside', filterMode: 'none' }, { type: 'slider', filterMode: 'none', height: 22, bottom: 18 }],
+        series: [
+          {
+            name: t('analysisPsdTitle'),
+            type: 'line',
+            data: psdData,
+            symbol: 'none',
+            lineStyle: { width: 1.8, color: '#1f6f8b' },
+            markArea: {
+              silent: true,
+              itemStyle: { color: 'rgba(47,125,161,.10)' },
+              data: [[{ name: t('spectralSelectedBand'), xAxis: band[0] }, { xAxis: band[1] }]]
+            },
+            markLine: {
+              silent: true,
+              lineStyle: { color: '#6b7280', type: 'dashed' },
+              data: [{ name: t('spectralNyquist'), xAxis: welch.nyquistHz, label: { formatter: t('spectralNyquist') } }]
+            }
+          },
+          { name: t('spectralPeakMarkers'), type: 'scatter', data: peakData, symbolSize: 9, itemStyle: { color: '#d14f36' } },
+          { name: t('spectralNoiseFloor'), type: 'line', data: noiseData, symbol: 'none', lineStyle: { width: 1.2, type: 'dashed', color: '#7d8b99' } },
+          { name: t('spectralConfidence95'), type: 'line', data: confidenceLower, symbol: 'none', lineStyle: { width: 1, type: 'dotted', color: '#8a6fbd' } },
+          { name: t('spectralConfidence95'), type: 'line', data: confidenceUpper, symbol: 'none', lineStyle: { width: 1, type: 'dotted', color: '#8a6fbd' } }
+        ]
+      }, true);
+    }
+
+    function renderSpectrogramAnalysisChart(result) {
+      const spectrogram = result.chart.spectrogram || {};
+      const timeBins = Array.from(spectrogram.timeBins || []);
+      const frequencyBins = Array.from(spectrogram.frequencyBins || []);
+      const rowCount = spectrogram.rowCount || timeBins.length;
+      const columnCount = spectrogram.columnCount || frequencyBins.length;
+      const powerValues = spectrogram.powerValues;
+      const data = [];
+      const invalidData = [];
+      for (let row = 0; row < rowCount; row += 1) {
+        for (let column = 0; column < columnCount; column += 1) {
+          const index = row * columnCount + column;
+          const value = powerValues ? Number(powerValues[index]) : Number(spectrogram.powerMatrix?.[row]?.[column]);
+          if (Number.isFinite(value)) data.push([row, column, value]);
+          else invalidData.push([row, column, 0]);
+        }
+      }
+      const range = finiteHeatmapRange(data);
+      const timeLabel = (rowIndex, includeSeconds = false) => {
+        const seconds = Number(timeBins[rowIndex] || 0);
+        const epoch = Number(spectrogram.analysisStartEpochMs);
+        if (Number.isFinite(epoch)) {
+          return new Date(epoch + seconds * 1000).toLocaleString(lang === 'en' ? 'en-US' : 'tr-TR', { hour: '2-digit', minute: '2-digit', second: includeSeconds ? '2-digit' : undefined });
+        }
+        return secondToTime(seconds).slice(0, includeSeconds ? 8 : 5);
+      };
+      const ridgeData = (spectrogram.peaksByTime || []).map((peak, rowIndex) => {
+        const column = nearestIndex(frequencyBins, peak.frequencyHz);
+        return Number.isFinite(peak.frequencyHz) ? [rowIndex, column] : null;
+      }).filter(Boolean);
+      const qualityData = Array.from(spectrogram.imputedSamplesByTime || [])
+        .map((count, rowIndex) => Number(count) > 0 ? [rowIndex, Math.max(0, columnCount - 1), Number(count)] : null)
+        .filter(Boolean);
+      $('analysisMainChart')?.classList.remove('quality-chart');
+      if ($('analysisMainChart')) $('analysisMainChart').style.height = '520px';
+      state.oscillationChart.resize();
+      setQualityZoomResetVisible(false);
+      state.oscillationChart.setOption({
+        animation: false,
+        tooltip: {
+          position: 'top',
+          formatter: params => {
+            const [timeIndex, freqIndex, power] = params.value;
+            const validRatio = Number(spectrogram.validityByTime?.[timeIndex]);
+            const imputed = Number(spectrogram.imputedSamplesByTime?.[timeIndex] || 0);
+            const frequency = frequencyBins[freqIndex];
+            const period = frequency > 0 ? 1 / frequency : NaN;
+            return [
+              `${t('spectrogramWindowCenter')}: ${timeLabel(timeIndex, true)}`,
+              `${t('spectralFrequencyHz')}: ${fmt(frequency, 5)} Hz`,
+              `${t('spectralPeriodSeconds')}: ${fmt(period, 2)} sn`,
+              `${t('spectralPsdLevel')}: ${fmt(power, 4)} ${spectrogram.units || 'Hz²/Hz'}`,
+              `${t('spectrogramValidRatio')}: ${percent(Number.isFinite(validRatio) ? validRatio : 0)}`,
+              `${t('spectrogramImputedSamples')}: ${imputed}`
+            ].join('<br>');
+          }
+        },
+        legend: { top: 8, type: 'scroll' },
+        grid: { left: 78, right: 88, top: 64, bottom: 78 },
+        xAxis: { type: 'category', data: timeBins.map((_, index) => timeLabel(index)), name: t('timeAxis'), axisLabel: { interval: Math.max(0, Math.floor(timeBins.length / 8) - 1) } },
+        yAxis: { type: 'category', data: frequencyBins.map(freq => fmt(freq, 3)), name: 'Hz' },
+        visualMap: { min: range.min, max: range.max, calculable: true, orient: 'vertical', right: 8, top: 86, text: [t('spectrogramPsdUnit'), ''] },
+        dataZoom: [{ type: 'inside', filterMode: 'none' }, { type: 'slider', filterMode: 'none', height: 22, bottom: 20 }],
+        series: [
+          { name: result.title, type: 'heatmap', data, progressive: 5000 },
+          { name: t('spectrogramInvalidWindows'), type: 'scatter', data: invalidData, symbolSize: 7, itemStyle: { color: 'rgba(120,120,120,.55)' } },
+          { name: t('spectrogramQualityIndicator'), type: 'scatter', data: qualityData, symbolSize: value => Math.min(16, 5 + Number(value?.[2] || 0) / 4), itemStyle: { color: '#d88c25' } },
+          { name: t('spectrogramRidge'), type: 'line', data: ridgeData, symbol: 'none', lineStyle: { width: 1.6, color: '#ffffff' } }
+        ]
+      }, true);
+    }
+
+    function finiteHeatmapRange(data) {
+      let min = Infinity;
+      let max = -Infinity;
+      for (const item of data || []) {
+        const value = Number(item?.[2]);
+        if (!Number.isFinite(value)) continue;
+        if (value < min) min = value;
+        if (value > max) max = value;
+      }
+      if (min === Infinity || max === -Infinity) return { min: 0, max: 1 };
+      if (min === max) return { min: min - 1, max: max + 1 };
+      return { min, max };
+    }
+
+    function nearestIndex(values, target) {
+      if (!values?.length || !Number.isFinite(target)) return 0;
+      let bestIndex = 0;
+      let bestDistance = Infinity;
+      values.forEach((value, index) => {
+        const distance = Math.abs(Number(value) - target);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          bestIndex = index;
+        }
+      });
+      return bestIndex;
     }
 
     function renderQualityAnalysisChart(result) {
@@ -11212,9 +11798,17 @@
         if (row.group) {
           return `<tr class="analysis-group-row"><th colspan="${Math.max(1, columns.length)}">${escapeHtml(row.group)}</th></tr>`;
         }
-        const clickable = Number.isFinite(row.startSecond);
+        const hasTimeRange = Number.isFinite(row.startSecond);
+        const hasFrequencyTarget = Number.isFinite(row.frequencyHz);
+        const hasTimeIndex = Number.isFinite(row.timeIndex);
+        const clickable = hasTimeRange || hasFrequencyTarget || hasTimeIndex;
         const attrs = clickable
-          ? `data-start="${row.startSecond}" data-end="${row.endSecond}" data-drilldown-type="${row.drilldownType || ''}"`
+          ? [
+              hasTimeRange ? `data-start="${row.startSecond}" data-end="${row.endSecond}"` : '',
+              hasFrequencyTarget ? `data-frequency-hz="${row.frequencyHz}"` : '',
+              hasTimeIndex ? `data-time-index="${row.timeIndex}"` : '',
+              `data-drilldown-type="${row.drilldownType || ''}"`
+            ].filter(Boolean).join(' ')
           : '';
         const cells = columns.map(column => {
           const cell = formatTableCell(row[column.key]);
@@ -11233,7 +11827,16 @@
         const eventEnd = Number(row.dataset.end);
         const start = Math.max(range.start, eventStart - 30);
         const end = Math.min(range.end, eventEnd + 30);
-        if (result.chart?.kind === 'quality') {
+        if (result.chart?.kind === 'welch' && Number.isFinite(Number(row.dataset.frequencyHz))) {
+          const frequency = Number(row.dataset.frequencyHz);
+          const resolution = result.chart.welch?.frequencyResolutionHz || 0.005;
+          state.oscillationChart?.dispatchAction({ type: 'dataZoom', startValue: Math.max(0, frequency - resolution * 8), endValue: frequency + resolution * 8 });
+          setQualityZoomResetVisible(true);
+        } else if (result.chart?.kind === 'spectrogram' && Number.isFinite(Number(row.dataset.timeIndex))) {
+          const timeIndex = Number(row.dataset.timeIndex);
+          state.oscillationChart?.dispatchAction({ type: 'dataZoom', startValue: Math.max(0, timeIndex - 2), endValue: timeIndex + 2 });
+          setQualityZoomResetVisible(true);
+        } else if (result.chart?.kind === 'quality') {
           showQualityDetailWindow(result, start, end, { startSecond: eventStart, endSecond: eventEnd, type: row.dataset.drilldownType });
         } else if (result.chart?.kind === 'stats') {
           showStatsDetailWindow(result, start, end, { startSecond: eventStart, endSecond: eventEnd, type: row.dataset.drilldownType });
@@ -11481,6 +12084,33 @@
           []
         );
       }
+      if (isSpectralAnalysis(result.type)) {
+        const meta = result.metadata?.parameters?.spectral || {};
+        rows.push(
+          ['parameter', 'value', 'unit'],
+          ['requestedSegmentSeconds', meta.requestedSegmentSeconds ?? '', 's'],
+          ['requestedSegmentSamples', meta.requestedSegmentSamples ?? '', 'samples'],
+          ['effectiveSegmentSeconds', meta.effectiveSegmentSeconds ?? '', 's'],
+          ['effectiveSegmentSamples', meta.effectiveSegmentSamples ?? '', 'samples'],
+          ['fftLengthSamples', meta.fftLengthSamples ?? '', 'samples'],
+          ['requestedStepSeconds', meta.requestedStepSeconds ?? '', 's'],
+          ['effectiveStepSeconds', meta.effectiveStepSeconds ?? '', 's'],
+          ['effectiveStepSamples', meta.effectiveStepSamples ?? '', 'samples'],
+          ['overlapSamples', meta.overlapSamples ?? '', 'samples'],
+          ['overlapRatio', meta.overlapRatio ?? '', 'ratio'],
+          ['frequencyResolutionHz', meta.frequencyResolutionHz ?? '', 'Hz'],
+          ['nyquistHz', meta.nyquistHz ?? '', 'Hz'],
+          ['candidateSegmentCount', meta.candidateSegmentCount ?? '', 'count'],
+          ['acceptedSegmentCount', meta.acceptedSegmentCount ?? '', 'count'],
+          ['rejectedSegmentCount', meta.rejectedSegmentCount ?? '', 'count'],
+          ['imputedSegmentCount', meta.imputedSegmentCount ?? '', 'count'],
+          ['totalImputedSampleCount', meta.totalImputedSampleCount ?? '', 'samples'],
+          ['gapHandlingMethod', meta.gapHandlingMethod ?? '', ''],
+          ['adjustmentApplied', meta.adjustmentApplied ?? '', 'boolean'],
+          ['adjustmentReason', meta.adjustmentReason ?? '', ''],
+          []
+        );
+      }
       const eventRows = columns.length && tableRows.length
         ? [
             columns.map(column => t(column.labelKey)),
@@ -11572,6 +12202,13 @@
         if (!Number.isFinite(Number(saved.rocofPreFilterSeconds))) merged.rocofPreFilterSeconds = rocofDefaults.preFilterSeconds;
         if (!Number.isFinite(Number(saved.rocofRegressionWindowSeconds))) merged.rocofRegressionWindowSeconds = rocofDefaults.windowSeconds;
         if (!Number.isFinite(Number(saved.rocofMinEventSeconds))) merged.rocofMinEventSeconds = rocofDefaults.minEventSeconds;
+        const spectralDefaults = spectralDefaultParameters('psd');
+        if (!saved.spectralWindowType) merged.spectralWindowType = spectralDefaults.windowType;
+        if (!saved.spectralDetrend) merged.spectralDetrend = spectralDefaults.detrend;
+        if (!Number.isFinite(Number(saved.spectralMinValidRatioPct))) merged.spectralMinValidRatioPct = spectralDefaults.minValidRatio * 100;
+        if (!saved.spectralScale) merged.spectralScale = spectralDefaults.scale;
+        if (!saved.spectralAveraging) merged.spectralAveraging = spectralDefaults.averaging;
+        if (!Number.isFinite(Number(saved.spectralMaxPeaks))) merged.spectralMaxPeaks = spectralDefaults.maxPeaks;
         return merged;
       } catch { return { ...DEFAULT_SETTINGS }; }
     }
@@ -11612,6 +12249,12 @@
       if ($('rocofThreshold')) $('rocofThreshold').value = s.rocofThresholdMhzPerSecond ?? hzPerSecondToMhzPerSecond(rocofDefaultParameters().thresholdHzPerSecond);
       if ($('rocofPreFilterSeconds')) $('rocofPreFilterSeconds').value = s.rocofPreFilterSeconds ?? rocofDefaultParameters().preFilterSeconds;
       if ($('rocofRegressionWindowSeconds')) $('rocofRegressionWindowSeconds').value = s.rocofRegressionWindowSeconds ?? rocofDefaultParameters().windowSeconds;
+      if ($('spectralWindowType')) $('spectralWindowType').value = s.spectralWindowType || spectralDefaultParameters('psd').windowType;
+      if ($('spectralDetrend')) $('spectralDetrend').value = s.spectralDetrend || spectralDefaultParameters('psd').detrend;
+      if ($('spectralMinValidRatioPct')) $('spectralMinValidRatioPct').value = s.spectralMinValidRatioPct ?? spectralDefaultParameters('psd').minValidRatio * 100;
+      if ($('spectralScale')) $('spectralScale').value = s.spectralScale || spectralDefaultParameters('psd').scale;
+      if ($('spectralAveraging')) $('spectralAveraging').value = s.spectralAveraging || spectralDefaultParameters('psd').averaging;
+      if ($('spectralMaxPeaks')) $('spectralMaxPeaks').value = s.spectralMaxPeaks ?? spectralDefaultParameters('psd').maxPeaks;
       $('analysisSourceSelect').value = s.oscillationSource || 'tr';
       $('oscSourceSelect').value = s.oscillationSource || 'tr';
       state.oscillationSource = getAnalysisSource();
@@ -11645,6 +12288,12 @@
         thresholdMhz: Number($('oscThreshold').value),
         windowSec: Number($('windowSec').value),
         stepSec: Number($('stepSec').value),
+        spectralWindowType: $('spectralWindowType')?.value || spectralDefaultParameters('psd').windowType,
+        spectralDetrend: $('spectralDetrend')?.value || spectralDefaultParameters('psd').detrend,
+        spectralMinValidRatioPct: Number($('spectralMinValidRatioPct')?.value || spectralDefaultParameters('psd').minValidRatio * 100),
+        spectralScale: $('spectralScale')?.value || spectralDefaultParameters('psd').scale,
+        spectralAveraging: $('spectralAveraging')?.value || spectralDefaultParameters('psd').averaging,
+        spectralMaxPeaks: Number($('spectralMaxPeaks')?.value || spectralDefaultParameters('psd').maxPeaks),
         filterTaps: Number($('filterTaps').value),
         minDuration: Number($('minDuration').value),
         repeatedValueSeconds: Number($('repeatedValueSeconds')?.value || 15),
@@ -12751,10 +13400,10 @@
         analysisEventsDesc: 'İyi kalite saniyelik frekans verisinde 49.90-50.10 Hz bandı dışındaki olaylar listelenir.',
         analysisRocofTitle: 'RoCoF Analiz Sonuçları',
         analysisRocofDesc: 'RoCoF eşik aşımı olayları ve tepe RoCoF değerleri mHz/s cinsinden raporlanır.',
-        analysisPsdTitle: 'Welch PSD Spektral Özeti',
-        analysisPsdDesc: 'Güç spektral yoğunluğu ve baskın düşük frekanslı bileşenler incelenir.',
-        analysisSpectrogramTitle: 'Spektrogram Zaman-Frekans Özeti',
-        analysisSpectrogramDesc: 'Spektral tepelerin gün içindeki zaman değişimi gösterilir.',
+        analysisPsdTitle: 'Welch Güç Spektral Yoğunluğu (PSD)',
+        analysisPsdDesc: 'Analiz çalıştırıldığında güç spektral yoğunluğu, baskın spektral tepeler ve bant güçleri burada gösterilecektir.',
+        analysisSpectrogramTitle: 'Spektrogram — Zaman-Frekans Analizi',
+        analysisSpectrogramDesc: 'Analiz çalıştırıldığında frekans içeriğinin zaman içindeki değişimi burada gösterilecektir.',
         analysisOscillationTitle: 'Osilasyon Adayı Bulguları',
         analysisOscillationDesc: 'Band geçiren bileşen üzerinden aday osilasyon aralıkları listelenir.',
         analysisCrossCorrelationTitle: 'Çapraz Korelasyon Özeti',
@@ -12877,7 +13526,79 @@
         qualityRepeatedTotal: 'Yinelenen Ardışık Frekans Süresi',
         qualityRepeatedLongest: 'En Uzun Yinelenen Ardışık Frekans Süresi',
         qualityRepeatedThresholdLabel: 'Yinelenen değer eşiği (sn)',
-        qualityResetZoomBtn: 'Zoom Sıfırla',
+        qualityResetZoomBtn: 'Görünümü Sıfırla',
+        spectralMinHzLabel: 'Minimum analiz frekansı (Hz)',
+        spectralMaxHzLabel: 'Maksimum analiz frekansı (Hz)',
+        spectralSegmentSecondsLabel: 'Segment süresi (sn)',
+        spectralStepSecondsLabel: 'Segment adımı (sn)',
+        spectralOverlapLabel: 'Örtüşme oranı (%)',
+        spectralWindowTypeLabel: 'Pencere fonksiyonu',
+        spectralDetrendLabel: 'Segment trend çıkarma',
+        spectralMinValidRatioLabel: 'Minimum geçerli örnek oranı (%)',
+        spectralScaleLabel: 'Güç ölçeği',
+        spectralScaleLinear: 'Lineer',
+        spectralScaleLog: 'Log',
+        spectralDetrendConstant: 'Sabit ortalama',
+        spectralDetrendLinear: 'Doğrusal',
+        spectralDetrendNone: 'Yok',
+        spectralAveragingLabel: 'Welch ortalaması',
+        spectralAveragingMean: 'Ortalama',
+        spectralAveragingMedian: 'Medyan',
+        spectralMaxPeaksLabel: 'Spektral tepe sayısı',
+        spectralPeaksTitle: 'Spektral Tepeler',
+        spectrogramTimeFrequencyRegionsTitle: 'Zaman-Frekans Bölümleri',
+        spectrogramWindowQualityTitle: 'Pencere Kalitesi',
+        spectralSnrLinear: 'Tepe/Gürültü oranı',
+        spectralSnrDb: 'Tepe/Gürültü oranı (dB)',
+        spectralPsdLevel: 'PSD seviyesi (dB re 1 Hz²/Hz)',
+        psdEmptyState: 'Analiz çalıştırıldığında güç spektral yoğunluğu, baskın spektral tepeler ve bant güçleri burada gösterilecektir.',
+        spectrogramEmptyState: 'Analiz çalıştırıldığında frekans içeriğinin zaman içindeki değişimi burada gösterilecektir.',
+        spectralPeakRank: 'Sıra',
+        spectralFrequencyHz: 'Frekans (Hz)',
+        spectralPeriodSeconds: 'Periyot (sn)',
+        spectralPsdHz2PerHz: 'PSD (Hz²/Hz)',
+        spectralPeakProminence: 'Belirginlik',
+        spectralPeakBandwidth: 'Bant genişliği',
+        spectralQualityFactor: 'Q faktörü',
+        spectralCalculationSummaryTitle: 'Hesap Özeti',
+        spectralSampleRate: 'Örnekleme frekansı',
+        spectralNyquist: 'Nyquist',
+        spectralRequestedSegment: 'İstenen segment',
+        spectralEffectiveSegment: 'Etkili segment',
+        spectralFftLength: 'FFT uzunluğu',
+        spectralFrequencyResolution: 'Frekans çözünürlüğü',
+        spectralStep: 'Adım',
+        spectralOverlap: 'Örtüşme',
+        spectralSegmentCounts: 'Aday/kullanılan/reddedilen segment',
+        spectralImputationCounts: 'Doldurulan segment ve örnek',
+        spectralAdjustment: 'Parametre ayarlaması',
+        spectralNoAdjustment: 'Yok',
+        spectralSamplesUnit: 'örnek',
+        spectralSegmentUsage: 'Segment kullanımı',
+        spectralNoFindingsTag: 'spektral analiz',
+        spectralSelectedBand: 'Seçili frekans bandı',
+        spectralPeakMarkers: 'Tepe işaretçileri',
+        spectralNoiseFloor: 'Gürültü tabanı',
+        spectralConfidence95: '%95 güven bandı',
+        spectrogramPsdUnit: 'PSD seviyesi (dB re 1 Hz²/Hz)',
+        spectrogramWindowCenter: 'Pencere merkez zamanı',
+        spectrogramValidRatio: 'Geçerli oran',
+        spectrogramMissingSamples: 'Eksik örnek',
+        spectrogramImputedSamples: 'Doldurulan örnek',
+        spectrogramWindowStatus: 'Durum',
+        spectrogramPeakPsd: 'Tepe PSD',
+        spectrogramStatusAccepted: 'Kullanıldı',
+        spectrogramStatusRejected: 'Reddedildi',
+        spectrogramInvalidWindows: 'Geçersiz pencereler',
+        spectrogramQualityIndicator: 'Doldurma kalite göstergesi',
+        spectrogramRidge: 'Baskın frekans sırtı',
+        spectrogramMedianFrequency: 'Medyan frekans',
+        spectrogramFrequencyRange: 'Min-maks frekans',
+        spectrogramRidgeContinuity: 'Sırt sürekliliği',
+        analysisSpectralRangeError: 'Spektral frekans aralığı geçersiz: 0 <= minimum < maksimum <= Nyquist olmalıdır.',
+        analysisSpectralStepError: 'Spektral adım geçersiz: adım pozitif olmalı ve segment süresini aşmamalıdır.',
+        analysisSpectralValidRatioError: 'Minimum geçerli örnek oranı 0 ile 100 arasında olmalıdır.',
+        analysisSpectralMaxPeaksError: 'Spektral tepe sayısı pozitif tam sayı olmalıdır.',
         statsBandMinLabel: 'İstatistik alt bandı (Hz)',
         statsBandMaxLabel: 'İstatistik üst bandı (Hz)',
         statsGroupSamples: 'Örnek kalitesi',
@@ -13225,10 +13946,10 @@
         analysisEventsDesc: 'Events outside the 49.90-50.10 Hz band are listed from Good Quality one-second frequency data.',
         analysisRocofTitle: 'RoCoF Analysis Results',
         analysisRocofDesc: 'RoCoF threshold-exceedance events and peak RoCoF values are reported in mHz/s.',
-        analysisPsdTitle: 'Welch PSD Spectral Summary',
-        analysisPsdDesc: 'Power spectral density and dominant low-frequency components are inspected.',
-        analysisSpectrogramTitle: 'Spectrogram Time-Frequency Summary',
-        analysisSpectrogramDesc: 'Spectral peak changes during the day are shown over time.',
+        analysisPsdTitle: 'Welch Power Spectral Density (PSD)',
+        analysisPsdDesc: 'When the analysis is run, power spectral density, dominant spectral peaks, and band powers will be shown here.',
+        analysisSpectrogramTitle: 'Spectrogram — Time-Frequency Analysis',
+        analysisSpectrogramDesc: 'When the analysis is run, frequency content changes over time will be shown here.',
         analysisOscillationTitle: 'Oscillation Candidate Findings',
         analysisOscillationDesc: 'Candidate oscillation intervals are listed from the band-pass component.',
         analysisCrossCorrelationTitle: 'Cross-Correlation Summary',
@@ -13351,7 +14072,79 @@
         qualityRepeatedTotal: 'Repeated Consecutive Frequency Duration',
         qualityRepeatedLongest: 'Longest Repeated Consecutive Frequency Duration',
         qualityRepeatedThresholdLabel: 'Repeated-value threshold (s)',
-        qualityResetZoomBtn: 'Reset Zoom',
+        qualityResetZoomBtn: 'Reset View',
+        spectralMinHzLabel: 'Minimum analysis frequency (Hz)',
+        spectralMaxHzLabel: 'Maximum analysis frequency (Hz)',
+        spectralSegmentSecondsLabel: 'Segment duration (s)',
+        spectralStepSecondsLabel: 'Segment step (s)',
+        spectralOverlapLabel: 'Overlap (%)',
+        spectralWindowTypeLabel: 'Window function',
+        spectralDetrendLabel: 'Segment detrending',
+        spectralMinValidRatioLabel: 'Minimum valid samples per segment (%)',
+        spectralScaleLabel: 'Power scale',
+        spectralScaleLinear: 'Linear',
+        spectralScaleLog: 'Log',
+        spectralDetrendConstant: 'Constant mean',
+        spectralDetrendLinear: 'Linear',
+        spectralDetrendNone: 'None',
+        spectralAveragingLabel: 'Welch averaging',
+        spectralAveragingMean: 'Mean',
+        spectralAveragingMedian: 'Median',
+        spectralMaxPeaksLabel: 'Spectral peak count',
+        spectralPeaksTitle: 'Spectral Peaks',
+        spectrogramTimeFrequencyRegionsTitle: 'Time-Frequency Regions',
+        spectrogramWindowQualityTitle: 'Window Quality',
+        spectralSnrLinear: 'Peak-to-noise ratio',
+        spectralSnrDb: 'Peak-to-noise ratio (dB)',
+        spectralPsdLevel: 'PSD level (dB re 1 Hz²/Hz)',
+        psdEmptyState: 'When the analysis is run, power spectral density, dominant spectral peaks, and band powers will be shown here.',
+        spectrogramEmptyState: 'When the analysis is run, frequency content changes over time will be shown here.',
+        spectralPeakRank: 'Rank',
+        spectralFrequencyHz: 'Frequency (Hz)',
+        spectralPeriodSeconds: 'Period (s)',
+        spectralPsdHz2PerHz: 'PSD (Hz²/Hz)',
+        spectralPeakProminence: 'Prominence',
+        spectralPeakBandwidth: 'Bandwidth',
+        spectralQualityFactor: 'Q factor',
+        spectralCalculationSummaryTitle: 'Calculation Summary',
+        spectralSampleRate: 'Sample rate',
+        spectralNyquist: 'Nyquist',
+        spectralRequestedSegment: 'Requested segment',
+        spectralEffectiveSegment: 'Effective segment',
+        spectralFftLength: 'FFT length',
+        spectralFrequencyResolution: 'Frequency resolution',
+        spectralStep: 'Step',
+        spectralOverlap: 'Overlap',
+        spectralSegmentCounts: 'Candidate/used/rejected segments',
+        spectralImputationCounts: 'Imputed segments and samples',
+        spectralAdjustment: 'Parameter adjustment',
+        spectralNoAdjustment: 'None',
+        spectralSamplesUnit: 'samples',
+        spectralSegmentUsage: 'Segment usage',
+        spectralNoFindingsTag: 'spectral analysis',
+        spectralSelectedBand: 'Selected frequency band',
+        spectralPeakMarkers: 'Peak markers',
+        spectralNoiseFloor: 'Noise floor',
+        spectralConfidence95: '95% confidence band',
+        spectrogramPsdUnit: 'PSD level (dB re 1 Hz²/Hz)',
+        spectrogramWindowCenter: 'Window center time',
+        spectrogramValidRatio: 'Valid ratio',
+        spectrogramMissingSamples: 'Missing samples',
+        spectrogramImputedSamples: 'Imputed samples',
+        spectrogramWindowStatus: 'Status',
+        spectrogramPeakPsd: 'Peak PSD',
+        spectrogramStatusAccepted: 'Used',
+        spectrogramStatusRejected: 'Rejected',
+        spectrogramInvalidWindows: 'Invalid windows',
+        spectrogramQualityIndicator: 'Imputation quality indicator',
+        spectrogramRidge: 'Dominant frequency ridge',
+        spectrogramMedianFrequency: 'Median frequency',
+        spectrogramFrequencyRange: 'Min-max frequency',
+        spectrogramRidgeContinuity: 'Ridge continuity',
+        analysisSpectralRangeError: 'Invalid spectral frequency range: expected 0 <= minimum < maximum <= Nyquist.',
+        analysisSpectralStepError: 'Invalid spectral step: step must be positive and must not exceed segment duration.',
+        analysisSpectralValidRatioError: 'Minimum valid sample ratio must be between 0 and 100.',
+        analysisSpectralMaxPeaksError: 'Spectral peak count must be a positive integer.',
         statsBandMinLabel: 'Statistics lower band (Hz)',
         statsBandMaxLabel: 'Statistics upper band (Hz)',
         statsGroupSamples: 'Sample quality',

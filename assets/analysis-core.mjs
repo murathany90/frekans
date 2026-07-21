@@ -11,6 +11,35 @@ export const DEFAULT_ROCOF_PARAMETERS = Object.freeze({
   windowSeconds: 5
 });
 
+export const DEFAULT_WELCH_PARAMETERS = Object.freeze({
+  sampleRateHz: 1,
+  segmentSeconds: 256,
+  stepSeconds: 128,
+  windowType: "hann",
+  detrend: "constant",
+  minValidRatio: 0.75,
+  scale: "linear",
+  averaging: "mean",
+  maxPeaks: 5
+});
+
+export const DEFAULT_SPECTROGRAM_PARAMETERS = Object.freeze({
+  sampleRateHz: 1,
+  segmentSeconds: 256,
+  stepSeconds: 64,
+  windowType: "hann",
+  detrend: "constant",
+  minValidRatio: 0.75,
+  scale: "log"
+});
+
+const ALLOWED_SPECTRAL_WINDOWS = new Set(["hann", "hamming", "rectangular"]);
+const ALLOWED_SPECTRAL_DETRENDS = new Set(["constant", "linear", "none"]);
+const ALLOWED_SPECTRAL_SCALES = new Set(["linear", "log"]);
+const ALLOWED_SPECTRAL_AVERAGING = new Set(["mean", "median"]);
+const ALLOWED_GAP_HANDLING = new Set(["segment-mean", "reject", "short-gap-linear"]);
+const DEFAULT_SPECTROGRAM_MAX_CELLS = 1_500_000;
+
 export function mHzPerSecondToHzPerSecond(value) {
   return Number(value) / 1000;
 }
@@ -518,54 +547,105 @@ export function computeRocof(values, options = {}) {
 }
 
 export function computeWelchPsd(values, options = {}) {
-  const params = normalizeSpectralOptions(values, options);
-  const window = makeWindow(params.windowType, params.segmentLength);
+  const params = normalizeSpectralOptions(values, options, DEFAULT_WELCH_PARAMETERS, "welch");
+  const window = makeWindow(params.windowType, params.effectiveSegmentSamples);
   const windowEnergy = window.reduce((sum, value) => sum + value * value, 0);
-  const binCount = Math.floor(params.segmentLength / 2) + 1;
+  const binCount = Math.floor(params.fftLengthSamples / 2) + 1;
   const accum = new Float64Array(binCount);
+  const periodograms = [];
   let segmentCount = 0;
-  const starts = segmentStarts(values?.length || 0, params.segmentLength, params.stepSamples);
+  let imputedSegmentCount = 0;
+  let totalImputedSampleCount = 0;
+  let acceptedValidRatioSum = 0;
+  let minimumAcceptedValidRatio = Infinity;
+  const starts = segmentStarts(values?.length || 0, params.effectiveSegmentSamples, params.effectiveStepSamples);
 
   for (const start of starts) {
-    const prepared = prepareSegment(values, start, params.segmentLength, params);
-    if (!prepared) continue;
-    for (let i = 0; i < prepared.length; i += 1) prepared[i] *= window[i];
+    const segment = prepareSegment(values, start, params.effectiveSegmentSamples, params);
+    if (!segment.accepted) continue;
+    const prepared = new Float64Array(params.fftLengthSamples);
+    for (let i = 0; i < segment.values.length; i += 1) prepared[i] = segment.values[i] * window[i];
     const spectrum = fftReal(prepared);
+    const periodogram = new Float64Array(binCount);
     for (let k = 0; k < binCount; k += 1) {
       let scale = 1 / (params.sampleRateHz * windowEnergy);
-      if (k > 0 && k < params.segmentLength / 2) scale *= 2;
-      accum[k] += (spectrum.re[k] * spectrum.re[k] + spectrum.im[k] * spectrum.im[k]) * scale;
+      if (k > 0 && k < params.fftLengthSamples / 2) scale *= 2;
+      const power = (spectrum.re[k] * spectrum.re[k] + spectrum.im[k] * spectrum.im[k]) * scale;
+      periodogram[k] = power;
+      if (params.averaging === "mean") accum[k] += power;
     }
+    if (params.averaging === "median") periodograms.push(periodogram);
+    if (segment.imputedCount > 0) imputedSegmentCount += 1;
+    totalImputedSampleCount += segment.imputedCount;
+    acceptedValidRatioSum += segment.validRatio;
+    minimumAcceptedValidRatio = Math.min(minimumAcceptedValidRatio, segment.validRatio);
     segmentCount += 1;
   }
 
-  if (!segmentCount) return emptyPsd(params);
+  const quality = spectralQualitySummary({
+    params,
+    candidateSegmentCount: starts.length,
+    acceptedSegmentCount: segmentCount,
+    imputedSegmentCount,
+    totalImputedSampleCount,
+    acceptedValidRatioSum,
+    minimumAcceptedValidRatio
+  });
+  if (!segmentCount) return emptyPsd(params, quality);
 
   const allFrequencies = new Float64Array(binCount);
   const allPsd = new Float64Array(binCount);
   for (let k = 0; k < binCount; k += 1) {
-    allFrequencies[k] = k * params.sampleRateHz / params.segmentLength;
-    allPsd[k] = accum[k] / segmentCount;
+    allFrequencies[k] = k * params.sampleRateHz / params.fftLengthSamples;
+    allPsd[k] = params.averaging === "median"
+      ? medianColumn(periodograms, k)
+      : accum[k] / segmentCount;
   }
   const filtered = filterFrequencyRange(allFrequencies, allPsd, params.minHz, params.maxHz);
-  const peaks = findPeaks(filtered.frequencies, filtered.values, params.maxPeaks).map(peak => ({
-    frequencyHz: peak.frequencyHz,
-    psd: peak.value,
-    power: peak.value
-  }));
-  const noiseFloor = medianWithoutPeakBins(filtered.values, peaks, filtered.frequencies);
+  const rawPeaks = findPeaks(filtered.frequencies, filtered.values, params.maxPeaks);
+  const noiseFloor = medianWithoutPeakBins(filtered.values, rawPeaks, filtered.frequencies);
+  const peaks = enrichSpectralPeaks(rawPeaks, filtered.frequencies, filtered.values, noiseFloor);
   const bandEnergies = computeBandEnergies(allFrequencies, allPsd, params.bands);
   const firstPeak = peaks[0] || { frequencyHz: NaN, psd: NaN, power: NaN };
+  const snrLinear = Number.isFinite(firstPeak.psd) ? firstPeak.psd / Math.max(noiseFloor, EPSILON) : NaN;
+  const snrDb = ratioToDb(snrLinear);
+  const degreesOfFreedom = segmentCount * 2;
+  const totalBandPower = integratePower(allFrequencies, allPsd, params.minHz, params.maxHz);
+  const variance = finiteVariance(values);
+  const totalPower = integratePower(allFrequencies, allPsd, 0, params.nyquistHz);
+  const parsevalErrorRatio = Number.isFinite(variance) && variance > EPSILON
+    ? (totalPower - variance) / variance
+    : NaN;
   return {
     method: "welch-psd",
     units: "Hz^2/Hz",
     sampleRateHz: params.sampleRateHz,
     segmentLength: params.segmentLength,
+    requestedSegmentSeconds: params.requestedSegmentSeconds,
+    requestedSegmentSamples: params.requestedSegmentSamples,
+    effectiveSegmentSeconds: params.effectiveSegmentSeconds,
+    effectiveSegmentSamples: params.effectiveSegmentSamples,
+    fftLengthSamples: params.fftLengthSamples,
+    requestedStepSeconds: params.requestedStepSeconds,
+    effectiveStepSeconds: params.effectiveStepSeconds,
+    effectiveStepSamples: params.effectiveStepSamples,
     overlapSamples: params.overlapSamples,
     overlapRatio: params.overlapRatio,
+    frequencyResolutionHz: params.frequencyResolutionHz,
+    nyquistHz: params.nyquistHz,
+    adjustmentApplied: params.adjustmentApplied,
+    adjustmentReason: params.adjustmentReason,
     windowType: params.windowType,
     detrend: params.detrend,
     segmentCount,
+    candidateSegmentCount: quality.candidateSegmentCount,
+    acceptedSegmentCount: quality.acceptedSegmentCount,
+    rejectedSegmentCount: quality.rejectedSegmentCount,
+    imputedSegmentCount: quality.imputedSegmentCount,
+    totalImputedSampleCount: quality.totalImputedSampleCount,
+    meanValidRatio: quality.meanValidRatio,
+    minimumAcceptedValidRatio: quality.minimumAcceptedValidRatio,
+    gapHandlingMethod: quality.gapHandlingMethod,
     frequencies: Array.from(filtered.frequencies),
     psd: Array.from(filtered.values),
     allFrequencies: Array.from(allFrequencies),
@@ -573,9 +653,17 @@ export function computeWelchPsd(values, options = {}) {
     peaks,
     bandEnergies,
     noiseFloor,
-    snr: Number.isFinite(firstPeak.psd) ? firstPeak.psd / Math.max(noiseFloor, EPSILON) : NaN,
+    snr: snrLinear,
+    snrLinear,
+    snrDb,
+    degreesOfFreedom,
+    confidenceInterval95: spectralConfidenceInterval95(degreesOfFreedom),
+    totalBandPower,
+    parsevalErrorRatio,
+    averagingMethod: params.averaging,
     frequencyHz: firstPeak.frequencyHz,
-    power: firstPeak.psd
+    power: firstPeak.psd,
+    parameters: { ...params }
   };
 }
 
@@ -789,62 +877,144 @@ export function estimatePhaseDifference(a, b, { targetHz = 0.12, ...options } = 
 }
 
 export function computeStftSpectrogram(values, options = {}) {
-  const params = normalizeSpectralOptions(values, { segmentLength: 256, overlapRatio: 0.75, ...options });
-  const window = makeWindow(params.windowType, params.segmentLength);
+  const params = normalizeSpectralOptions(values, options, DEFAULT_SPECTROGRAM_PARAMETERS, "spectrogram");
+  const window = makeWindow(params.windowType, params.effectiveSegmentSamples);
   const windowEnergy = window.reduce((sum, value) => sum + value * value, 0);
-  const binCount = Math.floor(params.segmentLength / 2) + 1;
+  const binCount = Math.floor(params.fftLengthSamples / 2) + 1;
   const allFrequencies = new Float64Array(binCount);
-  for (let k = 0; k < binCount; k += 1) allFrequencies[k] = k * params.sampleRateHz / params.segmentLength;
+  for (let k = 0; k < binCount; k += 1) allFrequencies[k] = k * params.sampleRateHz / params.fftLengthSamples;
   const frequencyIndices = [];
-  const frequencyBins = [];
+  const frequencyBinArray = [];
   for (let k = 0; k < binCount; k += 1) {
     if (allFrequencies[k] >= params.minHz - 1e-12 && allFrequencies[k] <= params.maxHz + 1e-12) {
       frequencyIndices.push(k);
-      frequencyBins.push(allFrequencies[k]);
+      frequencyBinArray.push(allFrequencies[k]);
     }
   }
+  if (!frequencyIndices.length) throw new Error("No frequency bins remain in the requested minHz/maxHz range.");
+  const starts = segmentStarts(values?.length || 0, params.effectiveSegmentSamples, params.effectiveStepSamples);
+  const estimatedCellCount = starts.length * frequencyIndices.length;
+  const estimatedBytes = estimatedCellCount * Float32Array.BYTES_PER_ELEMENT
+    + starts.length * (Float64Array.BYTES_PER_ELEMENT + 2 * Float32Array.BYTES_PER_ELEMENT)
+    + frequencyIndices.length * Float64Array.BYTES_PER_ELEMENT;
+  if (estimatedCellCount > params.maxCells) {
+    throw new Error(`Spectrogram cell limit exceeded: ${estimatedCellCount} cells would be produced. Use a shorter period, larger stepSeconds, or narrower frequency range.`);
+  }
 
-  const timeBins = [];
+  const rowCount = starts.length;
+  const columnCount = frequencyIndices.length;
+  const timeBins = new Float64Array(rowCount);
+  const frequencyBins = new Float64Array(frequencyBinArray);
+  const powerValues = new Float32Array(rowCount * columnCount);
+  powerValues.fill(NaN);
+  const validityByTime = new Float32Array(rowCount);
+  const imputedSamplesByTime = new Uint32Array(rowCount);
   const powerMatrix = [];
   const peaksByTime = [];
-  for (const start of segmentStarts(values?.length || 0, params.segmentLength, params.stepSamples)) {
-    const time = (start + params.segmentLength / 2) / params.sampleRateHz;
-    timeBins.push(time);
-    const prepared = prepareSegment(values, start, params.segmentLength, params);
-    if (!prepared) {
-      powerMatrix.push(frequencyBins.map(() => NaN));
+  let acceptedSegmentCount = 0;
+  let imputedSegmentCount = 0;
+  let totalImputedSampleCount = 0;
+  let acceptedValidRatioSum = 0;
+  let minimumAcceptedValidRatio = Infinity;
+  for (let rowIndex = 0; rowIndex < starts.length; rowIndex += 1) {
+    const start = starts[rowIndex];
+    const time = (start + params.effectiveSegmentSamples / 2) / params.sampleRateHz;
+    timeBins[rowIndex] = time;
+    const segment = prepareSegment(values, start, params.effectiveSegmentSamples, params);
+    validityByTime[rowIndex] = segment.validRatio;
+    imputedSamplesByTime[rowIndex] = segment.imputedCount;
+    if (!segment.accepted) {
+      powerMatrix.push(Array.from({ length: columnCount }, () => NaN));
       peaksByTime.push({ timeSeconds: time, frequencyHz: NaN, power: NaN });
       continue;
     }
-    for (let i = 0; i < prepared.length; i += 1) prepared[i] *= window[i];
+    const prepared = new Float64Array(params.fftLengthSamples);
+    for (let i = 0; i < segment.values.length; i += 1) prepared[i] = segment.values[i] * window[i];
     const spectrum = fftReal(prepared);
     const row = [];
     let best = { frequencyHz: NaN, power: -Infinity };
-    for (const k of frequencyIndices) {
+    for (let columnIndex = 0; columnIndex < frequencyIndices.length; columnIndex += 1) {
+      const k = frequencyIndices[columnIndex];
       let scale = 1 / (params.sampleRateHz * windowEnergy);
-      if (k > 0 && k < params.segmentLength / 2) scale *= 2;
+      if (k > 0 && k < params.fftLengthSamples / 2) scale *= 2;
       let power = (spectrum.re[k] * spectrum.re[k] + spectrum.im[k] * spectrum.im[k]) * scale;
       if (params.scale === "log") power = 10 * Math.log10(Math.max(power, EPSILON));
+      powerValues[rowIndex * columnCount + columnIndex] = power;
       row.push(power);
       if (power > best.power) best = { frequencyHz: allFrequencies[k], power };
     }
     powerMatrix.push(row);
     peaksByTime.push({ timeSeconds: time, ...best });
+    acceptedSegmentCount += 1;
+    if (segment.imputedCount > 0) imputedSegmentCount += 1;
+    totalImputedSampleCount += segment.imputedCount;
+    acceptedValidRatioSum += segment.validRatio;
+    minimumAcceptedValidRatio = Math.min(minimumAcceptedValidRatio, segment.validRatio);
   }
+  const quality = spectralQualitySummary({
+    params,
+    candidateSegmentCount: starts.length,
+    acceptedSegmentCount,
+    imputedSegmentCount,
+    totalImputedSampleCount,
+    acceptedValidRatioSum,
+    minimumAcceptedValidRatio
+  });
 
   return {
     method: "stft-spectrogram",
-    units: params.scale === "log" ? "dB(Hz^2/Hz)" : "Hz^2/Hz",
+    units: params.scale === "log" ? "dB re 1 Hz²/Hz" : "Hz^2/Hz",
     timeBins,
     frequencyBins,
+    powerValues,
+    rowCount,
+    columnCount,
     powerMatrix,
     peaksByTime,
     segmentLength: params.segmentLength,
+    requestedSegmentSeconds: params.requestedSegmentSeconds,
+    requestedSegmentSamples: params.requestedSegmentSamples,
+    effectiveSegmentSeconds: params.effectiveSegmentSeconds,
+    effectiveSegmentSamples: params.effectiveSegmentSamples,
+    fftLengthSamples: params.fftLengthSamples,
+    requestedStepSeconds: params.requestedStepSeconds,
+    effectiveStepSeconds: params.effectiveStepSeconds,
+    effectiveStepSamples: params.effectiveStepSamples,
     overlapSamples: params.overlapSamples,
     overlapRatio: params.overlapRatio,
+    frequencyResolutionHz: params.frequencyResolutionHz,
+    nyquistHz: params.nyquistHz,
+    adjustmentApplied: params.adjustmentApplied,
+    adjustmentReason: params.adjustmentReason,
     windowType: params.windowType,
+    detrend: params.detrend,
     sampleRateHz: params.sampleRateHz,
-    scale: params.scale
+    scale: params.scale,
+    minValidRatio: params.minValidRatio,
+    minHz: params.minHz,
+    maxHz: params.maxHz,
+    stepSamples: params.effectiveStepSamples,
+    stepSeconds: params.effectiveStepSeconds,
+    timeResolutionSeconds: params.effectiveStepSeconds,
+    analysisStartEpochMs: params.analysisStartEpochMs,
+    analysisTimezone: params.analysisTimezone,
+    timeBinReference: "window-center",
+    invalidWindowCount: quality.rejectedSegmentCount,
+    imputedWindowCount: quality.imputedSegmentCount,
+    validityByTime,
+    imputedSamplesByTime,
+    candidateSegmentCount: quality.candidateSegmentCount,
+    acceptedSegmentCount: quality.acceptedSegmentCount,
+    rejectedSegmentCount: quality.rejectedSegmentCount,
+    imputedSegmentCount: quality.imputedSegmentCount,
+    totalImputedSampleCount: quality.totalImputedSampleCount,
+    meanValidRatio: quality.meanValidRatio,
+    minimumAcceptedValidRatio: quality.minimumAcceptedValidRatio,
+    gapHandlingMethod: quality.gapHandlingMethod,
+    estimatedCellCount,
+    estimatedBytes,
+    adaptiveReductionApplied: false,
+    parameters: { ...params }
   };
 }
 
@@ -875,29 +1045,31 @@ export function computeOscillationConfidence({
 
 function computeWelchCrossSpectra(a, b, options = {}) {
   const n = Math.min(a?.length || 0, b?.length || 0);
-  const params = normalizeSpectralOptions({ length: n }, options);
-  const window = makeWindow(params.windowType, params.segmentLength);
+  const params = normalizeSpectralOptions({ length: n }, options, DEFAULT_WELCH_PARAMETERS, "welch");
+  const window = makeWindow(params.windowType, params.effectiveSegmentSamples);
   const windowEnergy = window.reduce((sum, value) => sum + value * value, 0);
-  const binCount = Math.floor(params.segmentLength / 2) + 1;
+  const binCount = Math.floor(params.fftLengthSamples / 2) + 1;
   const pxxAll = new Float64Array(binCount);
   const pyyAll = new Float64Array(binCount);
   const pxyReAll = new Float64Array(binCount);
   const pxyImAll = new Float64Array(binCount);
   let segmentCount = 0;
 
-  for (const start of segmentStarts(n, params.segmentLength, params.stepSamples)) {
-    const x = prepareSegment(a, start, params.segmentLength, params);
-    const y = prepareSegment(b, start, params.segmentLength, params);
-    if (!x || !y) continue;
-    for (let i = 0; i < params.segmentLength; i += 1) {
-      x[i] *= window[i];
-      y[i] *= window[i];
+  for (const start of segmentStarts(n, params.effectiveSegmentSamples, params.effectiveStepSamples)) {
+    const xSegment = prepareSegment(a, start, params.effectiveSegmentSamples, params);
+    const ySegment = prepareSegment(b, start, params.effectiveSegmentSamples, params);
+    if (!xSegment.accepted || !ySegment.accepted) continue;
+    const x = new Float64Array(params.fftLengthSamples);
+    const y = new Float64Array(params.fftLengthSamples);
+    for (let i = 0; i < params.effectiveSegmentSamples; i += 1) {
+      x[i] = xSegment.values[i] * window[i];
+      y[i] = ySegment.values[i] * window[i];
     }
     const sx = fftReal(x);
     const sy = fftReal(y);
     for (let k = 0; k < binCount; k += 1) {
       let scale = 1 / (params.sampleRateHz * windowEnergy);
-      if (k > 0 && k < params.segmentLength / 2) scale *= 2;
+      if (k > 0 && k < params.fftLengthSamples / 2) scale *= 2;
       const xr = sx.re[k];
       const xi = sx.im[k];
       const yr = sy.re[k];
@@ -929,7 +1101,7 @@ function computeWelchCrossSpectra(a, b, options = {}) {
   const pxyIm = [];
   const frequencies = [];
   for (let k = 0; k < binCount; k += 1) {
-    const f = k * params.sampleRateHz / params.segmentLength;
+    const f = k * params.sampleRateHz / params.fftLengthSamples;
     allFrequencies[k] = f;
     if (f < params.minHz - 1e-12 || f > params.maxHz + 1e-12) continue;
     frequencies.push(f);
@@ -950,53 +1122,389 @@ function computeWelchCrossSpectra(a, b, options = {}) {
   };
 }
 
-function normalizeSpectralOptions(values, options) {
+export function normalizeSpectralOptions(values, options = {}, defaults = DEFAULT_WELCH_PARAMETERS, mode = "welch") {
   const n = values?.length || 0;
-  const sampleRateHz = Number(options.sampleRateHz || DEFAULT_SAMPLE_RATE_HZ);
-  const requested = Math.max(8, Math.min(Number(options.segmentLength || 256), Math.max(8, n || 8)));
-  const segmentLength = isPowerOfTwo(requested) ? requested : previousPowerOfTwo(requested);
-  const overlapRatio = clamp(Number(options.overlapRatio ?? 0.5), 0, 0.95);
-  const overlapSamples = Math.min(segmentLength - 1, Math.max(0, Math.round(options.overlapSamples ?? segmentLength * overlapRatio)));
+  const sampleRateHz = Number(options.sampleRateHz ?? defaults.sampleRateHz ?? DEFAULT_SAMPLE_RATE_HZ);
+  if (!Number.isFinite(sampleRateHz) || sampleRateHz <= 0) throw new Error("Invalid spectral sampleRateHz: expected a finite value > 0.");
+
+  const hasLegacySegmentLength = options.segmentLength !== undefined && options.segmentSeconds === undefined && options.segmentSamples === undefined;
+  const requestedSegmentSamples = hasLegacySegmentLength
+    ? Math.round(Number(options.segmentLength))
+    : Math.round(Number(options.segmentSamples ?? (Number(options.segmentSeconds ?? defaults.segmentSeconds) * sampleRateHz)));
+  const requestedSegmentSeconds = hasLegacySegmentLength
+    ? requestedSegmentSamples / sampleRateHz
+    : Number(options.segmentSeconds ?? requestedSegmentSamples / sampleRateHz);
+  if (!Number.isFinite(requestedSegmentSeconds) || requestedSegmentSeconds <= 0) {
+    throw new Error("Invalid spectral segmentSeconds: expected a finite value > 0.");
+  }
+  if (!Number.isInteger(requestedSegmentSamples) || requestedSegmentSamples < 8) {
+    throw new Error("Invalid spectral segmentSamples: expected at least 8 samples.");
+  }
+  if (n > 0 && n < requestedSegmentSamples) {
+    throw new Error(`Data too short for spectral analysis: segmentSamples ${requestedSegmentSamples} exceeds data length ${n}.`);
+  }
+
+  const effectiveSegmentSamples = requestedSegmentSamples;
+  const effectiveSegmentSeconds = effectiveSegmentSamples / sampleRateHz;
+  const requestedFftLength = Number(options.fftLengthSamples ?? 0);
+  const fftLengthSamples = Math.max(
+    effectiveSegmentSamples,
+    nextPowerOfTwo(Number.isFinite(requestedFftLength) && requestedFftLength >= effectiveSegmentSamples
+      ? Math.round(requestedFftLength)
+      : effectiveSegmentSamples)
+  );
+
+  let requestedStepSamples;
+  let requestedStepSeconds;
+  if (options.stepSamples !== undefined) {
+    requestedStepSamples = Math.round(Number(options.stepSamples));
+    requestedStepSeconds = requestedStepSamples / sampleRateHz;
+  } else if (options.stepSeconds !== undefined) {
+    requestedStepSeconds = Number(options.stepSeconds);
+    requestedStepSamples = Math.round(requestedStepSeconds * sampleRateHz);
+  } else if (options.overlapSamples !== undefined || options.overlapRatio !== undefined) {
+    const overlapRatioInput = options.overlapRatio !== undefined ? Number(options.overlapRatio) : undefined;
+    if (overlapRatioInput !== undefined && (!Number.isFinite(overlapRatioInput) || overlapRatioInput < 0 || overlapRatioInput >= 1)) {
+      throw new Error("Invalid spectral overlapRatio: expected 0 <= overlapRatio < 1.");
+    }
+    const overlapSamples = options.overlapSamples !== undefined
+      ? Math.round(Number(options.overlapSamples))
+      : Math.round(effectiveSegmentSamples * (overlapRatioInput ?? 0.5));
+    requestedStepSamples = effectiveSegmentSamples - overlapSamples;
+    requestedStepSeconds = requestedStepSamples / sampleRateHz;
+  } else {
+    requestedStepSeconds = Number(defaults.stepSeconds);
+    requestedStepSamples = Math.round(requestedStepSeconds * sampleRateHz);
+  }
+  if (!Number.isFinite(requestedStepSeconds) || requestedStepSeconds <= 0) {
+    throw new Error("Invalid spectral stepSeconds: expected a finite value > 0.");
+  }
+  if (!Number.isInteger(requestedStepSamples) || requestedStepSamples <= 0 || requestedStepSamples > effectiveSegmentSamples) {
+    throw new Error("Invalid spectral stepSamples: expected 0 < stepSamples <= segmentSamples.");
+  }
+  const effectiveStepSamples = requestedStepSamples;
+  const effectiveStepSeconds = effectiveStepSamples / sampleRateHz;
+  const overlapSamples = effectiveSegmentSamples - effectiveStepSamples;
+  const overlapRatio = overlapSamples / effectiveSegmentSamples;
+  if (!Number.isFinite(overlapRatio) || overlapRatio < 0 || overlapRatio >= 1) {
+    throw new Error("Invalid spectral overlapRatio: expected 0 <= overlapRatio < 1.");
+  }
+
+  const windowType = normalizeSpectralWindow(options.windowType ?? defaults.windowType);
+  const detrend = normalizeSpectralDetrend(options.detrend ?? defaults.detrend);
+  const scale = String(options.scale ?? defaults.scale ?? "linear").toLowerCase();
+  if (!ALLOWED_SPECTRAL_SCALES.has(scale)) throw new Error("Invalid spectral scale: expected linear or log.");
+  const averaging = String(options.averaging ?? defaults.averaging ?? "mean").toLowerCase();
+  if (!ALLOWED_SPECTRAL_AVERAGING.has(averaging)) throw new Error("Invalid spectral averaging: expected mean or median.");
+  const minValidRatio = Number(options.minValidRatio ?? defaults.minValidRatio ?? 0.75);
+  if (!Number.isFinite(minValidRatio) || minValidRatio < 0 || minValidRatio > 1) {
+    throw new Error("Invalid spectral minValidRatio: expected 0 <= minValidRatio <= 1.");
+  }
+  const nyquistHz = sampleRateHz / 2;
+  const minHz = Number(options.minHz ?? 0);
+  const maxHz = Number(options.maxHz ?? nyquistHz);
+  if (!Number.isFinite(minHz) || !Number.isFinite(maxHz) || minHz < 0 || minHz >= maxHz) {
+    throw new Error("Invalid spectral minHz/maxHz: expected 0 <= minHz < maxHz.");
+  }
+  if (maxHz > nyquistHz + 1e-12) {
+    throw new Error(`Invalid spectral maxHz: expected maxHz <= Nyquist (${nyquistHz} Hz).`);
+  }
+  const maxPeaks = Math.round(Number(options.maxPeaks ?? defaults.maxPeaks ?? DEFAULT_WELCH_PARAMETERS.maxPeaks));
+  if (!Number.isInteger(maxPeaks) || maxPeaks <= 0) throw new Error("Invalid spectral maxPeaks: expected a positive integer.");
+  const gapHandlingMethod = String(options.gapHandlingMethod ?? options.imputationMethod ?? "segment-mean").toLowerCase();
+  if (!ALLOWED_GAP_HANDLING.has(gapHandlingMethod)) {
+    throw new Error("Invalid spectral gapHandlingMethod: expected reject, segment-mean, or short-gap-linear.");
+  }
+  const maxInterpolationGapSamples = Math.max(1, Math.round(Number(options.maxInterpolationGapSamples ?? 2)));
+  const maxCells = Math.max(1, Math.round(Number(options.maxCells ?? DEFAULT_SPECTROGRAM_MAX_CELLS)));
+  const frequencyResolutionHz = sampleRateHz / fftLengthSamples;
+  const adjustmentReasons = [];
+  if (fftLengthSamples !== effectiveSegmentSamples) adjustmentReasons.push("FFT zero-padding to next power of two");
+  if (Math.abs(effectiveSegmentSeconds - requestedSegmentSeconds) > EPSILON) adjustmentReasons.push("segment duration rounded to whole samples");
+  if (Math.abs(effectiveStepSeconds - requestedStepSeconds) > EPSILON) adjustmentReasons.push("step duration rounded to whole samples");
+  const bands = options.bands || [{ name: "selected", minHz, maxHz }];
+  const analysisStartEpochMs = Number.isFinite(Number(options.analysisStartEpochMs)) ? Number(options.analysisStartEpochMs) : null;
+  const analysisTimezone = options.analysisTimezone || "UTC";
+
   return {
+    mode,
     sampleRateHz,
-    segmentLength,
-    overlapRatio: overlapSamples / segmentLength,
+    requestedSegmentSeconds,
+    requestedSegmentSamples,
+    effectiveSegmentSeconds,
+    effectiveSegmentSamples,
+    segmentLength: effectiveSegmentSamples,
+    fftLengthSamples,
+    requestedStepSeconds,
+    effectiveStepSeconds,
+    effectiveStepSamples,
+    stepSamples: effectiveStepSamples,
     overlapSamples,
-    stepSamples: Math.max(1, segmentLength - overlapSamples),
-    windowType: options.windowType || "hann",
-    detrend: options.detrend ?? "constant",
-    minHz: Number(options.minHz ?? 0),
-    maxHz: Number(options.maxHz ?? sampleRateHz / 2),
-    maxPeaks: Math.max(1, Number(options.maxPeaks ?? 5)),
-    minValidRatio: Number(options.minValidRatio ?? 0.75),
-    bands: options.bands || [{ name: "selected", minHz: Number(options.minHz ?? 0), maxHz: Number(options.maxHz ?? sampleRateHz / 2) }],
-    scale: options.scale || "linear"
+    overlapRatio,
+    frequencyResolutionHz,
+    nyquistHz,
+    adjustmentApplied: adjustmentReasons.length > 0,
+    adjustmentReason: adjustmentReasons.length ? adjustmentReasons.join("; ") : "none",
+    windowType,
+    detrend,
+    minHz,
+    maxHz,
+    maxPeaks,
+    minValidRatio,
+    bands,
+    scale,
+    averaging,
+    gapHandlingMethod,
+    maxInterpolationGapSamples,
+    maxCells,
+    analysisStartEpochMs,
+    analysisTimezone
   };
 }
 
-function prepareSegment(values, start, length, params) {
-  let count = 0;
+export function prepareSegment(values, start, length, params = {}) {
+  const minValidRatio = Number(params.minValidRatio ?? 0.75);
+  const gapHandlingMethod = String(params.gapHandlingMethod ?? "segment-mean").toLowerCase();
+  const maxInterpolationGapSamples = Math.max(1, Math.round(Number(params.maxInterpolationGapSamples ?? 2)));
+  const raw = new Float64Array(length);
+  let validCount = 0;
+  let missingCount = 0;
   let sum = 0;
   for (let i = 0; i < length; i += 1) {
     const value = Number(values?.[start + i]);
+    raw[i] = Number.isFinite(value) ? value : NaN;
     if (Number.isFinite(value)) {
-      count += 1;
+      validCount += 1;
       sum += value;
+    } else {
+      missingCount += 1;
     }
   }
-  if (count / length < params.minValidRatio) return null;
-  const mean = count ? sum / count : 0;
-  const out = new Float64Array(length);
-  for (let i = 0; i < length; i += 1) {
-    const value = Number(values?.[start + i]);
-    out[i] = Number.isFinite(value) ? value : mean;
+  const validRatio = length ? validCount / length : 0;
+  const base = {
+    values: new Float64Array(),
+    validCount,
+    missingCount,
+    validRatio,
+    imputedCount: 0,
+    accepted: false,
+    rejectedReason: null,
+    imputationMethod: missingCount ? gapHandlingMethod : "none"
+  };
+  if (validRatio < minValidRatio) {
+    return { ...base, rejectedReason: "min-valid-ratio" };
   }
-  if (params.detrend === false || params.detrend === "none") return out;
-  if (params.detrend === "linear") removeLinearTrend(out);
-  else {
+  if (!validCount) {
+    return { ...base, rejectedReason: "no-valid-samples" };
+  }
+  if (missingCount && gapHandlingMethod === "reject") {
+    return { ...base, rejectedReason: "missing-data" };
+  }
+
+  const out = new Float64Array(length);
+  let imputedCount = 0;
+  if (!missingCount) {
+    for (let i = 0; i < length; i += 1) out[i] = raw[i];
+  } else if (gapHandlingMethod === "segment-mean") {
+    const mean = sum / validCount;
+    for (let i = 0; i < length; i += 1) out[i] = Number.isFinite(raw[i]) ? raw[i] : mean;
+    imputedCount = missingCount;
+  } else if (gapHandlingMethod === "short-gap-linear") {
+    for (let i = 0; i < length; i += 1) out[i] = raw[i];
+    for (let i = 0; i < length;) {
+      if (Number.isFinite(out[i])) {
+        i += 1;
+        continue;
+      }
+      const gapStart = i;
+      while (i < length && !Number.isFinite(out[i])) i += 1;
+      const gapEndExclusive = i;
+      const gapLength = gapEndExclusive - gapStart;
+      const left = gapStart - 1;
+      const right = gapEndExclusive;
+      if (
+        left < 0
+        || right >= length
+        || gapLength > maxInterpolationGapSamples
+        || !Number.isFinite(out[left])
+        || !Number.isFinite(out[right])
+      ) {
+        return { ...base, rejectedReason: "unfilled-gap", imputationMethod: "short-gap-linear" };
+      }
+      const leftValue = out[left];
+      const rightValue = out[right];
+      for (let j = 1; j <= gapLength; j += 1) {
+        out[left + j] = leftValue + (rightValue - leftValue) * (j / (gapLength + 1));
+      }
+      imputedCount += gapLength;
+    }
+  } else {
+    return { ...base, rejectedReason: "unsupported-gap-handling" };
+  }
+
+  const detrend = normalizeSpectralDetrend(params.detrend ?? "constant");
+  if (detrend === "linear") removeLinearTrend(out);
+  else if (detrend === "constant") {
+    let mean = 0;
+    for (let i = 0; i < out.length; i += 1) mean += out[i];
+    mean /= Math.max(1, out.length);
     for (let i = 0; i < out.length; i += 1) out[i] -= mean;
   }
-  return out;
+  return {
+    values: out,
+    validCount,
+    missingCount,
+    validRatio,
+    imputedCount,
+    accepted: true,
+    rejectedReason: null,
+    imputationMethod: missingCount ? gapHandlingMethod : "none"
+  };
+}
+
+function normalizeSpectralWindow(type) {
+  const normalized = String(type || "hann").toLowerCase();
+  const canonical = normalized === "rect" ? "rectangular" : normalized;
+  if (!ALLOWED_SPECTRAL_WINDOWS.has(canonical)) {
+    throw new Error("Invalid spectral windowType: expected hann, hamming, or rectangular.");
+  }
+  return canonical;
+}
+
+function normalizeSpectralDetrend(value) {
+  const normalized = value === false ? "none" : String(value ?? "constant").toLowerCase();
+  if (!ALLOWED_SPECTRAL_DETRENDS.has(normalized)) {
+    throw new Error("Invalid spectral detrend: expected constant, linear, or none.");
+  }
+  return normalized;
+}
+
+function medianColumn(periodograms, columnIndex) {
+  if (!periodograms.length) return NaN;
+  const values = [];
+  for (const periodogram of periodograms) {
+    const value = periodogram[columnIndex];
+    if (Number.isFinite(value)) values.push(value);
+  }
+  return percentile(values, 0.5);
+}
+
+function ratioToDb(value) {
+  return Number.isFinite(value) && value > 0 ? 10 * Math.log10(value) : NaN;
+}
+
+function powerToDb(value) {
+  return Number.isFinite(value) && value > 0 ? 10 * Math.log10(value) : NaN;
+}
+
+function enrichSpectralPeaks(peaks, frequencies, values, noiseFloor) {
+  return peaks.map((peak, rankIndex) => {
+    const index = Number.isInteger(peak.index)
+      ? peak.index
+      : nearestFrequencyIndex(frequencies, peak.frequencyHz);
+    const peakBandwidthHz = estimatePeakBandwidthHz(frequencies, values, index);
+    const snrLinear = peak.value / Math.max(noiseFloor, EPSILON);
+    return {
+      rank: rankIndex + 1,
+      frequencyHz: peak.frequencyHz,
+      periodSeconds: peak.frequencyHz > 0 ? 1 / peak.frequencyHz : Infinity,
+      psd: peak.value,
+      power: peak.value,
+      psdLevelDb: powerToDb(peak.value),
+      snrLinear,
+      snrDb: ratioToDb(snrLinear),
+      peakProminence: peak.value - noiseFloor,
+      peakBandwidthHz,
+      qualityFactor: peakBandwidthHz > EPSILON ? peak.frequencyHz / peakBandwidthHz : NaN
+    };
+  });
+}
+
+function nearestFrequencyIndex(frequencies, frequencyHz) {
+  let bestIndex = 0;
+  let bestDistance = Infinity;
+  for (let index = 0; index < frequencies.length; index += 1) {
+    const distance = Math.abs(frequencies[index] - frequencyHz);
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      bestIndex = index;
+    }
+  }
+  return bestIndex;
+}
+
+function estimatePeakBandwidthHz(frequencies, values, index) {
+  if (!Number.isInteger(index) || index < 0 || index >= values.length) return NaN;
+  const peak = values[index];
+  if (!Number.isFinite(peak) || peak <= 0) return NaN;
+  const halfPower = peak / 2;
+  let left = index;
+  while (left > 0 && Number.isFinite(values[left - 1]) && values[left - 1] >= halfPower) left -= 1;
+  let right = index;
+  while (right < values.length - 1 && Number.isFinite(values[right + 1]) && values[right + 1] >= halfPower) right += 1;
+  const leftHz = frequencies[left] ?? frequencies[index];
+  const rightHz = frequencies[right] ?? frequencies[index];
+  const resolution = frequencies.length > 1 ? Math.abs(frequencies[1] - frequencies[0]) : 0;
+  return Math.max(resolution, Math.abs(rightHz - leftHz));
+}
+
+function spectralQualitySummary({
+  params,
+  candidateSegmentCount,
+  acceptedSegmentCount,
+  imputedSegmentCount,
+  totalImputedSampleCount,
+  acceptedValidRatioSum,
+  minimumAcceptedValidRatio
+}) {
+  return {
+    candidateSegmentCount,
+    acceptedSegmentCount,
+    rejectedSegmentCount: Math.max(0, candidateSegmentCount - acceptedSegmentCount),
+    imputedSegmentCount,
+    totalImputedSampleCount,
+    meanValidRatio: acceptedSegmentCount ? acceptedValidRatioSum / acceptedSegmentCount : 0,
+    minimumAcceptedValidRatio: acceptedSegmentCount ? minimumAcceptedValidRatio : params.minValidRatio,
+    gapHandlingMethod: params.gapHandlingMethod
+  };
+}
+
+function spectralConfidenceInterval95(degreesOfFreedom) {
+  const dof = Math.max(1, Number(degreesOfFreedom) || 1);
+  const relativeStd = Math.sqrt(2 / dof);
+  return {
+    lowerFactor: Math.max(0, 1 - 1.96 * relativeStd),
+    upperFactor: 1 + 1.96 * relativeStd,
+    degreesOfFreedom: dof
+  };
+}
+
+function integratePower(frequencies, psd, minHz = 0, maxHz = Infinity) {
+  if (!frequencies?.length || !psd?.length) return NaN;
+  const df = frequencies.length > 1 ? Math.abs(frequencies[1] - frequencies[0]) : 0;
+  let total = 0;
+  for (let index = 0; index < frequencies.length; index += 1) {
+    const frequency = frequencies[index];
+    const value = psd[index];
+    if (frequency >= minHz - 1e-12 && frequency <= maxHz + 1e-12 && Number.isFinite(value)) total += value * df;
+  }
+  return total;
+}
+
+function finiteVariance(values) {
+  let count = 0;
+  let sum = 0;
+  let sumSquares = 0;
+  for (const raw of values || []) {
+    const value = Number(raw);
+    if (!Number.isFinite(value)) continue;
+    count += 1;
+    sum += value;
+    sumSquares += value * value;
+  }
+  if (!count) return NaN;
+  const mean = sum / count;
+  return Math.max(0, sumSquares / count - mean * mean);
 }
 
 function removeLinearTrend(values) {
@@ -1122,12 +1630,12 @@ function findPeaks(frequencies, values, maxPeaks) {
     const left = i === 0 ? -Infinity : values[i - 1];
     const right = i === values.length - 1 ? -Infinity : values[i + 1];
     if (Number.isFinite(values[i]) && values[i] >= left && values[i] >= right) {
-      peaks.push({ frequencyHz: frequencies[i], value: values[i] });
+      peaks.push({ frequencyHz: frequencies[i], value: values[i], index: i });
     }
   }
   if (!peaks.length && values.length) {
     const index = values.reduce((best, value, i) => value > values[best] ? i : best, 0);
-    peaks.push({ frequencyHz: frequencies[index], value: values[index] });
+    peaks.push({ frequencyHz: frequencies[index], value: values[index], index });
   }
   return peaks.sort((a, b) => b.value - a.value).slice(0, maxPeaks);
 }
@@ -1149,17 +1657,45 @@ function computeBandEnergies(frequencies, psd, bands) {
   });
 }
 
-function emptyPsd(params) {
+function emptyPsd(params, quality = spectralQualitySummary({
+  params,
+  candidateSegmentCount: 0,
+  acceptedSegmentCount: 0,
+  imputedSegmentCount: 0,
+  totalImputedSampleCount: 0,
+  acceptedValidRatioSum: 0,
+  minimumAcceptedValidRatio: Infinity
+})) {
   return {
     method: "welch-psd",
     units: "Hz^2/Hz",
     sampleRateHz: params.sampleRateHz,
     segmentLength: params.segmentLength,
+    requestedSegmentSeconds: params.requestedSegmentSeconds,
+    requestedSegmentSamples: params.requestedSegmentSamples,
+    effectiveSegmentSeconds: params.effectiveSegmentSeconds,
+    effectiveSegmentSamples: params.effectiveSegmentSamples,
+    fftLengthSamples: params.fftLengthSamples,
+    requestedStepSeconds: params.requestedStepSeconds,
+    effectiveStepSeconds: params.effectiveStepSeconds,
+    effectiveStepSamples: params.effectiveStepSamples,
     overlapSamples: params.overlapSamples,
     overlapRatio: params.overlapRatio,
+    frequencyResolutionHz: params.frequencyResolutionHz,
+    nyquistHz: params.nyquistHz,
+    adjustmentApplied: params.adjustmentApplied,
+    adjustmentReason: params.adjustmentReason,
     windowType: params.windowType,
     detrend: params.detrend,
     segmentCount: 0,
+    candidateSegmentCount: quality.candidateSegmentCount,
+    acceptedSegmentCount: quality.acceptedSegmentCount,
+    rejectedSegmentCount: quality.rejectedSegmentCount,
+    imputedSegmentCount: quality.imputedSegmentCount,
+    totalImputedSampleCount: quality.totalImputedSampleCount,
+    meanValidRatio: quality.meanValidRatio,
+    minimumAcceptedValidRatio: quality.minimumAcceptedValidRatio,
+    gapHandlingMethod: quality.gapHandlingMethod,
     frequencies: [],
     psd: [],
     allFrequencies: [],
@@ -1168,8 +1704,16 @@ function emptyPsd(params) {
     bandEnergies: [],
     noiseFloor: NaN,
     snr: NaN,
+    snrLinear: NaN,
+    snrDb: NaN,
+    degreesOfFreedom: 0,
+    confidenceInterval95: spectralConfidenceInterval95(1),
+    totalBandPower: NaN,
+    parsevalErrorRatio: NaN,
+    averagingMethod: params.averaging,
     frequencyHz: NaN,
-    power: NaN
+    power: NaN,
+    parameters: { ...params }
   };
 }
 
@@ -1530,6 +2074,10 @@ function previousPowerOfTwo(value) {
   return 2 ** Math.max(3, Math.floor(Math.log2(Math.max(8, value))));
 }
 
+function nextPowerOfTwo(value) {
+  return 2 ** Math.max(3, Math.ceil(Math.log2(Math.max(8, value))));
+}
+
 function emptyStats() {
   return {
     count: 0,
@@ -1558,6 +2106,8 @@ function emptyStats() {
 
 export const FrequencyAnalysisCore = {
   DEFAULT_ROCOF_PARAMETERS,
+  DEFAULT_SPECTROGRAM_PARAMETERS,
+  DEFAULT_WELCH_PARAMETERS,
   analyzeDataQuality,
   computeBasicStats,
   computeCrossCorrelation,
@@ -1574,6 +2124,8 @@ export const FrequencyAnalysisCore = {
   estimatePhaseDifference,
   hzPerSecondToMhzPerSecond,
   mHzPerSecondToHzPerSecond,
+  normalizeSpectralOptions,
+  prepareSegment,
   normalizeRocofParameters
 };
 
