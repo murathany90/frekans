@@ -24,7 +24,7 @@ const analyses = [
   ["oscillation", /Salınım Adayı Tespiti/, /Oscillation Candidate Detection/],
   ["crossCorrelation", /Çapraz Korelasyon Özeti/, /Cross-Correlation Summary/],
   ["coherence", /Koherens ve Faz Özeti/, /Coherence and Phase Summary/],
-  ["trend", /Uzun Dönem Trend Özeti/, /Long-Term Trend Summary/]
+  ["trend", /Günlük Frekans ve Trend Analizi/, /Daily Frequency and Trend Analysis/]
 ];
 
 const browser = await chromium.launch({ headless: true });

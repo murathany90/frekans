@@ -1599,6 +1599,27 @@
       gap: 10px;
       margin: 12px 0;
     }
+    .analysis-preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .analysis-preset-row button {
+      min-height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--navy);
+      font-weight: 800;
+      cursor: pointer;
+      padding: 6px 10px;
+    }
+    .analysis-preset-row button:hover,
+    .analysis-preset-row button:focus-visible {
+      border-color: rgba(27, 107, 156, .45);
+      box-shadow: 0 0 0 3px rgba(27, 107, 156, .12);
+      outline: none;
+    }
     .analysis-detail-summary {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
@@ -2866,7 +2887,7 @@
                 <option value="coherence" data-i18n="analysisCoherence">Koherens ve faz</option>
               </optgroup>
               <optgroup label="Uzun Dönem Analizi" data-i18n-label="analysisGroupTrend">
-                <option value="trend" data-i18n="analysisTrend">Günlük trend</option>
+                <option value="trend" data-i18n="analysisTrend">Günlük Frekans ve Trend Analizi</option>
               </optgroup>
             </select>
           </div>
@@ -2945,11 +2966,12 @@
           <summary data-i18n="advanced">Gelişmiş</summary>
           <div class="analysis-controls compact">
             <div class="field" data-param-key="date"><label for="analysisDateMode" data-i18n="analysisDateModeLabel">Tarih modu</label><select id="analysisDateMode"><option value="single" data-i18n="dateModeSingle">Tek gün</option><option value="range" data-i18n="dateModeRange">Tarih aralığı</option><option value="last7" data-i18n="dateModeLast7">Son 7 ortak gün</option><option value="last30" data-i18n="dateModeLast30">Son 30 ortak gün</option><option value="month" data-i18n="dateModeMonth">Ay seçimi</option><option value="customHours" data-i18n="dateModeCustomHours">Özel saat</option></select></div>
+            <div class="field" data-param-key="trendPreset"><label data-i18n="dailyTrendPresetLabel">Tarih aralığı presetleri</label><div class="segmented-control analysis-preset-row"><button type="button" data-trend-preset="last7" data-i18n="dateModeLast7">Son 7 ortak gün</button><button type="button" data-trend-preset="last30" data-i18n="dateModeLast30">Son 30 ortak gün</button><button type="button" data-trend-preset="month" data-i18n="dateModeMonth">Ay seçimi</button></div></div>
             <div class="field" data-param-key="date"><label for="analysisStartDate" data-i18n="startDateLabel">Başlangıç</label><input id="analysisStartDate" type="date" /></div>
             <div class="field" data-param-key="date"><label for="analysisEndDate" data-i18n="endDateLabel">Bitiş</label><input id="analysisEndDate" type="date" /></div>
             <div class="field" data-param-key="window"><label for="analysisStartHour" data-i18n="startHourLabel">Başlangıç saati</label><input id="analysisStartHour" type="time" value="00:00" /></div>
             <div class="field" data-param-key="window"><label for="analysisEndHour" data-i18n="endHourLabel">Bitiş saati</label><input id="analysisEndHour" type="time" value="23:59" /></div>
-            <div class="field" data-param-key="resolution"><label for="analysisResolution" data-i18n="resolutionLabel">Çözünürlük</label><select id="analysisResolution"><option value="auto" data-i18n="resolutionAuto">Otomatik</option><option value="1s" data-i18n="resolutionSecond">Saniyelik</option><option value="10s" data-i18n="resolution10s">10 saniyelik</option><option value="1m" data-i18n="resolutionMinute">Dakikalık</option><option value="1h" data-i18n="resolutionHour">Saatlik</option></select></div>
+            <div class="field" data-param-key="resolution"><label for="analysisResolution" class="field-label-with-help"><span data-i18n="resolutionLabel">Çözünürlük</span><button type="button" class="metric-info-button" data-help-key="dailyTrendDisplayResolutionHelp" aria-label="Bilgi">i</button></label><select id="analysisResolution"><option value="auto" data-i18n="resolutionAuto">Otomatik</option><option value="1s" data-i18n="resolutionSecond">Saniyelik</option><option value="10s" data-i18n="resolution10s">10 saniyelik</option><option value="1m" data-i18n="resolutionMinute">Dakikalık</option><option value="15m" data-i18n="resolution15Minute">15 dakika</option><option value="1h" data-i18n="resolutionHour">Saatlik</option></select></div>
             <div class="field" data-param-key="alignment"><label for="analysisAlignment" data-i18n="alignmentLabel">Zaman eşleştirme</label><select id="analysisAlignment"><option value="utcAuto" data-i18n="utcAuto">UTC - otomatik</option><option value="sameLocal" data-i18n="sameLocal">Aynı yerel saat</option><option value="manual" data-i18n="manualOption">Manuel</option></select></div>
             <div class="field" data-param-key="statsBand"><label for="statsBandMinHz" data-i18n="statsBandMinLabel">İstatistik alt bandı (Hz)</label><input id="statsBandMinHz" type="number" min="49" max="51" step="0.001" value="49.90" /></div>
             <div class="field" data-param-key="statsBand"><label for="statsBandMaxHz" data-i18n="statsBandMaxLabel">İstatistik üst bandı (Hz)</label><input id="statsBandMaxHz" type="number" min="49" max="51" step="0.001" value="50.10" /></div>
@@ -2970,6 +2992,18 @@
             <div class="field" data-param-key="spectralDisplay"><label for="spectralDisplayTimezone" data-i18n="spectralDisplayTimezoneLabel">Zaman dilimi gösterimi</label><select id="spectralDisplayTimezone"><option value="source" data-i18n="spectralDisplayTimezoneSource">Kaynak zaman dilimi</option><option value="Europe/Istanbul" data-i18n="spectralDisplayTimezoneTr">Türkiye saati</option><option value="UTC" data-i18n="spectralDisplayTimezoneUtc">UTC</option></select></div>
             <div class="field" data-param-key="spectralPeakAdvanced"><label for="spectralSignificantSnrDb" data-i18n="spectralSignificantSnrDbLabel">Anlamlı tepe SNR (dB)</label><input id="spectralSignificantSnrDb" type="number" min="0" max="40" step="0.5" value="6" /></div>
             <div class="field" data-param-key="spectralPeakAdvanced"><label for="spectralWeakSnrDb" data-i18n="spectralWeakSnrDbLabel">Zayıf tepe SNR (dB)</label><input id="spectralWeakSnrDb" type="number" min="0" max="40" step="0.5" value="3" /></div>
+            <div class="field" data-param-key="dailyTrendAdvanced"><label for="dailyTrendSummaryStatistic" data-i18n="dailyTrendSummaryStatisticLabel">Özet merkez ölçüsü</label><select id="dailyTrendSummaryStatistic"><option value="mean" data-i18n="dailyTrendSummaryMean">Ortalama</option><option value="median" data-i18n="dailyTrendSummaryMedian">Medyan</option></select></div>
+            <div class="field" data-param-key="dailyTrendAdvanced"><label for="dailyTrendEnvelopeMode" class="field-label-with-help"><span data-i18n="dailyTrendEnvelopeModeLabel">Zarf türü</span><button type="button" class="metric-info-button" data-help-key="dailyTrendEnvelopeHelp" aria-label="Bilgi">i</button></label><select id="dailyTrendEnvelopeMode"><option value="min-max" data-i18n="dailyTrendEnvelopeMinMax">Min–maks zarfı</option><option value="p01-p99" data-i18n="dailyTrendEnvelopeP01P99">P01–P99 zarfı</option></select></div>
+            <div class="field" data-param-key="dailyTrendAdvanced"><label for="dailyTrendMinCoveragePct" class="field-label-with-help"><span data-i18n="dailyTrendMinCoverageLabel">Minimum günlük kapsama oranı (%)</span><button type="button" class="metric-info-button" data-help-key="dailyTrendCoverageHelp" aria-label="Bilgi">i</button></label><input id="dailyTrendMinCoveragePct" type="number" min="0" max="100" step="1" value="75" /></div>
+            <div class="field" data-param-key="dailyTrendAdvanced"><label for="dailyTrendExcludeLowCoverageDays" data-i18n="dailyTrendExcludeLowCoverageLabel">Eksik günleri dışla</label><select id="dailyTrendExcludeLowCoverageDays"><option value="no" data-i18n="no">Hayır</option><option value="yes" data-i18n="yes">Evet</option></select></div>
+            <div class="field" data-param-key="dailyTrendAdvanced"><label for="dailyTrendHistogramBasis" class="field-label-with-help"><span data-i18n="dailyTrendHistogramBasisLabel">Histogram temeli</span><button type="button" class="metric-info-button" data-help-key="dailyTrendRawHistogramHelp" aria-label="Bilgi">i</button></label><select id="dailyTrendHistogramBasis"><option value="raw" data-i18n="dailyTrendHistogramRaw">Ham saniyelik veri dağılımı</option><option value="displayed" data-i18n="dailyTrendHistogramDisplayed">Görüntülenen seri dağılımı</option></select></div>
+            <div class="field" data-param-key="dailyTrendAdvanced"><label for="dailyTrendHistogramNormalization" data-i18n="dailyTrendHistogramNormalizationLabel">Histogram normalizasyonu</label><select id="dailyTrendHistogramNormalization"><option value="percent" data-i18n="dailyTrendHistogramPercent">Süre yüzdesi</option><option value="duration" data-i18n="dailyTrendHistogramDuration">Toplam süre</option><option value="count" data-i18n="dailyTrendHistogramCount">Örnek sayısı</option></select></div>
+            <div class="field" data-param-key="dailyTrendAdvanced"><label for="dailyTrendHistogramBinWidthHz" data-i18n="dailyTrendHistogramBinWidthLabel">Histogram bin genişliği (Hz)</label><input id="dailyTrendHistogramBinWidthHz" type="text" value="auto" /></div>
+            <div class="field" data-param-key="dailyTrendAdvanced"><label for="dailyTrendMovingAverageDays" class="field-label-with-help"><span data-i18n="dailyTrendMovingAverageLabel">Hareketli ortalama gün sayısı</span><button type="button" class="metric-info-button" data-help-key="dailyTrendMovingAverageHelp" aria-label="Bilgi">i</button></label><input id="dailyTrendMovingAverageDays" type="number" min="1" max="30" step="1" value="3" /></div>
+            <div class="field" data-param-key="dailyTrendAdvanced"><label for="dailyTrendTrendMethod" class="field-label-with-help"><span data-i18n="dailyTrendTrendMethodLabel">Trend yöntemi</span><button type="button" class="metric-info-button" data-help-key="dailyTrendSlopeHelp" aria-label="Bilgi">i</button></label><select id="dailyTrendTrendMethod"><option value="linear" data-i18n="dailyTrendLinearTrend">Doğrusal trend</option><option value="robust" data-i18n="dailyTrendRobustTrend">Robust trend</option></select></div>
+            <div class="field" data-param-key="dailyTrendAdvanced"><label for="dailyTrendDayType" data-i18n="dailyTrendDayTypeLabel">Gün filtresi</label><select id="dailyTrendDayType"><option value="all" data-i18n="dailyTrendDayTypeAll">Tüm günler</option><option value="weekday" data-i18n="dailyTrendDayTypeWeekday">Hafta içi</option><option value="weekend" data-i18n="dailyTrendDayTypeWeekend">Hafta sonu</option></select></div>
+            <div class="field" data-param-key="dailyTrendAdvanced"><label for="dailyTrendTimezone" data-i18n="dailyTrendTimezoneLabel">Zaman dilimi</label><select id="dailyTrendTimezone"><option value="source" data-i18n="spectralDisplayTimezoneSource">Kaynak zaman dilimi</option><option value="Europe/Istanbul" data-i18n="spectralDisplayTimezoneTr">Türkiye saati</option><option value="UTC" data-i18n="spectralDisplayTimezoneUtc">UTC</option></select></div>
+            <div class="field" data-param-key="dailyTrendAdvanced"><label for="dailyTrendMaxChartPoints" data-i18n="dailyTrendMaxChartPointsLabel">Maksimum grafik noktası</label><input id="dailyTrendMaxChartPoints" type="number" min="500" max="100000" step="500" value="5000" /></div>
             <div class="field" data-param-key="filter"><label for="filterTaps" data-i18n="filterTapsLabel">FIR katsayı sayısı</label><input id="filterTaps" type="number" min="31" max="401" step="2" value="101" /></div>
             <div class="field" data-param-key="duration"><label for="minDuration" data-i18n="minDurationLabel">Minimum olay süresi (sn)</label><input id="minDuration" type="number" min="1" max="1800" step="1" value="5" /></div>
             <div class="field" data-param-key="yd"><label for="repeatedValueSeconds" data-i18n="qualityRepeatedThresholdLabel">Yinelenen değer eşiği (sn)</label><input id="repeatedValueSeconds" type="number" min="1" max="3600" step="1" value="15" /></div>
@@ -3711,6 +3745,26 @@
       dampingMethod: 'envelope-regression'
     });
     const DEFAULT_OSCILLATION_PARAMETERS = window.FrequencyAnalysisCore?.DEFAULT_OSCILLATION_PARAMETERS || FALLBACK_OSCILLATION_PARAMETERS;
+    const FALLBACK_DAILY_TREND_PARAMETERS = Object.freeze({
+      sampleIntervalSeconds: 1,
+      requestedResolution: 'auto',
+      maxChartPoints: 5000,
+      aggregation: 'mean-min-max',
+      envelopeMode: 'min-max',
+      histogramBasis: 'raw',
+      histogramNormalization: 'percent',
+      histogramBinWidthHz: 'auto',
+      minimumDailyCoverageRatio: 0.75,
+      excludeLowCoverageDays: false,
+      movingAverageDays: 3,
+      trendMethod: 'linear',
+      nominalHz: 50,
+      bandMinHz: 49.90,
+      bandMaxHz: 50.10,
+      timeZone: 'UTC',
+      displayTimeZone: 'source'
+    });
+    const DEFAULT_DAILY_TREND_PARAMETERS = window.FrequencyAnalysisCore?.DEFAULT_DAILY_TREND_PARAMETERS || FALLBACK_DAILY_TREND_PARAMETERS;
 
     function rocofDefaultParameters() {
       return window.FrequencyAnalysisCore?.DEFAULT_ROCOF_PARAMETERS || DEFAULT_ROCOF_PARAMETERS;
@@ -3741,6 +3795,10 @@
 
     function oscillationDefaultParameters() {
       return window.FrequencyAnalysisCore?.DEFAULT_OSCILLATION_PARAMETERS || DEFAULT_OSCILLATION_PARAMETERS;
+    }
+
+    function dailyTrendDefaultParameters() {
+      return window.FrequencyAnalysisCore?.DEFAULT_DAILY_TREND_PARAMETERS || DEFAULT_DAILY_TREND_PARAMETERS;
     }
 
     const DEFAULT_SETTINGS = {
@@ -3779,6 +3837,16 @@
       spectralDisplayTimezone: 'source',
       spectralSignificantSnrDb: 6,
       spectralWeakSnrDb: 3,
+      dailyTrendMaxChartPoints: DEFAULT_DAILY_TREND_PARAMETERS.maxChartPoints,
+      dailyTrendEnvelopeMode: DEFAULT_DAILY_TREND_PARAMETERS.envelopeMode,
+      dailyTrendHistogramBasis: DEFAULT_DAILY_TREND_PARAMETERS.histogramBasis,
+      dailyTrendHistogramNormalization: DEFAULT_DAILY_TREND_PARAMETERS.histogramNormalization,
+      dailyTrendHistogramBinWidthHz: DEFAULT_DAILY_TREND_PARAMETERS.histogramBinWidthHz,
+      dailyTrendMinimumCoveragePct: DEFAULT_DAILY_TREND_PARAMETERS.minimumDailyCoverageRatio * 100,
+      dailyTrendExcludeLowCoverageDays: DEFAULT_DAILY_TREND_PARAMETERS.excludeLowCoverageDays,
+      dailyTrendMovingAverageDays: DEFAULT_DAILY_TREND_PARAMETERS.movingAverageDays,
+      dailyTrendTrendMethod: DEFAULT_DAILY_TREND_PARAMETERS.trendMethod,
+      dailyTrendTimezone: DEFAULT_DAILY_TREND_PARAMETERS.displayTimeZone,
       filterTaps: DEFAULT_OSCILLATION_PARAMETERS.filterOrder + 1,
       minDuration: DEFAULT_OSCILLATION_PARAMETERS.minimumEventSeconds,
       rocofMethod: DEFAULT_ROCOF_PARAMETERS.method,
@@ -3849,7 +3917,7 @@
     };
     let sourceCatalog = DEFAULT_SOURCE_CATALOG;
     const MAX_ANALYSIS_DAY_CONCURRENCY = 3;
-    const RESOLUTION_SECONDS = { '1s': 1, '10s': 10, '1m': 60, '1h': 3600 };
+    const RESOLUTION_SECONDS = { '1s': 1, '10s': 10, '1m': 60, '15m': 900, '1h': 3600 };
     const ANALYSIS_BASE_PARAMS = ['date', 'resolution', 'alignment'];
     const QUALITY_DATE_MODES = new Set(['single', 'range']);
     const LIMITED_DATE_MODE_ANALYSES = new Set(['quality', 'stats', 'events', 'rocof']);
@@ -4043,12 +4111,23 @@
         titleKey: 'analysisTrendTitle',
         descriptionKey: 'analysisTrendDesc',
         allowedSources: ['tr', 'de', 'both', 'diff', 'common', 'differential'],
-        allowedResolutions: ['1m', '1h'],
-        parameterKeys: [],
+        allowedResolutions: ['1s', '1m', '15m', '1h'],
+        parameterKeys: ['statsBand', 'trendPreset', 'window', 'dailyTrendAdvanced'],
         requiresPairedSeries: false,
-        minSampleIntervalSeconds: 60,
-        preferredResolution: '1m',
-        tableColumns: [{ key: 'date', labelKey: 'reportDateLabelShort' }, { key: 'rms', labelKey: 'rmsDeviation' }, { key: 'coverage', labelKey: 'qualityCoverage' }],
+        minSampleIntervalSeconds: 1,
+        preferredResolution: 'auto',
+        tableColumns: [
+          { key: 'date', labelKey: 'reportDateLabelShort' },
+          { key: 'maxFrequency', labelKey: 'dailyTrendMaxFrequency' },
+          { key: 'maxTime', labelKey: 'dailyTrendMaxTime' },
+          { key: 'mean', labelKey: 'dailyTrendMean' },
+          { key: 'median', labelKey: 'dailyTrendMedian' },
+          { key: 'minFrequency', labelKey: 'dailyTrendMinFrequency' },
+          { key: 'minTime', labelKey: 'dailyTrendMinTime' },
+          { key: 'stdDev', labelKey: 'dailyTrendStdDev' },
+          { key: 'coverage', labelKey: 'qualityCoverage', helpKey: 'dailyTrendCoverageHelp' },
+          { key: 'status', labelKey: 'spectrogramWindowStatus' }
+        ],
         methodKey: 'methodTrend',
         limitationsKey: 'limitTrend'
       }
@@ -4858,7 +4937,7 @@
         en: ['Phase wrapping', 'Phase wrapping around -180° and +180°.', 'Apparent jumps may not be real abrupt changes.']
       },
       dailyAggregation: {
-        tr: ['Daily aggregation', 'Saniyelik verinin günlük/saatlik özetlere indirgenmesidir.', 'Uzun dönem eğilimi gösterir, hızlı olayları saklayabilir.'],
+        tr: ['Günlük toplulaştırma', 'Saniyelik verinin günlük/saatlik özetlere indirgenmesidir.', 'Uzun dönem eğilimi gösterir, hızlı olayları saklayabilir.'],
         en: ['Daily aggregation', 'Reduction of second-level data into daily/hourly summaries.', 'It shows long-term trend and can hide fast events.']
       },
       trend: {
@@ -4866,8 +4945,32 @@
         en: ['Trend', 'Directional change over time.', 'Trend can be misleading when coverage is low.']
       },
       rollingAverage: {
-        tr: ['Rolling average', 'Kayan zaman penceresiyle hesaplanan ortalamadır.', 'Gürültüyü azaltır ama kısa sapmaları yumuşatır.'],
+        tr: ['Hareketli ortalama', 'Kayan zaman penceresiyle hesaplanan ortalamadır.', 'Gürültüyü azaltır ama kısa sapmaları yumuşatır.'],
         en: ['Rolling average', 'Average computed over a moving time window.', 'It reduces noise but smooths short deviations.']
+      },
+      minMaxEnvelope: {
+        tr: ['Min–maks zarfı', 'Her grafik kutusunda ham geçerli örneklerin minimum ve maksimum sınırını gösterir.', 'Uç değerleri görünür kılar; 15 dakika ve 1 saat görünümü günlük istatistik hesabını değiştirmez.'],
+        en: ['Min–max envelope', 'Shows the minimum and maximum raw valid sample bounds inside each chart bucket.', 'It exposes extremes; 15-minute and 1-hour views do not change daily statistics.']
+      },
+      rawDataHistogram: {
+        tr: ['Ham veri histogramı', 'Dağılımı saniyelik geçerli ölçümlerden hesaplar.', 'Grafik çözünürlüğü düşse bile ham temel seçiliyken süre yüzdesi gerçek saniyelik kapsama dayanır.'],
+        en: ['Raw-data histogram', 'Computes the distribution from valid one-second measurements.', 'Even when chart resolution is reduced, raw basis keeps duration percentages tied to one-second coverage.']
+      },
+      frequencyRange: {
+        tr: ['Frekans aralığı', 'Maksimum ve minimum frekans arasındaki farktır.', 'Tekil uç örneklerden etkilenebilir; P01/P99 zarfı daha dayanıklı bir karşılaştırma verir.'],
+        en: ['Frequency range', 'Difference between maximum and minimum frequency.', 'It can be driven by isolated extremes; P01/P99 gives a more robust comparison.']
+      },
+      trendSlope: {
+        tr: ['Trend eğimi', 'En az üç geçerli gün olduğunda mean/max/min değişimini mHz/gün olarak özetler.', 'Kaynak, işletme veya kalite değişimini işaret edebilir ama tek başına neden kanıtı değildir.'],
+        en: ['Trend slope', 'Summarizes mean/max/min change in mHz/day once at least three valid days exist.', 'It can flag source, operation, or quality changes but is not causal proof by itself.']
+      },
+      p01p99: {
+        tr: ['P01/P99', 'Dağılımın alt ve üst yüzde birlik sınırlarıdır.', 'Uç örnekleri azaltarak min–maks zarfına göre daha dayanıklı bir günlük zarf sağlar.'],
+        en: ['P01/P99', 'The lower and upper one-percentile bounds of the distribution.', 'They reduce outlier impact and provide a more robust daily envelope than min–max.']
+      },
+      displayResolution: {
+        tr: ['Görüntü çözünürlüğü', 'Grafikteki kutu süresini belirler: 1 saniye, 1 dakika, 15 dakika veya 1 saat.', 'Yalnız çizimi özetler; ana KPI ve günlük tablo ham saniyelik geçerli veriden hesaplanır.'],
+        en: ['Display resolution', 'Sets the chart bucket duration: 1 second, 1 minute, 15 minutes, or 1 hour.', 'It only summarizes drawing; main KPIs and daily table values use raw valid one-second data.']
       }
     };
 
@@ -5125,31 +5228,31 @@
         }
       },
       trend: {
-        parameterKeys: ['date', 'alignment', 'resolution'],
-        glossary: ['dailyAggregation', 'trend', 'rollingAverage', 'mean', 'median', 'coverage'],
+        parameterKeys: ['date', 'alignment', 'resolution', 'statsBand', 'dailyTrendAdvanced'],
+        glossary: ['dailyAggregation', 'displayResolution', 'minMaxEnvelope', 'rawDataHistogram', 'frequencyRange', 'coverage', 'trendSlope', 'rollingAverage', 'p01p99'],
         tr: {
-          title: 'Uzun Dönem Trend Özeti',
-          summary: 'Günlük veya saatlik özetlerle frekans davranışının zaman içindeki yönünü ve değişimini gösterir. Hızlı salınımları bulmak için değil, genel kayma ve kalite etkisini görmek için uygundur. Eksik kapsamalı günler trendi yanıltabilir.',
-          what: ['Günlük ortalama, medyan, min/maks ve bant ihlali özetleri karşılaştırılır.', 'Hareketli ortalama kısa dalgalanmayı yumuşatarak yönü görünür kılar.'],
-          when: ['Uzun dönem eğilim analizi', 'Veri kapsamı etkisini günler arasında karşılaştırma', 'Günlük kalite kontrol sonrası özet izleme'],
-          results: ['Yönlü değişim bir işletme koşulu veya veri kaynağı değişimini işaret edebilir.', 'Düşük kapsamalı günlerde trend güveni azalır.', 'Bant ihlali süresi günlük ortalamadan farklı bilgi verir.'],
-          chart: ['X ekseni gün veya saat, Y ekseni seçili özet metriktir.', 'Hareketli ortalama genel yönü, tekil noktalar günlük değişkenliği gösterir.', 'Eksik kapsamalı günler ayrı kalite bilgisiyle okunmalıdır.'],
-          table: ['Her satır bir gün veya saat özetidir.', 'RMS sapma, kapsama ve bant ihlali sütunları birlikte değerlendirilir.', 'Satıra tıklama ilgili dönemi daha ayrıntılı analiz için seçmeye yardımcı olur.'],
-          mistakes: ['Trend hızlı osilasyonları göstermez.', 'Eksik kapsamalı günleri normal gün gibi okumak yanıltır.', 'Tek günlük sapma uzun dönem eğilim kanıtı değildir.'],
-          ai: ['Trend değişmişse Temel İstatistikler ve Bant İhlali ile aynı dönemi karşılaştırın.', 'Kapsama düşen günleri Veri Kapsama analizinde inceleyin.', 'Ani kırılma varsa ham günlük grafikte kaynak değişimi olup olmadığını kontrol edin.'],
-          math: ['Trend özetleri dakikalık veya saatlik agregasyonlarla hesaplanır.', 'Hareketli ortalama yönü yumuşatır ancak kısa süreli ihlalleri gizleyebilir.']
+          title: 'Günlük Frekans ve Trend Analizi',
+          summary: 'Seçilen gün veya tarih aralığında ham saniyelik geçerli frekans verisinden günlük frekans istatistiklerini, dağılımı ve trend yönünü gösterir. Grafik çözünürlüğü yalnız çizimi özetler; ana KPI ve günlük tablo varsayılan olarak ham veriden hesaplanır.',
+          what: ['Tek gün veya tarih aralığı için ortalama, maksimum, minimum, standart sapma, kapsama ve günlük değişim hesaplanır.', 'Frekans zaman serisi aynı Hz ekseninde ortalama, maksimum, minimum ve min–maks zarfını gösterir.', 'Histogram ham saniyelik veri veya görüntülenen seri dağılımını süre yüzdesi, süre ya da örnek sayısı olarak sunar.'],
+          when: ['Günlük frekans davranışını özetleme', 'Birden çok gün arasında mean/max/min değişimini karşılaştırma', 'Kapsama düşüşünün trend yorumuna etkisini kontrol etme'],
+          results: ['Maksimum ve minimum zamanları ham geçerli örnekten gelir; eksik veri 0 Hz veya 50 Hz gibi doldurulmaz.', 'En az üç geçerli gün varsa mean/max/min trend eğimi mHz/gün olarak raporlanır.', 'Düşük kapsamalı günler tabloda ayrı durumla gösterilir ve istenirse trendden dışlanabilir.'],
+          chart: ['İlk grafik frekans zaman serisi ve min–maks zarfıdır; tüm çizgiler aynı Hz eksenini paylaşır.', 'İkinci grafik frekans dağılımı histogramıdır; nominal 50 Hz, çalışma bandı, ortalama ve medyan işaretlenir.', '1 dakika, 15 dakika ve 1 saat görüntüleri yalnız grafik kutularını özetler; günlük istatistikleri değiştirmez.'],
+          table: ['Her satır bir günü temsil eder ve varsayılan olarak maksimum, maksimum zamanı, ortalama, medyan, minimum, minimum zamanı, standart sapma, kapsama ve durumu gösterir.', 'Açılır satır detayında P01/P99, P05/P95, RMS sapması, bant süreleri, geçerli/eksik örnek ve veri kalite puanı bulunur.', 'Satıra tıklamak grafiği ilgili güne yakınlaştırır.'],
+          mistakes: ['Görüntü çözünürlüğünü günlük istatistiği değiştiren bir yeniden hesaplama gibi okumayın.', 'Eksik kapsamalı günü tam gün gibi yorumlamak trendi yanıltır.', 'Tek günlük uç değer uzun dönem trend kanıtı değildir.'],
+          ai: ['Uç maksimum veya minimum varsa grafikte aynı güne yakınlaşın ve veri kalitesi detayını kontrol edin.', 'Histogram geniş veya çift tepeliyse Temel İstatistikler ve Bant İhlali sonuçlarıyla aynı aralığı karşılaştırın.', 'Trend eğimi belirginse kaynak ve zaman dilimi seçimlerinin aynı kaldığını doğrulayın.'],
+          math: ['Günlük temel istatistikler ham saniyelik geçerli örneklerden hesaplanır.', 'Görüntü kutuları seçilen çözünürlükte mean/min/max üretir ve eksik aralıkları çizgiyle birleştirmez.', 'Trend eğimi doğrusal veya robust yöntemle geçerli günlük değerler üzerinden mHz/gün olarak hesaplanır.']
         },
         en: {
-          title: 'Long-Term Trend Summary',
-          summary: 'Shows direction and change in frequency behavior using daily or hourly summaries. It is meant for general drift and data-quality effects, not fast oscillation detection. Days with low coverage can mislead trend interpretation.',
-          what: ['Daily mean, median, min/max, and band-violation summaries are compared.', 'Rolling average smooths short fluctuation and makes direction visible.'],
-          when: ['Long-term trend analysis', 'Comparing coverage effects across days', 'Summary monitoring after daily quality control'],
-          results: ['Directional change can indicate operating condition or data-source changes.', 'Trend confidence decreases on low-coverage days.', 'Band-violation duration carries different information than daily mean.'],
-          chart: ['X axis is day or hour and Y axis is the selected summary metric.', 'Rolling average shows general direction, while individual points show day-level variability.', 'Low-coverage days should be read with separate quality information.'],
-          table: ['Each row is a day or hour summary.', 'RMS deviation, coverage, and band violation should be evaluated together.', 'Clicking a row helps choose the period for deeper analysis.'],
-          mistakes: ['Trend does not show fast oscillations.', 'Reading low-coverage days as normal days is misleading.', 'One daily deviation does not prove a long-term trend.'],
-          ai: ['If trend changes, compare the same period with Basic Statistics and Band Violation.', 'Inspect low-coverage days in Data Coverage.', 'If a break appears, check the raw daily chart for source changes.'],
-          math: ['Trend summaries use minute or hourly aggregations.', 'Rolling average smooths direction but can hide short violations.']
+          title: 'Daily Frequency and Trend Analysis',
+          summary: 'Shows daily frequency statistics, distribution, and trend direction for one day or a date range using raw valid one-second frequency data. Display resolution only summarizes the chart; main KPIs and the daily table are computed from raw data by default.',
+          what: ['Mean, maximum, minimum, standard deviation, coverage, and day-to-day changes are computed for each selected day.', 'The frequency time-series chart shows mean, maximum, minimum, and the min-max envelope on the same Hz axis.', 'The histogram can use raw one-second data or the displayed series and can be normalized as duration percentage, duration, or sample count.'],
+          when: ['Summarizing daily frequency behavior', 'Comparing mean/max/min changes across multiple days', 'Checking how coverage affects trend interpretation'],
+          results: ['Maximum and minimum timestamps come from raw valid samples; missing data is not filled as 0 Hz or 50 Hz.', 'When at least three valid days exist, mean/max/min trend slope is reported in mHz/day.', 'Low-coverage days are marked separately and can optionally be excluded from the trend.'],
+          chart: ['The first chart is the frequency time series and min-max envelope; all lines share the same Hz axis.', 'The second chart is the frequency distribution histogram with 50 Hz nominal, operating band, mean, and median markers.', 'One-minute, 15-minute, and one-hour views only summarize chart buckets; they do not change daily statistics.'],
+          table: ['Each row represents one day and shows maximum, maximum time, mean, median, minimum, minimum time, standard deviation, coverage, and status by default.', 'Expandable row details include P01/P99, P05/P95, RMS deviation, band durations, valid/missing samples, and data quality score.', 'Clicking a row zooms the chart to that day.'],
+          mistakes: ['Do not treat display resolution as a recalculation of daily statistics.', 'Reading a low-coverage day as a complete day can mislead the trend.', 'One extreme day is not proof of a long-term trend.'],
+          ai: ['If maximum or minimum is extreme, zoom to that day and inspect data quality details.', 'If the histogram is wide or bimodal, compare the same range with Basic Statistics and Band Violation results.', 'If trend slope is strong, verify that source and time-zone choices stayed consistent.'],
+          math: ['Daily base statistics are computed from raw valid one-second samples.', 'Display buckets produce mean/min/max at the selected resolution and do not connect missing gaps.', 'Trend slope is computed from valid daily values in mHz/day using linear or robust regression.']
         }
       }
     };
@@ -6096,6 +6199,9 @@
       $('analysisResolution').addEventListener('change', () => {
         updateAnalysisAvailability();
         updateUrlState({ resolution: $('analysisResolution').value });
+      });
+      document.querySelectorAll('[data-trend-preset]').forEach(button => {
+        button.addEventListener('click', () => applyTrendDatePreset(button.dataset.trendPreset));
       });
       $('rocofMethod')?.addEventListener('change', updateAnalysisParameterPanel);
       ['spectralQuickBandMin', 'spectralQuickBandMax', 'spectralQuickSegmentSeconds', 'spectralQuickDisplaySummary'].forEach(id => {
@@ -7165,6 +7271,29 @@
       return [selected];
     }
 
+    function applyTrendDatePreset(preset) {
+      const type = $('analysisTypeSelect')?.value || 'stats';
+      if (type !== 'trend') return;
+      const dates = reportDatesForAnalysisSource(getAnalysisSource(), type).sort();
+      const selected = $('analysisDateSelect')?.value || dates.at(-1) || latestCommonDate();
+      if (!selected || !dates.length) return;
+      let range = [];
+      if (preset === 'last7' || preset === 'last30') {
+        const limit = preset === 'last7' ? 7 : 30;
+        range = dates.filter(date => date <= selected).slice(-limit);
+      } else if (preset === 'month') {
+        const month = selected.slice(0, 7);
+        range = dates.filter(date => date.startsWith(month));
+      }
+      if (!range.length) return;
+      if ($('analysisDateMode')) $('analysisDateMode').value = 'range';
+      if ($('analysisStartDate')) $('analysisStartDate').value = range[0];
+      if ($('analysisEndDate')) $('analysisEndDate').value = range.at(-1);
+      if ($('analysisDateSelect')) $('analysisDateSelect').value = range.at(-1);
+      syncAnalysisDateControlState();
+      updateUrlState({ mode: 'range', start: range[0], end: range.at(-1), date: range.at(-1) });
+    }
+
     function timeInputToSecond(value, fallback) {
       if (!value) return fallback;
       const [hour, minute] = value.split(':').map(Number);
@@ -7173,7 +7302,8 @@
     }
 
     function analysisWindowBounds() {
-      if ($('analysisDateMode')?.value !== 'customHours') return { start: 0, end: 86400 };
+      const type = $('analysisTypeSelect')?.value || 'stats';
+      if ($('analysisDateMode')?.value !== 'customHours' && type !== 'trend') return { start: 0, end: 86400 };
       const start = timeInputToSecond($('analysisStartHour').value, 0);
       const end = Math.min(86400, timeInputToSecond($('analysisEndHour').value, 86340) + 60);
       return end > start ? { start, end } : { start: 0, end: 86400 };
@@ -7183,6 +7313,49 @@
       const { start, end } = analysisWindowBounds();
       if (start === 0 && end === 86400) return series;
       return series.slice(start, end);
+    }
+
+    function dailyTrendTimezone(source = getAnalysisSource()) {
+      const selected = $('dailyTrendTimezone')?.value || state.settings.dailyTrendTimezone || 'source';
+      return selected === 'source' ? sourceTimezoneForAnalysis(source) : selected;
+    }
+
+    function dailyTrendDateAllowed(date) {
+      const mode = $('dailyTrendDayType')?.value || 'all';
+      if (mode === 'all') return true;
+      const day = new Date(`${date}T12:00:00Z`).getUTCDay();
+      const weekend = day === 0 || day === 6;
+      return mode === 'weekend' ? weekend : !weekend;
+    }
+
+    function dailyTrendTimestampSeries(date, count, bounds = analysisWindowBounds(), source = getAnalysisSource()) {
+      const timezone = dailyTrendTimezone(source);
+      const startEpoch = localMidnightEpochMs(date, timezone);
+      const base = Number.isFinite(startEpoch) ? startEpoch + (bounds.start || 0) * 1000 : Date.parse(`${date}T00:00:00Z`);
+      return Float64Array.from({ length: count }, (_, index) => base + index * 1000);
+    }
+
+    function prepareDailyTrendInputFromCurrent(source, current, validation = validateAnalysisSelection('trend', source, $('analysisResolution')?.value || 'auto')) {
+      const bounds = analysisWindowBounds();
+      const baseSeries = sourceSeries(source, current);
+      if (!baseSeries) throw new Error(t('analysisNoSeries'));
+      const series = Float64Array.from(analysisWindowSeries(baseSeries), value => Number(value));
+      const timestamps = dailyTrendTimestampSeries(current.date || $('analysisDateSelect')?.value || '1970-01-01', series.length, bounds, source);
+      const sampling = buildSamplingMetadata(series, 1, 'raw-second');
+      sampling.requestedResolution = $('analysisResolution')?.value || 'auto';
+      sampling.resolution = validation.resolution;
+      sampling.effectiveResolution = validation.resolution;
+      return {
+        type: 'trend',
+        source,
+        resolution: validation.resolution,
+        intervalSeconds: 1,
+        method: 'raw-second',
+        series,
+        timestamps,
+        bounds,
+        sampling
+      };
     }
 
     function syncAnalysisDateDefaults() {
@@ -8540,7 +8713,7 @@
     }
 
     function hasSingleOrRangeDateModes(type = $('analysisTypeSelect')?.value || 'stats') {
-      return LIMITED_DATE_MODE_ANALYSES.has(type) || SPECTRAL_DATE_MODE_ANALYSES.has(type);
+      return type === 'trend' || LIMITED_DATE_MODE_ANALYSES.has(type) || SPECTRAL_DATE_MODE_ANALYSES.has(type);
     }
 
     function setControlLabel(labelId, key) {
@@ -9056,6 +9229,7 @@
       const select = $('analysisTypeSelect');
       if (!select) return;
       const source = updateAnalysisSourceOptions();
+      updateAnalysisResolutionOptions(select.value);
       let firstAllowed = null;
       [...select.options].forEach(option => {
         const def = analysisDefinition(option.value);
@@ -9077,6 +9251,19 @@
       updateAnalysisSamplingInfo(validation.sampling);
       updateAnalysisInfoPanel();
       syncAnalysisDateDefaults();
+    }
+
+    function updateAnalysisResolutionOptions(type = $('analysisTypeSelect')?.value || 'stats') {
+      const select = $('analysisResolution');
+      if (!select) return;
+      const def = analysisDefinition(type);
+      const allowed = new Set(['auto', ...(def.allowedResolutions || [])]);
+      [...select.options].forEach(option => {
+        const ok = allowed.has(option.value);
+        option.hidden = !ok;
+        option.disabled = !ok;
+      });
+      if (!allowed.has(select.value)) select.value = 'auto';
     }
 
     function toggleAnalysisInfoPanel(force) {
@@ -9208,9 +9395,11 @@
       if (hasLimitedDateModes && !QUALITY_DATE_MODES.has(modeSelect.value)) {
         modeSelect.value = 'single';
       }
-      if (hasLimitedDateModes && $('analysisResolution')) {
+      if (hasLimitedDateModes && type !== 'trend' && $('analysisResolution')) {
         $('analysisResolution').value = 'auto';
       }
+      const presetField = document.querySelector('[data-param-key="trendPreset"]');
+      if (presetField) presetField.hidden = type !== 'trend';
       syncAnalysisDateControlState();
     }
 
@@ -9252,7 +9441,7 @@
       if (type === 'psd') return '1s';
       if (type === 'spectrogram') return '1s';
       if (selectedResolution && selectedResolution !== 'auto') return selectedResolution;
-      if (type === 'trend') return '1m';
+      if (type === 'trend') return 'auto';
       if (['events', 'rocof', 'oscillation', 'crossCorrelation', 'coherence'].includes(type)) return '1s';
       return def.preferredResolution || '1s';
     }
@@ -9274,7 +9463,7 @@
             : t('analysisSourceNotAllowed', { source: sourceLabel(source), analysis: t(def.labelKey) })
         };
       }
-      if (!def.allowedResolutions.includes(resolution)) {
+      if (resolution !== 'auto' && !def.allowedResolutions.includes(resolution)) {
         return {
           valid: false,
           resolution,
@@ -9314,7 +9503,7 @@
     }
 
     function resolutionLabel(resolution) {
-      const key = { '1s': 'resolutionSecond', '10s': 'resolution10s', '1m': 'resolutionMinute', '1h': 'resolutionHour' }[resolution] || 'resolutionAuto';
+      const key = { '1s': 'resolutionSecond', '10s': 'resolution10s', '1m': 'resolutionMinute', '15m': 'resolution15Minute', '1h': 'resolutionHour' }[resolution] || 'resolutionAuto';
       return t(key);
     }
 
@@ -9736,7 +9925,7 @@
           return;
         }
         if (type === 'trend' && dateList.length > 1) {
-          const result = await computeTrendRangeResult(source, dateList);
+          const result = await computeTrendRangeResult(source, dateList, runToken);
           commitAnalysisResult(result, date, type, runToken);
           return;
         }
@@ -9832,10 +10021,11 @@
     }
 
     function shouldUseAnalysisWorker(type) {
-      return ['psd', 'spectrogram', 'coherence', 'crossCorrelation', 'oscillation'].includes(type);
+      return ['psd', 'spectrogram', 'coherence', 'crossCorrelation', 'oscillation', 'trend'].includes(type);
     }
 
     function prepareAnalysisInput(type, source, current, validation = validateAnalysisSelection(type, source, $('analysisResolution')?.value || 'auto')) {
+      if (type === 'trend') return prepareDailyTrendInputFromCurrent(source, current, validation);
       const intervalSeconds = RESOLUTION_SECONDS[validation.resolution] || 1;
       const method = 'mean';
       const baseSeries = sourceSeries(source, current);
@@ -9877,6 +10067,10 @@
       } else {
         payload.series = Float64Array.from(analysisInput.series);
         transfers.push(payload.series.buffer);
+        if (type === 'trend') {
+          payload.timestamps = Float64Array.from(analysisInput.timestamps || []);
+          transfers.push(payload.timestamps.buffer);
+        }
       }
 
       let worker;
@@ -10006,6 +10200,33 @@
           source
         };
       }
+      if (type === 'trend') {
+        const defaults = dailyTrendDefaultParameters();
+        const binWidthText = String($('dailyTrendHistogramBinWidthHz')?.value || defaults.histogramBinWidthHz || 'auto').trim();
+        const binWidth = binWidthText.toLowerCase() === 'auto' ? 'auto' : Number(binWidthText);
+        const timezone = dailyTrendTimezone(source);
+        const displayTimezone = $('dailyTrendTimezone')?.value === 'source' ? timezone : ($('dailyTrendTimezone')?.value || timezone);
+        return {
+          sampleIntervalSeconds: 1,
+          requestedResolution: $('analysisResolution')?.value || defaults.requestedResolution,
+          maxChartPoints: Math.max(500, Math.round(Number($('dailyTrendMaxChartPoints')?.value || state.settings.dailyTrendMaxChartPoints || defaults.maxChartPoints))),
+          aggregation: defaults.aggregation,
+          envelopeMode: $('dailyTrendEnvelopeMode')?.value || state.settings.dailyTrendEnvelopeMode || defaults.envelopeMode,
+          histogramBasis: $('dailyTrendHistogramBasis')?.value || state.settings.dailyTrendHistogramBasis || defaults.histogramBasis,
+          histogramNormalization: $('dailyTrendHistogramNormalization')?.value || state.settings.dailyTrendHistogramNormalization || defaults.histogramNormalization,
+          histogramBinWidthHz: Number.isFinite(binWidth) ? binWidth : 'auto',
+          minimumDailyCoverageRatio: clamp(Number($('dailyTrendMinCoveragePct')?.value || state.settings.dailyTrendMinimumCoveragePct || defaults.minimumDailyCoverageRatio * 100) / 100, 0, 1),
+          excludeLowCoverageDays: ($('dailyTrendExcludeLowCoverageDays')?.value || 'no') === 'yes',
+          movingAverageDays: Math.max(1, Math.round(Number($('dailyTrendMovingAverageDays')?.value || state.settings.dailyTrendMovingAverageDays || defaults.movingAverageDays))),
+          trendMethod: $('dailyTrendTrendMethod')?.value || state.settings.dailyTrendTrendMethod || defaults.trendMethod,
+          nominalHz: state.settings.nominalFrequency,
+          bandMinHz: Number($('statsBandMinHz')?.value || defaults.bandMinHz),
+          bandMaxHz: Number($('statsBandMaxHz')?.value || defaults.bandMaxHz),
+          timeZone: timezone,
+          displayTimeZone: displayTimezone,
+          source
+        };
+      }
       const defaults = spectralDefaultParameters(type);
       const segmentSeconds = Number($('windowSec')?.value || defaults.segmentSeconds || 256);
       const stepSeconds = Number($('stepSec')?.value || defaults.stepSeconds || Math.max(1, segmentSeconds / 2));
@@ -10054,6 +10275,7 @@
       if (type === 'spectrogram') return core.computeStftSpectrogram(payload.series, parameters);
       if (type === 'rocof') return core.computeRocof(payload.series, parameters);
       if (type === 'oscillation') return core.computeOscillationCandidates(payload.series, parameters);
+      if (type === 'trend') return core.computeDailyFrequencyTrend(payload.series, payload.timestamps, parameters);
       if (type === 'crossCorrelation') return core.computeCrossCorrelation(payload.a, payload.b, parameters);
       if (type === 'coherence') {
         return {
@@ -10078,47 +10300,222 @@
       return results;
     }
 
-    async function computeTrendRangeResult(source, dateList) {
+    async function computeTrendRangeResult(source, dateList, runToken = state.analysis.activeRunToken) {
       const core = window.FrequencyAnalysisCore;
       if (!core) throw new Error(t('analysisCoreMissing'));
-      const rows = [];
-      const trendItems = dateList.map((date, index) => ({ date, index }));
+      const bounds = analysisWindowBounds();
+      const trendDates = dateList.filter(dailyTrendDateAllowed);
+      if (!trendDates.length) throw new Error(t('analysisNoSeries'));
+      const trendItems = trendDates.map((date, index) => ({ date, index }));
       const trendResults = await mapWithConcurrency(trendItems, MAX_ANALYSIS_DAY_CONCURRENCY, async ({ date, index }) => {
+        if (!isCurrentAnalysisRun(runToken)) return null;
         const current = await prepareDailyContext(date, $('analysisAlignment').value);
+        if (!isCurrentAnalysisRun(runToken)) return null;
         const baseSeries = sourceSeries(source, current);
         if (!baseSeries) return null;
-        const series = analysisWindowSeries(baseSeries);
-        const stats = core.computeBasicStats(series, { nominalHz: state.settings.nominalFrequency });
-        return { index, date, stats, pairedRatio: current.overall.pairedCount / 86400, current };
+        const series = Float64Array.from(analysisWindowSeries(baseSeries), value => Number(value));
+        const timestamps = dailyTrendTimestampSeries(date, series.length, bounds, source);
+        return { index, date, series, timestamps, current };
       });
-      let lastCurrent = null;
-      for (const result of trendResults) {
-        if (!result) continue;
-        rows.push({ index: result.index, date: result.date, stats: result.stats, pairedRatio: result.pairedRatio });
-        lastCurrent = result.current;
+      if (!isCurrentAnalysisRun(runToken)) throw new Error(t('analysisCanceled'));
+      const ordered = trendResults.filter(Boolean).sort((a, b) => a.index - b.index);
+      if (!ordered.length) throw new Error(t('analysisNoSeries'));
+      const totalLength = ordered.reduce((sum, item) => sum + item.series.length, 0);
+      const series = new Float64Array(totalLength);
+      const timestamps = new Float64Array(totalLength);
+      let offset = 0;
+      for (const item of ordered) {
+        series.set(item.series, offset);
+        timestamps.set(item.timestamps, offset);
+        offset += item.series.length;
       }
-      if (lastCurrent) {
-        state.current = lastCurrent;
-        state.analysis.rawSeries = lastCurrent.rawSeries;
-        state.analysis.displaySeries = lastCurrent.displaySeries;
-        state.analysis.analysisSeries = lastCurrent.analysisSeries;
-      }
-      const sampling = buildSamplingMetadata(null, RESOLUTION_SECONDS[resolveAnalysisResolution('trend', $('analysisResolution')?.value || 'auto')] || 60, 'mean');
+      const lastCurrent = ordered.at(-1).current;
+      state.current = lastCurrent;
+      state.analysis.rawSeries = lastCurrent.rawSeries;
+      state.analysis.displaySeries = lastCurrent.displaySeries;
+      state.analysis.analysisSeries = lastCurrent.analysisSeries;
+      const sampling = buildSamplingMetadata(series, 1, 'raw-second');
+      sampling.requestedResolution = $('analysisResolution')?.value || 'auto';
+      sampling.resolution = sampling.requestedResolution;
       state.analysis.sampling = sampling;
-      return {
+      const analysisInput = {
         type: 'trend',
-        title: t(analysisDefinition('trend').titleKey),
-        description: t(analysisDefinition('trend').descriptionKey),
-        metadata: analysisMetadata('trend', source, lastCurrent, dateList, sampling),
+        source,
+        resolution: sampling.requestedResolution,
+        intervalSeconds: 1,
+        method: 'raw-second',
+        series,
+        timestamps,
+        bounds,
+        sampling
+      };
+      const workerResult = await runAnalysisWorker('trend', source, lastCurrent, analysisInput);
+      return buildDailyTrendAnalysisResult('trend', source, lastCurrent, ordered.map(item => item.date), workerResult, analysisInput);
+    }
+
+    function dailyTrendParameterMetadata(result = {}) {
+      return {
+        requestedResolution: result.requestedResolution,
+        effectiveResolution: result.effectiveResolution,
+        effectiveResolutionSeconds: result.effectiveResolutionSeconds,
+        aggregation: result.aggregation,
+        envelopeMode: result.envelopeMode,
+        histogramBasis: result.histogramBasis,
+        histogramNormalization: result.histogramNormalization,
+        histogramBinWidthHz: result.histogram?.binWidthHz,
+        maxChartPoints: result.maxChartPoints,
+        minimumDailyCoverageRatio: result.metadata?.parameters?.minimumDailyCoverageRatio,
+        excludeLowCoverageDays: result.metadata?.parameters?.excludeLowCoverageDays,
+        movingAverageDays: result.movingAverageDays,
+        trendMethod: result.trendSlopesMhzPerDay?.method,
+        nominalHz: result.nominalHz,
+        bandMinHz: result.bandMinHz,
+        bandMaxHz: result.bandMaxHz,
+        timeZone: result.timeZone,
+        displayTimeZone: result.displayTimeZone,
+        adjustmentApplied: result.adjustmentApplied,
+        adjustmentReason: result.adjustmentReason
+      };
+    }
+
+    function dailyTrendTimestampLabel(epochMs, timezone = 'UTC', options = {}) {
+      if (!Number.isFinite(Number(epochMs))) return '—';
+      const date = new Date(Number(epochMs));
+      try {
+        return new Intl.DateTimeFormat(lang === 'en' ? 'en-GB' : 'tr-TR', {
+          timeZone: timezone || 'UTC',
+          year: options.date === false ? undefined : 'numeric',
+          month: options.date === false ? undefined : '2-digit',
+          day: options.date === false ? undefined : '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: options.seconds === false ? undefined : '2-digit',
+          hour12: false
+        }).format(date);
+      } catch {
+        return date.toISOString().replace('T', ' ').slice(0, options.seconds === false ? 16 : 19);
+      }
+    }
+
+    function dailyTrendStatusLabel(status) {
+      return status === 'low_coverage' ? t('dailyTrendStatusLowCoverage') : t('dailyTrendStatusOk');
+    }
+
+    function dailyTrendResolutionText(result = {}) {
+      const requested = resolutionLabel(result.requestedResolution || 'auto');
+      const effective = resolutionLabel(result.effectiveResolution || 'auto');
+      return result.requestedResolution === result.effectiveResolution
+        ? effective
+        : `${requested} → ${effective}`;
+    }
+
+    function dailyTrendDetailHtml(day, result) {
+      const timezone = result.displayTimeZone || result.timeZone || 'UTC';
+      const rows = [
+        [t('dailyTrendP01P99'), `${statsValueText(day.p01, 5, ' Hz')} / ${statsValueText(day.p99, 5, ' Hz')}`],
+        [t('dailyTrendP05P95'), `${statsValueText(day.p05, 5, ' Hz')} / ${statsValueText(day.p95, 5, ' Hz')}`],
+        [t('rmsDeviation'), statsValueText(day.rmsDeviationMhz, 2, ' mHz')],
+        [t('dailyTrendRange'), statsValueText(day.rangeMhz, 2, ' mHz')],
+        [t('dailyTrendBandDurations'), `${durationText(day.lowerBandDurationSeconds || 0)} / ${durationText(day.upperBandDurationSeconds || 0)}`],
+        [t('dailyTrendValidMissing'), `${numberText(day.validSampleCount)} / ${numberText(day.missingSampleCount)}`],
+        [t('dailyTrendDayLength'), durationText(day.dayLengthSeconds || 0)],
+        [t('dailyTrendQualityScore'), `${numberText(day.dataQualityScore || 0)}/100`],
+        [t('dailyTrendMeanDelta'), day.meanDeltaMhz === null ? '—' : `${fmt(day.meanDeltaMhz, 2)} mHz`],
+        [t('dailyTrendMovingAverage3'), Number.isFinite(day.movingAverage3MeanHz) ? `${fmt(day.movingAverage3MeanHz, 5)} Hz` : '—'],
+        [t('dailyTrendMovingAverage7'), Number.isFinite(day.movingAverage7MeanHz) ? `${fmt(day.movingAverage7MeanHz, 5)} Hz` : '—'],
+        [t('dailyTrendSourceTimezone'), timezone]
+      ];
+      return `
+        <details>
+          <summary>${escapeHtml(t('dailyTrendShowDetails'))}</summary>
+          <dl>
+            ${rows.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join('')}
+          </dl>
+        </details>
+      `;
+    }
+
+    function buildDailyTrendAnalysisResult(type, source, current, dateList, workerResult = null, analysisInput = null) {
+      const core = window.FrequencyAnalysisCore;
+      const trend = workerResult || core.computeDailyFrequencyTrend(analysisInput.series, analysisInput.timestamps, workerAnalysisParameters('trend'));
+      const sampling = buildSamplingMetadata(null, trend.effectiveResolutionSeconds || 1, trend.aggregation || 'mean-min-max');
+      sampling.totalSamples = trend.overallStats?.totalSampleCount || analysisInput?.series?.length || 0;
+      sampling.validSamples = trend.overallStats?.validSampleCount || 0;
+      sampling.missingRatio = sampling.totalSamples ? 1 - sampling.validSamples / sampling.totalSamples : 0;
+      sampling.requestedResolution = trend.requestedResolution;
+      sampling.resolution = trend.effectiveResolution;
+      sampling.effectiveResolution = trend.effectiveResolution;
+      state.analysis.sampling = sampling;
+      const metadata = analysisMetadata('trend', source, current, dateList, sampling);
+      metadata.parameters.dailyTrend = dailyTrendParameterMetadata(trend);
+      metadata.parameters.dailyTrend.source = source;
+      const overall = trend.overallStats || {};
+      const days = trend.dailyStats || [];
+      const maxDay = days.find(day => day.maxTimestampMs === overall.maxTimestampMs) || days.slice().sort((a, b) => (b.maxFrequencyHz || -Infinity) - (a.maxFrequencyHz || -Infinity))[0] || {};
+      const minDay = days.find(day => day.minTimestampMs === overall.minTimestampMs) || days.slice().sort((a, b) => (a.minFrequencyHz || Infinity) - (b.minFrequencyHz || Infinity))[0] || {};
+      const timezone = trend.displayTimeZone || trend.timeZone || sourceTimezoneForAnalysis(source);
+      const startMs = trend.chart?.startTimestampMs ?? days[0]?.startTimestampMs ?? overall.minTimestampMs ?? null;
+      const tableRows = days.map(day => {
+        const startSecond = Number.isFinite(startMs) && Number.isFinite(day.startTimestampMs) ? (day.startTimestampMs - startMs) / 1000 : day.index * 86400;
+        const endSecond = Number.isFinite(startMs) && Number.isFinite(day.endTimestampMs) ? (day.endTimestampMs - startMs) / 1000 : startSecond + (day.dayLengthSeconds || 86400);
+        return {
+          date: displayDate(day.date),
+          maxFrequency: statsValueText(day.maxFrequencyHz, 5, ' Hz'),
+          maxTime: dailyTrendTimestampLabel(day.maxTimestampMs, timezone, { seconds: false }),
+          mean: statsValueText(day.meanFrequencyHz, 5, ' Hz'),
+          median: statsValueText(day.medianFrequencyHz, 5, ' Hz'),
+          minFrequency: statsValueText(day.minFrequencyHz, 5, ' Hz'),
+          minTime: dailyTrendTimestampLabel(day.minTimestampMs, timezone, { seconds: false }),
+          stdDev: statsValueText(day.stdDevMhz, 2, ' mHz'),
+          coverage: percent(day.coverageRatio || 0),
+          status: dailyTrendStatusLabel(day.status),
+          startSecond,
+          endSecond,
+          detailHtml: dailyTrendDetailHtml(day, trend)
+        };
+      });
+      return {
+        type,
+        source,
+        title: analysisResultTitle(type, source, dateList, trend),
+        description: t(analysisDefinition(type).descriptionKey),
+        metadata,
+        dailyTrend: trend,
+        dailyStats: days,
+        histogram: trend.histogram,
         cards: [
-          [t('eventCount'), rows.length.toLocaleString(t('localeNumeric'))],
-          [t('qualityCoverage'), percent(rows.reduce((sum, row) => sum + row.pairedRatio, 0) / Math.max(1, rows.length))],
-          [t('rmsDeviation'), `${fmt(rows.reduce((sum, row) => sum + row.stats.rmsDeviationMhz, 0) / Math.max(1, rows.length), 2)} mHz`],
-          [t('classification'), t('classUncertain')]
+          [t('dailyTrendMean'), statsValueText(overall.meanFrequencyHz, 5, ' Hz')],
+          [t('dailyTrendMaxWithTime'), `${statsValueText(overall.maxFrequencyHz ?? maxDay.maxFrequencyHz, 5, ' Hz')} · ${dailyTrendTimestampLabel(overall.maxTimestampMs ?? maxDay.maxTimestampMs, timezone, { seconds: false })}`],
+          [t('dailyTrendMinWithTime'), `${statsValueText(overall.minFrequencyHz ?? minDay.minFrequencyHz, 5, ' Hz')} · ${dailyTrendTimestampLabel(overall.minTimestampMs ?? minDay.minTimestampMs, timezone, { seconds: false })}`],
+          [t('dailyTrendRange'), statsValueText(overall.rangeMhz, 2, ' mHz')],
+          [t('dailyTrendStdDev'), statsValueText(overall.stdDevMhz, 2, ' mHz')],
+          [t('qualityCoverage'), percent(overall.coverageRatio || 0)]
         ],
+        trendDetails: {
+          primaryRows: [
+            { label: t('dailyTrendRequestedResolution'), value: resolutionLabel(trend.requestedResolution || 'auto'), helpKey: 'dailyTrendDisplayResolutionHelp' },
+            { label: t('dailyTrendEffectiveResolution'), value: resolutionLabel(trend.effectiveResolution || 'auto'), helpKey: 'dailyTrendEffectiveResolutionHelp' },
+            { label: t('dailyTrendAggregation'), value: t('dailyTrendAggregationMeanMinMax') },
+            { label: t('dailyTrendHistogramBasisLabel'), value: t(trend.histogramBasis === 'displayed' ? 'dailyTrendHistogramDisplayed' : 'dailyTrendHistogramRaw'), helpKey: 'dailyTrendRawHistogramHelp' },
+            { label: t('dailyTrendHistogramNormalizationLabel'), value: t(`dailyTrendHistogram${trend.histogramNormalization === 'duration' ? 'Duration' : trend.histogramNormalization === 'count' ? 'Count' : 'Percent'}`) },
+            { label: t('dailyTrendDayCount'), value: numberText(days.length) }
+          ],
+          advancedRows: [
+            { label: t('dailyTrendMedian'), value: statsValueText(overall.medianFrequencyHz, 5, ' Hz') },
+            { label: t('dailyTrendP01P99'), value: `${statsValueText(overall.p01, 5, ' Hz')} / ${statsValueText(overall.p99, 5, ' Hz')}`, helpKey: 'dailyTrendP01P99Help' },
+            { label: t('rmsDeviation'), value: statsValueText(overall.rmsDeviationMhz, 2, ' mHz') },
+            { label: t('dailyTrendIqr'), value: statsValueText((overall.iqrHz || 0) * 1000, 2, ' mHz') },
+            { label: t('dailyTrendBandDurations'), value: `${durationText(overall.lowerBandDurationSeconds || 0)} / ${durationText(overall.upperBandDurationSeconds || 0)}` },
+            { label: t('dailyTrendTrendSlopeMean'), value: trend.trendSlopesMhzPerDay?.mean === null ? '—' : `${fmt(trend.trendSlopesMhzPerDay?.mean, 3)} mHz/gün`, helpKey: 'dailyTrendSlopeHelp' },
+            { label: t('dailyTrendLowCoverageDays'), value: numberText(trend.lowCoverageDayCount || 0) },
+            { label: t('dailyTrendSourceTimezone'), value: timezone }
+          ]
+        },
         events: [],
-        tableRows: rows.map(row => ({ date: displayDate(row.date), rms: `${fmt(row.stats.rmsDeviationMhz, 2)} mHz`, coverage: percent(row.pairedRatio) })),
-        chart: { kind: 'line', series: [{ name: t('analysisTrend'), data: rows.map(row => [row.index, row.stats.rmsDeviationMhz]) }] },
+        tableTitle: t('analysisTrendTitle'),
+        tableRows,
+        exportRows: tableRows,
+        chart: { kind: 'dailyTrend', trend, source, range: trend.chart?.range || { start: 0, end: 86400 } },
         methodology: t('methodTrend'),
         limitations: t('limitTrend')
       };
@@ -11905,6 +12302,7 @@
       if (type === 'events') return computeBandViolationAnalysisResult(type, source, current, dateList);
       if (type === 'rocof') return computeRocofAnalysisResult(type, source, current, dateList);
       if (type === 'oscillation') return buildOscillationAnalysisResult(type, source, current, dateList, workerResult, analysisInput);
+      if (type === 'trend') return buildDailyTrendAnalysisResult(type, source, current, dateList, workerResult, analysisInput);
       const prepared = analysisInput || prepareAnalysisInput(type, source, current);
       const series = prepared.series;
       const sampleIntervalSeconds = prepared.sampling?.intervalSeconds || 1;
@@ -12712,6 +13110,44 @@
       `;
     }
 
+    function renderDailyTrendDetailSummary(result) {
+      const existing = $('dailyTrendDetailSummary');
+      if (result.type !== 'trend') {
+        if (existing) existing.remove();
+        return;
+      }
+      const anchor = $('analysisTableTitle')?.closest('.panel') || $('analysisResultCards');
+      if (!anchor) return;
+      let summary = existing;
+      if (!summary) {
+        summary = document.createElement('section');
+        summary.id = 'dailyTrendDetailSummary';
+        summary.className = 'spectral-technical-details';
+        anchor.insertAdjacentElement('afterend', summary);
+      } else if (summary.previousElementSibling !== anchor) {
+        anchor.insertAdjacentElement('afterend', summary);
+      }
+      const details = result.trendDetails || {};
+      const rowHtml = rows => (rows || []).map(row => `
+        <div class="analysis-detail-item">
+          <span class="metric-name">${metricLabelHtml(row.label, row.helpKey || '')}</span>
+          <strong>${escapeHtml(row.value)}</strong>
+        </div>
+      `).join('');
+      summary.innerHTML = `
+        <h4>${escapeHtml(t('dailyTrendTechnicalSummary'))}</h4>
+        <div class="analysis-detail-summary spectral-detail-grid spectral-primary-metrics">
+          ${rowHtml(details.primaryRows)}
+        </div>
+        <details>
+          <summary>${escapeHtml(t('dailyTrendShowAllTechnical'))}</summary>
+          <div class="analysis-detail-summary spectral-detail-grid">
+            ${rowHtml(details.advancedRows)}
+          </div>
+        </details>
+      `;
+    }
+
     function renderSpectralDetailSummary(result) {
       if (!isSpectralAnalysis(result?.type)) {
         const existing = $('spectralDetailSummary');
@@ -12784,6 +13220,7 @@
       renderAnalysisCards(result);
       renderAnalysisDetailSummary(result);
       renderRocofDetailSummary(result);
+      renderDailyTrendDetailSummary(result);
       $('oscCountTag').textContent = result.type === 'stats' || result.type === 'events'
         ? t('statsBandViolationCount', { count: result.events.length })
         : isSpectralAnalysis(result.type)
@@ -12823,6 +13260,10 @@
       }
       if (result.chart.kind === 'oscillationCandidates') {
         renderOscillationCandidateChart(result);
+        return;
+      }
+      if (result.chart.kind === 'dailyTrend') {
+        renderDailyTrendAnalysisChart(result);
         return;
       }
       if (result.chart.kind === 'welch') {
@@ -13062,6 +13503,177 @@
             symbol: 'none',
             connectNulls: false,
             lineStyle: { width: 1.1, color: '#176b9c', type: 'dotted' }
+          }
+        ]
+      }, true);
+    }
+
+    function dailyTrendChartTimeLabel(value, trend = {}) {
+      const second = Number(value) || 0;
+      const startMs = trend.chart?.startTimestampMs;
+      if (Number.isFinite(startMs)) {
+        return dailyTrendTimestampLabel(startMs + second * 1000, trend.displayTimeZone || trend.timeZone || 'UTC', { seconds: false });
+      }
+      return secondToTime(Math.round(second)).slice(0, 5);
+    }
+
+    function dailyTrendChartSeries(points, key, digits = 5) {
+      return (points || []).map(point => [point.second, Number.isFinite(point[key]) ? Number(point[key].toFixed(digits)) : null]);
+    }
+
+    function renderDailyTrendAnalysisChart(result) {
+      const trend = result.chart?.trend || result.dailyTrend || {};
+      const points = trend.chart?.points || [];
+      const histogram = trend.histogram || {};
+      const bins = histogram.bins || [];
+      const meanName = t('dailyTrendMeanSeries');
+      const maxName = t('dailyTrendMaxSeries');
+      const minName = t('dailyTrendMinSeries');
+      const envelopeName = t('dailyTrendEnvelopeSeries');
+      const histogramName = t('dailyTrendHistogramSeries');
+      const meanData = dailyTrendChartSeries(points, 'meanHz');
+      const maxData = dailyTrendChartSeries(points, 'maxHz');
+      const minData = dailyTrendChartSeries(points, 'minHz');
+      const envelopeBase = points.map(point => [point.second, Number.isFinite(point.minHz) ? Number(point.minHz.toFixed(5)) : null]);
+      const envelopeRange = points.map(point => [
+        point.second,
+        Number.isFinite(point.maxHz) && Number.isFinite(point.minHz) ? Number((point.maxHz - point.minHz).toFixed(5)) : null
+      ]);
+      const histogramData = bins.map(bin => [Number(bin.centerHz.toFixed(6)), Number((bin.value ?? bin.percent ?? 0).toFixed(6))]);
+      const histUnit = histogram.normalization === 'count'
+        ? t('dailyTrendHistogramCount')
+        : histogram.normalization === 'duration'
+          ? t('dailyTrendHistogramDuration')
+          : t('dailyTrendHistogramPercent');
+      $('analysisMainChart')?.classList.remove('quality-chart');
+      if ($('analysisMainChart')) $('analysisMainChart').style.height = '680px';
+      setQualityZoomResetVisible(false);
+      state.oscillationChart.setOption({
+        animation: false,
+        title: [
+          { text: t('dailyTrendTimeSeriesTitle'), left: 12, top: 6, textStyle: { fontSize: 14, fontWeight: 900, color: '#0b2b45' } },
+          { text: t('dailyTrendHistogramTitle'), left: 12, top: '57%', textStyle: { fontSize: 14, fontWeight: 900, color: '#0b2b45' } }
+        ],
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: { type: 'cross' },
+          formatter: params => {
+            const items = Array.isArray(params) ? params : [params];
+            const first = items[0];
+            if (first?.seriesName === histogramName) {
+              const frequency = Number(first.value?.[0]);
+              return `<strong>${fmt(frequency, 5)} Hz</strong><br>${first.marker}${histogramName}: ${fmt(first.value?.[1], 3)} ${histUnit}`;
+            }
+            const second = Number(first?.value?.[0] || 0);
+            const rows = [`<strong>${dailyTrendChartTimeLabel(second, trend)}</strong>`];
+            for (const item of items.filter(entry => !String(entry.seriesName || '').startsWith('__'))) {
+              if (item.seriesName === histogramName) continue;
+              const value = Number(item.value?.[1]);
+              rows.push(`${item.marker}${item.seriesName}: ${Number.isFinite(value) ? `${fmt(value, 5)} Hz` : '—'}`);
+            }
+            return rows.join('<br>');
+          }
+        },
+        legend: { top: 28, type: 'scroll', data: [meanName, maxName, minName, envelopeName, histogramName] },
+        grid: [
+          { left: 68, right: 38, top: 78, height: '40%' },
+          { left: 68, right: 38, top: '65%', height: '23%' }
+        ],
+        xAxis: [
+          { type: 'value', gridIndex: 0, min: trend.chart?.range?.start || 0, max: trend.chart?.range?.end || undefined, axisLabel: { formatter: value => dailyTrendChartTimeLabel(value, trend), hideOverlap: true } },
+          { type: 'value', gridIndex: 1, name: 'Hz', scale: true, axisLabel: { formatter: value => fmt(value, 3) } }
+        ],
+        yAxis: [
+          { type: 'value', gridIndex: 0, name: 'Hz', scale: true, splitLine: { lineStyle: { color: '#e5edf2' } } },
+          { type: 'value', gridIndex: 1, name: histUnit, scale: true, splitLine: { lineStyle: { color: '#e5edf2' } } }
+        ],
+        dataZoom: [
+          { type: 'inside', xAxisIndex: [0], filterMode: 'none' },
+          { type: 'slider', xAxisIndex: [0], filterMode: 'none', height: 22, bottom: 12 }
+        ],
+        series: [
+          {
+            name: '__envelopeBase',
+            type: 'line',
+            xAxisIndex: 0,
+            yAxisIndex: 0,
+            data: envelopeBase,
+            stack: 'daily-envelope',
+            symbol: 'none',
+            lineStyle: { opacity: 0 },
+            areaStyle: { opacity: 0 },
+            silent: true,
+            tooltip: { show: false }
+          },
+          {
+            name: envelopeName,
+            type: 'line',
+            xAxisIndex: 0,
+            yAxisIndex: 0,
+            data: envelopeRange,
+            stack: 'daily-envelope',
+            symbol: 'none',
+            connectNulls: false,
+            lineStyle: { opacity: 0 },
+            areaStyle: { color: 'rgba(27,107,156,.14)' },
+            emphasis: { disabled: true }
+          },
+          {
+            name: meanName,
+            type: 'line',
+            xAxisIndex: 0,
+            yAxisIndex: 0,
+            data: meanData,
+            symbol: 'none',
+            connectNulls: false,
+            progressive: 12000,
+            lineStyle: { width: 1.8, color: '#176b9c' },
+            markLine: {
+              silent: true,
+              symbol: 'none',
+              data: [
+                { yAxis: trend.nominalHz || 50, name: t('dailyTrendNominalLine'), label: { formatter: t('dailyTrendNominalLine') }, lineStyle: { color: '#64748b', type: 'dashed' } }
+              ]
+            },
+            markArea: {
+              silent: true,
+              itemStyle: { color: 'rgba(45,157,120,.08)' },
+              data: [[{ yAxis: trend.bandMinHz || 49.9, name: t('dailyTrendOperatingBand') }, { yAxis: trend.bandMaxHz || 50.1 }]]
+            }
+          },
+          { name: maxName, type: 'line', xAxisIndex: 0, yAxisIndex: 0, data: maxData, symbol: 'none', connectNulls: false, lineStyle: { width: 1.1, color: '#b37400' } },
+          { name: minName, type: 'line', xAxisIndex: 0, yAxisIndex: 0, data: minData, symbol: 'none', connectNulls: false, lineStyle: { width: 1.1, color: '#8a6fbd' } },
+          {
+            name: t('dailyTrendExtremeMarkers'),
+            type: 'scatter',
+            xAxisIndex: 0,
+            yAxisIndex: 0,
+            data: [trend.chart?.maxPoint, trend.chart?.minPoint].filter(Boolean).map(point => [point.second, point.maxHz ?? point.minHz]),
+            symbolSize: 9,
+            itemStyle: { color: '#c83c3c' }
+          },
+          {
+            name: histogramName,
+            type: 'bar',
+            xAxisIndex: 1,
+            yAxisIndex: 1,
+            data: histogramData,
+            barWidth: bins.length ? `${Math.max(1, Math.min(18, 100 / bins.length))}%` : undefined,
+            itemStyle: { color: '#1f6f8b' },
+            markLine: {
+              silent: true,
+              symbol: 'none',
+              data: [
+                { xAxis: trend.nominalHz || 50, name: t('dailyTrendNominalLine'), label: { formatter: t('dailyTrendNominalLine') }, lineStyle: { color: '#64748b', type: 'dashed' } },
+                { xAxis: histogram.meanHz, name: t('dailyTrendMean'), label: { formatter: t('dailyTrendMean') }, lineStyle: { color: '#176b9c', type: 'solid' } },
+                { xAxis: histogram.medianHz, name: t('dailyTrendMedian'), label: { formatter: t('dailyTrendMedian') }, lineStyle: { color: '#8a6fbd', type: 'dotted' } }
+              ].filter(item => Number.isFinite(item.xAxis))
+            },
+            markArea: {
+              silent: true,
+              itemStyle: { color: 'rgba(45,157,120,.08)' },
+              data: [[{ xAxis: trend.bandMinHz || 49.9, name: t('dailyTrendOperatingBand') }, { xAxis: trend.bandMaxHz || 50.1 }]]
+            }
           }
         ]
       }, true);
@@ -14839,7 +15451,7 @@
           showRocofDetailWindow(result, start, end, { startSecond: eventStart, endSecond: eventEnd, type: row.dataset.drilldownType });
         } else {
           state.oscillationChart?.dispatchAction({ type: 'dataZoom', startValue: start, endValue: end });
-          if (result.chart?.kind === 'oscillationCandidates') setQualityZoomResetVisible(true);
+          if (result.chart?.kind === 'oscillationCandidates' || result.chart?.kind === 'dailyTrend') setQualityZoomResetVisible(true);
         }
         $('analysisMainChart').scrollIntoView({ behavior: 'smooth', block: 'center' });
       }));
@@ -15357,6 +15969,75 @@
           []
         );
       }
+      if (result.type === 'trend') {
+        const meta = result.metadata?.parameters?.dailyTrend || {};
+        rows.push(
+          ['parameter', 'value', 'unit'],
+          ['buildCommitSha', result.metadata?.buildCommitSha ?? '', ''],
+          ['buildTimeUtc', result.metadata?.buildTimeUtc ?? '', ''],
+          ['requestedResolution', meta.requestedResolution ?? '', ''],
+          ['effectiveResolution', meta.effectiveResolution ?? '', ''],
+          ['aggregation', meta.aggregation ?? '', ''],
+          ['histogramBasis', meta.histogramBasis ?? '', ''],
+          ['histogramNormalization', meta.histogramNormalization ?? '', ''],
+          ['histogramBinWidthHz', meta.histogramBinWidthHz ?? '', 'Hz'],
+          ['maxChartPoints', meta.maxChartPoints ?? '', 'points'],
+          ['minimumDailyCoverageRatio', meta.minimumDailyCoverageRatio ?? '', 'ratio'],
+          ['movingAverageDays', meta.movingAverageDays ?? '', 'days'],
+          ['trendMethod', meta.trendMethod ?? '', ''],
+          ['source', result.source ?? meta.source ?? '', ''],
+          ['sourceTimezone', meta.timeZone ?? '', ''],
+          ['displayTimezone', meta.displayTimeZone ?? '', ''],
+          ['meanTrendSlopeMhzPerDay', result.dailyTrend?.trendSlopesMhzPerDay?.mean ?? '', 'mHz/day'],
+          ['maxTrendSlopeMhzPerDay', result.dailyTrend?.trendSlopesMhzPerDay?.max ?? '', 'mHz/day'],
+          ['minTrendSlopeMhzPerDay', result.dailyTrend?.trendSlopesMhzPerDay?.min ?? '', 'mHz/day'],
+          ['adjustmentApplied', meta.adjustmentApplied ?? '', 'boolean'],
+          ['adjustmentReason', meta.adjustmentReason ?? '', ''],
+          [],
+          ['daily statistics'],
+          ['date', 'maxFrequencyHz', 'maxTimestampMs', 'meanFrequencyHz', 'medianFrequencyHz', 'minFrequencyHz', 'minTimestampMs', 'stdDevMhz', 'coverageRatio', 'status', 'p01', 'p99', 'p05', 'p95', 'rmsDeviationMhz', 'rangeMhz', 'lowerBandDurationSeconds', 'upperBandDurationSeconds', 'validSampleCount', 'missingSampleCount', 'dayLengthSeconds', 'dataQualityScore', 'meanDeltaMhz', 'maxDeltaMhz', 'minDeltaMhz', 'movingAverage3MeanHz', 'movingAverage7MeanHz']
+        );
+        for (const day of result.dailyStats || []) {
+          rows.push([
+            day.date,
+            day.maxFrequencyHz,
+            day.maxTimestampMs,
+            day.meanFrequencyHz,
+            day.medianFrequencyHz,
+            day.minFrequencyHz,
+            day.minTimestampMs,
+            day.stdDevMhz,
+            day.coverageRatio,
+            day.status,
+            day.p01,
+            day.p99,
+            day.p05,
+            day.p95,
+            day.rmsDeviationMhz,
+            day.rangeMhz,
+            day.lowerBandDurationSeconds,
+            day.upperBandDurationSeconds,
+            day.validSampleCount,
+            day.missingSampleCount,
+            day.dayLengthSeconds,
+            day.dataQualityScore,
+            day.meanDeltaMhz,
+            day.maxDeltaMhz,
+            day.minDeltaMhz,
+            day.movingAverage3MeanHz,
+            day.movingAverage7MeanHz
+          ]);
+        }
+        rows.push(
+          [],
+          ['histogram bins'],
+          ['startHz', 'endHz', 'centerHz', 'count', 'durationSeconds', 'percent', 'value']
+        );
+        for (const bin of result.histogram?.bins || []) {
+          rows.push([bin.startHz, bin.endHz, bin.centerHz, bin.count, bin.durationSeconds, bin.percent, bin.value]);
+        }
+        rows.push([]);
+      }
       const eventRows = columns.length && tableRows.length
         ? [
             columns.map(column => t(column.labelKey)),
@@ -15517,6 +16198,16 @@
       syncSpectralQuickControlsFromAdvanced();
       if ($('spectralSignificantSnrDb')) $('spectralSignificantSnrDb').value = s.spectralSignificantSnrDb ?? DEFAULT_SETTINGS.spectralSignificantSnrDb;
       if ($('spectralWeakSnrDb')) $('spectralWeakSnrDb').value = s.spectralWeakSnrDb ?? DEFAULT_SETTINGS.spectralWeakSnrDb;
+      if ($('dailyTrendEnvelopeMode')) $('dailyTrendEnvelopeMode').value = s.dailyTrendEnvelopeMode || dailyTrendDefaultParameters().envelopeMode;
+      if ($('dailyTrendMinCoveragePct')) $('dailyTrendMinCoveragePct').value = s.dailyTrendMinimumCoveragePct ?? dailyTrendDefaultParameters().minimumDailyCoverageRatio * 100;
+      if ($('dailyTrendExcludeLowCoverageDays')) $('dailyTrendExcludeLowCoverageDays').value = s.dailyTrendExcludeLowCoverageDays ? 'yes' : 'no';
+      if ($('dailyTrendHistogramBasis')) $('dailyTrendHistogramBasis').value = s.dailyTrendHistogramBasis || dailyTrendDefaultParameters().histogramBasis;
+      if ($('dailyTrendHistogramNormalization')) $('dailyTrendHistogramNormalization').value = s.dailyTrendHistogramNormalization || dailyTrendDefaultParameters().histogramNormalization;
+      if ($('dailyTrendHistogramBinWidthHz')) $('dailyTrendHistogramBinWidthHz').value = s.dailyTrendHistogramBinWidthHz ?? dailyTrendDefaultParameters().histogramBinWidthHz;
+      if ($('dailyTrendMovingAverageDays')) $('dailyTrendMovingAverageDays').value = s.dailyTrendMovingAverageDays ?? dailyTrendDefaultParameters().movingAverageDays;
+      if ($('dailyTrendTrendMethod')) $('dailyTrendTrendMethod').value = s.dailyTrendTrendMethod || dailyTrendDefaultParameters().trendMethod;
+      if ($('dailyTrendTimezone')) $('dailyTrendTimezone').value = s.dailyTrendTimezone || dailyTrendDefaultParameters().displayTimeZone;
+      if ($('dailyTrendMaxChartPoints')) $('dailyTrendMaxChartPoints').value = s.dailyTrendMaxChartPoints ?? dailyTrendDefaultParameters().maxChartPoints;
       $('analysisSourceSelect').value = s.oscillationSource || 'tr';
       $('oscSourceSelect').value = s.oscillationSource || 'tr';
       state.oscillationSource = getAnalysisSource();
@@ -15563,6 +16254,16 @@
         spectralDisplayTimezone: $('spectralDisplayTimezone')?.value || DEFAULT_SETTINGS.spectralDisplayTimezone,
         spectralSignificantSnrDb: Number($('spectralSignificantSnrDb')?.value || DEFAULT_SETTINGS.spectralSignificantSnrDb),
         spectralWeakSnrDb: Number($('spectralWeakSnrDb')?.value || DEFAULT_SETTINGS.spectralWeakSnrDb),
+        dailyTrendEnvelopeMode: $('dailyTrendEnvelopeMode')?.value || dailyTrendDefaultParameters().envelopeMode,
+        dailyTrendMinimumCoveragePct: Number($('dailyTrendMinCoveragePct')?.value || dailyTrendDefaultParameters().minimumDailyCoverageRatio * 100),
+        dailyTrendExcludeLowCoverageDays: ($('dailyTrendExcludeLowCoverageDays')?.value || 'no') === 'yes',
+        dailyTrendHistogramBasis: $('dailyTrendHistogramBasis')?.value || dailyTrendDefaultParameters().histogramBasis,
+        dailyTrendHistogramNormalization: $('dailyTrendHistogramNormalization')?.value || dailyTrendDefaultParameters().histogramNormalization,
+        dailyTrendHistogramBinWidthHz: $('dailyTrendHistogramBinWidthHz')?.value || dailyTrendDefaultParameters().histogramBinWidthHz,
+        dailyTrendMovingAverageDays: Number($('dailyTrendMovingAverageDays')?.value || dailyTrendDefaultParameters().movingAverageDays),
+        dailyTrendTrendMethod: $('dailyTrendTrendMethod')?.value || dailyTrendDefaultParameters().trendMethod,
+        dailyTrendTimezone: $('dailyTrendTimezone')?.value || dailyTrendDefaultParameters().displayTimeZone,
+        dailyTrendMaxChartPoints: Number($('dailyTrendMaxChartPoints')?.value || dailyTrendDefaultParameters().maxChartPoints),
         filterTaps: Number($('filterTaps').value),
         minDuration: Number($('minDuration').value),
         repeatedValueSeconds: Number($('repeatedValueSeconds')?.value || 15),
@@ -16598,6 +17299,8 @@
         analysisTypeLabel: 'Analiz',
         analysisRunBtn: 'Çalıştır',
         analysisCancelBtn: 'İptal',
+        yes: 'Evet',
+        no: 'Hayır',
         advanced: 'Gelişmiş',
         spectralAdvancedSettings: 'Gelişmiş Ayarlar',
         analysisDateModeLabel: 'Tarih modu',
@@ -16616,6 +17319,7 @@
         resolutionSecond: 'Saniyelik',
         resolution10s: '10 saniyelik',
         resolutionMinute: 'Dakikalık',
+        resolution15Minute: '15 dakika',
         resolutionHour: 'Saatlik',
         rocofThresholdLabel: 'RoCoF olay eşiği (mHz/s)',
         rocofMethodLabel: 'RoCoF hesaplama yöntemi',
@@ -16641,7 +17345,7 @@
         analysisOscillation: 'Salınım Adayı Tespiti',
         analysisCrossCorrelation: 'Çapraz korelasyon',
         analysisCoherence: 'Koherens ve faz',
-        analysisTrend: 'Günlük trend',
+        analysisTrend: 'Günlük Frekans ve Trend Analizi',
         analysisRunning: 'Analiz çalışıyor...',
         analysisDone: 'Analiz tamamlandı.',
         analysisCanceled: 'Analiz iptal edildi.',
@@ -16729,8 +17433,8 @@
         analysisCrossCorrelationDesc: 'Türkiye ve Kıta Avrupası serileri arasındaki gecikmeli benzerlik ölçülür.',
         analysisCoherenceTitle: 'Koherens ve Faz Özeti',
         analysisCoherenceDesc: 'Eşlenmiş serilerde frekans bazlı ortak hareket ve faz farkı incelenir.',
-        analysisTrendTitle: 'Uzun Dönem Trend Özeti',
-        analysisTrendDesc: 'Dakikalık veya saatlik özetlerle günlük/saatlik eğilim ölçülür.',
+        analysisTrendTitle: 'Günlük Frekans ve Trend Analizi',
+        analysisTrendDesc: 'Ham saniyelik günlük frekans istatistikleri, görüntü çözünürlüğünden bağımsız trendler ve frekans dağılımı birlikte incelenir.',
         tableMetric: 'Metrik',
         tableValue: 'Değer',
         tableFrequency: 'Frekans',
@@ -16744,7 +17448,86 @@
         limitOscillation: 'Salınım adayları doğrulama bulgusudur; kaynak kalitesi, filtre parametreleri ve eşik seçimi sonucu etkiler. Damping oranı yalnız uygun ringdown olaylarında tahmin edilir.',
         limitCrossCorrelation: 'Çapraz korelasyon yalnız eşlenmiş iki seri için anlamlıdır.',
         limitCoherence: 'Koherens-faz yorumu eşlenmiş, aynı örnekleme hızındaki serilere bağlıdır.',
-        limitTrend: 'Trend görünümü hızlı osilasyonları değil uzun dönem sapma eğilimini gösterir.',
+        limitTrend: 'Görüntü çözünürlüğü yalnız grafiği özetler; günlük temel istatistikler ham geçerli saniyelik veriden hesaplanır. Eksik örnekler 50 Hz veya sıfır kabul edilmez.',
+        dailyTrendPresetLabel: 'Tarih aralığı presetleri',
+        dailyTrendTimeSeriesTitle: 'Frekans Zaman Serisi ve Min–Maks Zarfı',
+        dailyTrendHistogramTitle: 'Frekans Dağılımı',
+        dailyTrendMean: 'Ortalama frekans',
+        dailyTrendMeanSeries: 'Ortalama frekans',
+        dailyTrendMaxSeries: 'Maksimum frekans',
+        dailyTrendMinSeries: 'Minimum frekans',
+        dailyTrendEnvelopeSeries: 'Min–maks zarfı',
+        dailyTrendHistogramSeries: 'Frekans Dağılımı Histogramı',
+        dailyTrendMaxFrequency: 'Maksimum frekans',
+        dailyTrendMaxTime: 'Maksimum zamanı',
+        dailyTrendMinFrequency: 'Minimum frekans',
+        dailyTrendMinTime: 'Minimum zamanı',
+        dailyTrendMedian: 'Medyan',
+        dailyTrendStdDev: 'Standart sapma',
+        dailyTrendMaxWithTime: 'Maksimum frekans ve zamanı',
+        dailyTrendMinWithTime: 'Minimum frekans ve zamanı',
+        dailyTrendRange: 'Maksimum–minimum aralığı',
+        dailyTrendFrequencyRangeHelp: 'Frekans aralığı, gün içindeki maksimum ve minimum ham geçerli örneklerin farkıdır; uç değer etkisini hızlı gösterir.',
+        dailyTrendCoverageHelp: 'Kapsama oranı, beklenen saniyeler içinde geçerli ham örnek oranıdır. Düşük kapsama günlük trend yorumunu zayıflatır.',
+        dailyTrendEnvelopeHelp: 'Min–maks zarfı her görüntü kutusundaki ham geçerli örneklerin sınırlarını gösterir; 15 dakika ve 1 saat yalnız grafik özetidir, günlük istatistiği değiştirmez.',
+        dailyTrendRawHistogramHelp: 'Ham veri histogramı saniyelik geçerli örneklerin dağılımını gösterir. Görüntülenen seri seçilirse dağılım grafik özet noktalarından hesaplanır.',
+        dailyTrendSlopeHelp: 'Trend eğimi en az üç geçerli gün olduğunda mean/max/min için mHz/gün olarak hesaplanır; işletme veya kaynak değişimi sinyali olabilir.',
+        dailyTrendMovingAverageHelp: 'Hareketli ortalama günlük dalgalanmayı yumuşatır ancak kısa süreli uç günleri gizleyebilir.',
+        dailyTrendP01P99Help: 'P01/P99, en düşük ve en yüksek %1 uç değerleri dışarıda bırakarak daha dayanıklı bir zarf sağlar.',
+        dailyTrendDisplayResolutionHelp: 'Görüntü çözünürlüğü yalnız grafikteki mean/min/max kutularını değiştirir; günlük KPI ve tablo ham saniyelik geçerli veriden hesaplanır.',
+        dailyTrendEffectiveResolutionHelp: 'Otomatik mod maxChartPoints sınırına göre güvenli çözünürlük seçer; çok uzun aralıkta saniyelik görünüm otomatik özetlenebilir.',
+        dailyTrendSummaryStatisticLabel: 'Özet merkez ölçüsü',
+        dailyTrendSummaryMean: 'Ortalama',
+        dailyTrendSummaryMedian: 'Medyan',
+        dailyTrendEnvelopeModeLabel: 'Zarf türü',
+        dailyTrendEnvelopeMinMax: 'Min–maks zarfı',
+        dailyTrendEnvelopeP01P99: 'P01–P99 zarfı',
+        dailyTrendMinCoverageLabel: 'Minimum günlük kapsama oranı (%)',
+        dailyTrendExcludeLowCoverageLabel: 'Eksik günleri dışla',
+        dailyTrendHistogramBasisLabel: 'Histogram temeli',
+        dailyTrendHistogramRaw: 'Ham saniyelik veri dağılımı',
+        dailyTrendHistogramDisplayed: 'Görüntülenen seri dağılımı',
+        dailyTrendHistogramNormalizationLabel: 'Histogram normalizasyonu',
+        dailyTrendHistogramPercent: 'Süre yüzdesi',
+        dailyTrendHistogramDuration: 'Toplam süre',
+        dailyTrendHistogramCount: 'Örnek sayısı',
+        dailyTrendHistogramBinWidthLabel: 'Histogram bin genişliği (Hz)',
+        dailyTrendMovingAverageLabel: 'Hareketli ortalama gün sayısı',
+        dailyTrendTrendMethodLabel: 'Trend yöntemi',
+        dailyTrendLinearTrend: 'Doğrusal trend',
+        dailyTrendRobustTrend: 'Robust trend',
+        dailyTrendDayTypeLabel: 'Gün filtresi',
+        dailyTrendDayTypeAll: 'Tüm günler',
+        dailyTrendDayTypeWeekday: 'Hafta içi',
+        dailyTrendDayTypeWeekend: 'Hafta sonu',
+        dailyTrendTimezoneLabel: 'Zaman dilimi',
+        dailyTrendMaxChartPointsLabel: 'Maksimum grafik noktası',
+        dailyTrendRequestedResolution: 'İstenen çözünürlük',
+        dailyTrendEffectiveResolution: 'Etkili çözünürlük',
+        dailyTrendAggregation: 'Agregasyon',
+        dailyTrendAggregationMeanMinMax: 'Ortalama / min / maks',
+        dailyTrendDayCount: 'Gün sayısı',
+        dailyTrendTechnicalSummary: 'Teknik özet',
+        dailyTrendShowAllTechnical: 'Tüm teknik ayrıntıları göster',
+        dailyTrendShowDetails: 'Günlük ayrıntıları göster',
+        dailyTrendStatusOk: 'Yeterli',
+        dailyTrendStatusLowCoverage: 'Düşük kapsama',
+        dailyTrendP01P99: 'P01/P99',
+        dailyTrendP05P95: 'P05/P95',
+        dailyTrendBandDurations: 'Bant altı/üstü süre',
+        dailyTrendValidMissing: 'Geçerli/eksik örnek',
+        dailyTrendDayLength: 'Gün uzunluğu',
+        dailyTrendQualityScore: 'Veri kalite puanı',
+        dailyTrendMeanDelta: 'Önceki güne göre ortalama değişimi',
+        dailyTrendMovingAverage3: '3 günlük hareketli ortalama',
+        dailyTrendMovingAverage7: '7 günlük hareketli ortalama',
+        dailyTrendSourceTimezone: 'Kaynak zaman dilimi',
+        dailyTrendTrendSlopeMean: 'Ortalama trend eğimi',
+        dailyTrendLowCoverageDays: 'Düşük kapsamalı gün',
+        dailyTrendIqr: 'IQR',
+        dailyTrendNominalLine: '50 Hz nominal',
+        dailyTrendOperatingBand: 'Çalışma bandı',
+        dailyTrendExtremeMarkers: 'Maks/min işaretçileri',
         healthWorkflow: 'Workflow başarılı',
         healthLastCheck: 'Son başarılı kontrol',
         healthLatestData: 'Son mevcut veri',
@@ -17295,6 +18078,8 @@
         analysisTypeLabel: 'Analysis',
         analysisRunBtn: 'Run',
         analysisCancelBtn: 'Cancel',
+        yes: 'Yes',
+        no: 'No',
         advanced: 'Advanced',
         spectralAdvancedSettings: 'Advanced Settings',
         analysisDateModeLabel: 'Date mode',
@@ -17313,6 +18098,7 @@
         resolutionSecond: 'Second-level',
         resolution10s: '10-second',
         resolutionMinute: 'Minutely',
+        resolution15Minute: '15 minutes',
         resolutionHour: 'Hourly',
         rocofThresholdLabel: 'RoCoF event threshold (mHz/s)',
         rocofMethodLabel: 'RoCoF estimation method',
@@ -17338,7 +18124,7 @@
         analysisOscillation: 'Oscillation Candidate Detection',
         analysisCrossCorrelation: 'Cross-correlation',
         analysisCoherence: 'Coherence and phase',
-        analysisTrend: 'Daily trend',
+        analysisTrend: 'Daily Frequency and Trend Analysis',
         analysisRunning: 'Analysis is running...',
         analysisDone: 'Analysis complete.',
         analysisCanceled: 'Analysis canceled.',
@@ -17426,8 +18212,8 @@
         analysisCrossCorrelationDesc: 'Delayed similarity between Türkiye and Continental Europe is measured.',
         analysisCoherenceTitle: 'Coherence and Phase Summary',
         analysisCoherenceDesc: 'Frequency-based common movement and phase difference are inspected for paired series.',
-        analysisTrendTitle: 'Long-Term Trend Summary',
-        analysisTrendDesc: 'Daily/hourly trend is measured with minutely or hourly summaries.',
+        analysisTrendTitle: 'Daily Frequency and Trend Analysis',
+        analysisTrendDesc: 'Raw one-second daily frequency statistics, resolution-independent trends, and the frequency distribution are inspected together.',
         tableMetric: 'Metric',
         tableValue: 'Value',
         tableFrequency: 'Frequency',
@@ -17441,7 +18227,86 @@
         limitOscillation: 'Oscillation candidates require validation; data quality, filter parameters, and threshold selection affect results. Damping ratio is estimated only for suitable ringdown events.',
         limitCrossCorrelation: 'Cross-correlation is meaningful only for two paired series.',
         limitCoherence: 'Coherence-phase interpretation depends on paired series with the same sampling rate.',
-        limitTrend: 'Trend view shows long-term deviation, not fast oscillations.',
+        limitTrend: 'Display resolution only summarizes the chart; daily base statistics are computed from raw valid one-second data. Missing samples are not treated as 50 Hz or zero.',
+        dailyTrendPresetLabel: 'Date range presets',
+        dailyTrendTimeSeriesTitle: 'Frequency Time Series and Min–Max Envelope',
+        dailyTrendHistogramTitle: 'Frequency Distribution',
+        dailyTrendMean: 'Mean frequency',
+        dailyTrendMeanSeries: 'Mean frequency',
+        dailyTrendMaxSeries: 'Maximum frequency',
+        dailyTrendMinSeries: 'Minimum frequency',
+        dailyTrendEnvelopeSeries: 'Min–max envelope',
+        dailyTrendHistogramSeries: 'Frequency Distribution Histogram',
+        dailyTrendMaxFrequency: 'Maximum frequency',
+        dailyTrendMaxTime: 'Maximum time',
+        dailyTrendMinFrequency: 'Minimum frequency',
+        dailyTrendMinTime: 'Minimum time',
+        dailyTrendMedian: 'Median',
+        dailyTrendStdDev: 'Standard deviation',
+        dailyTrendMaxWithTime: 'Maximum frequency and time',
+        dailyTrendMinWithTime: 'Minimum frequency and time',
+        dailyTrendRange: 'Maximum–minimum range',
+        dailyTrendFrequencyRangeHelp: 'Frequency range is the difference between maximum and minimum raw valid samples in the day; it quickly exposes outlier impact.',
+        dailyTrendCoverageHelp: 'Coverage ratio is the valid raw-sample share of expected seconds. Low coverage weakens daily trend interpretation.',
+        dailyTrendEnvelopeHelp: 'The min–max envelope shows raw valid sample bounds in each display bucket; 15-minute and 1-hour views only summarize the chart and do not change daily statistics.',
+        dailyTrendRawHistogramHelp: 'The raw-data histogram shows the distribution of valid one-second samples. If displayed series is selected, the distribution is computed from chart summary points.',
+        dailyTrendSlopeHelp: 'Trend slope is reported as mHz/day for mean/max/min once at least three valid days exist; it can indicate operational or source changes.',
+        dailyTrendMovingAverageHelp: 'A moving average smooths daily fluctuation but can hide short-lived extreme days.',
+        dailyTrendP01P99Help: 'P01/P99 excludes the lowest and highest 1% tails to provide a more robust envelope.',
+        dailyTrendDisplayResolutionHelp: 'Display resolution changes only chart mean/min/max buckets; daily KPIs and table values are computed from raw valid one-second data.',
+        dailyTrendEffectiveResolutionHelp: 'Auto mode chooses a safe resolution from maxChartPoints; very long ranges can automatically summarize a requested one-second view.',
+        dailyTrendSummaryStatisticLabel: 'Summary center statistic',
+        dailyTrendSummaryMean: 'Mean',
+        dailyTrendSummaryMedian: 'Median',
+        dailyTrendEnvelopeModeLabel: 'Envelope type',
+        dailyTrendEnvelopeMinMax: 'Min–max envelope',
+        dailyTrendEnvelopeP01P99: 'P01–P99 envelope',
+        dailyTrendMinCoverageLabel: 'Minimum daily coverage (%)',
+        dailyTrendExcludeLowCoverageLabel: 'Exclude low-coverage days',
+        dailyTrendHistogramBasisLabel: 'Histogram basis',
+        dailyTrendHistogramRaw: 'Raw one-second data distribution',
+        dailyTrendHistogramDisplayed: 'Displayed series distribution',
+        dailyTrendHistogramNormalizationLabel: 'Histogram normalization',
+        dailyTrendHistogramPercent: 'Duration percentage',
+        dailyTrendHistogramDuration: 'Total duration',
+        dailyTrendHistogramCount: 'Sample count',
+        dailyTrendHistogramBinWidthLabel: 'Histogram bin width (Hz)',
+        dailyTrendMovingAverageLabel: 'Moving-average days',
+        dailyTrendTrendMethodLabel: 'Trend method',
+        dailyTrendLinearTrend: 'Linear trend',
+        dailyTrendRobustTrend: 'Robust trend',
+        dailyTrendDayTypeLabel: 'Day filter',
+        dailyTrendDayTypeAll: 'All days',
+        dailyTrendDayTypeWeekday: 'Weekdays',
+        dailyTrendDayTypeWeekend: 'Weekends',
+        dailyTrendTimezoneLabel: 'Time zone',
+        dailyTrendMaxChartPointsLabel: 'Maximum chart points',
+        dailyTrendRequestedResolution: 'Requested resolution',
+        dailyTrendEffectiveResolution: 'Effective resolution',
+        dailyTrendAggregation: 'Aggregation',
+        dailyTrendAggregationMeanMinMax: 'Mean / min / max',
+        dailyTrendDayCount: 'Day count',
+        dailyTrendTechnicalSummary: 'Technical summary',
+        dailyTrendShowAllTechnical: 'Show all technical details',
+        dailyTrendShowDetails: 'Show daily details',
+        dailyTrendStatusOk: 'Sufficient',
+        dailyTrendStatusLowCoverage: 'Low coverage',
+        dailyTrendP01P99: 'P01/P99',
+        dailyTrendP05P95: 'P05/P95',
+        dailyTrendBandDurations: 'Below/above band duration',
+        dailyTrendValidMissing: 'Valid/missing samples',
+        dailyTrendDayLength: 'Day length',
+        dailyTrendQualityScore: 'Data quality score',
+        dailyTrendMeanDelta: 'Mean change vs previous day',
+        dailyTrendMovingAverage3: '3-day moving average',
+        dailyTrendMovingAverage7: '7-day moving average',
+        dailyTrendSourceTimezone: 'Source time zone',
+        dailyTrendTrendSlopeMean: 'Mean trend slope',
+        dailyTrendLowCoverageDays: 'Low-coverage days',
+        dailyTrendIqr: 'IQR',
+        dailyTrendNominalLine: '50 Hz nominal',
+        dailyTrendOperatingBand: 'Operating band',
+        dailyTrendExtremeMarkers: 'Max/min markers',
         healthWorkflow: 'Workflow success',
         healthLastCheck: 'Last successful check',
         healthLatestData: 'Latest available data',

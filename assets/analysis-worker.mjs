@@ -1,6 +1,7 @@
 import {
   computeCrossCorrelation,
   computeCrossPowerSpectralDensity,
+  computeDailyFrequencyTrend,
   computeMagnitudeSquaredCoherence,
   computeOscillationCandidates,
   computeRocof,
@@ -40,6 +41,7 @@ if (workerScope) workerScope.onmessage = event => {
 
 function runAnalysis(type, payload, parameters) {
   const series = typed(payload.series);
+  const timestamps = typed(payload.timestamps);
   const a = typed(payload.a);
   const b = typed(payload.b);
   if (type === "welchPsd" || type === "psd") return computeWelchPsd(series, parameters);
@@ -54,6 +56,7 @@ function runAnalysis(type, payload, parameters) {
   if (type === "crossCorrelation") return computeCrossCorrelation(a, b, parameters);
   if (type === "rocof") return computeRocof(series, parameters);
   if (type === "oscillation") return computeOscillationCandidates(series, parameters);
+  if (type === "trend") return computeDailyFrequencyTrend(series, timestamps, parameters);
   throw new Error(`Unknown analysis type: ${type}`);
 }
 

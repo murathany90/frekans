@@ -55,6 +55,26 @@ export const DEFAULT_OSCILLATION_PARAMETERS = Object.freeze({
   dampingMethod: "envelope-regression"
 });
 
+export const DEFAULT_DAILY_TREND_PARAMETERS = Object.freeze({
+  sampleIntervalSeconds: 1,
+  requestedResolution: "auto",
+  maxChartPoints: 5000,
+  aggregation: "mean-min-max",
+  envelopeMode: "min-max",
+  histogramBasis: "raw",
+  histogramNormalization: "percent",
+  histogramBinWidthHz: "auto",
+  minimumDailyCoverageRatio: 0.75,
+  excludeLowCoverageDays: false,
+  movingAverageDays: 3,
+  trendMethod: "linear",
+  nominalHz: DEFAULT_NOMINAL_HZ,
+  bandMinHz: 49.90,
+  bandMaxHz: 50.10,
+  timeZone: "UTC",
+  displayTimeZone: "source"
+});
+
 const ALLOWED_SPECTRAL_WINDOWS = new Set(["hann", "hamming", "rectangular"]);
 const ALLOWED_SPECTRAL_DETRENDS = new Set(["constant", "linear", "none"]);
 const ALLOWED_SPECTRAL_SCALES = new Set(["linear", "log"]);
@@ -63,6 +83,12 @@ const ALLOWED_GAP_HANDLING = new Set(["segment-mean", "reject", "short-gap-linea
 const ALLOWED_OSCILLATION_THRESHOLD_MODES = new Set(["fixed", "adaptive"]);
 const ALLOWED_OSCILLATION_FILTER_PHASE_MODES = new Set(["zero-phase", "centered", "causal"]);
 const ALLOWED_OSCILLATION_DAMPING_METHODS = new Set(["envelope-regression", "log-decrement", "damped-sinusoid-fit", "matrix-pencil"]);
+const DAILY_TREND_RESOLUTION_SECONDS = Object.freeze({ "1s": 1, "1m": 60, "15m": 900, "1h": 3600 });
+const ALLOWED_DAILY_TREND_RESOLUTIONS = new Set(["auto", ...Object.keys(DAILY_TREND_RESOLUTION_SECONDS)]);
+const ALLOWED_DAILY_TREND_HISTOGRAM_BASIS = new Set(["raw", "displayed"]);
+const ALLOWED_DAILY_TREND_HISTOGRAM_NORMALIZATION = new Set(["percent", "duration", "count"]);
+const ALLOWED_DAILY_TREND_ENVELOPES = new Set(["min-max", "p01-p99"]);
+const ALLOWED_DAILY_TREND_METHODS = new Set(["linear", "robust"]);
 const DEFAULT_SPECTROGRAM_MAX_CELLS = 1_500_000;
 const DEFAULT_SPECTRAL_PEAK_CLASSIFICATION = Object.freeze({
   significantSnrDb: 6,
@@ -450,6 +476,179 @@ export function computeBasicStats(values, {
     outOfBandSeconds: n - inBand,
     longestBandViolationSeconds: bandEvents.longestSeconds,
     bandViolationEventCount: bandEvents.count
+  };
+}
+
+export function normalizeDailyTrendParameters(options = {}, sampleCount = 0) {
+  const defaults = DEFAULT_DAILY_TREND_PARAMETERS;
+  const requestedResolution = ALLOWED_DAILY_TREND_RESOLUTIONS.has(options.requestedResolution)
+    ? options.requestedResolution
+    : defaults.requestedResolution;
+  const maxChartPoints = Math.max(100, Math.round(finitePositive(options.maxChartPoints, defaults.maxChartPoints, 100)));
+  const sampleIntervalSeconds = finitePositive(options.sampleIntervalSeconds, defaults.sampleIntervalSeconds);
+  const nominalHz = finitePositive(options.nominalHz, defaults.nominalHz);
+  const bandMinHz = Number.isFinite(Number(options.bandMinHz)) ? Number(options.bandMinHz) : defaults.bandMinHz;
+  const bandMaxHz = Number.isFinite(Number(options.bandMaxHz)) ? Number(options.bandMaxHz) : defaults.bandMaxHz;
+  if (!(bandMaxHz > bandMinHz)) throw new Error("Invalid daily trend band: bandMaxHz must be greater than bandMinHz.");
+  const envelopeMode = ALLOWED_DAILY_TREND_ENVELOPES.has(options.envelopeMode) ? options.envelopeMode : defaults.envelopeMode;
+  const histogramBasis = ALLOWED_DAILY_TREND_HISTOGRAM_BASIS.has(options.histogramBasis) ? options.histogramBasis : defaults.histogramBasis;
+  const histogramNormalization = ALLOWED_DAILY_TREND_HISTOGRAM_NORMALIZATION.has(options.histogramNormalization)
+    ? options.histogramNormalization
+    : defaults.histogramNormalization;
+  const histogramBinWidthHz = options.histogramBinWidthHz === "auto" || options.histogramBinWidthHz === undefined
+    ? "auto"
+    : finitePositive(options.histogramBinWidthHz, 0.001, 0.000001);
+  const minimumDailyCoverageRatio = clamp01(options.minimumDailyCoverageRatio ?? defaults.minimumDailyCoverageRatio);
+  const movingAverageDays = Math.max(1, Math.round(finitePositive(options.movingAverageDays, defaults.movingAverageDays, 1)));
+  const trendMethod = ALLOWED_DAILY_TREND_METHODS.has(options.trendMethod) ? options.trendMethod : defaults.trendMethod;
+  const timeZone = String(options.timeZone || options.analysisTimezone || defaults.timeZone);
+  const displayTimeZone = String(options.displayTimeZone || options.analysisTimezone || defaults.displayTimeZone);
+  const automaticResolution = chooseDailyTrendResolution(sampleCount, maxChartPoints, sampleIntervalSeconds);
+  let effectiveResolution = requestedResolution === "auto" ? automaticResolution : requestedResolution;
+  let manualResolutionLimited = false;
+  let adjustmentReason = "";
+  if (requestedResolution === "1s" && Math.ceil(sampleCount / Math.max(1, sampleIntervalSeconds)) > maxChartPoints) {
+    effectiveResolution = automaticResolution;
+    manualResolutionLimited = true;
+    adjustmentReason = "manual-second-resolution-exceeds-max-chart-points";
+  }
+  const effectiveResolutionSeconds = DAILY_TREND_RESOLUTION_SECONDS[effectiveResolution] || sampleIntervalSeconds;
+  return {
+    ...defaults,
+    sampleIntervalSeconds,
+    requestedResolution,
+    effectiveResolution,
+    effectiveResolutionSeconds,
+    maxChartPoints,
+    aggregation: defaults.aggregation,
+    envelopeMode,
+    histogramBasis,
+    histogramNormalization,
+    histogramBinWidthHz,
+    minimumDailyCoverageRatio,
+    excludeLowCoverageDays: Boolean(options.excludeLowCoverageDays ?? defaults.excludeLowCoverageDays),
+    movingAverageDays,
+    trendMethod,
+    nominalHz,
+    bandMinHz,
+    bandMaxHz,
+    timeZone,
+    displayTimeZone,
+    automaticResolution,
+    adjustmentApplied: requestedResolution !== effectiveResolution,
+    adjustmentReason,
+    manualResolutionLimited
+  };
+}
+
+export function computeDailyFrequencyTrend(series, timestamps = null, options = {}) {
+  const values = Array.from(series || [], value => Number(value));
+  const timestampValues = normalizeDailyTrendTimestamps(timestamps, values.length, options);
+  const params = normalizeDailyTrendParameters(options, values.length);
+  if (!values.length) throw new Error("Daily frequency trend requires at least one sample.");
+  const groups = groupDailyTrendSamples(values, timestampValues, params);
+  if (!groups.length) throw new Error("Daily frequency trend found no timestamped samples.");
+  const dailyStats = groups.map((group, index) => dailyTrendStatsForGroup(group, index, params));
+  addDailyTrendComparisons(dailyStats, params);
+  const overallStats = dailyTrendOverallStats(values, timestampValues, params);
+  const usableDailyStats = params.excludeLowCoverageDays
+    ? dailyStats.filter(day => day.status !== "low_coverage")
+    : dailyStats;
+  const chart = buildDailyTrendChart(groups, params);
+  const histogramSource = params.histogramBasis === "displayed"
+    ? chart.points.map(point => point.meanHz)
+    : values;
+  const histogram = buildDailyTrendHistogram(histogramSource, params);
+  const trendSlopesMhzPerDay = computeDailyTrendSlopes(usableDailyStats, params);
+  return {
+    method: "daily-frequency-trend",
+    requestedResolution: params.requestedResolution,
+    effectiveResolution: params.effectiveResolution,
+    effectiveResolutionSeconds: params.effectiveResolutionSeconds,
+    aggregation: params.aggregation,
+    envelopeMode: params.envelopeMode,
+    histogramBasis: params.histogramBasis,
+    histogramNormalization: params.histogramNormalization,
+    maxChartPoints: params.maxChartPoints,
+    adjustmentApplied: params.adjustmentApplied,
+    adjustmentReason: params.adjustmentReason,
+    manualResolutionLimited: params.manualResolutionLimited,
+    sampleIntervalSeconds: params.sampleIntervalSeconds,
+    nominalHz: params.nominalHz,
+    bandMinHz: params.bandMinHz,
+    bandMaxHz: params.bandMaxHz,
+    timeZone: params.timeZone,
+    displayTimeZone: params.displayTimeZone,
+    overallStats,
+    dailyStats,
+    days: dailyStats,
+    chart,
+    histogram,
+    histogramBins: histogram.bins,
+    trendSlopesMhzPerDay,
+    trendSlopeMhzPerDay: trendSlopesMhzPerDay.mean,
+    movingAverageDays: params.movingAverageDays,
+    validDayCount: usableDailyStats.filter(day => day.validSampleCount > 0).length,
+    lowCoverageDayCount: dailyStats.filter(day => day.status === "low_coverage").length,
+    metadata: {
+      parameters: params,
+      sourceSampleCount: values.length,
+      timestampCount: timestampValues.length
+    }
+  };
+}
+
+function dailyTrendOverallStats(values, timestamps, params) {
+  const clean = [];
+  let sum = 0;
+  let min = Infinity;
+  let max = -Infinity;
+  let minTimestampMs = null;
+  let maxTimestampMs = null;
+  for (let index = 0; index < values.length; index += 1) {
+    const value = Number(values[index]);
+    if (!Number.isFinite(value)) continue;
+    clean.push(value);
+    sum += value;
+    if (value < min) {
+      min = value;
+      minTimestampMs = timestamps[index] ?? null;
+    }
+    if (value > max) {
+      max = value;
+      maxTimestampMs = timestamps[index] ?? null;
+    }
+  }
+  const mean = clean.length ? sum / clean.length : NaN;
+  const sorted = clean.slice().sort((a, b) => a - b);
+  const stdDev = standardDeviation(clean);
+  const lowerBandSeconds = clean.filter(value => value < params.bandMinHz).length * params.sampleIntervalSeconds;
+  const upperBandSeconds = clean.filter(value => value > params.bandMaxHz).length * params.sampleIntervalSeconds;
+  return {
+    validSampleCount: clean.length,
+    totalSampleCount: values.length,
+    missingSampleCount: Math.max(0, values.length - clean.length),
+    coverageRatio: values.length ? clean.length / values.length : 0,
+    meanFrequencyHz: mean,
+    medianFrequencyHz: percentile(sorted, 0.5),
+    maxFrequencyHz: max === -Infinity ? NaN : max,
+    maxTimestampMs,
+    minFrequencyHz: min === Infinity ? NaN : min,
+    minTimestampMs,
+    rangeHz: max === -Infinity || min === Infinity ? NaN : max - min,
+    rangeMhz: max === -Infinity || min === Infinity ? NaN : (max - min) * 1000,
+    stdDevHz: stdDev,
+    stdDevMhz: stdDev * 1000,
+    rmsDeviationMhz: clean.length ? Math.sqrt(clean.reduce((acc, value) => acc + (value - params.nominalHz) ** 2, 0) / clean.length) * 1000 : NaN,
+    iqrHz: Number.isFinite(percentile(sorted, 0.75)) && Number.isFinite(percentile(sorted, 0.25))
+      ? percentile(sorted, 0.75) - percentile(sorted, 0.25)
+      : NaN,
+    p01: percentile(sorted, 0.01),
+    p05: percentile(sorted, 0.05),
+    p95: percentile(sorted, 0.95),
+    p99: percentile(sorted, 0.99),
+    lowerBandDurationSeconds: lowerBandSeconds,
+    upperBandDurationSeconds: upperBandSeconds
   };
 }
 
@@ -2789,6 +2988,365 @@ function detrendedArray(values) {
   return Array.from(values || [], value => Number.isFinite(value) ? value - mean : 0);
 }
 
+function chooseDailyTrendResolution(sampleCount, maxChartPoints, sampleIntervalSeconds = 1) {
+  const targetSamples = Math.max(0, Number(sampleCount) || 0);
+  for (const resolution of ["1s", "1m", "15m", "1h"]) {
+    const seconds = DAILY_TREND_RESOLUTION_SECONDS[resolution] || 1;
+    const factor = Math.max(1, Math.round(seconds / Math.max(EPSILON, sampleIntervalSeconds)));
+    if (Math.ceil(targetSamples / factor) <= maxChartPoints) return resolution;
+  }
+  return "1h";
+}
+
+function normalizeDailyTrendTimestamps(timestamps, length, options = {}) {
+  const raw = ArrayBuffer.isView(timestamps) || Array.isArray(timestamps) ? Array.from(timestamps) : [];
+  const startEpochMs = Number.isFinite(Number(options.analysisStartEpochMs))
+    ? Number(options.analysisStartEpochMs)
+    : Date.UTC(1970, 0, 1, 0, 0, 0);
+  const stepMs = finitePositive(options.sampleIntervalSeconds, DEFAULT_DAILY_TREND_PARAMETERS.sampleIntervalSeconds) * 1000;
+  if (raw.length) {
+    return Array.from({ length }, (_, index) => {
+      const value = Number(raw[index]);
+      if (!Number.isFinite(value)) return startEpochMs + index * stepMs;
+      return Math.abs(value) < 100_000_000_000 ? value * 1000 : value;
+    });
+  }
+  return Array.from({ length }, (_, index) => startEpochMs + index * stepMs);
+}
+
+function dailyTrendDateKey(epochMs, timeZone = "UTC") {
+  const date = new Date(epochMs);
+  if (!Number.isFinite(date.getTime())) return "invalid-date";
+  if (!timeZone || timeZone === "UTC") return date.toISOString().slice(0, 10);
+  try {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).formatToParts(date);
+    const part = type => parts.find(item => item.type === type)?.value || "";
+    const year = part("year");
+    const month = part("month");
+    const day = part("day");
+    if (year && month && day) return `${year}-${month}-${day}`;
+  } catch {}
+  return date.toISOString().slice(0, 10);
+}
+
+function groupDailyTrendSamples(values, timestamps, params) {
+  const groupsByDate = new Map();
+  for (let index = 0; index < values.length; index += 1) {
+    const timestampMs = Number(timestamps[index]);
+    if (!Number.isFinite(timestampMs)) continue;
+    const date = dailyTrendDateKey(timestampMs, params.timeZone);
+    if (!groupsByDate.has(date)) {
+      groupsByDate.set(date, {
+        date,
+        values: [],
+        timestamps: [],
+        firstIndex: index,
+        lastIndex: index
+      });
+    }
+    const group = groupsByDate.get(date);
+    group.values.push(values[index]);
+    group.timestamps.push(timestampMs);
+    group.lastIndex = index;
+  }
+  return Array.from(groupsByDate.values()).sort((a, b) => a.timestamps[0] - b.timestamps[0]);
+}
+
+function dailyTrendStatsForGroup(group, index, params) {
+  const valid = [];
+  let sum = 0;
+  let min = Infinity;
+  let max = -Infinity;
+  let minTimestampMs = null;
+  let maxTimestampMs = null;
+  let lowerBandSeconds = 0;
+  let upperBandSeconds = 0;
+  for (let i = 0; i < group.values.length; i += 1) {
+    const value = Number(group.values[i]);
+    if (!Number.isFinite(value)) continue;
+    valid.push(value);
+    sum += value;
+    if (value < min) {
+      min = value;
+      minTimestampMs = group.timestamps[i];
+    }
+    if (value > max) {
+      max = value;
+      maxTimestampMs = group.timestamps[i];
+    }
+    if (value < params.bandMinHz) lowerBandSeconds += params.sampleIntervalSeconds;
+    if (value > params.bandMaxHz) upperBandSeconds += params.sampleIntervalSeconds;
+  }
+  const spanSamples = group.timestamps.length
+    ? Math.round((group.timestamps.at(-1) - group.timestamps[0]) / (params.sampleIntervalSeconds * 1000)) + 1
+    : group.values.length;
+  const expectedCount = Math.max(group.values.length, spanSamples);
+  const dayLengthSeconds = expectedCount * params.sampleIntervalSeconds;
+  const missingSampleCount = Math.max(0, expectedCount - valid.length);
+  const coverageRatio = expectedCount ? valid.length / expectedCount : 0;
+  const sorted = valid.slice().sort((a, b) => a - b);
+  const mean = valid.length ? sum / valid.length : NaN;
+  const stdDev = standardDeviation(valid);
+  const rmsDeviationMhz = valid.length
+    ? Math.sqrt(valid.reduce((acc, value) => acc + (value - params.nominalHz) ** 2, 0) / valid.length) * 1000
+    : NaN;
+  const median = percentile(sorted, 0.5);
+  const p01 = percentile(sorted, 0.01);
+  const p05 = percentile(sorted, 0.05);
+  const p95 = percentile(sorted, 0.95);
+  const p99 = percentile(sorted, 0.99);
+  return {
+    date: group.date,
+    index,
+    status: coverageRatio >= params.minimumDailyCoverageRatio ? "ok" : "low_coverage",
+    startTimestampMs: group.timestamps[0] ?? null,
+    endTimestampMs: group.timestamps.at(-1) ?? null,
+    dayLengthSeconds,
+    expectedSampleCount: expectedCount,
+    validSampleCount: valid.length,
+    missingSampleCount,
+    coverageRatio,
+    dataQualityScore: Math.round(clamp01(coverageRatio) * 100),
+    meanFrequencyHz: mean,
+    medianFrequencyHz: median,
+    maxFrequencyHz: max === -Infinity ? NaN : max,
+    maxTimestampMs,
+    minFrequencyHz: min === Infinity ? NaN : min,
+    minTimestampMs,
+    stdDevHz: stdDev,
+    stdDevMhz: stdDev * 1000,
+    rmsDeviationMhz,
+    iqrHz: Number.isFinite(percentile(sorted, 0.75)) && Number.isFinite(percentile(sorted, 0.25))
+      ? percentile(sorted, 0.75) - percentile(sorted, 0.25)
+      : NaN,
+    p01,
+    p05,
+    p95,
+    p99,
+    p01Hz: p01,
+    p05Hz: p05,
+    p95Hz: p95,
+    p99Hz: p99,
+    rangeHz: max === -Infinity || min === Infinity ? NaN : max - min,
+    rangeMhz: max === -Infinity || min === Infinity ? NaN : (max - min) * 1000,
+    lowerBandDurationSeconds: lowerBandSeconds,
+    upperBandDurationSeconds: upperBandSeconds
+  };
+}
+
+function addDailyTrendComparisons(days, params) {
+  for (let index = 0; index < days.length; index += 1) {
+    const day = days[index];
+    const previous = days[index - 1];
+    day.meanDeltaMhz = previous && Number.isFinite(day.meanFrequencyHz) && Number.isFinite(previous.meanFrequencyHz)
+      ? (day.meanFrequencyHz - previous.meanFrequencyHz) * 1000
+      : null;
+    day.maxDeltaMhz = previous && Number.isFinite(day.maxFrequencyHz) && Number.isFinite(previous.maxFrequencyHz)
+      ? (day.maxFrequencyHz - previous.maxFrequencyHz) * 1000
+      : null;
+    day.minDeltaMhz = previous && Number.isFinite(day.minFrequencyHz) && Number.isFinite(previous.minFrequencyHz)
+      ? (day.minFrequencyHz - previous.minFrequencyHz) * 1000
+      : null;
+    day.movingAverage3MeanHz = rollingMean(days, index, 3, "meanFrequencyHz");
+    day.movingAverage7MeanHz = rollingMean(days, index, 7, "meanFrequencyHz");
+    day.movingAverageMeanHz = rollingMean(days, index, params.movingAverageDays, "meanFrequencyHz");
+  }
+}
+
+function rollingMean(items, index, windowSize, key) {
+  let sum = 0;
+  let count = 0;
+  const start = Math.max(0, index - Math.max(1, windowSize) + 1);
+  for (let i = start; i <= index; i += 1) {
+    const value = Number(items[i]?.[key]);
+    if (!Number.isFinite(value)) continue;
+    sum += value;
+    count += 1;
+  }
+  return count ? sum / count : null;
+}
+
+function buildDailyTrendChart(groups, params) {
+  const all = groups.flatMap(group => group.values.map((value, index) => ({
+    value: Number(value),
+    timestampMs: group.timestamps[index],
+    date: group.date
+  }))).filter(item => Number.isFinite(item.timestampMs));
+  if (!all.length) return { points: [], range: { start: 0, end: 0 } };
+  const firstMs = all[0].timestampMs;
+  const lastMs = all.at(-1).timestampMs;
+  const bucketSeconds = params.effectiveResolutionSeconds;
+  const bucketMs = bucketSeconds * 1000;
+  const bucketCount = Math.max(1, Math.floor((lastMs - firstMs) / bucketMs) + 1);
+  const buckets = Array.from({ length: bucketCount }, (_, bucketIndex) => ({
+    startTimestampMs: firstMs + bucketIndex * bucketMs,
+    endTimestampMs: firstMs + (bucketIndex + 1) * bucketMs,
+    values: [],
+    validCount: 0
+  }));
+  for (const sample of all) {
+    const bucketIndex = clamp(Math.floor((sample.timestampMs - firstMs) / bucketMs), 0, bucketCount - 1);
+    buckets[bucketIndex].values.push(sample.value);
+    if (Number.isFinite(sample.value)) buckets[bucketIndex].validCount += 1;
+  }
+  const points = buckets.map((bucket, index) => {
+    const clean = bucket.values.filter(Number.isFinite);
+    const mean = clean.length ? clean.reduce((sum, value) => sum + value, 0) / clean.length : null;
+    const lower = params.envelopeMode === "p01-p99" ? percentile(clean, 0.01) : minArrayFinite(clean);
+    const upper = params.envelopeMode === "p01-p99" ? percentile(clean, 0.99) : maxArrayFinite(clean);
+    return {
+      index,
+      second: (bucket.startTimestampMs - firstMs) / 1000,
+      centerSecond: (bucket.startTimestampMs + bucket.endTimestampMs - 2 * firstMs) / 2000,
+      startTimestampMs: bucket.startTimestampMs,
+      endTimestampMs: bucket.endTimestampMs,
+      meanHz: mean,
+      minHz: Number.isFinite(lower) ? lower : null,
+      maxHz: Number.isFinite(upper) ? upper : null,
+      validCount: clean.length,
+      missingCount: Math.max(0, bucket.values.length - clean.length)
+    };
+  });
+  const validPoints = points.filter(point => Number.isFinite(point.meanHz));
+  let minPoint = null;
+  let maxPoint = null;
+  for (const point of validPoints) {
+    if (!minPoint || point.minHz < minPoint.minHz) minPoint = point;
+    if (!maxPoint || point.maxHz > maxPoint.maxHz) maxPoint = point;
+  }
+  return {
+    kind: "daily-frequency-trend",
+    title: "Frequency Time Series and Min-Max Envelope",
+    resolution: params.effectiveResolution,
+    resolutionSeconds: params.effectiveResolutionSeconds,
+    aggregation: params.aggregation,
+    envelopeMode: params.envelopeMode,
+    nominalHz: params.nominalHz,
+    bandMinHz: params.bandMinHz,
+    bandMaxHz: params.bandMaxHz,
+    range: { start: 0, end: Math.max(0, (lastMs - firstMs) / 1000) },
+    startTimestampMs: firstMs,
+    endTimestampMs: lastMs,
+    points,
+    minPoint,
+    maxPoint
+  };
+}
+
+function buildDailyTrendHistogram(values, params) {
+  const clean = finiteValues(values);
+  if (!clean.length) {
+    return {
+      basis: params.histogramBasis,
+      normalization: params.histogramNormalization,
+      binWidthHz: params.histogramBinWidthHz,
+      bins: [],
+      totalCount: 0,
+      totalDurationSeconds: 0,
+      totalPercent: 0,
+      meanHz: NaN,
+      medianHz: NaN
+    };
+  }
+  const min = minArrayFinite(clean);
+  const max = maxArrayFinite(clean);
+  const rawWidth = params.histogramBinWidthHz === "auto"
+    ? Math.max(0.0001, (max - min) / 40 || 0.001)
+    : params.histogramBinWidthHz;
+  const binWidthHz = Math.max(0.000001, Number(rawWidth));
+  const binCount = Math.max(1, Math.ceil((max - min) / binWidthHz) + 1);
+  const counts = new Array(binCount).fill(0);
+  for (const value of clean) {
+    const index = clamp(Math.floor((value - min) / binWidthHz), 0, binCount - 1);
+    counts[index] += 1;
+  }
+  const total = clean.length;
+  const bins = counts.map((count, index) => {
+    const startHz = min + index * binWidthHz;
+    const endHz = startHz + binWidthHz;
+    const durationSeconds = count * params.sampleIntervalSeconds;
+    const percent = total ? count / total * 100 : 0;
+    const value = params.histogramNormalization === "count"
+      ? count
+      : params.histogramNormalization === "duration"
+        ? durationSeconds
+        : percent;
+    return {
+      startHz,
+      endHz,
+      centerHz: startHz + binWidthHz / 2,
+      count,
+      durationSeconds,
+      percent,
+      value
+    };
+  });
+  const meanHz = clean.reduce((sum, value) => sum + value, 0) / total;
+  return {
+    basis: params.histogramBasis,
+    normalization: params.histogramNormalization,
+    binWidthHz,
+    bins,
+    totalCount: total,
+    totalDurationSeconds: total * params.sampleIntervalSeconds,
+    totalPercent: bins.reduce((sum, bin) => sum + bin.percent, 0),
+    meanHz,
+    medianHz: percentile(clean, 0.5),
+    nominalHz: params.nominalHz,
+    bandMinHz: params.bandMinHz,
+    bandMaxHz: params.bandMaxHz
+  };
+}
+
+function computeDailyTrendSlopes(days, params) {
+  const valid = days.filter(day => Number.isFinite(day.meanFrequencyHz));
+  if (valid.length < 3) return { mean: null, max: null, min: null, method: params.trendMethod, minimumDaysMet: false };
+  const firstMs = valid[0].startTimestampMs ?? 0;
+  const x = valid.map(day => ((day.startTimestampMs ?? firstMs) - firstMs) / 86_400_000);
+  const slopeFor = key => {
+    const pairs = valid.map((day, index) => [x[index], Number(day[key])]).filter(pair => Number.isFinite(pair[0]) && Number.isFinite(pair[1]));
+    if (pairs.length < 3) return null;
+    const slopeHzPerDay = params.trendMethod === "robust" ? theilSenSlope(pairs) : linearSlope(pairs);
+    return Number.isFinite(slopeHzPerDay) ? slopeHzPerDay * 1000 : null;
+  };
+  return {
+    mean: slopeFor("meanFrequencyHz"),
+    max: slopeFor("maxFrequencyHz"),
+    min: slopeFor("minFrequencyHz"),
+    method: params.trendMethod,
+    minimumDaysMet: true
+  };
+}
+
+function linearSlope(pairs) {
+  const n = pairs.length;
+  const meanX = pairs.reduce((sum, pair) => sum + pair[0], 0) / n;
+  const meanY = pairs.reduce((sum, pair) => sum + pair[1], 0) / n;
+  let numerator = 0;
+  let denominator = 0;
+  for (const [x, y] of pairs) {
+    numerator += (x - meanX) * (y - meanY);
+    denominator += (x - meanX) ** 2;
+  }
+  return denominator ? numerator / denominator : NaN;
+}
+
+function theilSenSlope(pairs) {
+  const slopes = [];
+  for (let i = 0; i < pairs.length; i += 1) {
+    for (let j = i + 1; j < pairs.length; j += 1) {
+      const dx = pairs[j][0] - pairs[i][0];
+      if (dx) slopes.push((pairs[j][1] - pairs[i][1]) / dx);
+    }
+  }
+  return percentile(slopes, 0.5);
+}
+
 function percentile(values, p) {
   const clean = finiteValues(values).sort((a, b) => a - b);
   if (!clean.length) return NaN;
@@ -3210,6 +3768,7 @@ function emptyStats() {
 }
 
 export const FrequencyAnalysisCore = {
+  DEFAULT_DAILY_TREND_PARAMETERS,
   DEFAULT_OSCILLATION_PARAMETERS,
   DEFAULT_ROCOF_PARAMETERS,
   DEFAULT_SPECTROGRAM_PARAMETERS,
@@ -3218,6 +3777,7 @@ export const FrequencyAnalysisCore = {
   computeBasicStats,
   computeCrossCorrelation,
   computeCrossPowerSpectralDensity,
+  computeDailyFrequencyTrend,
   computeMagnitudeSquaredCoherence,
   computeOscillationCandidates,
   computeOscillationConfidence,
@@ -3231,6 +3791,7 @@ export const FrequencyAnalysisCore = {
   estimatePhaseDifference,
   hzPerSecondToMhzPerSecond,
   mHzPerSecondToHzPerSecond,
+  normalizeDailyTrendParameters,
   normalizeOscillationParameters,
   normalizeSpectralOptions,
   prepareSegment,
