@@ -2,6 +2,87 @@ const DEFAULT_NOMINAL_HZ = 50;
 const DEFAULT_SAMPLE_RATE_HZ = 1;
 const EPSILON = 1e-18;
 
+export const DEFAULT_ROCOF_PARAMETERS = Object.freeze({
+  method: "central",
+  sampleIntervalSeconds: 1,
+  thresholdHzPerSecond: 0.01,
+  minEventSeconds: 5,
+  preFilterSeconds: 5,
+  windowSeconds: 5
+});
+
+export function mHzPerSecondToHzPerSecond(value) {
+  return Number(value) / 1000;
+}
+
+export function hzPerSecondToMhzPerSecond(value) {
+  return Number(value) * 1000;
+}
+
+function finitePositive(value, fallback, minimum = EPSILON) {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? Math.max(minimum, numeric) : fallback;
+}
+
+function normalizeRocofMethod(method) {
+  if (method === "centralDifference") return "central";
+  if (method === "filtered" || method === "filteredCentral") return "filteredDerivative";
+  if (method === "regression" || method === "slidingRegression") return "movingRegression";
+  if (["central", "filteredDerivative", "movingRegression", "simple"].includes(method)) return method;
+  return DEFAULT_ROCOF_PARAMETERS.method;
+}
+
+function effectiveOddWindowSamples(requestedSeconds, sampleIntervalSeconds, minimumSamples = 1) {
+  const dt = Math.max(EPSILON, Number(sampleIntervalSeconds) || DEFAULT_ROCOF_PARAMETERS.sampleIntervalSeconds);
+  let samples = Math.max(minimumSamples, Math.round(finitePositive(requestedSeconds, dt, dt) / dt));
+  if (samples % 2 === 0) samples += 1;
+  return samples;
+}
+
+export function normalizeRocofParameters(options = {}) {
+  const defaults = DEFAULT_ROCOF_PARAMETERS;
+  const method = normalizeRocofMethod(options.method ?? defaults.method);
+  const sampleIntervalSeconds = finitePositive(options.sampleIntervalSeconds, defaults.sampleIntervalSeconds);
+  const thresholdHzPerSecond = Math.abs(finitePositive(options.thresholdHzPerSecond, defaults.thresholdHzPerSecond, 0));
+  const minEventSeconds = finitePositive(options.minEventSeconds, defaults.minEventSeconds, sampleIntervalSeconds);
+  const preFilterSeconds = finitePositive(options.preFilterSeconds, defaults.preFilterSeconds, sampleIntervalSeconds);
+  const windowSeconds = finitePositive(options.windowSeconds, defaults.windowSeconds, sampleIntervalSeconds);
+  const effectivePreFilterSamples = effectiveOddWindowSamples(preFilterSeconds, sampleIntervalSeconds, 1);
+  const effectiveWindowSamples = effectiveOddWindowSamples(windowSeconds, sampleIntervalSeconds, 3);
+  const hysteresisEnabled = Boolean(options.hysteresisEnabled);
+  const enterThresholdHzPerSecond = Math.abs(finitePositive(
+    options.enterThresholdHzPerSecond,
+    thresholdHzPerSecond,
+    0
+  ));
+  const rawExitThreshold = options.exitThresholdHzPerSecond;
+  const exitThresholdHzPerSecond = Math.min(
+    enterThresholdHzPerSecond,
+    Math.abs(finitePositive(rawExitThreshold, enterThresholdHzPerSecond, 0))
+  );
+  const mergeGapSeconds = Number.isFinite(Number(options.mergeGapSeconds))
+    ? Math.max(0, Number(options.mergeGapSeconds))
+    : 0;
+  return {
+    method,
+    sampleIntervalSeconds,
+    thresholdHzPerSecond,
+    minEventSeconds,
+    preFilterSeconds,
+    windowSeconds,
+    requestedPreFilterSeconds: preFilterSeconds,
+    effectivePreFilterSamples,
+    effectivePreFilterSeconds: effectivePreFilterSamples * sampleIntervalSeconds,
+    requestedWindowSeconds: windowSeconds,
+    effectiveWindowSamples,
+    effectiveWindowSeconds: effectiveWindowSamples * sampleIntervalSeconds,
+    hysteresisEnabled,
+    enterThresholdHzPerSecond,
+    exitThresholdHzPerSecond,
+    mergeGapSeconds
+  };
+}
+
 export function createSyntheticSignal({
   seconds = 600,
   sampleRateHz = 1,
@@ -305,27 +386,39 @@ export function computeBasicStats(values, {
   };
 }
 
-export function computeRocof(values, {
-  method = "central",
-  sampleIntervalSeconds = 1,
-  windowSeconds = 5,
-  preFilterSeconds = 5,
-  thresholdHzPerSecond = 0.01,
-  minEventSeconds = 1,
-  startSecond = 0
-} = {}) {
+export function computeRocof(values, options = {}) {
+  const params = normalizeRocofParameters(options);
   const n = values?.length || 0;
-  const dt = Math.max(EPSILON, Number(sampleIntervalSeconds) || 1);
-  const normalizedMethod = method === "centralDifference" ? "central" : method;
+  const dt = params.sampleIntervalSeconds;
+  const normalizedMethod = params.method;
+  const startSecond = Number.isFinite(Number(options.startSecond)) ? Number(options.startSecond) : 0;
   const rocof = new Float64Array(n);
   rocof.fill(NaN);
+  const discardReasons = new Array(n).fill(null);
+  let originalValidCount = 0;
+  for (let i = 0; i < n; i += 1) {
+    if (Number.isFinite(values[i])) originalValidCount += 1;
+  }
+
+  const markDiscard = (index, reason) => {
+    if (index < 0 || index >= n || !Number.isFinite(values[index]) || Number.isFinite(rocof[index])) return;
+    discardReasons[index] = reason;
+  };
 
   if (normalizedMethod === "movingRegression") {
-    const radius = Math.max(1, Math.floor((windowSeconds / dt) / 2));
-    for (let i = radius; i < n - radius; i += 1) {
+    const radius = Math.floor(params.effectiveWindowSamples / 2);
+    for (let i = 0; i < n; i += 1) {
+      if (i < radius || i >= n - radius) {
+        markDiscard(i, "edge");
+        continue;
+      }
       const from = i - radius;
       const to = i + radius;
-      if (!allFinite(values, from, to)) continue;
+      if (!Number.isFinite(values[i])) continue;
+      if (!allFinite(values, from, to)) {
+        markDiscard(i, "regressionWindow");
+        continue;
+      }
       let count = 0;
       let sumT = 0;
       let sumY = 0;
@@ -342,36 +435,78 @@ export function computeRocof(values, {
       }
       const denom = count * sumTT - sumT * sumT;
       if (count >= 3 && Math.abs(denom) > EPSILON) rocof[i] = (count * sumTY - sumT * sumY) / denom;
+      else markDiscard(i, "regressionWindow");
     }
   } else {
-    const source = normalizedMethod === "filteredDerivative" ? movingAverage(values, Math.max(1, Math.round(preFilterSeconds / dt))) : values;
+    const source = normalizedMethod === "filteredDerivative" ? movingAverage(values, params.effectivePreFilterSamples) : values;
     for (let i = 0; i < n; i += 1) {
       const prevIndex = normalizedMethod === "simple" ? i - 1 : i - 1;
       const nextIndex = normalizedMethod === "simple" ? i : i + 1;
-      if (prevIndex < 0 || nextIndex >= n) continue;
-      if (!Number.isFinite(values[i]) || !Number.isFinite(values[prevIndex]) || !Number.isFinite(values[nextIndex])) continue;
+      if (prevIndex < 0 || nextIndex >= n) {
+        markDiscard(i, "edge");
+        continue;
+      }
+      if (!Number.isFinite(values[i])) continue;
+      if (!Number.isFinite(values[prevIndex]) || !Number.isFinite(values[nextIndex])) {
+        markDiscard(i, "qualityGap");
+        continue;
+      }
       const a = source[prevIndex];
       const c = source[i];
       const b = source[nextIndex];
-      if (!Number.isFinite(a) || !Number.isFinite(c) || !Number.isFinite(b)) continue;
+      if (!Number.isFinite(a) || !Number.isFinite(c) || !Number.isFinite(b)) {
+        markDiscard(i, normalizedMethod === "filteredDerivative" ? "filterWindow" : "qualityGap");
+        continue;
+      }
       rocof[i] = (b - a) / ((nextIndex - prevIndex) * dt);
     }
   }
 
-  const clean = finiteValues(rocof);
-  const abs = clean.map(Math.abs);
-  const events = thresholdEvents(rocof, thresholdHzPerSecond, minEventSeconds, dt, values, startSecond);
+  let calculatedCount = 0;
+  let maxPositive = -Infinity;
+  let maxNegative = Infinity;
+  let sumAbs = 0;
+  let sumSquares = 0;
+  for (const value of rocof) {
+    if (!Number.isFinite(value)) continue;
+    calculatedCount += 1;
+    if (value > maxPositive) maxPositive = value;
+    if (value < maxNegative) maxNegative = value;
+    sumAbs += Math.abs(value);
+    sumSquares += value * value;
+  }
+  const edgeDiscardCount = discardReasons.filter(reason => reason === "edge").length;
+  const qualityGapDiscardCount = discardReasons.filter(reason => reason === "qualityGap").length;
+  const filterWindowDiscardCount = discardReasons.filter(reason => reason === "filterWindow").length;
+  const regressionWindowDiscardCount = discardReasons.filter(reason => reason === "regressionWindow").length;
+  const methodDiscardCount = edgeDiscardCount + qualityGapDiscardCount + filterWindowDiscardCount + regressionWindowDiscardCount;
+  const events = thresholdEvents(rocof, params, values, startSecond);
   return {
     series: rocof,
     method: normalizedMethod,
     sampleIntervalSeconds: dt,
-    maxPositive: clean.length ? Math.max(...clean) : NaN,
-    maxNegative: clean.length ? Math.min(...clean) : NaN,
-    meanAbsolute: abs.length ? abs.reduce((a, b) => a + b, 0) / abs.length : NaN,
-    rms: abs.length ? Math.sqrt(clean.reduce((sum, v) => sum + v * v, 0) / abs.length) : NaN,
-    originalValidCount: finiteValues(values).length,
-    rocofCalculatedCount: clean.length,
-    methodDiscardCount: Math.max(0, finiteValues(values).length - clean.length),
+    thresholdHzPerSecond: params.thresholdHzPerSecond,
+    minEventSeconds: params.minEventSeconds,
+    requestedWindowSeconds: params.requestedWindowSeconds,
+    effectiveWindowSamples: params.effectiveWindowSamples,
+    effectiveWindowSeconds: params.effectiveWindowSeconds,
+    requestedPreFilterSeconds: params.requestedPreFilterSeconds,
+    effectivePreFilterSamples: params.effectivePreFilterSamples,
+    effectivePreFilterSeconds: params.effectivePreFilterSeconds,
+    parameters: { ...params },
+    maxPositive: calculatedCount ? maxPositive : NaN,
+    maxNegative: calculatedCount ? maxNegative : NaN,
+    meanAbsolute: calculatedCount ? sumAbs / calculatedCount : NaN,
+    rms: calculatedCount ? Math.sqrt(sumSquares / calculatedCount) : NaN,
+    originalValidCount,
+    calculatedCount,
+    rocofCalculatedCount: calculatedCount,
+    rocofSampleCount: calculatedCount,
+    edgeDiscardCount,
+    qualityGapDiscardCount,
+    filterWindowDiscardCount,
+    regressionWindowDiscardCount,
+    methodDiscardCount,
     thresholdEventCount: events.length,
     thresholdSeconds: events.reduce((sum, event) => sum + event.durationSeconds, 0),
     positiveEventCount: events.filter(event => event.side === "positive").length,
@@ -1125,14 +1260,29 @@ function rocofFrequencyStats(values, startIndex, endIndex, sampleIntervalSeconds
   };
 }
 
-function thresholdEvents(series, threshold, minEventSeconds, sampleIntervalSeconds, values = [], startSecond = 0) {
+function thresholdEvents(series, params, values = [], startSecond = 0) {
   const events = [];
+  const sampleIntervalSeconds = params.sampleIntervalSeconds;
+  const minEventSeconds = params.minEventSeconds;
+  const enterLimit = Math.abs(params.hysteresisEnabled ? params.enterThresholdHzPerSecond : params.thresholdHzPerSecond);
+  const exitLimit = Math.abs(params.hysteresisEnabled ? params.exitThresholdHzPerSecond : params.thresholdHzPerSecond);
+  const mergeGapSamples = Math.max(0, Math.floor((params.mergeGapSeconds || 0) / sampleIntervalSeconds));
   let start = null;
   let side = null;
   let peak = 0;
-  const limit = Math.abs(Number(threshold) || 0);
+  let lastIncluded = null;
+  let pendingGapStart = null;
+  let pendingGapCount = 0;
   const closeRun = endIndex => {
-    if (start === null || !side) return;
+    if (start === null || !side || endIndex < start) {
+      start = null;
+      side = null;
+      peak = 0;
+      lastIncluded = null;
+      pendingGapStart = null;
+      pendingGapCount = 0;
+      return;
+    }
     const durationSeconds = (endIndex - start + 1) * sampleIntervalSeconds;
     if (durationSeconds >= minEventSeconds) {
       const frequencyStats = rocofFrequencyStats(values, start, endIndex, sampleIntervalSeconds, startSecond);
@@ -1149,38 +1299,80 @@ function thresholdEvents(series, threshold, minEventSeconds, sampleIntervalSecon
         peakMhzPerSecond: peak * 1000,
         value: peak,
         classification: side,
-        shortLabel: side === "positive" ? "R+" : "R-",
+        shortLabel: side === "positive" ? "R+" : "R−",
         ...frequencyStats
       });
     }
     start = null;
     side = null;
     peak = 0;
+    lastIncluded = null;
+    pendingGapStart = null;
+    pendingGapCount = 0;
   };
-  for (let i = 0; i <= series.length; i += 1) {
+  const sideForEnter = value => {
+    if (!Number.isFinite(value)) return null;
+    if (value > enterLimit) return "positive";
+    if (value < -enterLimit) return "negative";
+    return null;
+  };
+  const remainsInsideHysteresis = value => {
+    if (!params.hysteresisEnabled || !side || !Number.isFinite(value)) return false;
+    return side === "positive" ? value > exitLimit : value < -exitLimit;
+  };
+  const beginRun = (index, currentSide, value) => {
+    start = index;
+    side = currentSide;
+    peak = value;
+    lastIncluded = index;
+    pendingGapStart = null;
+    pendingGapCount = 0;
+  };
+  const includeSample = (index, value) => {
+    lastIncluded = index;
+    pendingGapStart = null;
+    pendingGapCount = 0;
+    if (Number.isFinite(value) && (side === "positive" ? value > peak : value < peak)) peak = value;
+  };
+
+  for (let i = 0; i < series.length; i += 1) {
     const value = series[i];
-    const currentSide = Number.isFinite(value)
-      ? value > limit ? "positive" : value < -limit ? "negative" : null
-      : null;
+    const currentSide = sideForEnter(value);
+    if (!Number.isFinite(value)) {
+      closeRun(pendingGapStart !== null ? pendingGapStart - 1 : lastIncluded ?? i - 1);
+      continue;
+    }
     if (currentSide && start === null) {
-      start = i;
-      side = currentSide;
-      peak = value;
+      beginRun(i, currentSide, value);
       continue;
     }
-    if (currentSide && currentSide === side) {
-      if (side === "positive" ? value > peak : value < peak) peak = value;
-      continue;
-    }
+    if (start === null) continue;
     if (currentSide && currentSide !== side) {
-      closeRun(i - 1);
-      start = i;
-      side = currentSide;
-      peak = value;
+      closeRun(pendingGapStart !== null ? pendingGapStart - 1 : i - 1);
+      beginRun(i, currentSide, value);
+      continue;
+    }
+    if ((currentSide && currentSide === side) || remainsInsideHysteresis(value)) {
+      includeSample(i, value);
+      continue;
+    }
+    if (mergeGapSamples > 0) {
+      if (pendingGapStart === null) {
+        pendingGapStart = i;
+        pendingGapCount = 1;
+      } else {
+        pendingGapCount += 1;
+      }
+      if (pendingGapCount <= mergeGapSamples) {
+        lastIncluded = i;
+        continue;
+      }
+      closeRun(pendingGapStart - 1);
       continue;
     }
     closeRun(i - 1);
   }
+  closeRun(pendingGapStart !== null ? pendingGapStart - 1 : lastIncluded ?? series.length - 1);
   return events;
 }
 
@@ -1365,6 +1557,7 @@ function emptyStats() {
 }
 
 export const FrequencyAnalysisCore = {
+  DEFAULT_ROCOF_PARAMETERS,
   analyzeDataQuality,
   computeBasicStats,
   computeCrossCorrelation,
@@ -1378,7 +1571,10 @@ export const FrequencyAnalysisCore = {
   dominantFrequencyScan,
   estimateCoherence,
   estimateDominantFrequency,
-  estimatePhaseDifference
+  estimatePhaseDifference,
+  hzPerSecondToMhzPerSecond,
+  mHzPerSecondToHzPerSecond,
+  normalizeRocofParameters
 };
 
 globalThis.FrequencyAnalysisCore = FrequencyAnalysisCore;

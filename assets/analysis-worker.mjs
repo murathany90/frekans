@@ -8,29 +8,30 @@ import {
 } from "./analysis-core.mjs";
 
 const cancelled = new Set();
+const workerScope = typeof self !== "undefined" ? self : null;
 
-self.onmessage = event => {
+if (workerScope) workerScope.onmessage = event => {
   const message = event.data || {};
   if (message.type === "cancel" && message.id) {
     cancelled.add(message.id);
-    self.postMessage({ id: message.id, status: "cancelled" });
+    workerScope.postMessage({ id: message.id, status: "cancelled" });
     return;
   }
 
   const { id, type, payload = {}, parameters = {} } = message;
   try {
     if (cancelled.has(id)) {
-      self.postMessage({ id, status: "cancelled" });
+      workerScope.postMessage({ id, status: "cancelled" });
       return;
     }
     const result = runAnalysis(type, payload, parameters);
     if (cancelled.has(id)) {
-      self.postMessage({ id, status: "cancelled" });
+      workerScope.postMessage({ id, status: "cancelled" });
       return;
     }
-    self.postMessage({ id, status: "success", result });
+    workerScope.postMessage({ id, status: "success", result });
   } catch (error) {
-    self.postMessage({ id, status: "error", error: error?.message || String(error) });
+    workerScope.postMessage({ id, status: "error", error: error?.message || String(error) });
   } finally {
     if (id) cancelled.delete(id);
   }
@@ -54,11 +55,9 @@ function runAnalysis(type, payload, parameters) {
   throw new Error(`Unknown analysis type: ${type}`);
 }
 
-function typed(value) {
+export function typed(value) {
   if (!value) return new Float64Array();
-  if (value instanceof Float64Array) return value;
-  if (value instanceof Float32Array) return new Float64Array(value);
-  if (ArrayBuffer.isView(value)) return new Float64Array(value.buffer);
+  if (ArrayBuffer.isView(value)) return Float64Array.from(value);
   if (value instanceof ArrayBuffer) return new Float64Array(value);
   return Float64Array.from(value);
 }

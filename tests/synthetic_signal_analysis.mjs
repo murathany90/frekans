@@ -25,7 +25,7 @@ if (!(stats.rmsDeviationMhz > 10 && stats.p99Hz > stats.p01Hz)) {
   throw new Error("basic frequency statistics did not capture synthetic oscillation spread");
 }
 
-const rocof = computeRocof(sine.values, { method: "central", thresholdHzPerSecond: 0.004 });
+const rocof = computeRocof(sine.values, { method: "central", thresholdHzPerSecond: 0.004, minEventSeconds: 1 });
 if (!(rocof.maxPositive > 0 && rocof.maxNegative < 0 && rocof.events.length > 0)) {
   throw new Error("RoCoF analysis did not detect synthetic rate-of-change events");
 }
@@ -105,6 +105,16 @@ assertEqual(negEvent.durationSeconds, 4, "Negative event durationSeconds");
 assertEqual(boundaryRocof.originalValidCount, 10, "originalValidCount");
 assertEqual(boundaryRocof.methodDiscardCount, 1, "methodDiscardCount");
 assertEqual(boundaryRocof.rocofCalculatedCount, 9, "rocofCalculatedCount");
+assertEqual(boundaryRocof.calculatedCount, boundaryRocof.rocofCalculatedCount, "calculatedCount");
+assertEqual(boundaryRocof.edgeDiscardCount, 1, "edgeDiscardCount");
+assertEqual(boundaryRocof.qualityGapDiscardCount, 0, "qualityGapDiscardCount");
+assertEqual(boundaryRocof.filterWindowDiscardCount, 0, "filterWindowDiscardCount");
+assertEqual(boundaryRocof.regressionWindowDiscardCount, 0, "regressionWindowDiscardCount");
+assertEqual(
+  boundaryRocof.edgeDiscardCount + boundaryRocof.qualityGapDiscardCount + boundaryRocof.filterWindowDiscardCount + boundaryRocof.regressionWindowDiscardCount,
+  boundaryRocof.methodDiscardCount,
+  "discard counter arithmetic"
+);
 
 // 4. Moving regression discard metrics
 const mrValues = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // 10 values
@@ -113,5 +123,23 @@ const mrRocof = computeRocof(mrValues, { method: "movingRegression", windowSecon
 assertEqual(mrRocof.originalValidCount, 10, "MR originalValidCount");
 assertEqual(mrRocof.methodDiscardCount, 2, "MR methodDiscardCount");
 assertEqual(mrRocof.rocofCalculatedCount, 8, "MR rocofCalculatedCount");
+assertEqual(mrRocof.calculatedCount, 8, "MR calculatedCount");
+assertEqual(mrRocof.edgeDiscardCount, 2, "MR edgeDiscardCount");
+assertEqual(mrRocof.regressionWindowDiscardCount, 0, "MR regressionWindowDiscardCount");
+
+// 5. Large-array safety: extrema must not use spread syntax that overflows the call stack.
+const millionSampleRamp = new Float64Array(1_000_005);
+for (let index = 0; index < millionSampleRamp.length; index += 1) {
+  millionSampleRamp[index] = 50 + index * 0.000001;
+}
+const millionRocof = computeRocof(millionSampleRamp, {
+  method: "central",
+  sampleIntervalSeconds: 1,
+  thresholdHzPerSecond: 0.5,
+  minEventSeconds: 1
+});
+if (!Number.isFinite(millionRocof.maxPositive) || !Number.isFinite(millionRocof.maxNegative)) {
+  throw new Error("large-array RoCoF extrema should be finite and must not throw RangeError");
+}
 
 console.log("synthetic_signal_analysis ok");

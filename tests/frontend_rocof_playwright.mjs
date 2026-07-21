@@ -109,7 +109,7 @@ try {
       heatmapNames: option.series.filter(series => series.type === "heatmap").map(series => series.name),
       seriesNames: option.series.map(series => series.name).filter(Boolean),
       markerLabels: option.series
-        .filter(series => /R\+|R-/.test(series.name || ""))
+        .filter(series => /R\+|R-|R−/.test(series.name || ""))
         .flatMap(series => series.markArea?.data?.map(item => item?.[0]?.name).filter(Boolean) || []),
       resetHidden: document.querySelector("#qualityZoomResetBtn").hidden,
       reportPreview: document.querySelector("#reportPreview")?.textContent || ""
@@ -169,17 +169,96 @@ try {
     } finally {
       window.downloadBlob = originalDownload;
     }
+    const json = JSON.parse(captured.find(item => item.filename === "analysis-result.json")?.content || "{}");
     return {
       preview: document.querySelector("#reportPreview")?.textContent || "",
       downloads: captured.map(item => item.filename),
-      csv: captured.find(item => item.filename === "analysis-events.csv")?.content || ""
+      csv: captured.find(item => item.filename === "analysis-events.csv")?.content || "",
+      workerThreshold: workerAnalysisParameters("rocof").thresholdHzPerSecond,
+      displayThreshold: state.analysis.lastResult?.rocofMeta?.thresholdMhzPerSecond,
+      jsonThreshold: json.metadata?.parameters?.rocof?.threshold,
+      jsonRocof: json.metadata?.parameters?.rocof
     };
   });
   assert(/RoCoF/.test(reportAndExport.preview));
   assert(reportAndExport.downloads.includes("analysis-result.json"));
   assert(reportAndExport.downloads.includes("analysis-events.csv"));
+  assert.equal(reportAndExport.workerThreshold, 0.002, "UI value 2 mHz/s should reach worker parameters as 0.002 Hz/s.");
+  assert.equal(reportAndExport.displayThreshold, 2, "Display/export value should remain 2 mHz/s.");
+  assert.deepEqual(reportAndExport.jsonThreshold, {
+    value: 2,
+    unit: "mHz/s",
+    engineValueHzPerSecond: 0.002
+  });
+  assert.equal(reportAndExport.jsonRocof.requestedWindowSeconds, 5);
+  assert.equal(reportAndExport.jsonRocof.effectiveWindowSeconds, 5);
+  assert.equal(reportAndExport.jsonRocof.requestedPreFilterSeconds, 5);
+  assert.equal(reportAndExport.jsonRocof.effectivePreFilterSeconds, 5);
   assert(/Peak RoCoF|Tepe/.test(reportAndExport.csv));
+  assert(/requestedWindowSeconds|İstenen regresyon|Requested regression/.test(reportAndExport.csv));
+  assert(/effectiveWindowSeconds|Etkili regresyon|Effective regression/.test(reportAndExport.csv));
   assert(!/undefined/.test(reportAndExport.csv));
+
+  const languageMatrix = await page.evaluate(({ tr, de }) => {
+    const outcomes = [];
+    const forbidden = {
+      tr: ["Peak RoCoF", "Heatmap", "Severity", "Findings", "Minimum duration"],
+      en: ["Bulgular", "Şiddet", "Isı Haritası", "Minimum olay süresi", "Yinelenen değer"]
+    };
+    for (const language of ["tr", "en"]) {
+      state.current = null;
+      setLanguage(language);
+      for (const method of ["central", "filteredDerivative", "movingRegression"]) {
+        document.querySelector("#analysisTypeSelect").value = "rocof";
+        document.querySelector("#analysisSourceSelect").value = "tr";
+        document.querySelector("#analysisDateMode").value = "single";
+        document.querySelector("#rocofMethod").value = method;
+        document.querySelector("#rocofThreshold").value = "2";
+        document.querySelector("#minDuration").value = "2";
+        document.querySelector("#repeatedValueSeconds").value = "15";
+        updateAnalysisParameterPanel();
+        const current = {
+          date: "2026-01-01",
+          rawSeries: { tr, de },
+          displaySeries: { tr, de },
+          analysisSeries: { tr, de },
+          tr,
+          de,
+          overall: { pairedCount: tr.length }
+        };
+        state.current = current;
+        const computed = computeAnalysisResult("rocof", "tr", current, ["2026-01-01"]);
+        state.analysis.lastResult = computed;
+        renderAnalysisResult(computed);
+        renderReportPreview();
+        const visibleText = [
+          document.querySelector("#analysisLab")?.innerText || "",
+          document.querySelector("#rocofResultNotice")?.innerText || "",
+          document.querySelector("#reportPreview")?.innerText || ""
+        ].join("\n");
+        const visibleTextLower = visibleText.toLocaleLowerCase(language === "tr" ? "tr-TR" : "en-US");
+        outcomes.push({
+          language,
+          method,
+          title: computed.title,
+          description: computed.description,
+          events: computed.events.length,
+          forbiddenHits: forbidden[language].filter(fragment => visibleText.includes(fragment)),
+          warningVisible: visibleTextLower.includes(language === "tr" ? "koruma rölesi" : "protection-relay"),
+          legendVisible: visibleText.includes("R+") && visibleText.includes(language === "tr" ? "frekans yükselişi" : "positive RoCoF")
+        });
+      }
+    }
+    return outcomes;
+  }, { tr: buildSeries(), de: buildSeries(0.0002) });
+  assert.equal(languageMatrix.length, 6);
+  for (const item of languageMatrix) {
+    assert(item.events > 0, `No RoCoF events for ${item.language}/${item.method}`);
+    assert.deepEqual(item.forbiddenHits, [], `Localization leftovers for ${item.language}/${item.method}`);
+    assert.equal(item.warningVisible, true, `Scientific warning missing for ${item.language}/${item.method}`);
+    assert.equal(item.legendVisible, true, `R+/R- explanation missing for ${item.language}/${item.method}`);
+  }
+  assert(languageMatrix.find(item => item.language === "en").title.includes("RoCoF Analysis Results"));
 
   const heatmapProbe = await page.evaluate(() => {
     const chart = state.oscillationChart;
@@ -317,6 +396,55 @@ try {
     assert.equal(item.heatmap, true, `Heatmap missing: ${JSON.stringify(item)}`);
     assert.equal(item.reportOk, true, `Report preview failed: ${JSON.stringify(item)}`);
   }
+
+  const cancellationProbe = await page.evaluate(async ({ tr, de }) => {
+    const originalPrepare = prepareDailyContext;
+    let calls = 0;
+    const buildCurrent = date => ({
+      date,
+      rawSeries: { tr, de },
+      displaySeries: { tr, de },
+      analysisSeries: { tr, de },
+      tr,
+      de,
+      overall: { pairedCount: tr.length }
+    });
+    prepareDailyContext = async () => {
+      calls += 1;
+      const call = calls;
+      await new Promise(resolve => setTimeout(resolve, call === 1 ? 160 : 10));
+      return buildCurrent(call === 1 ? "2026-01-01" : "2026-01-02");
+    };
+    try {
+      state.current = null;
+      setLanguage("en");
+      document.querySelector("#analysisTypeSelect").value = "rocof";
+      document.querySelector("#analysisSourceSelect").value = "tr";
+      document.querySelector("#analysisDateMode").value = "single";
+      document.querySelector("#rocofMethod").value = "central";
+      document.querySelector("#rocofThreshold").value = "2";
+      document.querySelector("#minDuration").value = "2";
+      updateAnalysisParameterPanel();
+      const first = runAnalysisLab();
+      await new Promise(resolve => setTimeout(resolve, 30));
+      cancelAnalysis();
+      const second = runAnalysisLab();
+      await Promise.allSettled([first, second]);
+      return {
+        calls,
+        running: state.analysis.running,
+        lastDate: state.current?.date,
+        status: document.querySelector("#analysisStatus")?.textContent || "",
+        lastResultDate: state.analysis.lastResult?.metadata?.dataFiles?.[0]
+      };
+    } finally {
+      prepareDailyContext = originalPrepare;
+    }
+  }, { tr: buildSeries(), de: buildSeries(0.0002) });
+  assert.equal(cancellationProbe.calls, 2);
+  assert.equal(cancellationProbe.running, false);
+  assert.equal(cancellationProbe.lastDate, "2026-01-02", "Cancelled first run must not overwrite the second run's current data.");
+  assert.equal(cancellationProbe.lastResultDate, "2026-01-02", "Cancelled first run must not overwrite the second run's rendered result.");
 
   assert.deepEqual(consoleIssues, []);
   console.log("RoCoF Playwright checks passed.");

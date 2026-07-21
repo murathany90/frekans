@@ -195,7 +195,7 @@ try {
   });
   assert(option.seriesNames.some(name => /Aİ \/ Alt Bant İhlali|LBV \/ Lower Band Violation/.test(name)));
   assert(option.seriesNames.some(name => /Üİ \/ Üst Bant İhlali|UBV \/ Upper Band Violation/.test(name)));
-  assert(option.heatmapNames.some(name => /Bant İhlali Heatmap|Band Violation Heatmap/.test(name)));
+  assert(option.heatmapNames.some(name => /Bant İhlali Isı Haritası|Band Violation Heatmap/.test(name)));
   assert(option.labels.every(label => label === "Aİ" || label === "Üİ" || label === "LBV" || label === "UBV"));
   assert(option.visualPieces.some(label => String(label).includes("100")));
 
@@ -225,7 +225,7 @@ try {
     };
   });
   assert(heatmapProbe.heatmapIndex >= 0 && heatmapProbe.dataIndex >= 0);
-  assert(/Bant İhlali Heatmap|Band Violation Heatmap/.test(heatmapProbe.realTooltip));
+  assert(/Bant İhlali Isı Haritası|Band Violation Heatmap/.test(heatmapProbe.realTooltip));
   assert.equal(typeof heatmapProbe.malformedTooltip, "string");
   assert.equal(heatmapProbe.resetVisible, true);
   assert.equal(heatmapProbe.zoomSeries, true);

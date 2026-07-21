@@ -1,4 +1,6 @@
 import { mkdirSync } from "node:fs";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 let chromium;
 try {
@@ -10,7 +12,16 @@ try {
 }
 
 const baseUrl = process.env.APP_URL || "http://127.0.0.1:8080/frekans_rapor_v1.html";
-const targetDate = process.env.GERMANY_ONLY_DATE || "2026-07-15";
+function latestGermanyOnlyDate() {
+  const manifest = JSON.parse(readFileSync(resolve("data", "manifest.json"), "utf8"));
+  const teiasDates = new Set(manifest?.sources?.teias?.availableDates || []);
+  const netzDates = manifest?.sources?.netztransparenz?.availableDates || [];
+  const candidate = netzDates.filter(date => !teiasDates.has(date)).sort().at(-1);
+  if (!candidate) throw new Error("No Continental Europe-only date found in manifest.");
+  return candidate;
+}
+
+const targetDate = process.env.GERMANY_ONLY_DATE || latestGermanyOnlyDate();
 const artifactDir = process.env.PLAYWRIGHT_ARTIFACT_DIR || "playwright-artifacts";
 mkdirSync(artifactDir, { recursive: true });
 
