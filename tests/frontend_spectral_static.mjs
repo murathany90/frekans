@@ -11,6 +11,9 @@ for (const fragment of [
   "requestedSegmentSeconds",
   "effectiveSegmentSamples",
   "fftLengthSamples",
+  "fftBinSpacingHz",
+  "effectiveSpectralResolutionHz",
+  "zeroPaddingApplied",
   "frequencyResolutionHz",
   "candidateSegmentCount",
   "acceptedSegmentCount",
@@ -19,7 +22,13 @@ for (const fragment of [
   "snrDb",
   "parsevalErrorRatio",
   "powerValues",
-  "validityByTime"
+  "validityByTime",
+  "timeBinsSeconds",
+  "timeBinsEpochMs",
+  "peakCandidates",
+  "peakStatus",
+  "timeFrequencyRegions",
+  "ridgePoints"
 ]) {
   assert(core.includes(fragment), `Core missing ${fragment}`);
 }
@@ -68,6 +77,33 @@ for (const fragment of [
   assert(html.includes(fragment), `Frontend missing localized text: ${fragment}`);
 }
 
+for (const fragment of [
+  "Detaylı Metrikler ve Örnek Analizi",
+  "Detailed Metrics and Sample Analysis",
+  "FFT bin aralığı",
+  "FFT bin spacing",
+  "Etkin spektral çözünürlük",
+  "Effective spectral resolution",
+  "Logaritmik (dB)",
+  "Arithmetic mean",
+  "Sabit ortalama",
+  "Constant mean",
+  "Kaynak zaman dilimi",
+  "Source time zone",
+  "Hesaplama çözünürlüğü",
+  "Calculation resolution",
+  "Görüntü özeti",
+  "Display summary",
+  "Tepe durumu",
+  "Peak status",
+  "Anlamlı",
+  "Significant",
+  "Sıfır doldurma yalnız FFT ara değerlerini sıklaştırır",
+  "Zero padding only densifies FFT interpolation"
+]) {
+  assert(html.includes(fragment), `Frontend missing spectral audit text: ${fragment}`);
+}
+
 assert(!html.includes(">Zoom Sıfırla<"), "Turkish UI should not contain mixed-language Zoom Sıfırla text.");
 assert(html.includes("psdEmptyState"), "Welch should have a dedicated empty state.");
 assert(html.includes("spectrogramEmptyState"), "Spectrogram should have a dedicated empty state.");
@@ -76,8 +112,16 @@ assert(html.includes("renderSpectrogramAnalysisChart"), "Spectrogram should have
 assert(html.includes("renderSpectralDetailSummary"), "Spectral analyses should render parameter/data-quality summaries.");
 assert(html.includes("spectralParameterMetadata"), "Spectral metadata should be included in export metadata.");
 assert(html.includes("'units'"), "Spectral metadata should preserve result units.");
+assert(html.includes("'fftBinSpacingHz'"), "Spectral metadata should include FFT bin spacing.");
+assert(html.includes("'effectiveSpectralResolutionHz'"), "Spectral metadata should include effective spectral resolution.");
+assert(html.includes("'dataTimezone'"), "Spectrogram metadata should include source data timezone.");
+assert(html.includes("'displayTimezone'"), "Spectrogram metadata should include display timezone.");
 assert(html.includes("['powerUnit', meta.units"), "Spectral CSV export should include the PSD power unit.");
+assert(html.includes("['fftBinSpacingHz', meta.fftBinSpacingHz"), "Spectral CSV export should include FFT bin spacing.");
+assert(html.includes("['effectiveSpectralResolutionHz', meta.effectiveSpectralResolutionHz"), "Spectral CSV export should include effective spectral resolution.");
 assert(html.includes("secondsUnitShort"), "Second labels should be localized instead of hard-coded as sn.");
 assert(html.includes("analysisSpectralTableTitle"), "Spectral table title should be analysis-specific.");
+assert.match(html, /mode === 'spectrogram'[\s\S]{0,240}spectralScaleLabel/, "Spectrogram detail rows should label scale, not Welch averaging.");
+assert.match(html, /details[\s\S]{0,120}spectralTechnicalDetailsTitle/, "Spectral technical metrics should be rendered in a collapsible details block.");
 
 console.log("frontend_spectral_static ok");

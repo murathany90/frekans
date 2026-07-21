@@ -117,10 +117,18 @@ try {
         const text = [
           document.querySelector("#analysisLab")?.innerText || "",
           document.querySelector("#analysisDetailSummary")?.innerText || "",
+          document.querySelector("#spectralDetailSummary")?.innerText || "",
           document.querySelector("#analysisEventsHead")?.innerText || "",
           document.querySelector("#analysisEventsBody")?.innerText || "",
           document.querySelector("#reportPreview")?.innerText || ""
         ].join("\n");
+        const spectralDetailText = document.querySelector("#spectralDetailSummary")?.innerText || "";
+        const resultCards = [...document.querySelectorAll("#analysisResultCards .analysis-result-card")]
+          .map(card => ({
+            label: card.querySelector(".label")?.textContent.trim() || "",
+            value: card.querySelector(".value")?.textContent.trim() || "",
+            text: card.textContent.trim()
+          }));
         const firstRow = document.querySelector("#analysisEventsBody tr.event-row");
         if (firstRow) firstRow.click();
         const zoomAfterRowClick = state.oscillationChart.getOption().dataZoom?.some(zoom => zoom.startValue !== undefined || zoom.endValue !== undefined) || false;
@@ -132,20 +140,35 @@ try {
           emptyText,
           tableTitle: document.querySelector("#analysisTableTitle")?.textContent || "",
           tableHeaders: [...document.querySelectorAll("#analysisEventsHead th")].map(th => th.textContent.trim()),
-          cards: [...document.querySelectorAll("#analysisResultCards .analysis-result-card")].map(card => card.textContent.trim()),
+          cards: resultCards.map(card => card.text),
+          cardPairs: resultCards,
+          spectralDetailText,
           forbiddenHits: forbidden[language].filter(fragment => text.includes(fragment)),
+          rawEnumHits: ["constant", "segment-mean", "FFT zero-padding to next power of two", "Welch averaging — log", "Welch ortalaması — log"]
+            .filter(fragment => text.includes(fragment)),
           englishTurkishSecondHits: language === "en" ? [...text.matchAll(/\b\d+(?:[\.,]\d+)? sn\b/g)].map(match => match[0]) : [],
           requestedSegmentSeconds: json.metadata?.parameters?.spectral?.requestedSegmentSeconds,
           effectiveSegmentSamples: json.metadata?.parameters?.spectral?.effectiveSegmentSamples,
           fftLengthSamples: json.metadata?.parameters?.spectral?.fftLengthSamples,
+          fftBinSpacingHz: json.metadata?.parameters?.spectral?.fftBinSpacingHz,
+          effectiveSpectralResolutionHz: json.metadata?.parameters?.spectral?.effectiveSpectralResolutionHz,
           frequencyResolutionHz: json.metadata?.parameters?.spectral?.frequencyResolutionHz,
           units: json.metadata?.parameters?.spectral?.units,
+          dataTimezone: json.metadata?.parameters?.spectral?.dataTimezone,
+          displayTimezone: json.metadata?.parameters?.spectral?.displayTimezone,
+          utcOffset: json.metadata?.parameters?.spectral?.utcOffset,
+          displaySummaryMode: json.metadata?.parameters?.spectral?.displaySummaryMode,
+          calculationResolutionSeconds: json.metadata?.parameters?.spectral?.calculationResolutionSeconds,
           acceptedSegmentCount: json.metadata?.parameters?.spectral?.acceptedSegmentCount,
           rejectedSegmentCount: json.metadata?.parameters?.spectral?.rejectedSegmentCount,
           totalImputedSampleCount: json.metadata?.parameters?.spectral?.totalImputedSampleCount,
           csvHasRequestedSegment: csv.includes("requestedSegmentSeconds"),
           csvHasEffectiveSegment: csv.includes("effectiveSegmentSamples"),
           csvHasFftLength: csv.includes("fftLengthSamples"),
+          csvHasFftBinSpacing: csv.includes("fftBinSpacingHz"),
+          csvHasEffectiveSpectralResolution: csv.includes("effectiveSpectralResolutionHz"),
+          csvHasTimezone: csv.includes("dataTimezone") && csv.includes("displayTimezone"),
+          csvHasDisplaySummary: csv.includes("displaySummaryMode") && csv.includes("calculationResolutionSeconds"),
           csvHasDbReference: csv.includes("dB re 1 Hz²/Hz"),
           csvHasQuality: csv.includes("totalImputedSampleCount"),
           downloads: captured.map(item => item.filename),
@@ -162,21 +185,30 @@ try {
   assert.equal(checks.length, 4);
   for (const item of checks) {
     assert.equal(item.forbiddenHits.length, 0, `Localization leftovers: ${JSON.stringify(item)}`);
+    assert.equal(item.rawEnumHits.length, 0, `Visible spectral details should localize engine enums: ${JSON.stringify(item)}`);
+    assert.notEqual(item.description, item.emptyText, `Completed result should not keep the empty-state description: ${JSON.stringify(item)}`);
     assert.equal(item.englishTurkishSecondHits.length, 0, `English UI should not show Turkish second units: ${JSON.stringify(item)}`);
     assert.equal(item.requestedSegmentSeconds, 300, `Requested segment missing: ${JSON.stringify(item)}`);
     assert.equal(item.effectiveSegmentSamples, 300, `Effective segment missing: ${JSON.stringify(item)}`);
     assert.equal(item.fftLengthSamples, 512, `FFT length missing: ${JSON.stringify(item)}`);
     assert.equal(item.frequencyResolutionHz, 1 / 512, `Frequency resolution wrong: ${JSON.stringify(item)}`);
+    assert.equal(item.fftBinSpacingHz, 1 / 512, `FFT bin spacing wrong: ${JSON.stringify(item)}`);
+    assert(item.effectiveSpectralResolutionHz > item.fftBinSpacingHz, `Effective spectral resolution should be wider than zero-padded FFT bin spacing: ${JSON.stringify(item)}`);
+    assert.equal(item.calculationResolutionSeconds, 1, `Spectral calculations should stay on one-second data: ${JSON.stringify(item)}`);
+    assert(item.displaySummaryMode, `Display summary mode should be exported: ${JSON.stringify(item)}`);
+    assert(item.dataTimezone && item.displayTimezone && item.utcOffset, `Timezone metadata missing: ${JSON.stringify(item)}`);
     assert(Number.isFinite(item.acceptedSegmentCount), `Accepted segment metadata missing: ${JSON.stringify(item)}`);
     assert(Number.isFinite(item.rejectedSegmentCount), `Rejected segment metadata missing: ${JSON.stringify(item)}`);
     assert(Number.isFinite(item.totalImputedSampleCount), `Imputation metadata missing: ${JSON.stringify(item)}`);
-    assert(item.csvHasRequestedSegment && item.csvHasEffectiveSegment && item.csvHasFftLength && item.csvHasQuality, `CSV metadata missing: ${JSON.stringify(item)}`);
+    assert(item.csvHasRequestedSegment && item.csvHasEffectiveSegment && item.csvHasFftLength && item.csvHasFftBinSpacing && item.csvHasEffectiveSpectralResolution && item.csvHasTimezone && item.csvHasDisplaySummary && item.csvHasQuality, `CSV metadata missing: ${JSON.stringify(item)}`);
     assert(item.downloads.includes("analysis-result.json") && item.downloads.includes("analysis-events.csv"));
     assert(item.zoomAfterRowClick, `Table row should zoom chart: ${JSON.stringify(item)}`);
     if (item.type === "psd") {
       assert(/Welch|PSD/.test(item.title));
       assert(item.emptyText.includes(item.language === "tr" ? "güç spektral yoğunluğu" : "power spectral density"));
       assert(item.tableHeaders.some(header => /SNR|Gürültü|noise/i.test(header)));
+      assert(item.tableHeaders.some(header => /Durum|Status/i.test(header)));
+      assert(item.tableHeaders.some(header => /Güven|Confidence/i.test(header)));
       assert(item.seriesNames.some(name => /Peak|Tepe|Noise|Gürültü|95|Nyquist/i.test(name)));
     } else {
       assert(/Spektrogram|Spectrogram/.test(item.title));
@@ -185,9 +217,76 @@ try {
       assert(item.hasVisualMap, "Spectrogram should show a color scale.");
       assert.equal(item.units, "dB re 1 Hz²/Hz", `Spectrogram unit metadata missing: ${JSON.stringify(item)}`);
       assert.equal(item.csvHasDbReference, true, `Spectrogram CSV dB reference missing: ${JSON.stringify(item)}`);
+      const psdCard = item.cardPairs.find(card => /PSD/.test(card.label));
+      assert(psdCard && /-?\d/.test(psdCard.value) && /dB re 1 Hz²\/Hz/.test(psdCard.value), `Spectrogram PSD KPI should show a numeric dB level, not only the unit: ${JSON.stringify(item)}`);
       assert(item.seriesNames.some(name => /Ridge|Sırt|Invalid|Geçersiz|Quality|Kalite/i.test(name)));
     }
   }
+
+  const cleanSpectrogramSeries = await page.evaluate(({ tr, de }) => {
+    setLanguage("en");
+    document.querySelector("#analysisTypeSelect").value = "spectrogram";
+    document.querySelector("#analysisSourceSelect").value = "tr";
+    document.querySelector("#analysisDateMode").value = "single";
+    document.querySelector("#analysisDateSelect").value = "2026-01-03";
+    document.querySelector("#analysisStartDate").value = "2026-01-03";
+    document.querySelector("#analysisEndDate").value = "2026-01-03";
+    document.querySelector("#analysisResolution").value = "1s";
+    document.querySelector("#bandMin").value = "0.05";
+    document.querySelector("#bandMax").value = "0.25";
+    document.querySelector("#windowSec").value = "300";
+    document.querySelector("#stepSec").value = "64";
+    updateAnalysisParameterPanel();
+    state.current = {
+      date: "2026-01-03",
+      rawSeries: { tr, de },
+      displaySeries: { tr, de },
+      analysisSeries: { tr, de },
+      tr,
+      de,
+      overall: { pairedCount: tr.length }
+    };
+    const prepared = prepareAnalysisInput("spectrogram", "tr", state.current);
+    const workerResult = FrequencyAnalysisCore.computeStftSpectrogram(prepared.series, workerAnalysisParameters("spectrogram"));
+    const result = computeAnalysisResult("spectrogram", "tr", state.current, ["2026-01-03"], workerResult, prepared);
+    state.analysis.lastResult = result;
+    renderAnalysisResult(result);
+    return {
+      invalidWindowCount: workerResult.invalidWindowCount,
+      imputedWindowCount: workerResult.imputedWindowCount,
+      seriesNames: state.oscillationChart.getOption().series?.map(series => series.name || "") || []
+    };
+  }, {
+    tr: Array.from({ length: 4096 }, (_, index) => 50 + 0.02 * Math.sin(2 * Math.PI * 0.12 * index)),
+    de: Array.from({ length: 4096 }, (_, index) => 50 + 0.02 * Math.sin(2 * Math.PI * 0.12 * index) + 0.0002)
+  });
+  assert.equal(cleanSpectrogramSeries.invalidWindowCount, 0);
+  assert.equal(cleanSpectrogramSeries.imputedWindowCount, 0);
+  assert(!cleanSpectrogramSeries.seriesNames.some(name => /Invalid|Geçersiz|Quality|Kalite|Imputation|Doldur/i.test(name)), `Clean spectrogram should not render mask/quality overlay series: ${JSON.stringify(cleanSpectrogramSeries)}`);
+
+  const dateSync = await page.evaluate(() => {
+    setLanguage("tr");
+    document.querySelector("#analysisTypeSelect").value = "psd";
+    updateAnalysisParameterPanel();
+    document.querySelector("#analysisDateMode").value = "single";
+    document.querySelector("#analysisDateSelect").value = "2026-01-04";
+    document.querySelector("#analysisDateSelect").dispatchEvent(new Event("change", { bubbles: true }));
+    const afterMain = {
+      main: document.querySelector("#analysisDateSelect").value,
+      start: document.querySelector("#analysisStartDate").value,
+      end: document.querySelector("#analysisEndDate").value
+    };
+    document.querySelector("#analysisStartDate").value = "2026-01-05";
+    document.querySelector("#analysisStartDate").dispatchEvent(new Event("change", { bubbles: true }));
+    const afterStart = {
+      main: document.querySelector("#analysisDateSelect").value,
+      start: document.querySelector("#analysisStartDate").value,
+      end: document.querySelector("#analysisEndDate").value
+    };
+    return { afterMain, afterStart };
+  });
+  assert.deepEqual(dateSync.afterMain, { main: "2026-01-04", start: "2026-01-04", end: "2026-01-04" });
+  assert.deepEqual(dateSync.afterStart, { main: "2026-01-05", start: "2026-01-05", end: "2026-01-05" });
 
   const invalidMessage = await page.evaluate(() => {
     setLanguage("en");

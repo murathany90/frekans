@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="light" />
+  <meta name="gridfreq-build-commit" content="dev" />
+  <meta name="gridfreq-build-time" content="dev" />
   <meta name="description" content="GridFreq, Türkiye ve Kıta Avrupası şebeke frekansı verilerini karşılaştıran bağımsız frekans kalite ve analiz platformudur." />
   <link rel="canonical" href="https://gridfreq.com/">
   <meta property="og:type" content="website">
@@ -1267,6 +1269,7 @@
       border-radius: 8px;
       padding: 10px;
       background: #fff;
+      min-width: 0;
     }
     .coverage-item.is-view,
     .coverage-item.is-report-date {
@@ -1286,7 +1289,7 @@
     .source-health-card .label { color: var(--muted); font-size: .76rem; font-weight: 800; }
     .coverage-item .value,
     .analysis-result-card .value,
-    .source-health-card .value { margin-top: 4px; font-weight: 900; color: var(--navy); }
+    .source-health-card .value { margin-top: 4px; font-weight: 900; color: var(--navy); overflow-wrap: anywhere; }
     .source-health-card .meta { margin-top: 6px; color: var(--muted); font-size: .74rem; line-height: 1.35; }
     .source-health-card.good { border-color: rgba(45, 157, 120, .42); background: #f5fcf8; }
     .source-health-card.warn { border-color: rgba(255, 184, 77, .55); background: #fffaf0; }
@@ -1314,6 +1317,27 @@
       margin: 0 0 10px;
     }
     .analysis-detail-summary[hidden] { display: none; }
+    .spectral-detail-summary {
+      display: block;
+    }
+    .spectral-technical-details {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfdfe;
+      margin: 0 0 10px;
+      padding: 0 10px 8px;
+    }
+    .spectral-technical-details summary {
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      color: var(--navy);
+      font-weight: 900;
+    }
+    .spectral-detail-grid {
+      margin: 0;
+    }
     .analysis-detail-item {
       display: flex;
       align-items: center;
@@ -1331,7 +1355,8 @@
     .analysis-detail-item strong {
       color: var(--navy);
       font-size: .8rem;
-      white-space: nowrap;
+      overflow-wrap: anywhere;
+      text-align: right;
     }
     .report-preview {
       border: 1px solid var(--line);
@@ -2435,6 +2460,10 @@
             <div class="field" data-param-key="spectralScale"><label for="spectralScale" data-i18n="spectralScaleLabel">Güç ölçeği</label><select id="spectralScale"><option value="linear" data-i18n="spectralScaleLinear">Lineer</option><option value="log" data-i18n="spectralScaleLog">Log</option></select></div>
             <div class="field" data-param-key="spectralAveraging"><label for="spectralAveraging" data-i18n="spectralAveragingLabel">Welch ortalaması</label><select id="spectralAveraging"><option value="mean" data-i18n="spectralAveragingMean">Mean</option><option value="median" data-i18n="spectralAveragingMedian">Median</option></select></div>
             <div class="field" data-param-key="spectralPeaks"><label for="spectralMaxPeaks" data-i18n="spectralMaxPeaksLabel">Spektral tepe sayısı</label><input id="spectralMaxPeaks" type="number" min="1" max="20" step="1" value="5" /></div>
+            <div class="field" data-param-key="spectralDisplay"><label for="spectralDisplaySummary" data-i18n="spectralDisplaySummaryLabel">Görüntü özeti</label><select id="spectralDisplaySummary"><option value="detailed" data-i18n="spectralDisplayDetailed">Ayrıntılı</option><option value="15m" data-i18n="spectralDisplay15m">15 dakika</option><option value="1h" data-i18n="spectralDisplay1h">1 saat</option></select></div>
+            <div class="field" data-param-key="spectralDisplay"><label for="spectralDisplayTimezone" data-i18n="spectralDisplayTimezoneLabel">Zaman dilimi gösterimi</label><select id="spectralDisplayTimezone"><option value="source" data-i18n="spectralDisplayTimezoneSource">Kaynak zaman dilimi</option><option value="Europe/Istanbul" data-i18n="spectralDisplayTimezoneTr">Türkiye saati</option><option value="UTC" data-i18n="spectralDisplayTimezoneUtc">UTC</option></select></div>
+            <div class="field" data-param-key="spectralPeakAdvanced"><label for="spectralSignificantSnrDb" data-i18n="spectralSignificantSnrDbLabel">Anlamlı tepe SNR (dB)</label><input id="spectralSignificantSnrDb" type="number" min="0" max="40" step="0.5" value="6" /></div>
+            <div class="field" data-param-key="spectralPeakAdvanced"><label for="spectralWeakSnrDb" data-i18n="spectralWeakSnrDbLabel">Zayıf tepe SNR (dB)</label><input id="spectralWeakSnrDb" type="number" min="0" max="40" step="0.5" value="3" /></div>
             <div class="field" data-param-key="filter"><label for="filterTaps" data-i18n="filterTapsLabel">FIR kademe</label><input id="filterTaps" type="number" min="31" max="401" step="2" value="101" /></div>
             <div class="field" data-param-key="duration"><label for="minDuration" data-i18n="minDurationLabel">Minimum olay süresi (sn)</label><input id="minDuration" type="number" min="1" max="1800" step="1" value="5" /></div>
             <div class="field" data-param-key="yd"><label for="repeatedValueSeconds" data-i18n="qualityRepeatedThresholdLabel">Yinelenen değer eşiği (sn)</label><input id="repeatedValueSeconds" type="number" min="1" max="3600" step="1" value="15" /></div>
@@ -3211,6 +3240,10 @@
       spectralScale: DEFAULT_WELCH_PARAMETERS.scale,
       spectralAveraging: DEFAULT_WELCH_PARAMETERS.averaging,
       spectralMaxPeaks: DEFAULT_WELCH_PARAMETERS.maxPeaks,
+      spectralDisplaySummary: 'detailed',
+      spectralDisplayTimezone: 'source',
+      spectralSignificantSnrDb: 6,
+      spectralWeakSnrDb: 3,
       filterTaps: 101,
       minDuration: 30,
       rocofMethod: DEFAULT_ROCOF_PARAMETERS.method,
@@ -3285,6 +3318,7 @@
     const ANALYSIS_BASE_PARAMS = ['date', 'resolution', 'alignment'];
     const QUALITY_DATE_MODES = new Set(['single', 'range']);
     const LIMITED_DATE_MODE_ANALYSES = new Set(['quality', 'stats', 'events', 'rocof']);
+    const SPECTRAL_DATE_MODE_ANALYSES = new Set(['psd', 'spectrogram']);
     const analysisRegistry = {
       quality: {
         labelKey: 'analysisQuality',
@@ -3364,8 +3398,8 @@
         titleKey: 'analysisPsdTitle',
         descriptionKey: 'analysisPsdDesc',
         allowedSources: ['tr', 'de', 'both', 'diff', 'common', 'differential'],
-        allowedResolutions: ['1s', '10s'],
-        parameterKeys: ['band', 'window', 'spectralWindow', 'spectralDetrend', 'spectralValid', 'spectralScale', 'spectralAveraging', 'spectralPeaks'],
+        allowedResolutions: ['1s'],
+        parameterKeys: ['band', 'window', 'spectralWindow', 'spectralDetrend', 'spectralValid', 'spectralScale', 'spectralAveraging', 'spectralPeaks', 'spectralDisplay', 'spectralPeakAdvanced'],
         requiresPairedSeries: false,
         minSampleIntervalSeconds: 1,
         preferredResolution: '1s',
@@ -3382,6 +3416,8 @@
           { key: 'prominence', labelKey: 'spectralPeakProminence' },
           { key: 'bandwidth', labelKey: 'spectralPeakBandwidth' },
           { key: 'qualityFactor', labelKey: 'spectralQualityFactor' },
+          { key: 'status', labelKey: 'spectralPeakStatus' },
+          { key: 'confidence', labelKey: 'spectralPeakConfidence' },
           { key: 'source', labelKey: 'bandViolationSource' }
         ],
         methodKey: 'methodPsd',
@@ -3393,7 +3429,7 @@
         descriptionKey: 'analysisSpectrogramDesc',
         allowedSources: ['tr', 'de', 'both', 'diff', 'common', 'differential'],
         allowedResolutions: ['1s'],
-        parameterKeys: ['band', 'window', 'spectralWindow', 'spectralDetrend', 'spectralValid', 'spectralScale'],
+        parameterKeys: ['band', 'window', 'spectralWindow', 'spectralDetrend', 'spectralValid', 'spectralScale', 'spectralDisplay'],
         requiresPairedSeries: false,
         minSampleIntervalSeconds: 1,
         preferredResolution: '1s',
@@ -4388,13 +4424,13 @@
         syncAnalysisSource('analysis');
         updateAnalysisAvailability();
       });
-      $('analysisDateSelect').addEventListener('change', () => updateUrlState({ date: $('analysisDateSelect').value }));
+      $('analysisDateSelect').addEventListener('change', () => handleAnalysisMainDateChange());
       $('analysisDateMode').addEventListener('change', () => {
         updateAnalysisAvailability();
         updateUrlState({ mode: $('analysisDateMode').value });
       });
-      $('analysisStartDate').addEventListener('change', () => updateUrlState({ start: $('analysisStartDate').value }));
-      $('analysisEndDate').addEventListener('change', () => updateUrlState({ end: $('analysisEndDate').value }));
+      $('analysisStartDate').addEventListener('change', () => handleAnalysisRangeDateChange('start'));
+      $('analysisEndDate').addEventListener('change', () => handleAnalysisRangeDateChange('end'));
       $('analysisTypeSelect').addEventListener('change', () => {
         applySpectralDefaultsForType($('analysisTypeSelect').value);
         updateAnalysisAvailability();
@@ -4719,9 +4755,8 @@
 
     function selectAnalysisDate(iso) {
       setPickerDate('analysis', iso);
-      $('analysisStartDate').value ||= iso;
-      $('analysisEndDate').value ||= iso;
-      updateUrlState({ date: iso });
+      if (analysisDateModeValue() === 'single') setAnalysisSingleDate(iso);
+      else updateUrlState({ date: iso });
     }
 
     function setPickerDate(kind, iso) {
@@ -5437,7 +5472,7 @@
       const base = reportDatesForAnalysisSource(source, type);
       const dates = (base.length ? base : reportDatesForCurrentMode()).sort();
       const selected = $('analysisDateSelect').value || dates.at(-1) || latestCommonDate();
-      const limitedDateMode = LIMITED_DATE_MODE_ANALYSES.has(type);
+      const limitedDateMode = LIMITED_DATE_MODE_ANALYSES.has(type) || SPECTRAL_DATE_MODE_ANALYSES.has(type);
       const requestedMode = $('analysisDateMode')?.value || 'single';
       const mode = limitedDateMode && !QUALITY_DATE_MODES.has(requestedMode) ? 'single' : requestedMode;
       if (!selected) return [];
@@ -5487,6 +5522,34 @@
         const el = $(id);
         if (el && !el.value) el.value = latest;
       }
+    }
+
+    function analysisDateModeValue() {
+      return $('analysisDateMode')?.value || 'single';
+    }
+
+    function setAnalysisSingleDate(date, options = {}) {
+      if (!date) return;
+      if ($('analysisDateSelect')) $('analysisDateSelect').value = date;
+      if ($('analysisStartDate')) $('analysisStartDate').value = date;
+      if ($('analysisEndDate')) $('analysisEndDate').value = date;
+      if (options.updateRoute !== false) updateUrlState({ date, start: date, end: date, mode: 'single' });
+    }
+
+    function handleAnalysisMainDateChange() {
+      const date = $('analysisDateSelect')?.value;
+      if (analysisDateModeValue() === 'single') setAnalysisSingleDate(date);
+      else updateUrlState({ date });
+    }
+
+    function handleAnalysisRangeDateChange(which) {
+      const value = $(which === 'end' ? 'analysisEndDate' : 'analysisStartDate')?.value;
+      if (!value) return;
+      if (analysisDateModeValue() === 'single') {
+        setAnalysisSingleDate(value);
+        return;
+      }
+      updateUrlState({ [which]: value });
     }
 
     function useAutoDataMode() {
@@ -6801,6 +6864,10 @@
       return type === 'psd' || type === 'spectrogram';
     }
 
+    function hasSingleOrRangeDateModes(type = $('analysisTypeSelect')?.value || 'stats') {
+      return LIMITED_DATE_MODE_ANALYSES.has(type) || SPECTRAL_DATE_MODE_ANALYSES.has(type);
+    }
+
     function setControlLabel(labelId, key) {
       const label = $(labelId);
       if (!label) return;
@@ -6953,7 +7020,7 @@
 
     function updateQualityControlVisibility() {
       const type = $('analysisTypeSelect')?.value || 'stats';
-      const hasLimitedDateModes = LIMITED_DATE_MODE_ANALYSES.has(type);
+      const hasLimitedDateModes = hasSingleOrRangeDateModes(type);
       const modeSelect = $('analysisDateMode');
       if (!modeSelect) return;
       [...modeSelect.options].forEach(option => {
@@ -6974,7 +7041,7 @@
       const type = $('analysisTypeSelect')?.value || 'stats';
       const modeSelect = $('analysisDateMode');
       if (!modeSelect) return;
-      const hasLimitedDateModes = LIMITED_DATE_MODE_ANALYSES.has(type);
+      const hasLimitedDateModes = hasSingleOrRangeDateModes(type);
       const isRangeMode = hasLimitedDateModes && modeSelect.value === 'range';
       const dateModeField = modeSelect.closest('.field');
       const dateControlsVisible = !dateModeField?.hidden;
@@ -7005,10 +7072,11 @@
       if (type === 'stats') return '1s';
       if (type === 'events') return '1s';
       if (type === 'rocof') return '1s';
+      if (type === 'psd') return '1s';
+      if (type === 'spectrogram') return '1s';
       if (selectedResolution && selectedResolution !== 'auto') return selectedResolution;
       if (type === 'trend') return '1m';
-      if (type === 'psd') return '1s';
-      if (['events', 'rocof', 'spectrogram', 'oscillation', 'crossCorrelation', 'coherence'].includes(type)) return '1s';
+      if (['events', 'rocof', 'oscillation', 'crossCorrelation', 'coherence'].includes(type)) return '1s';
       return def.preferredResolution || '1s';
     }
 
@@ -7120,7 +7188,7 @@
         return;
       }
       el.className = 'sr-only analysis-sampling-info';
-      el.textContent = t('analysisSamplingInfoText', {
+      const baseText = t('analysisSamplingInfoText', {
         interval: fmt(sampling.intervalSeconds, 0),
         sampleRate: fmt(sampling.sampleRateHz, 5),
         nyquist: fmt(sampling.nyquistHz, 5),
@@ -7128,7 +7196,24 @@
         method: sampling.method || 'mean',
         missing: percent(sampling.missingRatio || 0)
       });
+      const spectralEstimate = isSpectralAnalysis($('analysisTypeSelect')?.value) ? spectralWorkloadEstimateText($('analysisTypeSelect')?.value) : '';
+      el.textContent = spectralEstimate ? `${baseText} ${spectralEstimate}` : baseText;
       updateAnalysisInfoPanel();
+    }
+
+    function spectralWorkloadEstimateText(type = $('analysisTypeSelect')?.value || 'psd') {
+      if (!isSpectralAnalysis(type)) return '';
+      const defaults = spectralDefaultParameters(type);
+      const segmentSeconds = Number($('windowSec')?.value || defaults.segmentSeconds || 256);
+      const stepSeconds = Math.max(1, Number($('stepSec')?.value || defaults.stepSeconds || 64));
+      const fftLengthSamples = nextPowerOfTwoLocal(Math.max(8, Math.round(segmentSeconds)));
+      const dateCount = Math.max(1, resolveAnalysisDates(getAnalysisSource(), type).length || 1);
+      const sampleCount = dateCount * 86400;
+      const windowCount = Math.max(0, Math.floor((sampleCount - segmentSeconds) / stepSeconds) + 1);
+      const binCount = Math.floor(fftLengthSamples / 2) + 1;
+      const cellCount = type === 'spectrogram' ? windowCount * binCount : binCount;
+      const bytes = cellCount * 4;
+      return t('spectralWorkloadEstimate', { windows: numberText(windowCount), cells: numberText(cellCount), mb: fmt(bytes / (1024 * 1024), 1) });
     }
 
     function sourceSeries(source, current = state.current) {
@@ -7435,6 +7520,11 @@
         return;
       }
       const dateList = resolveAnalysisDates(source, type);
+      const spectralDateError = validateSpectralDateList(type, dateList);
+      if (spectralDateError) {
+        setBanner('analysisStatus', spectralDateError, 'error');
+        return;
+      }
       const date = dateList.at(-1) || $('analysisDateSelect').value || latestCommonDate() || $('dateSelect').value;
       if (!date) {
         setBanner('analysisStatus', t('analysisStatusDefault'), 'error');
@@ -7510,6 +7600,36 @@
           $('analysisRunBtn').disabled = false;
         }
       }
+    }
+
+    function validateSpectralDateList(type, dateList = []) {
+      if (type === 'psd' && dateList.length > 7) {
+        return t('analysisPsdRangeLimitError');
+      }
+      if (type === 'spectrogram') {
+        const defaults = spectralDefaultParameters('spectrogram');
+        const segmentSeconds = Number($('windowSec')?.value || defaults.segmentSeconds || 256);
+        const stepSeconds = Number($('stepSec')?.value || defaults.stepSeconds || 64);
+        const minHz = Number($('bandMin')?.value || 0);
+        const maxHz = Number($('bandMax')?.value || 0.5);
+        const fftLengthSamples = nextPowerOfTwoLocal(Math.max(8, Math.round(segmentSeconds)));
+        const binCount = Math.floor(fftLengthSamples / 2) + 1;
+        const frequencyBinCount = Math.max(1, Math.round((Math.min(0.5, maxHz) - Math.max(0, minHz)) / Math.max(1 / fftLengthSamples, 1e-12)));
+        const sampleCount = Math.max(0, dateList.length * 86400);
+        const windowCount = Math.max(0, Math.floor((sampleCount - segmentSeconds) / Math.max(1, stepSeconds)) + 1);
+        const estimatedCellCount = windowCount * Math.min(binCount, frequencyBinCount);
+        if (estimatedCellCount > 1_500_000) {
+          return t('analysisSpectrogramCellLimitError', { cells: numberText(estimatedCellCount) });
+        }
+      }
+      return '';
+    }
+
+    function nextPowerOfTwoLocal(value) {
+      let out = 1;
+      const target = Math.max(1, Math.round(Number(value) || 1));
+      while (out < target) out *= 2;
+      return out;
     }
 
     function cancelAnalysis() {
@@ -7623,6 +7743,56 @@
       return type;
     }
 
+    function sourceTimezoneForAnalysis(source = getAnalysisSource()) {
+      if (source === 'tr') return 'Europe/Istanbul';
+      if (source === 'de') return 'Europe/Berlin';
+      return 'UTC';
+    }
+
+    function timezoneOffsetString(timeZone, epochMs = Date.now()) {
+      if (!timeZone || timeZone === 'UTC') return '+00:00';
+      const instant = new Date(Number.isFinite(epochMs) ? epochMs : Date.now());
+      try {
+        const parts = new Intl.DateTimeFormat('en-US', {
+          timeZone,
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZoneName: 'shortOffset'
+        }).formatToParts(instant);
+        const zone = parts.find(part => part.type === 'timeZoneName')?.value || '';
+        const match = zone.match(/GMT([+-])(\d{1,2})(?::?(\d{2}))?/i);
+        if (match) {
+          return `${match[1]}${String(Number(match[2])).padStart(2, '0')}:${String(Number(match[3] || 0)).padStart(2, '0')}`;
+        }
+      } catch {}
+      if (timeZone === 'Europe/Istanbul') return '+03:00';
+      if (timeZone === 'Europe/Berlin') {
+        const month = instant.getUTCMonth() + 1;
+        return month >= 4 && month <= 10 ? '+02:00' : '+01:00';
+      }
+      return '+00:00';
+    }
+
+    function timezoneOffsetMinutes(timeZone, epochMs = Date.now()) {
+      const label = timezoneOffsetString(timeZone, epochMs);
+      const match = label.match(/^([+-])(\d{2}):(\d{2})$/);
+      if (!match) return 0;
+      const minutes = Number(match[2]) * 60 + Number(match[3]);
+      return match[1] === '-' ? -minutes : minutes;
+    }
+
+    function localMidnightEpochMs(isoDate, timeZone = 'UTC') {
+      if (!isoDate) return null;
+      const utcMidnight = Date.parse(`${isoDate}T00:00:00Z`);
+      if (!Number.isFinite(utcMidnight)) return null;
+      return utcMidnight - timezoneOffsetMinutes(timeZone, utcMidnight) * 60_000;
+    }
+
+    function spectralDisplayTimezone(source = getAnalysisSource()) {
+      const selected = $('spectralDisplayTimezone')?.value || state.settings.spectralDisplayTimezone || 'source';
+      return selected === 'source' ? sourceTimezoneForAnalysis(source) : selected;
+    }
+
     function workerAnalysisParameters(type) {
       const source = getAnalysisSource();
       const sampling = state.analysis.sampling || { sampleRateHz: 1, intervalSeconds: 1 };
@@ -7638,7 +7808,9 @@
       const minValidRatio = clamp(Number($('spectralMinValidRatioPct')?.value || defaults.minValidRatio * 100) / 100, 0, 1);
       const selectedScale = $('spectralScale')?.value || defaults.scale || 'linear';
       const analysisDate = state.current?.date || $('analysisDateSelect')?.value;
-      const analysisStartEpochMs = analysisDate ? Date.parse(`${analysisDate}T00:00:00Z`) : null;
+      const dataTimezone = sourceTimezoneForAnalysis(source);
+      const displayTimezone = spectralDisplayTimezone(source);
+      const analysisStartEpochMs = localMidnightEpochMs(analysisDate, dataTimezone);
       const base = {
         sampleRateHz,
         sampleIntervalSeconds,
@@ -7656,7 +7828,14 @@
         gapHandlingMethod: 'segment-mean',
         maxCells: 1_500_000,
         analysisStartEpochMs: Number.isFinite(analysisStartEpochMs) ? analysisStartEpochMs : null,
-        analysisTimezone: source === 'de' ? 'Europe/Berlin' : source === 'tr' ? 'Europe/Istanbul' : 'UTC'
+        analysisTimezone: dataTimezone,
+        dataTimezone,
+        displayTimezone,
+        utcOffset: timezoneOffsetString(displayTimezone, analysisStartEpochMs),
+        displaySummaryMode: $('spectralDisplaySummary')?.value || state.settings.spectralDisplaySummary || 'detailed',
+        calculationResolutionSeconds: 1,
+        significantPeakSnrDb: Number($('spectralSignificantSnrDb')?.value || state.settings.spectralSignificantSnrDb || 6),
+        weakPeakSnrDb: Number($('spectralWeakSnrDb')?.value || state.settings.spectralWeakSnrDb || 3)
       };
       if (type === 'rocof') {
         return normalizeRocofParameters({ ...rocofOptions(), sampleIntervalSeconds });
@@ -9531,22 +9710,22 @@
         metadata.parameters.spectral = spectralParameterMetadata(dominant);
         return {
           type,
-          title: t(analysisDefinition(type).titleKey),
-          description: t(analysisDefinition(type).descriptionKey),
+          title: analysisResultTitle(type, source, dateList, dominant),
+          description: spectralResultDescription('psd', dominant),
           metadata,
           cards: [
             [t('dominantFrequency'), `${fmt(peak.frequencyHz, 4)} Hz`],
-            [t('spectralPower'), `${fmt(peak.psd ?? peak.power, 8)} Hz²/Hz`],
-            [t('spectralSnrLinear'), fmt(dominant.snrLinear, 2)],
+            [t('spectralPsdHz2PerHz'), `${fmt(peak.psd ?? peak.power, 8)} Hz²/Hz`],
             [t('spectralSnrDb'), `${fmt(dominant.snrDb, 2)} dB`],
             [t('spectralSegmentUsage'), `${dominant.acceptedSegmentCount || 0}/${dominant.candidateSegmentCount || 0}`],
-            [t('spectralFftLength'), `${dominant.fftLengthSamples} ${t('spectralSamplesUnit')}`]
+            [t('spectralPeakStatus'), peak.peakStatus ? spectralPeakStatusLabel(peak.peakStatus) : '—'],
+            [t('spectralDataQuality'), percent(dominant.meanValidRatio || 0)]
           ],
           detailRows: spectralDetailRows(dominant),
           extraTables: [welchSummaryTable(dominant)],
           events: [],
           tableTitle: t('spectralPeaksTitle'),
-          tableRows: (dominant.peaks || [peak]).filter(Boolean).map((item, index) => ({
+          tableRows: (dominant.peaks || []).filter(Boolean).map((item, index) => ({
             rank: item.rank || index + 1,
             frequency: `${fmt(item.frequencyHz, 4)} Hz`,
             period: Number.isFinite(item.periodSeconds) ? secondsValue(item.periodSeconds, 2) : '—',
@@ -9557,6 +9736,8 @@
             prominence: fmt(item.peakProminence, 8),
             bandwidth: `${fmt(item.peakBandwidthHz, 5)} Hz`,
             qualityFactor: fmt(item.qualityFactor, 2),
+            status: spectralPeakStatusLabel(item.peakStatus),
+            confidence: spectralPeakConfidenceLabel(item.confidenceLevel),
             source: sourceLabel(source),
             frequencyHz: item.frequencyHz
           })),
@@ -9570,40 +9751,26 @@
         metadata.parameters.spectral = spectralParameterMetadata(spectrogram);
         return {
           type,
-          title: t(analysisDefinition(type).titleKey),
-          description: t(analysisDefinition(type).descriptionKey),
+          title: analysisResultTitle(type, source, dateList, spectrogram),
+          description: spectralResultDescription('spectrogram', spectrogram),
           metadata,
           cards: [
             [t('spectralSegmentSecondsLabel'), secondsValue(spectrogram.requestedSegmentSeconds, 0)],
-            [t('spectralEffectiveSegment'), `${spectrogram.effectiveSegmentSamples} ${t('spectralSamplesUnit')}`],
-            [t('dominantFrequency'), spectrogram.peaksByTime?.length ? `${fmt(spectrogram.peaksByTime[0].frequencyHz, 4)} Hz` : '—'],
+            [t('dominantFrequency'), spectrogramDominantFrequencyLabel(spectrogram)],
+            [t('spectralPsdLevel'), spectrogramPeakPsdLabel(spectrogram)],
             [t('spectrogramWindowQualityTitle'), `${spectrogram.acceptedSegmentCount || 0}/${spectrogram.candidateSegmentCount || 0}`],
             [t('spectrogramImputedSamples'), String(spectrogram.totalImputedSampleCount || 0)],
-            [t('spectrogramPsdUnit'), spectrogram.units || 'Hz²/Hz']
+            [t('spectralDataQuality'), percent(spectrogram.meanValidRatio || 0)]
           ],
           detailRows: spectralDetailRows(spectrogram),
           events: [],
           tableTitle: t('spectrogramWindowQualityTitle'),
           extraTables: spectralExtraTables(spectrogram, source),
-          tableRows: (spectrogram.peaksByTime || []).slice(0, 24).map((item, index) => {
-            const validRatio = Number(spectrogram.validityByTime?.[index]);
-            const imputedCount = Number(spectrogram.imputedSamplesByTime?.[index] || 0);
-            const missingCount = Math.max(0, Math.round((spectrogram.effectiveSegmentSamples || 0) * (1 - (Number.isFinite(validRatio) ? validRatio : 0))));
-            const startSecond = Math.max(0, item.timeSeconds - (spectrogram.effectiveSegmentSeconds || 0) / 2);
-            const endSecond = item.timeSeconds + (spectrogram.effectiveSegmentSeconds || 0) / 2;
-            return {
-              center: secondToTime(item.timeSeconds || 0),
-              validRatio: percent(Number.isFinite(validRatio) ? validRatio : 0),
-              missingCount,
-              imputedCount,
-              status: Number.isFinite(item.frequencyHz) ? t('spectrogramStatusAccepted') : t('spectrogramStatusRejected'),
-              dominantFrequency: Number.isFinite(item.frequencyHz) ? `${fmt(item.frequencyHz, 4)} Hz` : '—',
-              peakPsd: fmt(item.power, 4),
-              startSecond,
-              endSecond,
-              timeIndex: index
-            };
-          }),
+          tableRows: spectrogramQualityRows(spectrogram, source, { problemOnly: true, limit: 100 }),
+          exportRows: spectrogramQualityRows(spectrogram, source, { problemOnly: false, limit: Infinity }),
+          emptyTableMessage: spectrogram.invalidWindowCount || spectrogram.imputedWindowCount
+            ? t('analysisNoTableRows')
+            : t('spectrogramNoProblemWindows'),
           chart: { kind: 'spectrogram', spectrogram, source },
           methodology: t('methodSpectrogram'),
           limitations: t('limitSpectrogram')
@@ -9706,6 +9873,120 @@
       };
     }
 
+    function analysisResultTitle(type, source, dateList = [], result = {}) {
+      const base = t(analysisDefinition(type).titleKey);
+      const dateLabel = dateList.length > 1
+        ? `${displayDate(dateList[0])} - ${displayDate(dateList.at(-1))}`
+        : displayDate(dateList[0] || state.current?.date);
+      const timezone = result.displayTimezone || result.dataTimezone || result.analysisTimezone || sourceTimezoneForAnalysis(source);
+      return `${base} - ${sourceLabel(source)} - ${dateLabel} (${timezone})`;
+    }
+
+    function spectralResultDescription(type, result = {}) {
+      if (type === 'psd') {
+        return t('psdResultDescription', {
+          peaks: numberText((result.peaks || []).length),
+          used: numberText(result.acceptedSegmentCount || 0),
+          rejected: numberText(result.rejectedSegmentCount || 0)
+        });
+      }
+      return t('spectrogramResultDescription', {
+        windows: numberText(result.acceptedSegmentCount || 0),
+        rejected: numberText(result.rejectedSegmentCount || 0),
+        imputed: numberText(result.imputedWindowCount || result.imputedSegmentCount || 0)
+      });
+    }
+
+    function spectralPeakStatusLabel(status) {
+      const key = {
+        significant: 'spectralPeakStatusSignificant',
+        weak: 'spectralPeakStatusWeak',
+        noise: 'spectralPeakStatusNoise',
+        rejected: 'spectralPeakStatusRejected'
+      }[status];
+      return key ? t(key) : '—';
+    }
+
+    function spectralPeakConfidenceLabel(confidence) {
+      const key = {
+        high: 'spectralConfidenceHigh',
+        medium: 'spectralConfidenceMedium',
+        low: 'spectralConfidenceLow',
+        rejected: 'spectralConfidenceRejected'
+      }[confidence];
+      return key ? t(key) : '—';
+    }
+
+    function strongestSpectrogramPeak(spectrogram = {}) {
+      let best = null;
+      for (const peak of spectrogram.peaksByTime || []) {
+        const value = Number(peak.power);
+        if (!Number.isFinite(value) || !Number.isFinite(peak.frequencyHz)) continue;
+        if (!best || value > best.power) best = peak;
+      }
+      return best;
+    }
+
+    function spectrogramDominantFrequencyLabel(spectrogram = {}) {
+      const peak = strongestSpectrogramPeak(spectrogram);
+      return peak ? `${fmt(peak.frequencyHz, 4)} Hz` : '—';
+    }
+
+    function spectrogramPeakPsdLabel(spectrogram = {}) {
+      const peak = strongestSpectrogramPeak(spectrogram);
+      if (!peak || !Number.isFinite(Number(peak.power))) return '—';
+      return `${fmt(peak.power, 2)} ${spectrogram.units || 'Hz²/Hz'}`;
+    }
+
+    function spectrogramTimeLabel(spectrogram = {}, seconds = 0, includeSeconds = false) {
+      const epoch = Number(spectrogram.analysisStartEpochMs);
+      const timeZone = spectrogram.displayTimezone || spectrogram.analysisTimezone || 'UTC';
+      if (Number.isFinite(epoch)) {
+        return new Date(epoch + Number(seconds || 0) * 1000).toLocaleString(lang === 'en' ? 'en-US' : 'tr-TR', {
+          timeZone,
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: includeSeconds ? '2-digit' : undefined
+        });
+      }
+      return secondToTime(seconds).slice(0, includeSeconds ? 8 : 5);
+    }
+
+    function spectrogramQualityRows(spectrogram = {}, source, { problemOnly = true, limit = 100 } = {}) {
+      const peaks = spectrogram.peaksByTime || [];
+      const rows = [];
+      for (let index = 0; index < peaks.length; index += 1) {
+        const item = peaks[index] || {};
+        const validRatio = Number(spectrogram.validityByTime?.[index]);
+        const imputedCount = Number(spectrogram.imputedSamplesByTime?.[index] || item.imputedCount || 0);
+        const accepted = Number.isFinite(item.frequencyHz);
+        if (problemOnly && accepted && imputedCount === 0 && validRatio >= 0.999) continue;
+        const missingCount = Math.max(0, Math.round((spectrogram.effectiveSegmentSamples || 0) * (1 - (Number.isFinite(validRatio) ? validRatio : 0))));
+        const startSecond = Math.max(0, Number(item.timeSeconds || 0) - (spectrogram.effectiveSegmentSeconds || 0) / 2);
+        const endSecond = Number(item.timeSeconds || 0) + (spectrogram.effectiveSegmentSeconds || 0) / 2;
+        const status = accepted
+          ? imputedCount > 0 ? t('spectrogramStatusImputed') : t('spectrogramStatusAccepted')
+          : t('spectrogramStatusRejected');
+        rows.push({
+          center: spectrogramTimeLabel(spectrogram, item.timeSeconds || 0, true),
+          validRatio: percent(Number.isFinite(validRatio) ? validRatio : 0),
+          missingCount,
+          imputedCount,
+          status,
+          dominantFrequency: accepted ? `${fmt(item.frequencyHz, 4)} Hz` : '—',
+          peakPsd: Number.isFinite(item.power) ? `${fmt(item.power, 4)} ${spectrogram.units || ''}` : '—',
+          source: sourceLabel(source),
+          startSecond,
+          endSecond,
+          timeIndex: index
+        });
+        if (rows.length >= limit) break;
+      }
+      return rows;
+    }
+
     function spectralParameterMetadata(result = {}) {
       const fields = [
         'sampleRateHz',
@@ -9720,9 +10001,14 @@
         'overlapSamples',
         'overlapRatio',
         'frequencyResolutionHz',
+        'fftBinSpacingHz',
+        'effectiveSpectralResolutionHz',
+        'windowEquivalentNoiseBandwidthBins',
+        'zeroPaddingApplied',
         'nyquistHz',
         'adjustmentApplied',
         'adjustmentReason',
+        'adjustmentReasonCodes',
         'candidateSegmentCount',
         'acceptedSegmentCount',
         'rejectedSegmentCount',
@@ -9737,11 +10023,20 @@
         'units',
         'averagingMethod',
         'degreesOfFreedom',
+        'nominalDegreesOfFreedom',
+        'effectiveDegreesOfFreedom',
         'totalBandPower',
         'parsevalErrorRatio',
         'analysisStartEpochMs',
         'analysisTimezone',
+        'dataTimezone',
+        'displayTimezone',
+        'utcOffset',
+        'calculationResolutionSeconds',
+        'displaySummaryMode',
         'timeBinReference',
+        'timeBinsSeconds',
+        'timeBinsEpochMs',
         'invalidWindowCount',
         'imputedWindowCount',
         'rowCount',
@@ -9750,27 +10045,82 @@
         'estimatedBytes'
       ];
       return fields.reduce((out, field) => {
-        if (result[field] !== undefined) out[field] = result[field];
+        if (result[field] !== undefined) {
+          out[field] = ArrayBuffer.isView(result[field]) ? Array.from(result[field]) : result[field];
+        }
         return out;
       }, {});
     }
 
+    function spectralValueLabel(kind, value) {
+      const key = String(value || '').toLowerCase();
+      const maps = {
+        windowType: {
+          hann: 'Hann',
+          hamming: 'Hamming',
+          rectangular: t('spectralWindowRectangular')
+        },
+        detrend: {
+          constant: t('spectralDetrendConstant'),
+          linear: t('spectralDetrendLinear'),
+          none: t('spectralDetrendNone')
+        },
+        averaging: {
+          mean: t('spectralAveragingMean'),
+          median: t('spectralAveragingMedian')
+        },
+        scale: {
+          linear: t('spectralScaleLinear'),
+          log: t('spectralScaleLog')
+        },
+        gapHandling: {
+          'segment-mean': t('spectralGapSegmentMean'),
+          reject: t('spectralGapReject'),
+          'short-gap-linear': t('spectralGapShortLinear')
+        },
+        displaySummary: {
+          detailed: t('spectralDisplayDetailed'),
+          '15m': t('spectralDisplay15m'),
+          '1h': t('spectralDisplay1h')
+        }
+      };
+      return maps[kind]?.[key] || value || '—';
+    }
+
+    function spectralAdjustmentLabel(result = {}) {
+      if (!result.adjustmentApplied) return t('spectralNoAdjustment');
+      const codes = Array.isArray(result.adjustmentReasonCodes) ? result.adjustmentReasonCodes : [];
+      const labels = codes.map(code => t(`spectralAdjustment_${code.replaceAll('-', '_')}`)).filter(label => label && !label.startsWith('spectralAdjustment_'));
+      if (labels.length) return labels.join('; ');
+      return result.adjustmentReason || t('spectralAdjustmentApplied');
+    }
+
     function spectralDetailRows(result = {}) {
+      const mode = result.method === 'stft-spectrogram' || result.rowCount !== undefined ? 'spectrogram' : 'psd';
+      const methodSpecific = mode === 'spectrogram'
+        ? { label: t('spectralScaleLabel'), value: spectralValueLabel('scale', result.scale) }
+        : { label: t('spectralAveragingLabel'), value: spectralValueLabel('averaging', result.averagingMethod) };
       return [
         { label: t('spectralSampleRate'), value: `${fmt(result.sampleRateHz, 5)} Hz` },
+        { label: t('spectralCalculationResolution'), value: secondsValue(result.calculationResolutionSeconds || (result.sampleRateHz ? 1 / result.sampleRateHz : 1), 0) },
+        { label: t('spectralDisplaySummaryLabel'), value: spectralValueLabel('displaySummary', result.displaySummaryMode || 'detailed') },
         { label: t('spectralNyquist'), value: `${fmt(result.nyquistHz, 5)} Hz` },
         { label: t('spectralRequestedSegment'), value: `${secondsValue(result.requestedSegmentSeconds, 0)} / ${result.requestedSegmentSamples || 0} ${t('spectralSamplesUnit')}` },
         { label: t('spectralEffectiveSegment'), value: `${secondsValue(result.effectiveSegmentSeconds, 0)} / ${result.effectiveSegmentSamples || 0} ${t('spectralSamplesUnit')}` },
         { label: t('spectralFftLength'), value: `${result.fftLengthSamples || 0} ${t('spectralSamplesUnit')}` },
-        { label: t('spectralFrequencyResolution'), value: `${fmt(result.frequencyResolutionHz, 6)} Hz` },
+        { label: t('spectralFftBinSpacing'), value: `${fmt(result.fftBinSpacingHz ?? result.frequencyResolutionHz, 6)} Hz`, tooltip: t('spectralFftBinSpacingHelp'), metricHelp: true },
+        { label: t('spectralEffectiveResolution'), value: `${fmt(result.effectiveSpectralResolutionHz ?? result.frequencyResolutionHz, 6)} Hz`, tooltip: t('spectralEffectiveResolutionHelp'), metricHelp: true },
         { label: t('spectralStep'), value: `${secondsValue(result.effectiveStepSeconds, 0)} / ${result.effectiveStepSamples || 0} ${t('spectralSamplesUnit')}` },
         { label: t('spectralOverlap'), value: `${result.overlapSamples || 0} ${t('spectralSamplesUnit')} / ${percent(result.overlapRatio || 0)}` },
         { label: t('spectralSegmentCounts'), value: `${result.candidateSegmentCount || 0}/${result.acceptedSegmentCount || 0}/${result.rejectedSegmentCount || 0}` },
         { label: t('spectralImputationCounts'), value: `${result.imputedSegmentCount || 0} / ${result.totalImputedSampleCount || 0}` },
-        { label: t('spectralWindowTypeLabel'), value: result.windowType || '—' },
-        { label: t('spectralDetrendLabel'), value: result.detrend || '—' },
-        { label: t('spectralAveragingLabel'), value: result.averagingMethod || result.scale || '—' },
-        { label: t('spectralAdjustment'), value: result.adjustmentApplied ? result.adjustmentReason : t('spectralNoAdjustment') }
+        { label: t('spectralWindowTypeLabel'), value: spectralValueLabel('windowType', result.windowType) },
+        { label: t('spectralDetrendLabel'), value: spectralValueLabel('detrend', result.detrend) },
+        methodSpecific,
+        { label: t('spectralGapHandling'), value: spectralValueLabel('gapHandling', result.gapHandlingMethod) },
+        { label: t('spectralSourceTimezone'), value: result.dataTimezone || result.analysisTimezone || 'UTC' },
+        { label: t('spectralDisplayTimezoneLabel'), value: result.displayTimezone || result.analysisTimezone || 'UTC' },
+        { label: t('spectralAdjustment'), value: spectralAdjustmentLabel(result), tooltip: result.zeroPaddingApplied ? t('spectralZeroPaddingHelp') : '' }
       ];
     }
 
@@ -9779,18 +10129,14 @@
     }
 
     function spectralExtraTables(spectrogram = {}, source) {
-      const peaks = spectrogram.peaksByTime || [];
-      const finitePeaks = peaks.filter(peak => Number.isFinite(peak.frequencyHz));
-      if (!finitePeaks.length) return [];
-      const frequencies = finitePeaks.map(peak => peak.frequencyHz);
-      const powers = finitePeaks.map(peak => peak.power).filter(Number.isFinite);
-      const start = finitePeaks[0].timeSeconds - (spectrogram.effectiveSegmentSeconds || 0) / 2;
-      const end = finitePeaks.at(-1).timeSeconds + (spectrogram.effectiveSegmentSeconds || 0) / 2;
-      const medianFrequency = percentileLocal(frequencies, 0.5);
-      const minFrequency = minFinite(frequencies);
-      const maxFrequency = maxFinite(frequencies);
-      const maxPower = maxFinite(powers);
-      const meanValidRatio = spectrogram.meanValidRatio || 0;
+      const regions = spectrogram.timeFrequencyRegions || [];
+      if (!regions.length) {
+        return [{
+          title: t('spectrogramTimeFrequencyRegionsTitle'),
+          columns: [{ key: 'message', labelKey: 'tableValue' }],
+          rows: [{ message: t('spectrogramNoSignificantRegions') }]
+        }];
+      }
       return [{
         title: t('spectrogramTimeFrequencyRegionsTitle'),
         columns: [
@@ -9805,18 +10151,20 @@
           { key: 'validRatio', labelKey: 'spectrogramValidRatio' },
           { key: 'source', labelKey: 'bandViolationSource' }
         ],
-        rows: [{
-          start: secondToTime(Math.max(0, start)),
-          end: secondToTime(Math.max(0, end)),
-          duration: durationText(Math.max(0, Math.round(end - start))),
-          medianFrequency: `${fmt(medianFrequency, 4)} Hz`,
-          frequencyRange: `${fmt(minFrequency, 4)}-${fmt(maxFrequency, 4)} Hz`,
-          peakPsd: fmt(maxPower, 4),
-          snrDb: '—',
-          ridgeContinuity: percent(finitePeaks.length / Math.max(1, peaks.length)),
-          validRatio: percent(meanValidRatio),
-          source: sourceLabel(source)
-        }]
+        rows: regions.map(region => ({
+          start: spectrogramTimeLabel(spectrogram, region.startSeconds, false),
+          end: spectrogramTimeLabel(spectrogram, region.endSeconds, false),
+          duration: durationText(Math.max(0, Math.round(region.durationSeconds || 0))),
+          medianFrequency: `${fmt(region.medianFrequencyHz, 4)} Hz`,
+          frequencyRange: `${fmt(region.minFrequencyHz, 4)}-${fmt(region.maxFrequencyHz, 4)} Hz`,
+          peakPsd: `${fmt(region.peakPsd, 4)} ${spectrogram.units || ''}`,
+          snrDb: `${fmt(region.snrDb, 2)} dB`,
+          ridgeContinuity: percent(region.ridgeContinuity || 0),
+          validRatio: percent(region.validRatio || 0),
+          source: sourceLabel(source),
+          startSecond: region.startSeconds,
+          endSecond: region.endSeconds
+        }))
       }];
     }
 
@@ -9830,14 +10178,16 @@
           { metric: t('spectralRequestedSegment'), value: `${secondsValue(result.requestedSegmentSeconds, 0)} / ${result.requestedSegmentSamples || 0} ${t('spectralSamplesUnit')}` },
           { metric: t('spectralEffectiveSegment'), value: `${secondsValue(result.effectiveSegmentSeconds, 0)} / ${result.effectiveSegmentSamples || 0} ${t('spectralSamplesUnit')}` },
           { metric: t('spectralFftLength'), value: `${result.fftLengthSamples || 0} ${t('spectralSamplesUnit')}` },
-          { metric: t('spectralFrequencyResolution'), value: `${fmt(result.frequencyResolutionHz, 6)} Hz` },
+          { metric: t('spectralFftBinSpacing'), value: `${fmt(result.fftBinSpacingHz ?? result.frequencyResolutionHz, 6)} Hz` },
+          { metric: t('spectralEffectiveResolution'), value: `${fmt(result.effectiveSpectralResolutionHz ?? result.frequencyResolutionHz, 6)} Hz` },
           { metric: t('spectralStep'), value: `${secondsValue(result.effectiveStepSeconds, 0)} / ${result.effectiveStepSamples || 0} ${t('spectralSamplesUnit')}` },
           { metric: t('spectralOverlap'), value: percent(result.overlapRatio || 0) },
           { metric: t('spectralSegmentCounts'), value: `${result.candidateSegmentCount || 0}/${result.acceptedSegmentCount || 0}/${result.rejectedSegmentCount || 0}` },
           { metric: t('spectralImputationCounts'), value: `${result.imputedSegmentCount || 0} / ${result.totalImputedSampleCount || 0}` },
-          { metric: t('spectralWindowTypeLabel'), value: result.windowType || '—' },
-          { metric: t('spectralDetrendLabel'), value: result.detrend || '—' },
-          { metric: t('spectralAveragingLabel'), value: result.averagingMethod || '—' }
+          { metric: t('spectralWindowTypeLabel'), value: spectralValueLabel('windowType', result.windowType) },
+          { metric: t('spectralDetrendLabel'), value: spectralValueLabel('detrend', result.detrend) },
+          { metric: t('spectralAveragingLabel'), value: spectralValueLabel('averaging', result.averagingMethod) },
+          { metric: t('spectralAdjustment'), value: spectralAdjustmentLabel(result) }
         ]
       };
     }
@@ -9929,6 +10279,11 @@
         summary.id = 'analysisDetailSummary';
         summary.className = 'analysis-detail-summary';
         anchor.insertAdjacentElement('afterend', summary);
+      }
+      if (isSpectralAnalysis(result?.type)) {
+        summary.innerHTML = '';
+        summary.hidden = true;
+        return;
       }
       const rows = result.detailRows || [];
       summary.hidden = !rows.length;
@@ -10053,22 +10408,56 @@
         anchor.insertAdjacentElement('afterend', summary);
       }
       const tables = result.extraTables || [];
-      summary.hidden = !tables.length;
-      if (!tables.length) {
+      const detailRows = result.detailRows || [];
+      summary.hidden = !tables.length && !detailRows.length;
+      if (!tables.length && !detailRows.length) {
         summary.innerHTML = '';
         return;
       }
-      summary.innerHTML = tables.map(table => `
+      const detailsHtml = detailRows.length ? `
+        <details class="spectral-technical-details">
+          <summary>${escapeHtml(t('spectralTechnicalDetailsTitle'))}</summary>
+          <div class="analysis-detail-summary spectral-detail-grid">
+            ${detailRows.map(row => {
+              const attrs = row.tooltip
+                ? `tabindex="0" data-tooltip-kind="metric-help" data-tooltip="${escapeHtml(row.tooltip)}" aria-label="${escapeHtml(`${row.label}: ${row.value}. ${row.tooltip}`)}"`
+                : '';
+              const icon = row.tooltip ? '<span class="metric-info-icon" aria-hidden="true">&#9432;</span>' : '';
+              return `<div class="analysis-detail-item" ${attrs}><span>${escapeHtml(row.label)}${icon}</span><strong>${escapeHtml(row.value)}</strong></div>`;
+            }).join('')}
+          </div>
+        </details>
+      ` : '';
+      summary.innerHTML = `${detailsHtml}${tables.map(table => `
         <section class="spectral-extra-table">
           <h4>${escapeHtml(table.title)}</h4>
           <div class="table-wrap">
             <table>
               <thead><tr>${(table.columns || []).map(column => `<th>${escapeHtml(t(column.labelKey))}</th>`).join('')}</tr></thead>
-              <tbody>${(table.rows || []).map(row => `<tr>${(table.columns || []).map(column => `<td>${formatTableCell(row[column.key])}</td>`).join('')}</tr>`).join('')}</tbody>
+              <tbody>${(table.rows || []).map(row => {
+                const hasRange = Number.isFinite(row.startSecond) && Number.isFinite(row.endSecond);
+                const attrs = hasRange ? `class="event-row" data-start="${row.startSecond}" data-end="${row.endSecond}"` : '';
+                return `<tr ${attrs}>${(table.columns || []).map(column => `<td>${formatTableCell(row[column.key])}</td>`).join('')}</tr>`;
+              }).join('')}</tbody>
             </table>
           </div>
         </section>
-      `).join('');
+      `).join('')}`;
+      summary.querySelectorAll('.spectral-extra-table tr.event-row').forEach(row => row.addEventListener('click', () => {
+        const start = Number(row.dataset.start);
+        const end = Number(row.dataset.end);
+        if (!Number.isFinite(start) || !Number.isFinite(end)) return;
+        if (result.chart?.kind === 'spectrogram') {
+          const bins = Array.from(result.chart.spectrogram?.timeBins || []);
+          const startIndex = nearestIndex(bins, start);
+          const endIndex = nearestIndex(bins, end);
+          state.oscillationChart?.dispatchAction({ type: 'dataZoom', startValue: Math.max(0, startIndex - 1), endValue: endIndex + 1 });
+        } else {
+          state.oscillationChart?.dispatchAction({ type: 'dataZoom', startValue: start, endValue: end });
+        }
+        setQualityZoomResetVisible(true);
+        $('analysisMainChart')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }));
     }
 
     function heatmapRangeFromValue(value) {
@@ -10256,15 +10645,11 @@
       const range = finiteHeatmapRange(data);
       const timeLabel = (rowIndex, includeSeconds = false) => {
         const seconds = Number(timeBins[rowIndex] || 0);
-        const epoch = Number(spectrogram.analysisStartEpochMs);
-        if (Number.isFinite(epoch)) {
-          return new Date(epoch + seconds * 1000).toLocaleString(lang === 'en' ? 'en-US' : 'tr-TR', { hour: '2-digit', minute: '2-digit', second: includeSeconds ? '2-digit' : undefined });
-        }
-        return secondToTime(seconds).slice(0, includeSeconds ? 8 : 5);
+        return spectrogramTimeLabel(spectrogram, seconds, includeSeconds);
       };
-      const ridgeData = (spectrogram.peaksByTime || []).map((peak, rowIndex) => {
+      const ridgeData = (spectrogram.ridgePoints || spectrogram.peaksByTime || []).map((peak, rowIndex) => {
         const column = nearestIndex(frequencyBins, peak.frequencyHz);
-        return Number.isFinite(peak.frequencyHz) ? [rowIndex, column] : null;
+        return peak.significant && Number.isFinite(peak.frequencyHz) ? [rowIndex, column] : null;
       }).filter(Boolean);
       const qualityData = Array.from(spectrogram.imputedSamplesByTime || [])
         .map((count, rowIndex) => Number(count) > 0 ? [rowIndex, Math.max(0, columnCount - 1), Number(count)] : null)
@@ -10273,6 +10658,18 @@
       if ($('analysisMainChart')) $('analysisMainChart').style.height = '520px';
       state.oscillationChart.resize();
       setQualityZoomResetVisible(false);
+      const series = [
+        { name: result.title, type: 'heatmap', data, progressive: 5000 }
+      ];
+      if ((spectrogram.invalidWindowCount || 0) > 0 && invalidData.length) {
+        series.push({ name: t('spectrogramInvalidWindows'), type: 'scatter', data: invalidData, symbolSize: 7, itemStyle: { color: 'rgba(120,120,120,.55)' } });
+      }
+      if ((spectrogram.imputedWindowCount || 0) > 0 && qualityData.length) {
+        series.push({ name: t('spectrogramQualityIndicator'), type: 'scatter', data: qualityData, symbolSize: value => Math.min(16, 5 + Number(value?.[2] || 0) / 4), itemStyle: { color: '#d88c25' } });
+      }
+      if (ridgeData.length) {
+        series.push({ name: t('spectrogramRidge'), type: 'line', data: ridgeData, symbol: 'none', lineStyle: { width: 1.6, color: '#ffffff' } });
+      }
       state.oscillationChart.setOption({
         animation: false,
         tooltip: {
@@ -10299,12 +10696,7 @@
         yAxis: { type: 'category', data: frequencyBins.map(freq => fmt(freq, 3)), name: 'Hz' },
         visualMap: { min: range.min, max: range.max, calculable: true, orient: 'vertical', right: 8, top: 86, text: [t('spectrogramPsdUnit'), ''] },
         dataZoom: [{ type: 'inside', filterMode: 'none' }, { type: 'slider', filterMode: 'none', height: 22, bottom: 20 }],
-        series: [
-          { name: result.title, type: 'heatmap', data, progressive: 5000 },
-          { name: t('spectrogramInvalidWindows'), type: 'scatter', data: invalidData, symbolSize: 7, itemStyle: { color: 'rgba(120,120,120,.55)' } },
-          { name: t('spectrogramQualityIndicator'), type: 'scatter', data: qualityData, symbolSize: value => Math.min(16, 5 + Number(value?.[2] || 0) / 4), itemStyle: { color: '#d88c25' } },
-          { name: t('spectrogramRidge'), type: 'line', data: ridgeData, symbol: 'none', lineStyle: { width: 1.6, color: '#ffffff' } }
-        ]
+        series
       }, true);
     }
 
@@ -11791,7 +12183,7 @@
       setAnalysisTableHeader(columns);
       const rows = result.tableRows || analysisEventsToRows(result.events || []);
       if (!rows.length) {
-        const noEventsMsg = result.type === 'rocof' ? t('rocofNoEvents') : t('analysisNoTableRows');
+        const noEventsMsg = result.emptyTableMessage || (result.type === 'rocof' ? t('rocofNoEvents') : t('analysisNoTableRows'));
         body.innerHTML = `<tr><td colspan="${Math.max(1, columns.length)}" class="empty-state">${noEventsMsg}</td></tr>`;
         return;
       }
@@ -11925,9 +12317,13 @@
 
     function analysisMetadata(type, source, current, dateList = [current?.date].filter(Boolean), sampling = state.analysis.sampling) {
       const windowBounds = analysisWindowBounds();
+      const buildCommitSha = document.querySelector('meta[name="gridfreq-build-commit"]')?.content || 'unknown';
+      const buildTimeUtc = document.querySelector('meta[name="gridfreq-build-time"]')?.content || 'unknown';
       return {
         appVersion: '1.1.0',
-        analysisVersion: '2026.07.prompt2',
+        analysisVersion: '2026.07.spectral-audit',
+        buildCommitSha,
+        buildTimeUtc,
         dataSchemaVersion: String(state.auto.manifest?.schemaVersion || 1),
         generatedAt: new Date().toISOString(),
         parameters: {
@@ -11937,7 +12333,9 @@
           dateRange: dateList,
           timeWindowSeconds: [windowBounds.start, windowBounds.end],
           alignment: $('analysisAlignment')?.value || state.settings.alignmentMode,
-          resolution: (type === 'quality' || type === 'stats' || type === 'events' || type === 'rocof') ? '1s' : ($('analysisResolution')?.value || 'auto'),
+          resolution: (type === 'quality' || type === 'stats' || type === 'events' || type === 'rocof' || isSpectralAnalysis(type)) ? '1s' : ($('analysisResolution')?.value || 'auto'),
+          calculationResolution: isSpectralAnalysis(type) ? '1s' : undefined,
+          displaySummaryMode: isSpectralAnalysis(type) ? ($('spectralDisplaySummary')?.value || state.settings.spectralDisplaySummary || 'detailed') : undefined,
           bandHz: (type === 'stats' || type === 'events')
             ? [Number($('statsBandMinHz')?.value || 49.90), Number($('statsBandMaxHz')?.value || 50.10)]
             : [Number($('bandMin').value), Number($('bandMax').value)],
@@ -11947,7 +12345,7 @@
         },
         sampling,
         sources: [sourceLabel(source, 'report')],
-        dataFiles: [current?.date].filter(Boolean)
+        dataFiles: dateList.length ? dateList : [current?.date].filter(Boolean)
       };
     }
 
@@ -12069,7 +12467,7 @@
       const result = state.analysis.lastResult;
       if (!result) return;
       const columns = result.tableColumns || analysisDefinition(result.type).tableColumns || [];
-      const tableRows = result.tableRows || [];
+      const tableRows = result.exportRows || result.tableRows || [];
       const rows = [];
       if (result.type === 'rocof') {
         const meta = result.metadata?.parameters?.rocof || result.rocofMeta || {};
@@ -12089,6 +12487,8 @@
         const meta = result.metadata?.parameters?.spectral || {};
         rows.push(
           ['parameter', 'value', 'unit'],
+          ['buildCommitSha', result.metadata?.buildCommitSha ?? '', ''],
+          ['buildTimeUtc', result.metadata?.buildTimeUtc ?? '', ''],
           ['requestedSegmentSeconds', meta.requestedSegmentSeconds ?? '', 's'],
           ['requestedSegmentSamples', meta.requestedSegmentSamples ?? '', 'samples'],
           ['effectiveSegmentSeconds', meta.effectiveSegmentSeconds ?? '', 's'],
@@ -12100,8 +12500,17 @@
           ['overlapSamples', meta.overlapSamples ?? '', 'samples'],
           ['overlapRatio', meta.overlapRatio ?? '', 'ratio'],
           ['frequencyResolutionHz', meta.frequencyResolutionHz ?? '', 'Hz'],
+          ['fftBinSpacingHz', meta.fftBinSpacingHz ?? '', 'Hz'],
+          ['effectiveSpectralResolutionHz', meta.effectiveSpectralResolutionHz ?? '', 'Hz'],
+          ['windowEquivalentNoiseBandwidthBins', meta.windowEquivalentNoiseBandwidthBins ?? '', 'bins'],
+          ['zeroPaddingApplied', meta.zeroPaddingApplied ?? '', 'boolean'],
           ['nyquistHz', meta.nyquistHz ?? '', 'Hz'],
           ['powerUnit', meta.units ?? '', ''],
+          ['calculationResolutionSeconds', meta.calculationResolutionSeconds ?? '', 's'],
+          ['displaySummaryMode', meta.displaySummaryMode ?? '', ''],
+          ['dataTimezone', meta.dataTimezone ?? meta.analysisTimezone ?? '', ''],
+          ['displayTimezone', meta.displayTimezone ?? '', ''],
+          ['utcOffset', meta.utcOffset ?? '', ''],
           ['candidateSegmentCount', meta.candidateSegmentCount ?? '', 'count'],
           ['acceptedSegmentCount', meta.acceptedSegmentCount ?? '', 'count'],
           ['rejectedSegmentCount', meta.rejectedSegmentCount ?? '', 'count'],
@@ -12211,6 +12620,10 @@
         if (!saved.spectralScale) merged.spectralScale = spectralDefaults.scale;
         if (!saved.spectralAveraging) merged.spectralAveraging = spectralDefaults.averaging;
         if (!Number.isFinite(Number(saved.spectralMaxPeaks))) merged.spectralMaxPeaks = spectralDefaults.maxPeaks;
+        if (!saved.spectralDisplaySummary) merged.spectralDisplaySummary = DEFAULT_SETTINGS.spectralDisplaySummary;
+        if (!saved.spectralDisplayTimezone) merged.spectralDisplayTimezone = DEFAULT_SETTINGS.spectralDisplayTimezone;
+        if (!Number.isFinite(Number(saved.spectralSignificantSnrDb))) merged.spectralSignificantSnrDb = DEFAULT_SETTINGS.spectralSignificantSnrDb;
+        if (!Number.isFinite(Number(saved.spectralWeakSnrDb))) merged.spectralWeakSnrDb = DEFAULT_SETTINGS.spectralWeakSnrDb;
         return merged;
       } catch { return { ...DEFAULT_SETTINGS }; }
     }
@@ -12257,6 +12670,10 @@
       if ($('spectralScale')) $('spectralScale').value = s.spectralScale || spectralDefaultParameters('psd').scale;
       if ($('spectralAveraging')) $('spectralAveraging').value = s.spectralAveraging || spectralDefaultParameters('psd').averaging;
       if ($('spectralMaxPeaks')) $('spectralMaxPeaks').value = s.spectralMaxPeaks ?? spectralDefaultParameters('psd').maxPeaks;
+      if ($('spectralDisplaySummary')) $('spectralDisplaySummary').value = s.spectralDisplaySummary || DEFAULT_SETTINGS.spectralDisplaySummary;
+      if ($('spectralDisplayTimezone')) $('spectralDisplayTimezone').value = s.spectralDisplayTimezone || DEFAULT_SETTINGS.spectralDisplayTimezone;
+      if ($('spectralSignificantSnrDb')) $('spectralSignificantSnrDb').value = s.spectralSignificantSnrDb ?? DEFAULT_SETTINGS.spectralSignificantSnrDb;
+      if ($('spectralWeakSnrDb')) $('spectralWeakSnrDb').value = s.spectralWeakSnrDb ?? DEFAULT_SETTINGS.spectralWeakSnrDb;
       $('analysisSourceSelect').value = s.oscillationSource || 'tr';
       $('oscSourceSelect').value = s.oscillationSource || 'tr';
       state.oscillationSource = getAnalysisSource();
@@ -12296,6 +12713,10 @@
         spectralScale: $('spectralScale')?.value || spectralDefaultParameters('psd').scale,
         spectralAveraging: $('spectralAveraging')?.value || spectralDefaultParameters('psd').averaging,
         spectralMaxPeaks: Number($('spectralMaxPeaks')?.value || spectralDefaultParameters('psd').maxPeaks),
+        spectralDisplaySummary: $('spectralDisplaySummary')?.value || DEFAULT_SETTINGS.spectralDisplaySummary,
+        spectralDisplayTimezone: $('spectralDisplayTimezone')?.value || DEFAULT_SETTINGS.spectralDisplayTimezone,
+        spectralSignificantSnrDb: Number($('spectralSignificantSnrDb')?.value || DEFAULT_SETTINGS.spectralSignificantSnrDb),
+        spectralWeakSnrDb: Number($('spectralWeakSnrDb')?.value || DEFAULT_SETTINGS.spectralWeakSnrDb),
         filterTaps: Number($('filterTaps').value),
         minDuration: Number($('minDuration').value),
         repeatedValueSeconds: Number($('repeatedValueSeconds')?.value || 15),
@@ -12553,9 +12974,12 @@
         if (routeLang && routeLang !== lang) setLanguage(routeLang);
         if (date) {
           $('dateSelect').value = date;
-          $('analysisDateSelect').value = date;
-          $('analysisStartDate').value = $('analysisStartDate').value || date;
-          $('analysisEndDate').value = $('analysisEndDate').value || date;
+          if (!mode || mode === 'single') setAnalysisSingleDate(date, { updateRoute: false });
+          else {
+            $('analysisDateSelect').value = date;
+            $('analysisStartDate').value = $('analysisStartDate').value || date;
+            $('analysisEndDate').value = $('analysisEndDate').value || date;
+          }
         }
         if (source && $('analysisSourceSelect').querySelector(`option[value="${source}"]`)) {
           $('analysisSourceSelect').value = source;
@@ -13546,14 +13970,16 @@
         spectralMinValidRatioLabel: 'Minimum geçerli örnek oranı (%)',
         spectralScaleLabel: 'Güç ölçeği',
         spectralScaleLinear: 'Lineer',
-        spectralScaleLog: 'Log',
+        spectralScaleLog: 'Logaritmik (dB)',
         spectralDetrendConstant: 'Sabit ortalama',
-        spectralDetrendLinear: 'Doğrusal',
-        spectralDetrendNone: 'Yok',
+        spectralDetrendLinear: 'Doğrusal trend',
+        spectralDetrendNone: 'Trend çıkarma yok',
         spectralAveragingLabel: 'Welch ortalaması',
-        spectralAveragingMean: 'Ortalama',
-        spectralAveragingMedian: 'Medyan',
+        spectralAveragingMean: 'Aritmetik ortalama',
+        spectralAveragingMedian: 'Medyan ortalama',
         spectralMaxPeaksLabel: 'Spektral tepe sayısı',
+        spectralSignificantSnrDbLabel: 'Anlamlı tepe SNR (dB)',
+        spectralWeakSnrDbLabel: 'Zayıf tepe SNR (dB)',
         spectralPeaksTitle: 'Spektral Tepeler',
         spectrogramTimeFrequencyRegionsTitle: 'Zaman-Frekans Bölümleri',
         spectrogramWindowQualityTitle: 'Pencere Kalitesi',
@@ -13576,19 +14002,55 @@
         spectralEffectiveSegment: 'Etkili segment',
         spectralFftLength: 'FFT uzunluğu',
         spectralFrequencyResolution: 'Frekans çözünürlüğü',
+        spectralFftBinSpacing: 'FFT bin aralığı',
+        spectralFftBinSpacingHelp: 'Sıfır doldurma sonrası FFT frekans örnekleri arasındaki aralıktır.',
+        spectralEffectiveResolution: 'Etkin spektral çözünürlük',
+        spectralEffectiveResolutionHelp: 'Pencere fonksiyonunun eşdeğer gürültü bant genişliğine göre ayrıştırabildiği yaklaşık frekans genişliğidir.',
         spectralStep: 'Adım',
         spectralOverlap: 'Örtüşme',
         spectralSegmentCounts: 'Aday/kullanılan/reddedilen segment',
         spectralImputationCounts: 'Doldurulan segment ve örnek',
         spectralAdjustment: 'Parametre ayarlaması',
+        spectralAdjustmentApplied: 'Uygulandı',
         spectralNoAdjustment: 'Yok',
+        spectralAdjustment_fft_zero_padding: 'FFT uzunluğu için bir sonraki 2 kuvvetine sıfır doldurma uygulandı',
+        spectralAdjustment_segment_rounded_to_samples: 'Segment süresi tam örnek sayısına yuvarlandı',
+        spectralAdjustment_step_rounded_to_samples: 'Adım süresi tam örnek sayısına yuvarlandı',
+        spectralZeroPaddingHelp: 'Sıfır doldurma yalnız FFT ara değerlerini sıklaştırır; gerçek spektral çözünürlük pencere süresi ve pencere fonksiyonuyla sınırlıdır.',
         spectralSamplesUnit: 'örnek',
         spectralSegmentUsage: 'Segment kullanımı',
         spectralNoFindingsTag: 'spektral analiz',
+        spectralTechnicalDetailsTitle: 'Detaylı Metrikler ve Örnek Analizi',
+        spectralCalculationResolution: 'Hesaplama çözünürlüğü',
+        spectralDisplaySummaryLabel: 'Görüntü özeti',
+        spectralDisplayDetailed: 'Ayrıntılı',
+        spectralDisplay15m: '15 dakika',
+        spectralDisplay1h: '1 saat',
+        spectralDisplayTimezoneLabel: 'Zaman dilimi gösterimi',
+        spectralDisplayTimezoneSource: 'Kaynak zaman dilimi',
+        spectralDisplayTimezoneTr: 'Türkiye saati',
+        spectralDisplayTimezoneUtc: 'UTC',
+        spectralSourceTimezone: 'Kaynak zaman dilimi',
+        spectralDataQuality: 'Veri kalitesi',
+        spectralWindowRectangular: 'Dikdörtgen',
+        spectralGapHandling: 'Eksik veri davranışı',
+        spectralGapSegmentMean: 'Segment ortalamasıyla doldurma',
+        spectralGapReject: 'Eksik segmenti reddet',
+        spectralGapShortLinear: 'Kısa iç boşluğu doğrusal doldurma',
+        spectralPeakStatus: 'Tepe durumu',
+        spectralPeakConfidence: 'Güven',
+        spectralPeakStatusSignificant: 'Anlamlı',
+        spectralPeakStatusWeak: 'Zayıf',
+        spectralPeakStatusNoise: 'Gürültü düzeyi',
+        spectralPeakStatusRejected: 'Reddedildi',
+        spectralConfidenceHigh: 'Yüksek',
+        spectralConfidenceMedium: 'Orta',
+        spectralConfidenceLow: 'Düşük',
+        spectralConfidenceRejected: 'Reddedildi',
         spectralSelectedBand: 'Seçili frekans bandı',
         spectralPeakMarkers: 'Tepe işaretçileri',
         spectralNoiseFloor: 'Gürültü tabanı',
-        spectralConfidence95: '%95 güven bandı',
+        spectralConfidence95: 'Yaklaşık %95 güven bandı',
         spectrogramPsdUnit: 'PSD seviyesi (dB re 1 Hz²/Hz)',
         spectrogramWindowCenter: 'Pencere merkez zamanı',
         spectrogramValidRatio: 'Geçerli oran',
@@ -13597,6 +14059,7 @@
         spectrogramWindowStatus: 'Durum',
         spectrogramPeakPsd: 'Tepe PSD',
         spectrogramStatusAccepted: 'Kullanıldı',
+        spectrogramStatusImputed: 'Dolduruldu',
         spectrogramStatusRejected: 'Reddedildi',
         spectrogramInvalidWindows: 'Geçersiz pencereler',
         spectrogramQualityIndicator: 'Doldurma kalite göstergesi',
@@ -13604,10 +14067,17 @@
         spectrogramMedianFrequency: 'Medyan frekans',
         spectrogramFrequencyRange: 'Min-maks frekans',
         spectrogramRidgeContinuity: 'Sırt sürekliliği',
+        spectrogramNoProblemWindows: 'Tüm pencereler kabul edildi; problemli veya doldurulmuş pencere yok.',
+        spectrogramNoSignificantRegions: 'Seçilen eşiklerde anlamlı zaman-frekans bölgesi bulunmadı.',
+        psdResultDescription: '{peaks} spektral tepe raporlandı; {used} segment kullanıldı, {rejected} segment reddedildi.',
+        spectrogramResultDescription: '{windows} spektrogram penceresi kullanıldı; {rejected} pencere reddedildi, {imputed} pencere dolduruldu.',
+        spectralWorkloadEstimate: 'Tahmini hesap yükü: {windows} pencere, {cells} hücre, yaklaşık {mb} MB.',
         analysisSpectralRangeError: 'Spektral frekans aralığı geçersiz: 0 <= minimum < maksimum <= Nyquist olmalıdır.',
         analysisSpectralStepError: 'Spektral adım geçersiz: adım pozitif olmalı ve segment süresini aşmamalıdır.',
         analysisSpectralValidRatioError: 'Minimum geçerli örnek oranı 0 ile 100 arasında olmalıdır.',
         analysisSpectralMaxPeaksError: 'Spektral tepe sayısı pozitif tam sayı olmalıdır.',
+        analysisPsdRangeLimitError: 'Welch PSD tarih aralığı en fazla 7 gün olabilir.',
+        analysisSpectrogramCellLimitError: 'Spektrogram tahmini {cells} hücre üretecek. Daha kısa dönem, daha büyük adım veya daha dar frekans aralığı seçin.',
         statsBandMinLabel: 'İstatistik alt bandı (Hz)',
         statsBandMaxLabel: 'İstatistik üst bandı (Hz)',
         statsGroupSamples: 'Örnek kalitesi',
@@ -14092,14 +14562,16 @@
         spectralMinValidRatioLabel: 'Minimum valid samples per segment (%)',
         spectralScaleLabel: 'Power scale',
         spectralScaleLinear: 'Linear',
-        spectralScaleLog: 'Log',
+        spectralScaleLog: 'Logarithmic (dB)',
         spectralDetrendConstant: 'Constant mean',
-        spectralDetrendLinear: 'Linear',
-        spectralDetrendNone: 'None',
+        spectralDetrendLinear: 'Linear trend',
+        spectralDetrendNone: 'No detrending',
         spectralAveragingLabel: 'Welch averaging',
-        spectralAveragingMean: 'Mean',
-        spectralAveragingMedian: 'Median',
+        spectralAveragingMean: 'Arithmetic mean',
+        spectralAveragingMedian: 'Median average',
         spectralMaxPeaksLabel: 'Spectral peak count',
+        spectralSignificantSnrDbLabel: 'Significant peak SNR (dB)',
+        spectralWeakSnrDbLabel: 'Weak peak SNR (dB)',
         spectralPeaksTitle: 'Spectral Peaks',
         spectrogramTimeFrequencyRegionsTitle: 'Time-Frequency Regions',
         spectrogramWindowQualityTitle: 'Window Quality',
@@ -14122,19 +14594,55 @@
         spectralEffectiveSegment: 'Effective segment',
         spectralFftLength: 'FFT length',
         spectralFrequencyResolution: 'Frequency resolution',
+        spectralFftBinSpacing: 'FFT bin spacing',
+        spectralFftBinSpacingHelp: 'Spacing between FFT frequency samples after zero padding.',
+        spectralEffectiveResolution: 'Effective spectral resolution',
+        spectralEffectiveResolutionHelp: 'Approximate resolvable frequency width from the window equivalent noise bandwidth.',
         spectralStep: 'Step',
         spectralOverlap: 'Overlap',
         spectralSegmentCounts: 'Candidate/used/rejected segments',
         spectralImputationCounts: 'Imputed segments and samples',
         spectralAdjustment: 'Parameter adjustment',
+        spectralAdjustmentApplied: 'Applied',
         spectralNoAdjustment: 'None',
+        spectralAdjustment_fft_zero_padding: 'Zero padding was applied to the next power-of-two FFT length',
+        spectralAdjustment_segment_rounded_to_samples: 'Segment duration was rounded to a whole sample count',
+        spectralAdjustment_step_rounded_to_samples: 'Step duration was rounded to a whole sample count',
+        spectralZeroPaddingHelp: 'Zero padding only densifies FFT interpolation; actual spectral resolution is limited by window duration and window function.',
         spectralSamplesUnit: 'samples',
         spectralSegmentUsage: 'Segment usage',
         spectralNoFindingsTag: 'spectral analysis',
+        spectralTechnicalDetailsTitle: 'Detailed Metrics and Sample Analysis',
+        spectralCalculationResolution: 'Calculation resolution',
+        spectralDisplaySummaryLabel: 'Display summary',
+        spectralDisplayDetailed: 'Detailed',
+        spectralDisplay15m: '15 minutes',
+        spectralDisplay1h: '1 hour',
+        spectralDisplayTimezoneLabel: 'Time-zone display',
+        spectralDisplayTimezoneSource: 'Source time zone',
+        spectralDisplayTimezoneTr: 'Türkiye time',
+        spectralDisplayTimezoneUtc: 'UTC',
+        spectralSourceTimezone: 'Source time zone',
+        spectralDataQuality: 'Data quality',
+        spectralWindowRectangular: 'Rectangular',
+        spectralGapHandling: 'Missing-data handling',
+        spectralGapSegmentMean: 'Segment-mean imputation',
+        spectralGapReject: 'Reject missing segment',
+        spectralGapShortLinear: 'Short internal linear gap fill',
+        spectralPeakStatus: 'Peak status',
+        spectralPeakConfidence: 'Confidence',
+        spectralPeakStatusSignificant: 'Significant',
+        spectralPeakStatusWeak: 'Weak',
+        spectralPeakStatusNoise: 'Noise-level',
+        spectralPeakStatusRejected: 'Rejected',
+        spectralConfidenceHigh: 'High',
+        spectralConfidenceMedium: 'Medium',
+        spectralConfidenceLow: 'Low',
+        spectralConfidenceRejected: 'Rejected',
         spectralSelectedBand: 'Selected frequency band',
         spectralPeakMarkers: 'Peak markers',
         spectralNoiseFloor: 'Noise floor',
-        spectralConfidence95: '95% confidence band',
+        spectralConfidence95: 'Approximate 95% confidence band',
         spectrogramPsdUnit: 'PSD level (dB re 1 Hz²/Hz)',
         spectrogramWindowCenter: 'Window center time',
         spectrogramValidRatio: 'Valid ratio',
@@ -14143,6 +14651,7 @@
         spectrogramWindowStatus: 'Status',
         spectrogramPeakPsd: 'Peak PSD',
         spectrogramStatusAccepted: 'Used',
+        spectrogramStatusImputed: 'Imputed',
         spectrogramStatusRejected: 'Rejected',
         spectrogramInvalidWindows: 'Invalid windows',
         spectrogramQualityIndicator: 'Imputation quality indicator',
@@ -14150,10 +14659,17 @@
         spectrogramMedianFrequency: 'Median frequency',
         spectrogramFrequencyRange: 'Min-max frequency',
         spectrogramRidgeContinuity: 'Ridge continuity',
+        spectrogramNoProblemWindows: 'All windows were accepted; there are no problematic or imputed windows.',
+        spectrogramNoSignificantRegions: 'No significant time-frequency region was found at the selected thresholds.',
+        psdResultDescription: '{peaks} spectral peaks reported; {used} segments used and {rejected} segments rejected.',
+        spectrogramResultDescription: '{windows} spectrogram windows used; {rejected} windows rejected and {imputed} windows imputed.',
+        spectralWorkloadEstimate: 'Estimated workload: {windows} windows, {cells} cells, about {mb} MB.',
         analysisSpectralRangeError: 'Invalid spectral frequency range: expected 0 <= minimum < maximum <= Nyquist.',
         analysisSpectralStepError: 'Invalid spectral step: step must be positive and must not exceed segment duration.',
         analysisSpectralValidRatioError: 'Minimum valid sample ratio must be between 0 and 100.',
         analysisSpectralMaxPeaksError: 'Spectral peak count must be a positive integer.',
+        analysisPsdRangeLimitError: 'Welch PSD date range can be at most 7 days.',
+        analysisSpectrogramCellLimitError: 'The spectrogram would produce an estimated {cells} cells. Choose a shorter period, larger step, or narrower frequency range.',
         statsBandMinLabel: 'Statistics lower band (Hz)',
         statsBandMaxLabel: 'Statistics upper band (Hz)',
         statsGroupSamples: 'Sample quality',

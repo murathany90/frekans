@@ -39,6 +39,19 @@ const ALLOWED_SPECTRAL_SCALES = new Set(["linear", "log"]);
 const ALLOWED_SPECTRAL_AVERAGING = new Set(["mean", "median"]);
 const ALLOWED_GAP_HANDLING = new Set(["segment-mean", "reject", "short-gap-linear"]);
 const DEFAULT_SPECTROGRAM_MAX_CELLS = 1_500_000;
+const DEFAULT_SPECTRAL_PEAK_CLASSIFICATION = Object.freeze({
+  significantSnrDb: 6,
+  weakSnrDb: 3,
+  noiseSnrDb: 0,
+  minProminenceRatio: 0.05
+});
+const DEFAULT_SPECTROGRAM_RIDGE_PARAMETERS = Object.freeze({
+  minSnrDb: 6,
+  minProminenceRatio: 0.05,
+  minDurationSeconds: 180,
+  maxFrequencyJumpHz: 0.04,
+  minContinuityRatio: 0.6
+});
 
 export function mHzPerSecondToHzPerSecond(value) {
   return Number(value) / 1000;
@@ -604,12 +617,14 @@ export function computeWelchPsd(values, options = {}) {
   const filtered = filterFrequencyRange(allFrequencies, allPsd, params.minHz, params.maxHz);
   const rawPeaks = findPeaks(filtered.frequencies, filtered.values, params.maxPeaks);
   const noiseFloor = medianWithoutPeakBins(filtered.values, rawPeaks, filtered.frequencies);
-  const peaks = enrichSpectralPeaks(rawPeaks, filtered.frequencies, filtered.values, noiseFloor);
+  const peakCandidates = enrichSpectralPeaks(rawPeaks, filtered.frequencies, filtered.values, noiseFloor, params);
+  const peaks = peakCandidates.filter(peak => peak.peakStatus !== "rejected");
   const bandEnergies = computeBandEnergies(allFrequencies, allPsd, params.bands);
   const firstPeak = peaks[0] || { frequencyHz: NaN, psd: NaN, power: NaN };
   const snrLinear = Number.isFinite(firstPeak.psd) ? firstPeak.psd / Math.max(noiseFloor, EPSILON) : NaN;
   const snrDb = ratioToDb(snrLinear);
   const degreesOfFreedom = segmentCount * 2;
+  const effectiveDegreesOfFreedom = effectiveWelchDegreesOfFreedom(segmentCount, params.overlapRatio, params.averaging);
   const totalBandPower = integratePower(allFrequencies, allPsd, params.minHz, params.maxHz);
   const variance = finiteVariance(values);
   const totalPower = integratePower(allFrequencies, allPsd, 0, params.nyquistHz);
@@ -632,9 +647,14 @@ export function computeWelchPsd(values, options = {}) {
     overlapSamples: params.overlapSamples,
     overlapRatio: params.overlapRatio,
     frequencyResolutionHz: params.frequencyResolutionHz,
+    fftBinSpacingHz: params.fftBinSpacingHz,
+    effectiveSpectralResolutionHz: params.effectiveSpectralResolutionHz,
+    windowEquivalentNoiseBandwidthBins: params.windowEquivalentNoiseBandwidthBins,
+    zeroPaddingApplied: params.zeroPaddingApplied,
     nyquistHz: params.nyquistHz,
     adjustmentApplied: params.adjustmentApplied,
     adjustmentReason: params.adjustmentReason,
+    adjustmentReasonCodes: params.adjustmentReasonCodes,
     windowType: params.windowType,
     detrend: params.detrend,
     segmentCount,
@@ -651,16 +671,27 @@ export function computeWelchPsd(values, options = {}) {
     allFrequencies: Array.from(allFrequencies),
     allPsd: Array.from(allPsd),
     peaks,
+    peakCandidates,
     bandEnergies,
     noiseFloor,
     snr: snrLinear,
     snrLinear,
     snrDb,
     degreesOfFreedom,
-    confidenceInterval95: spectralConfidenceInterval95(degreesOfFreedom),
+    nominalDegreesOfFreedom: degreesOfFreedom,
+    effectiveDegreesOfFreedom,
+    confidenceInterval95: spectralConfidenceInterval95(effectiveDegreesOfFreedom, params.averaging),
     totalBandPower,
     parsevalErrorRatio,
     averagingMethod: params.averaging,
+    scale: params.scale,
+    analysisStartEpochMs: params.analysisStartEpochMs,
+    analysisTimezone: params.analysisTimezone,
+    dataTimezone: params.dataTimezone,
+    displayTimezone: params.displayTimezone,
+    utcOffset: params.utcOffset,
+    calculationResolutionSeconds: params.calculationResolutionSeconds,
+    displaySummaryMode: params.displaySummaryMode,
     frequencyHz: firstPeak.frequencyHz,
     power: firstPeak.psd,
     parameters: { ...params }
@@ -911,6 +942,7 @@ export function computeStftSpectrogram(values, options = {}) {
   const imputedSamplesByTime = new Uint32Array(rowCount);
   const powerMatrix = [];
   const peaksByTime = [];
+  const ridgePoints = [];
   let acceptedSegmentCount = 0;
   let imputedSegmentCount = 0;
   let totalImputedSampleCount = 0;
@@ -925,26 +957,65 @@ export function computeStftSpectrogram(values, options = {}) {
     imputedSamplesByTime[rowIndex] = segment.imputedCount;
     if (!segment.accepted) {
       powerMatrix.push(Array.from({ length: columnCount }, () => NaN));
-      peaksByTime.push({ timeSeconds: time, frequencyHz: NaN, power: NaN });
+      const rejectedPeak = {
+        timeSeconds: time,
+        frequencyHz: NaN,
+        power: NaN,
+        powerLinear: NaN,
+        psdLevelDb: NaN,
+        snrLinear: NaN,
+        snrDb: NaN,
+        peakProminence: NaN,
+        validRatio: segment.validRatio,
+        imputedCount: segment.imputedCount,
+        accepted: false,
+        significant: false,
+        rejectedReason: segment.rejectedReason
+      };
+      peaksByTime.push(rejectedPeak);
+      ridgePoints.push(rejectedPeak);
       continue;
     }
     const prepared = new Float64Array(params.fftLengthSamples);
     for (let i = 0; i < segment.values.length; i += 1) prepared[i] = segment.values[i] * window[i];
     const spectrum = fftReal(prepared);
     const row = [];
-    let best = { frequencyHz: NaN, power: -Infinity };
+    const linearPowers = [];
+    let best = { frequencyHz: NaN, power: -Infinity, powerLinear: -Infinity, columnIndex: -1 };
     for (let columnIndex = 0; columnIndex < frequencyIndices.length; columnIndex += 1) {
       const k = frequencyIndices[columnIndex];
       let scale = 1 / (params.sampleRateHz * windowEnergy);
       if (k > 0 && k < params.fftLengthSamples / 2) scale *= 2;
-      let power = (spectrum.re[k] * spectrum.re[k] + spectrum.im[k] * spectrum.im[k]) * scale;
-      if (params.scale === "log") power = 10 * Math.log10(Math.max(power, EPSILON));
+      const linearPower = (spectrum.re[k] * spectrum.re[k] + spectrum.im[k] * spectrum.im[k]) * scale;
+      const power = params.scale === "log" ? 10 * Math.log10(Math.max(linearPower, EPSILON)) : linearPower;
+      linearPowers.push(linearPower);
       powerValues[rowIndex * columnCount + columnIndex] = power;
       row.push(power);
-      if (power > best.power) best = { frequencyHz: allFrequencies[k], power };
+      if (linearPower > best.powerLinear) best = { frequencyHz: allFrequencies[k], power, powerLinear: linearPower, columnIndex };
     }
+    const rowNoiseFloor = percentile(linearPowers, 0.5) || EPSILON;
+    const rowSnrLinear = best.powerLinear / Math.max(rowNoiseFloor, EPSILON);
+    const rowSnrDb = ratioToDb(rowSnrLinear);
+    const rowPeakProminence = best.powerLinear - rowNoiseFloor;
+    const significant = isSignificantSpectrogramPeak({ snrDb: rowSnrDb, peakProminence: rowPeakProminence, noiseFloor: rowNoiseFloor }, params);
+    const enrichedPeak = {
+      timeSeconds: time,
+      frequencyHz: best.frequencyHz,
+      power: best.power,
+      powerLinear: best.powerLinear,
+      psdLevelDb: powerToDb(best.powerLinear),
+      snrLinear: rowSnrLinear,
+      snrDb: rowSnrDb,
+      peakProminence: rowPeakProminence,
+      validRatio: segment.validRatio,
+      imputedCount: segment.imputedCount,
+      accepted: true,
+      significant,
+      columnIndex: best.columnIndex
+    };
     powerMatrix.push(row);
-    peaksByTime.push({ timeSeconds: time, ...best });
+    peaksByTime.push(enrichedPeak);
+    ridgePoints.push(enrichedPeak);
     acceptedSegmentCount += 1;
     if (segment.imputedCount > 0) imputedSegmentCount += 1;
     totalImputedSampleCount += segment.imputedCount;
@@ -961,16 +1032,31 @@ export function computeStftSpectrogram(values, options = {}) {
     minimumAcceptedValidRatio
   });
 
+  const timeBinsSeconds = Float64Array.from(timeBins);
+  const timeBinsEpochMs = new Float64Array(rowCount);
+  if (Number.isFinite(params.analysisStartEpochMs)) {
+    for (let index = 0; index < rowCount; index += 1) {
+      timeBinsEpochMs[index] = params.analysisStartEpochMs + timeBinsSeconds[index] * 1000;
+    }
+  } else {
+    timeBinsEpochMs.fill(NaN);
+  }
+  const timeFrequencyRegions = buildSpectrogramRegions(ridgePoints, params);
+
   return {
     method: "stft-spectrogram",
     units: params.scale === "log" ? "dB re 1 Hz²/Hz" : "Hz^2/Hz",
     timeBins,
+    timeBinsSeconds,
+    timeBinsEpochMs,
     frequencyBins,
     powerValues,
     rowCount,
     columnCount,
     powerMatrix,
     peaksByTime,
+    ridgePoints,
+    timeFrequencyRegions,
     segmentLength: params.segmentLength,
     requestedSegmentSeconds: params.requestedSegmentSeconds,
     requestedSegmentSamples: params.requestedSegmentSamples,
@@ -983,9 +1069,14 @@ export function computeStftSpectrogram(values, options = {}) {
     overlapSamples: params.overlapSamples,
     overlapRatio: params.overlapRatio,
     frequencyResolutionHz: params.frequencyResolutionHz,
+    fftBinSpacingHz: params.fftBinSpacingHz,
+    effectiveSpectralResolutionHz: params.effectiveSpectralResolutionHz,
+    windowEquivalentNoiseBandwidthBins: params.windowEquivalentNoiseBandwidthBins,
+    zeroPaddingApplied: params.zeroPaddingApplied,
     nyquistHz: params.nyquistHz,
     adjustmentApplied: params.adjustmentApplied,
     adjustmentReason: params.adjustmentReason,
+    adjustmentReasonCodes: params.adjustmentReasonCodes,
     windowType: params.windowType,
     detrend: params.detrend,
     sampleRateHz: params.sampleRateHz,
@@ -998,6 +1089,11 @@ export function computeStftSpectrogram(values, options = {}) {
     timeResolutionSeconds: params.effectiveStepSeconds,
     analysisStartEpochMs: params.analysisStartEpochMs,
     analysisTimezone: params.analysisTimezone,
+    dataTimezone: params.dataTimezone,
+    displayTimezone: params.displayTimezone,
+    utcOffset: params.utcOffset,
+    calculationResolutionSeconds: params.calculationResolutionSeconds,
+    displaySummaryMode: params.displaySummaryMode,
     timeBinReference: "window-center",
     invalidWindowCount: quality.rejectedSegmentCount,
     imputedWindowCount: quality.imputedSegmentCount,
@@ -1217,14 +1313,44 @@ export function normalizeSpectralOptions(values, options = {}, defaults = DEFAUL
   }
   const maxInterpolationGapSamples = Math.max(1, Math.round(Number(options.maxInterpolationGapSamples ?? 2)));
   const maxCells = Math.max(1, Math.round(Number(options.maxCells ?? DEFAULT_SPECTROGRAM_MAX_CELLS)));
-  const frequencyResolutionHz = sampleRateHz / fftLengthSamples;
+  const fftBinSpacingHz = sampleRateHz / fftLengthSamples;
+  const windowEquivalentNoiseBandwidthBins = equivalentNoiseBandwidthBins(makeWindow(windowType, effectiveSegmentSamples));
+  const effectiveSpectralResolutionHz = windowEquivalentNoiseBandwidthBins * sampleRateHz / effectiveSegmentSamples;
+  const frequencyResolutionHz = fftBinSpacingHz;
+  const zeroPaddingApplied = fftLengthSamples !== effectiveSegmentSamples;
   const adjustmentReasons = [];
-  if (fftLengthSamples !== effectiveSegmentSamples) adjustmentReasons.push("FFT zero-padding to next power of two");
-  if (Math.abs(effectiveSegmentSeconds - requestedSegmentSeconds) > EPSILON) adjustmentReasons.push("segment duration rounded to whole samples");
-  if (Math.abs(effectiveStepSeconds - requestedStepSeconds) > EPSILON) adjustmentReasons.push("step duration rounded to whole samples");
+  const adjustmentReasonCodes = [];
+  if (zeroPaddingApplied) {
+    adjustmentReasons.push("FFT zero-padding to next power of two");
+    adjustmentReasonCodes.push("fft-zero-padding");
+  }
+  if (Math.abs(effectiveSegmentSeconds - requestedSegmentSeconds) > EPSILON) {
+    adjustmentReasons.push("segment duration rounded to whole samples");
+    adjustmentReasonCodes.push("segment-rounded-to-samples");
+  }
+  if (Math.abs(effectiveStepSeconds - requestedStepSeconds) > EPSILON) {
+    adjustmentReasons.push("step duration rounded to whole samples");
+    adjustmentReasonCodes.push("step-rounded-to-samples");
+  }
   const bands = options.bands || [{ name: "selected", minHz, maxHz }];
   const analysisStartEpochMs = Number.isFinite(Number(options.analysisStartEpochMs)) ? Number(options.analysisStartEpochMs) : null;
   const analysisTimezone = options.analysisTimezone || "UTC";
+  const dataTimezone = options.dataTimezone || analysisTimezone;
+  const displayTimezone = options.displayTimezone || dataTimezone;
+  const utcOffset = options.utcOffset || timezoneOffsetLabel(displayTimezone, analysisStartEpochMs);
+  const displaySummaryMode = String(options.displaySummaryMode ?? "detailed");
+  const calculationResolutionSeconds = Number.isFinite(Number(options.calculationResolutionSeconds))
+    ? Number(options.calculationResolutionSeconds)
+    : 1 / sampleRateHz;
+  const significantPeakSnrDb = Number(options.significantPeakSnrDb ?? DEFAULT_SPECTRAL_PEAK_CLASSIFICATION.significantSnrDb);
+  const weakPeakSnrDb = Number(options.weakPeakSnrDb ?? DEFAULT_SPECTRAL_PEAK_CLASSIFICATION.weakSnrDb);
+  const noisePeakSnrDb = Number(options.noisePeakSnrDb ?? DEFAULT_SPECTRAL_PEAK_CLASSIFICATION.noiseSnrDb);
+  const minPeakProminenceRatio = Number(options.minPeakProminenceRatio ?? DEFAULT_SPECTRAL_PEAK_CLASSIFICATION.minProminenceRatio);
+  const ridgeMinSnrDb = Number(options.ridgeMinSnrDb ?? DEFAULT_SPECTROGRAM_RIDGE_PARAMETERS.minSnrDb);
+  const ridgeMinProminenceRatio = Number(options.ridgeMinProminenceRatio ?? DEFAULT_SPECTROGRAM_RIDGE_PARAMETERS.minProminenceRatio);
+  const ridgeMinDurationSeconds = Math.max(0, Number(options.ridgeMinDurationSeconds ?? DEFAULT_SPECTROGRAM_RIDGE_PARAMETERS.minDurationSeconds));
+  const ridgeMaxFrequencyJumpHz = Math.max(0, Number(options.ridgeMaxFrequencyJumpHz ?? DEFAULT_SPECTROGRAM_RIDGE_PARAMETERS.maxFrequencyJumpHz));
+  const ridgeMinContinuityRatio = clamp01(Number(options.ridgeMinContinuityRatio ?? DEFAULT_SPECTROGRAM_RIDGE_PARAMETERS.minContinuityRatio));
 
   return {
     mode,
@@ -1242,9 +1368,14 @@ export function normalizeSpectralOptions(values, options = {}, defaults = DEFAUL
     overlapSamples,
     overlapRatio,
     frequencyResolutionHz,
+    fftBinSpacingHz,
+    effectiveSpectralResolutionHz,
+    windowEquivalentNoiseBandwidthBins,
+    zeroPaddingApplied,
     nyquistHz,
     adjustmentApplied: adjustmentReasons.length > 0,
     adjustmentReason: adjustmentReasons.length ? adjustmentReasons.join("; ") : "none",
+    adjustmentReasonCodes,
     windowType,
     detrend,
     minHz,
@@ -1258,7 +1389,21 @@ export function normalizeSpectralOptions(values, options = {}, defaults = DEFAUL
     maxInterpolationGapSamples,
     maxCells,
     analysisStartEpochMs,
-    analysisTimezone
+    analysisTimezone,
+    dataTimezone,
+    displayTimezone,
+    utcOffset,
+    displaySummaryMode,
+    calculationResolutionSeconds,
+    significantPeakSnrDb,
+    weakPeakSnrDb,
+    noisePeakSnrDb,
+    minPeakProminenceRatio,
+    ridgeMinSnrDb,
+    ridgeMinProminenceRatio,
+    ridgeMinDurationSeconds,
+    ridgeMaxFrequencyJumpHz,
+    ridgeMinContinuityRatio
   };
 }
 
@@ -1397,13 +1542,124 @@ function powerToDb(value) {
   return Number.isFinite(value) && value > 0 ? 10 * Math.log10(value) : NaN;
 }
 
-function enrichSpectralPeaks(peaks, frequencies, values, noiseFloor) {
+function equivalentNoiseBandwidthBins(window) {
+  let sum = 0;
+  let sumSquares = 0;
+  for (const value of window || []) {
+    sum += value;
+    sumSquares += value * value;
+  }
+  return sum > EPSILON ? (window.length * sumSquares) / (sum * sum) : 1;
+}
+
+function effectiveWelchDegreesOfFreedom(segmentCount, overlapRatio, averagingMethod) {
+  const nominal = Math.max(0, segmentCount * 2);
+  if (!nominal) return 0;
+  const overlapPenalty = 1 - Math.min(0.75, Math.max(0, Number(overlapRatio) || 0)) * 0.5;
+  const averagingPenalty = averagingMethod === "median" ? 0.7 : 1;
+  return Math.max(1, nominal * overlapPenalty * averagingPenalty);
+}
+
+function classifySpectralPeak({ snrDb, peakProminence, noiseFloor }, params = {}) {
+  const prominenceRatio = Math.max(0, Number(peakProminence) || 0) / Math.max(Math.abs(Number(noiseFloor) || 0), EPSILON);
+  if (!Number.isFinite(snrDb) || !Number.isFinite(peakProminence) || peakProminence <= EPSILON) return "rejected";
+  if (snrDb >= params.significantPeakSnrDb && prominenceRatio >= params.minPeakProminenceRatio) return "significant";
+  if (snrDb >= params.weakPeakSnrDb && prominenceRatio >= params.minPeakProminenceRatio) return "weak";
+  if (snrDb >= params.noisePeakSnrDb) return "noise";
+  return "rejected";
+}
+
+function peakConfidenceLevel(status) {
+  if (status === "significant") return "high";
+  if (status === "weak") return "medium";
+  if (status === "noise") return "low";
+  return "rejected";
+}
+
+function isSignificantSpectrogramPeak(peak, params = {}) {
+  const prominenceRatio = Math.max(0, Number(peak.peakProminence) || 0) / Math.max(Math.abs(Number(peak.noiseFloor) || 0), EPSILON);
+  return Number.isFinite(peak.snrDb)
+    && peak.snrDb >= params.ridgeMinSnrDb
+    && prominenceRatio >= params.ridgeMinProminenceRatio;
+}
+
+function buildSpectrogramRegions(ridgePoints, params = {}) {
+  const regions = [];
+  let current = null;
+  const segmentHalf = (params.effectiveSegmentSeconds || 0) / 2;
+  const closeCurrent = () => {
+    if (!current) return;
+    const durationSeconds = Math.max(0, current.endSecond - current.startSecond);
+    const continuityRatio = current.totalWindows ? current.significantWindows / current.totalWindows : 0;
+    if (
+      durationSeconds >= params.ridgeMinDurationSeconds
+      && continuityRatio >= params.ridgeMinContinuityRatio
+      && current.significantWindows > 0
+    ) {
+      const frequencies = current.points.map(point => point.frequencyHz).filter(Number.isFinite);
+      const powers = current.points.map(point => point.power).filter(Number.isFinite);
+      const snrs = current.points.map(point => point.snrDb).filter(Number.isFinite);
+      const validRatios = current.points.map(point => point.validRatio).filter(Number.isFinite);
+      regions.push({
+        startSeconds: current.startSecond,
+        endSeconds: current.endSecond,
+        durationSeconds,
+        medianFrequencyHz: percentile(frequencies, 0.5),
+        minFrequencyHz: minArrayFinite(frequencies),
+        maxFrequencyHz: maxArrayFinite(frequencies),
+        peakPsd: maxArrayFinite(powers),
+        snrDb: percentile(snrs, 0.5),
+        ridgeContinuity: continuityRatio,
+        validRatio: percentile(validRatios, 0.5),
+        significantWindowCount: current.significantWindows,
+        totalWindowCount: current.totalWindows
+      });
+    }
+    current = null;
+  };
+  for (const point of ridgePoints || []) {
+    const significant = Boolean(point?.significant) && Number.isFinite(point.frequencyHz);
+    if (!significant) {
+      if (current) current.totalWindows += 1;
+      closeCurrent();
+      continue;
+    }
+    const startSecond = Math.max(0, point.timeSeconds - segmentHalf);
+    const endSecond = point.timeSeconds + segmentHalf;
+    if (
+      !current
+      || Math.abs(point.frequencyHz - current.lastFrequencyHz) > params.ridgeMaxFrequencyJumpHz
+    ) {
+      closeCurrent();
+      current = {
+        startSecond,
+        endSecond,
+        lastFrequencyHz: point.frequencyHz,
+        points: [],
+        significantWindows: 0,
+        totalWindows: 0
+      };
+    }
+    current.endSecond = endSecond;
+    current.lastFrequencyHz = point.frequencyHz;
+    current.points.push(point);
+    current.significantWindows += 1;
+    current.totalWindows += 1;
+  }
+  closeCurrent();
+  return regions;
+}
+
+function enrichSpectralPeaks(peaks, frequencies, values, noiseFloor, params = {}) {
   return peaks.map((peak, rankIndex) => {
     const index = Number.isInteger(peak.index)
       ? peak.index
       : nearestFrequencyIndex(frequencies, peak.frequencyHz);
     const peakBandwidthHz = estimatePeakBandwidthHz(frequencies, values, index);
     const snrLinear = peak.value / Math.max(noiseFloor, EPSILON);
+    const snrDb = ratioToDb(snrLinear);
+    const peakProminence = peak.value - noiseFloor;
+    const peakStatus = classifySpectralPeak({ snrDb, peakProminence, noiseFloor }, params);
     return {
       rank: rankIndex + 1,
       frequencyHz: peak.frequencyHz,
@@ -1412,10 +1668,13 @@ function enrichSpectralPeaks(peaks, frequencies, values, noiseFloor) {
       power: peak.value,
       psdLevelDb: powerToDb(peak.value),
       snrLinear,
-      snrDb: ratioToDb(snrLinear),
-      peakProminence: peak.value - noiseFloor,
+      snrDb,
+      peakProminence,
       peakBandwidthHz,
-      qualityFactor: peakBandwidthHz > EPSILON ? peak.frequencyHz / peakBandwidthHz : NaN
+      qualityFactor: peakBandwidthHz > EPSILON ? peak.frequencyHz / peakBandwidthHz : NaN,
+      peakStatus,
+      confidenceLevel: peakConfidenceLevel(peakStatus),
+      rejectedReason: peakStatus === "rejected" ? "below-snr-or-prominence-threshold" : null
     };
   });
 }
@@ -1469,13 +1728,15 @@ function spectralQualitySummary({
   };
 }
 
-function spectralConfidenceInterval95(degreesOfFreedom) {
+function spectralConfidenceInterval95(degreesOfFreedom, averagingMethod = "mean") {
   const dof = Math.max(1, Number(degreesOfFreedom) || 1);
   const relativeStd = Math.sqrt(2 / dof);
   return {
     lowerFactor: Math.max(0, 1 - 1.96 * relativeStd),
     upperFactor: 1 + 1.96 * relativeStd,
-    degreesOfFreedom: dof
+    degreesOfFreedom: dof,
+    approximate: true,
+    averagingMethod
   };
 }
 
@@ -1682,9 +1943,14 @@ function emptyPsd(params, quality = spectralQualitySummary({
     overlapSamples: params.overlapSamples,
     overlapRatio: params.overlapRatio,
     frequencyResolutionHz: params.frequencyResolutionHz,
+    fftBinSpacingHz: params.fftBinSpacingHz,
+    effectiveSpectralResolutionHz: params.effectiveSpectralResolutionHz,
+    windowEquivalentNoiseBandwidthBins: params.windowEquivalentNoiseBandwidthBins,
+    zeroPaddingApplied: params.zeroPaddingApplied,
     nyquistHz: params.nyquistHz,
     adjustmentApplied: params.adjustmentApplied,
     adjustmentReason: params.adjustmentReason,
+    adjustmentReasonCodes: params.adjustmentReasonCodes,
     windowType: params.windowType,
     detrend: params.detrend,
     segmentCount: 0,
@@ -1701,16 +1967,27 @@ function emptyPsd(params, quality = spectralQualitySummary({
     allFrequencies: [],
     allPsd: [],
     peaks: [],
+    peakCandidates: [],
     bandEnergies: [],
     noiseFloor: NaN,
     snr: NaN,
     snrLinear: NaN,
     snrDb: NaN,
     degreesOfFreedom: 0,
-    confidenceInterval95: spectralConfidenceInterval95(1),
+    nominalDegreesOfFreedom: 0,
+    effectiveDegreesOfFreedom: 0,
+    confidenceInterval95: spectralConfidenceInterval95(1, params.averaging),
     totalBandPower: NaN,
     parsevalErrorRatio: NaN,
     averagingMethod: params.averaging,
+    scale: params.scale,
+    analysisStartEpochMs: params.analysisStartEpochMs,
+    analysisTimezone: params.analysisTimezone,
+    dataTimezone: params.dataTimezone,
+    displayTimezone: params.displayTimezone,
+    utcOffset: params.utcOffset,
+    calculationResolutionSeconds: params.calculationResolutionSeconds,
+    displaySummaryMode: params.displaySummaryMode,
     frequencyHz: NaN,
     power: NaN,
     parameters: { ...params }
@@ -1735,6 +2012,49 @@ function percentile(values, p) {
   const upper = Math.ceil(index);
   if (lower === upper) return clean[lower];
   return clean[lower] + (clean[upper] - clean[lower]) * (index - lower);
+}
+
+function minArrayFinite(values) {
+  let best = Infinity;
+  for (const value of values || []) {
+    if (Number.isFinite(value) && value < best) best = value;
+  }
+  return best === Infinity ? NaN : best;
+}
+
+function maxArrayFinite(values) {
+  let best = -Infinity;
+  for (const value of values || []) {
+    if (Number.isFinite(value) && value > best) best = value;
+  }
+  return best === -Infinity ? NaN : best;
+}
+
+function timezoneOffsetLabel(timeZone, epochMs = null) {
+  if (!timeZone || timeZone === "UTC") return "+00:00";
+  const instant = new Date(Number.isFinite(epochMs) ? epochMs : Date.now());
+  try {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZoneName: "shortOffset"
+    }).formatToParts(instant);
+    const zone = parts.find(part => part.type === "timeZoneName")?.value || "";
+    const match = zone.match(/GMT([+-])(\d{1,2})(?::?(\d{2}))?/i);
+    if (match) {
+      const sign = match[1];
+      const hours = String(Number(match[2])).padStart(2, "0");
+      const minutes = String(Number(match[3] || 0)).padStart(2, "0");
+      return `${sign}${hours}:${minutes}`;
+    }
+  } catch {}
+  if (timeZone === "Europe/Istanbul") return "+03:00";
+  if (timeZone === "Europe/Berlin") {
+    const month = instant.getUTCMonth() + 1;
+    return month >= 4 && month <= 10 ? "+02:00" : "+01:00";
+  }
+  return "+00:00";
 }
 
 function standardDeviation(values) {

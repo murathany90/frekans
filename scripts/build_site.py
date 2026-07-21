@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 import shutil
+import subprocess
 from pathlib import Path
 import sys
 
@@ -45,6 +47,21 @@ def copy_domain_files(dist_root: Path, require_domain_files: bool = True) -> Non
             shutil.copy2(source, dist_root / name)
 
 
+def git_commit_sha() -> str:
+    try:
+        return subprocess.check_output(["git", "rev-parse", "HEAD"], text=True, stderr=subprocess.DEVNULL).strip()
+    except Exception:
+        return "unknown"
+
+
+def write_index_with_build_metadata(source: Path, target: Path) -> None:
+    text = source.read_text(encoding="utf-8")
+    build_time = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    text = text.replace('name="gridfreq-build-commit" content="dev"', f'name="gridfreq-build-commit" content="{git_commit_sha()}"')
+    text = text.replace('name="gridfreq-build-time" content="dev"', f'name="gridfreq-build-time" content="{build_time}"')
+    target.write_text(text, encoding="utf-8", newline="\n")
+
+
 def build_site(data_root: Path = Path("data"), dist_root: Path = Path("dist"), require_domain_files: bool = True) -> dict:
     resolved_dist = dist_root.resolve()
     resolved_cwd = Path.cwd().resolve()
@@ -53,7 +70,7 @@ def build_site(data_root: Path = Path("data"), dist_root: Path = Path("dist"), r
     if dist_root.exists():
         shutil.rmtree(dist_root)
     dist_root.mkdir(parents=True)
-    shutil.copy2("frekans_rapor_v1.html", dist_root / "index.html")
+    write_index_with_build_metadata(Path("frekans_rapor_v1.html"), dist_root / "index.html")
     if Path("index.html").exists():
         shutil.copy2("index.html", dist_root / "source-index.html")
     copy_domain_files(dist_root, require_domain_files=bool(require_domain_files))

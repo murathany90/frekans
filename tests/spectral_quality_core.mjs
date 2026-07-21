@@ -76,6 +76,9 @@ assert.equal(welch300.fftLengthSamples, 512);
 assert.equal(welch300.adjustmentApplied, true);
 assert.match(welch300.adjustmentReason, /zero-padding|sıfır|power/i);
 assert.equal(welch300.frequencyResolutionHz, 1 / welch300.fftLengthSamples);
+assert.equal(welch300.fftBinSpacingHz, 1 / welch300.fftLengthSamples);
+assert(welch300.effectiveSpectralResolutionHz > welch300.fftBinSpacingHz);
+assert.equal(welch300.zeroPaddingApplied, true);
 assert.equal(welch300.nyquistHz, 0.5);
 
 const at74 = prepareSegment(withValidRatio(100, 0.74), 0, 100, { minValidRatio: 0.75, gapHandlingMethod: "segment-mean" });
@@ -147,14 +150,30 @@ assert(two.peaks.every(peak => Number.isFinite(peak.snrDb)));
 assert(two.peaks.every(peak => Number.isFinite(peak.peakProminence)));
 assert(two.peaks.every(peak => Number.isFinite(peak.peakBandwidthHz)));
 assert(two.peaks.every(peak => Number.isFinite(peak.qualityFactor)));
+assert(two.peaks.every(peak => peak.peakStatus && peak.peakStatus !== "rejected"));
+assert(two.peakCandidates.length >= two.peaks.length);
+assert(two.peakCandidates.some(peak => peak.peakStatus === "significant"));
 assert(Number.isFinite(two.snrLinear));
 assert(Number.isFinite(two.snrDb));
 assert.equal(two.snr, two.snrLinear);
 assert(two.degreesOfFreedom >= two.acceptedSegmentCount * 2);
+assert.equal(two.confidenceInterval95.approximate, true);
+assert.equal(two.confidenceInterval95.averagingMethod, "median");
 assert(two.confidenceInterval95.lowerFactor < 1);
 assert(two.confidenceInterval95.upperFactor > 1);
 assert(two.totalBandPower > 0);
 assert(Math.abs(two.parsevalErrorRatio) < 0.35);
+
+const noiseOnly = computeWelchPsd(new Float64Array(1024).fill(50), {
+  sampleRateHz: 1,
+  segmentSeconds: 256,
+  stepSeconds: 128,
+  minHz: 0.05,
+  maxHz: 0.25,
+  maxPeaks: 5
+});
+assert.equal(noiseOnly.peaks.length, 0);
+assert(noiseOnly.peakCandidates.every(peak => peak.peakStatus === "rejected"));
 
 const spectrogram = computeStftSpectrogram(chirp(), {
   sampleRateHz: 1,
@@ -171,10 +190,18 @@ assert.equal(spectrogram.requestedSegmentSeconds, 300);
 assert.equal(spectrogram.effectiveSegmentSamples, 300);
 assert.equal(spectrogram.fftLengthSamples, 512);
 assert.equal(spectrogram.frequencyResolutionHz, 1 / 512);
+assert.equal(spectrogram.fftBinSpacingHz, 1 / 512);
+assert(spectrogram.effectiveSpectralResolutionHz > spectrogram.fftBinSpacingHz);
 assert.equal(spectrogram.timeResolutionSeconds, 64);
 assert.equal(spectrogram.timeBinReference, "window-center");
 assert.equal(spectrogram.analysisStartEpochMs, Date.UTC(2026, 0, 1));
 assert.equal(spectrogram.analysisTimezone, "Europe/Istanbul");
+assert.equal(spectrogram.dataTimezone, "Europe/Istanbul");
+assert.equal(spectrogram.displayTimezone, "Europe/Istanbul");
+assert.equal(spectrogram.utcOffset, "+03:00");
+assert(spectrogram.timeBinsSeconds instanceof Float64Array);
+assert(spectrogram.timeBinsEpochMs instanceof Float64Array);
+assert.equal(spectrogram.timeBinsEpochMs[0], spectrogram.analysisStartEpochMs + spectrogram.timeBinsSeconds[0] * 1000);
 assert(spectrogram.powerValues instanceof Float32Array);
 assert.equal(spectrogram.powerValues.length, spectrogram.rowCount * spectrogram.columnCount);
 assert.equal(spectrogram.timeBins.length, spectrogram.rowCount);
@@ -182,6 +209,19 @@ assert.equal(spectrogram.frequencyBins.length, spectrogram.columnCount);
 assert.equal(spectrogram.validityByTime.length, spectrogram.rowCount);
 assert.equal(spectrogram.imputedSamplesByTime.length, spectrogram.rowCount);
 assert(Number.isFinite(spectrogram.peaksByTime[1].frequencyHz));
+assert(spectrogram.ridgePoints.some(point => Number.isFinite(point.frequencyHz)));
+assert(spectrogram.timeFrequencyRegions.length > 0);
+
+const flatSpectrogram = computeStftSpectrogram(new Float64Array(2048).fill(50), {
+  sampleRateHz: 1,
+  segmentSeconds: 300,
+  stepSeconds: 64,
+  minHz: 0.05,
+  maxHz: 0.25,
+  scale: "log"
+});
+assert.equal(flatSpectrogram.timeFrequencyRegions.length, 0);
+assert(flatSpectrogram.ridgePoints.every(point => !point.significant));
 
 const invalidSpectrogram = computeStftSpectrogram(gappy, {
   sampleRateHz: 1,

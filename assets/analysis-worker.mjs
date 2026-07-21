@@ -67,6 +67,8 @@ export function spectrogramTransfers(result) {
   const transfers = [];
   if (ArrayBuffer.isView(result.powerValues) && result.powerValues.buffer instanceof ArrayBuffer) transfers.push(result.powerValues.buffer);
   if (ArrayBuffer.isView(result.timeBins) && result.timeBins.buffer instanceof ArrayBuffer) transfers.push(result.timeBins.buffer);
+  if (ArrayBuffer.isView(result.timeBinsSeconds) && result.timeBinsSeconds.buffer instanceof ArrayBuffer) transfers.push(result.timeBinsSeconds.buffer);
+  if (ArrayBuffer.isView(result.timeBinsEpochMs) && result.timeBinsEpochMs.buffer instanceof ArrayBuffer) transfers.push(result.timeBinsEpochMs.buffer);
   if (ArrayBuffer.isView(result.frequencyBins) && result.frequencyBins.buffer instanceof ArrayBuffer) transfers.push(result.frequencyBins.buffer);
   if (ArrayBuffer.isView(result.validityByTime) && result.validityByTime.buffer instanceof ArrayBuffer) transfers.push(result.validityByTime.buffer);
   if (ArrayBuffer.isView(result.imputedSamplesByTime) && result.imputedSamplesByTime.buffer instanceof ArrayBuffer) transfers.push(result.imputedSamplesByTime.buffer);
