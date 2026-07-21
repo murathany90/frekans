@@ -9325,9 +9325,9 @@
           rocofSampleCount: (aggregate.rocofSampleCount || 0).toLocaleString(),
           methodUnavailable: (aggregate.methodUnavailable || 0).toLocaleString(),
           requestedWindowSeconds: fmt(parameterMeta.requestedWindowSeconds, 0),
-          effectiveWindow: `${parameterMeta.effectiveWindowSamples} / ${fmt(parameterMeta.effectiveWindowSeconds, 0)} sn`,
+          effectiveWindow: `${parameterMeta.effectiveWindowSamples} / ${secondsValue(parameterMeta.effectiveWindowSeconds, 0)}`,
           requestedPreFilterSeconds: fmt(parameterMeta.requestedPreFilterSeconds, 0),
-          effectivePreFilter: `${parameterMeta.effectivePreFilterSamples} / ${fmt(parameterMeta.effectivePreFilterSeconds, 0)} sn`,
+          effectivePreFilter: `${parameterMeta.effectivePreFilterSamples} / ${secondsValue(parameterMeta.effectivePreFilterSeconds, 0)}`,
           edgeDiscardCount: (aggregate.edgeDiscardCount || 0).toLocaleString(),
           qualityGapDiscardCount: (aggregate.qualityGapDiscardCount || 0).toLocaleString(),
           filterWindowDiscardCount: (aggregate.filterWindowDiscardCount || 0).toLocaleString(),
@@ -9549,7 +9549,7 @@
           tableRows: (dominant.peaks || [peak]).filter(Boolean).map((item, index) => ({
             rank: item.rank || index + 1,
             frequency: `${fmt(item.frequencyHz, 4)} Hz`,
-            period: Number.isFinite(item.periodSeconds) ? `${fmt(item.periodSeconds, 2)} sn` : '—',
+            period: Number.isFinite(item.periodSeconds) ? secondsValue(item.periodSeconds, 2) : '—',
             psd: fmt(item.psd ?? item.power, 8),
             psdLevel: `${fmt(item.psdLevelDb, 2)} dB`,
             snrLinear: fmt(item.snrLinear, 2),
@@ -9574,7 +9574,7 @@
           description: t(analysisDefinition(type).descriptionKey),
           metadata,
           cards: [
-            [t('spectralSegmentSecondsLabel'), `${fmt(spectrogram.requestedSegmentSeconds, 0)} sn`],
+            [t('spectralSegmentSecondsLabel'), secondsValue(spectrogram.requestedSegmentSeconds, 0)],
             [t('spectralEffectiveSegment'), `${spectrogram.effectiveSegmentSamples} ${t('spectralSamplesUnit')}`],
             [t('dominantFrequency'), spectrogram.peaksByTime?.length ? `${fmt(spectrogram.peaksByTime[0].frequencyHz, 4)} Hz` : '—'],
             [t('spectrogramWindowQualityTitle'), `${spectrogram.acceptedSegmentCount || 0}/${spectrogram.candidateSegmentCount || 0}`],
@@ -9617,7 +9617,7 @@
           description: t(analysisDefinition(type).descriptionKey),
           metadata,
           cards: [
-            [t('bestLag'), `${fmt(corr.bestAbsoluteLagSeconds, 0)} sn`],
+            [t('bestLag'), secondsValue(corr.bestAbsoluteLagSeconds, 0)],
             [t('kpiCorrelation'), fmt(corr.bestAbsoluteCorrelation, 4)],
             [t('negativeCorrelation'), fmt(corr.bestNegativeCorrelation, 4)],
             [t('classification'), t('classCommonModeIndicator')],
@@ -9625,7 +9625,7 @@
           ],
           events: [{ start: 0, end: 86400, type: t('analysisCrossCorrelation'), value: corr.bestAbsoluteCorrelation, classification: t('classCommonModeIndicator') }],
           tableRows: [
-            { metric: t('bestLag'), value: `${fmt(corr.bestAbsoluteLagSeconds, 0)} sn` },
+            { metric: t('bestLag'), value: secondsValue(corr.bestAbsoluteLagSeconds, 0) },
             { metric: t('kpiCorrelation'), value: fmt(corr.bestAbsoluteCorrelation, 4) },
             { metric: t('negativeCorrelation'), value: fmt(corr.bestNegativeCorrelation, 4) }
           ],
@@ -9759,11 +9759,11 @@
       return [
         { label: t('spectralSampleRate'), value: `${fmt(result.sampleRateHz, 5)} Hz` },
         { label: t('spectralNyquist'), value: `${fmt(result.nyquistHz, 5)} Hz` },
-        { label: t('spectralRequestedSegment'), value: `${fmt(result.requestedSegmentSeconds, 0)} sn / ${result.requestedSegmentSamples || 0} ${t('spectralSamplesUnit')}` },
-        { label: t('spectralEffectiveSegment'), value: `${fmt(result.effectiveSegmentSeconds, 0)} sn / ${result.effectiveSegmentSamples || 0} ${t('spectralSamplesUnit')}` },
+        { label: t('spectralRequestedSegment'), value: `${secondsValue(result.requestedSegmentSeconds, 0)} / ${result.requestedSegmentSamples || 0} ${t('spectralSamplesUnit')}` },
+        { label: t('spectralEffectiveSegment'), value: `${secondsValue(result.effectiveSegmentSeconds, 0)} / ${result.effectiveSegmentSamples || 0} ${t('spectralSamplesUnit')}` },
         { label: t('spectralFftLength'), value: `${result.fftLengthSamples || 0} ${t('spectralSamplesUnit')}` },
         { label: t('spectralFrequencyResolution'), value: `${fmt(result.frequencyResolutionHz, 6)} Hz` },
-        { label: t('spectralStep'), value: `${fmt(result.effectiveStepSeconds, 0)} sn / ${result.effectiveStepSamples || 0} ${t('spectralSamplesUnit')}` },
+        { label: t('spectralStep'), value: `${secondsValue(result.effectiveStepSeconds, 0)} / ${result.effectiveStepSamples || 0} ${t('spectralSamplesUnit')}` },
         { label: t('spectralOverlap'), value: `${result.overlapSamples || 0} ${t('spectralSamplesUnit')} / ${percent(result.overlapRatio || 0)}` },
         { label: t('spectralSegmentCounts'), value: `${result.candidateSegmentCount || 0}/${result.acceptedSegmentCount || 0}/${result.rejectedSegmentCount || 0}` },
         { label: t('spectralImputationCounts'), value: `${result.imputedSegmentCount || 0} / ${result.totalImputedSampleCount || 0}` },
@@ -9827,11 +9827,11 @@
         rows: [
           { metric: t('spectralSampleRate'), value: `${fmt(result.sampleRateHz, 5)} Hz` },
           { metric: t('spectralNyquist'), value: `${fmt(result.nyquistHz, 5)} Hz` },
-          { metric: t('spectralRequestedSegment'), value: `${fmt(result.requestedSegmentSeconds, 0)} sn / ${result.requestedSegmentSamples || 0} ${t('spectralSamplesUnit')}` },
-          { metric: t('spectralEffectiveSegment'), value: `${fmt(result.effectiveSegmentSeconds, 0)} sn / ${result.effectiveSegmentSamples || 0} ${t('spectralSamplesUnit')}` },
+          { metric: t('spectralRequestedSegment'), value: `${secondsValue(result.requestedSegmentSeconds, 0)} / ${result.requestedSegmentSamples || 0} ${t('spectralSamplesUnit')}` },
+          { metric: t('spectralEffectiveSegment'), value: `${secondsValue(result.effectiveSegmentSeconds, 0)} / ${result.effectiveSegmentSamples || 0} ${t('spectralSamplesUnit')}` },
           { metric: t('spectralFftLength'), value: `${result.fftLengthSamples || 0} ${t('spectralSamplesUnit')}` },
           { metric: t('spectralFrequencyResolution'), value: `${fmt(result.frequencyResolutionHz, 6)} Hz` },
-          { metric: t('spectralStep'), value: `${fmt(result.effectiveStepSeconds, 0)} sn / ${result.effectiveStepSamples || 0} ${t('spectralSamplesUnit')}` },
+          { metric: t('spectralStep'), value: `${secondsValue(result.effectiveStepSeconds, 0)} / ${result.effectiveStepSamples || 0} ${t('spectralSamplesUnit')}` },
           { metric: t('spectralOverlap'), value: percent(result.overlapRatio || 0) },
           { metric: t('spectralSegmentCounts'), value: `${result.candidateSegmentCount || 0}/${result.acceptedSegmentCount || 0}/${result.rejectedSegmentCount || 0}` },
           { metric: t('spectralImputationCounts'), value: `${result.imputedSegmentCount || 0} / ${result.totalImputedSampleCount || 0}` },
@@ -10017,11 +10017,11 @@
               <td style="padding: 4px;"><strong>${t('rocofMethodUnavailable', 'Yöntem/pencere nedeniyle hesaplanamayan')}:</strong> ${data.methodUnavailable}</td>
             </tr>
             <tr>
-              <td style="padding: 4px;"><strong>${t('rocofRequestedWindowSeconds')}:</strong> ${data.requestedWindowSeconds} sn</td>
+              <td style="padding: 4px;"><strong>${t('rocofRequestedWindowSeconds')}:</strong> ${secondsValue(data.requestedWindowSeconds, 0)}</td>
               <td style="padding: 4px;"><strong>${t('rocofEffectiveWindow')}:</strong> ${data.effectiveWindow}</td>
             </tr>
             <tr>
-              <td style="padding: 4px;"><strong>${t('rocofRequestedPreFilterSeconds')}:</strong> ${data.requestedPreFilterSeconds} sn</td>
+              <td style="padding: 4px;"><strong>${t('rocofRequestedPreFilterSeconds')}:</strong> ${secondsValue(data.requestedPreFilterSeconds, 0)}</td>
               <td style="padding: 4px;"><strong>${t('rocofEffectivePreFilter')}:</strong> ${data.effectivePreFilter}</td>
             </tr>
             <tr>
@@ -10197,7 +10197,7 @@
             const first = Array.isArray(params) ? params[0] : params;
             const frequency = Number(first?.value?.[0]);
             const period = frequency > 0 ? 1 / frequency : NaN;
-            const rows = [`${fmt(frequency, 5)} Hz`, `${t('spectralPeriodSeconds')}: ${fmt(period, 2)} sn`];
+            const rows = [`${fmt(frequency, 5)} Hz`, `${t('spectralPeriodSeconds')}: ${secondsValue(period, 2)}`];
             (Array.isArray(params) ? params : [params]).forEach(item => {
               const value = Number(item.value?.[1]);
               rows.push(`${item.marker || ''}${item.seriesName}: ${fmt(value, 8)} ${welch.units || 'Hz²/Hz'}`);
@@ -10286,7 +10286,7 @@
             return [
               `${t('spectrogramWindowCenter')}: ${timeLabel(timeIndex, true)}`,
               `${t('spectralFrequencyHz')}: ${fmt(frequency, 5)} Hz`,
-              `${t('spectralPeriodSeconds')}: ${fmt(period, 2)} sn`,
+              `${t('spectralPeriodSeconds')}: ${secondsValue(period, 2)}`,
               `${t('spectralPsdLevel')}: ${fmt(power, 4)} ${spectrogram.units || 'Hz²/Hz'}`,
               `${t('spectrogramValidRatio')}: ${percent(Number.isFinite(validRatio) ? validRatio : 0)}`,
               `${t('spectrogramImputedSamples')}: ${imputed}`
@@ -12637,7 +12637,14 @@
     function minuteToTime(minute) { return `${String(Math.floor(minute / 60)).padStart(2, '0')}:${String(minute % 60).padStart(2, '0')}`; }
     function hourRange(hour) { return `${String(hour).padStart(2,'0')}:00–${String((hour + 1) % 24).padStart(2,'0')}:00`; }
     function quarterLabel(q) { const m = q * 15; return `${String(Math.floor(m / 60)).padStart(2,'0')}:${String(m % 60).padStart(2,'0')}`; }
-    function durationText(sec) { const m = Math.floor(sec / 60), s = sec % 60; return m ? `${m} dk ${s} sn` : `${s} sn`; }
+    function durationText(sec) {
+      const total = Math.max(0, Math.round(Number(sec) || 0));
+      const m = Math.floor(total / 60);
+      const s = total % 60;
+      return m ? t('durationMinSec', { m, s }) : t('durationSec', { s });
+    }
+    function secondsUnitShort() { return lang === 'en' ? 's' : 'sn'; }
+    function secondsValue(value, digits = 0) { return `${fmt(value, digits)} ${secondsUnitShort()}`; }
     function signed(n) { return Number(n) >= 0 ? `+${n}` : String(n); }
 
     // -----------------------------

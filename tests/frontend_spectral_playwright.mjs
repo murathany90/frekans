@@ -134,6 +134,7 @@ try {
           tableHeaders: [...document.querySelectorAll("#analysisEventsHead th")].map(th => th.textContent.trim()),
           cards: [...document.querySelectorAll("#analysisResultCards .analysis-result-card")].map(card => card.textContent.trim()),
           forbiddenHits: forbidden[language].filter(fragment => text.includes(fragment)),
+          englishTurkishSecondHits: language === "en" ? [...text.matchAll(/\b\d+(?:[\.,]\d+)? sn\b/g)].map(match => match[0]) : [],
           requestedSegmentSeconds: json.metadata?.parameters?.spectral?.requestedSegmentSeconds,
           effectiveSegmentSamples: json.metadata?.parameters?.spectral?.effectiveSegmentSamples,
           fftLengthSamples: json.metadata?.parameters?.spectral?.fftLengthSamples,
@@ -161,6 +162,7 @@ try {
   assert.equal(checks.length, 4);
   for (const item of checks) {
     assert.equal(item.forbiddenHits.length, 0, `Localization leftovers: ${JSON.stringify(item)}`);
+    assert.equal(item.englishTurkishSecondHits.length, 0, `English UI should not show Turkish second units: ${JSON.stringify(item)}`);
     assert.equal(item.requestedSegmentSeconds, 300, `Requested segment missing: ${JSON.stringify(item)}`);
     assert.equal(item.effectiveSegmentSamples, 300, `Effective segment missing: ${JSON.stringify(item)}`);
     assert.equal(item.fftLengthSamples, 512, `FFT length missing: ${JSON.stringify(item)}`);

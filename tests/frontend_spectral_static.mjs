@@ -77,6 +77,7 @@ assert(html.includes("renderSpectralDetailSummary"), "Spectral analyses should r
 assert(html.includes("spectralParameterMetadata"), "Spectral metadata should be included in export metadata.");
 assert(html.includes("'units'"), "Spectral metadata should preserve result units.");
 assert(html.includes("['powerUnit', meta.units"), "Spectral CSV export should include the PSD power unit.");
+assert(html.includes("secondsUnitShort"), "Second labels should be localized instead of hard-coded as sn.");
 assert(html.includes("analysisSpectralTableTitle"), "Spectral table title should be analysis-specific.");
 
 console.log("frontend_spectral_static ok");
