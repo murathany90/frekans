@@ -79,7 +79,17 @@ for (const fragment of [
 
 for (const fragment of [
   "Detaylı Metrikler ve Örnek Analizi",
+  "Tüm teknik ayrıntıları göster",
+  "Analiz Ayrıntıları",
+  "Anlamlı Bölgeler",
+  "Veri Kalitesi",
+  "Dengeli",
   "Detailed Metrics and Sample Analysis",
+  "Show all technical details",
+  "Analysis Details",
+  "Meaningful Regions",
+  "Data Quality",
+  "Balanced",
   "FFT bin aralığı",
   "FFT bin spacing",
   "Etkin spektral çözünürlük",
@@ -104,6 +114,20 @@ for (const fragment of [
   assert(html.includes(fragment), `Frontend missing spectral audit text: ${fragment}`);
 }
 
+for (const fragment of [
+  'id="spectralProfile"',
+  'id="spectralMaxCells"',
+  "spectralProfileBalanced",
+  "spectrogramNoProblemWindowsSummary",
+  "spectralDetailsRowsShowing",
+  "metric-info-button",
+  "data-spectral-tab",
+  "data-spectral-detail-kind",
+  "SPECTRAL_VISIBLE_ROW_LIMIT"
+]) {
+  assert(html.includes(fragment), `Frontend missing simplified spectral result UI hook: ${fragment}`);
+}
+
 assert(!html.includes(">Zoom Sıfırla<"), "Turkish UI should not contain mixed-language Zoom Sıfırla text.");
 assert(html.includes("psdEmptyState"), "Welch should have a dedicated empty state.");
 assert(html.includes("spectrogramEmptyState"), "Spectrogram should have a dedicated empty state.");
@@ -122,6 +146,9 @@ assert(html.includes("['effectiveSpectralResolutionHz', meta.effectiveSpectralRe
 assert(html.includes("secondsUnitShort"), "Second labels should be localized instead of hard-coded as sn.");
 assert(html.includes("analysisSpectralTableTitle"), "Spectral table title should be analysis-specific.");
 assert.match(html, /mode === 'spectrogram'[\s\S]{0,240}spectralScaleLabel/, "Spectrogram detail rows should label scale, not Welch averaging.");
-assert.match(html, /details[\s\S]{0,120}spectralTechnicalDetailsTitle/, "Spectral technical metrics should be rendered in a collapsible details block.");
+assert.match(html, /function renderSpectrogramDetailsCard/, "Spectrogram tables should be combined into an analysis-details card.");
+assert.match(html, /const SPECTRAL_VISIBLE_ROW_LIMIT\s*=\s*50/, "Spectrogram UI tables should be capped at 50 visible rows.");
+assert.match(html, /calculationResolutionSeconds:\s*1/, "Spectral UI parameters should keep one-second calculation semantics.");
+assert.match(html, /details[\s\S]{0,180}spectralTechnicalAdvancedTitle/, "Advanced spectral metrics should be in a collapsible technical details block.");
 
 console.log("frontend_spectral_static ok");

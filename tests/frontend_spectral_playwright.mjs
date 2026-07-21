@@ -102,6 +102,28 @@ try {
         state.analysis.lastResult = result;
         renderAnalysisResult(result);
         renderReportPreview();
+        const topOf = selector => {
+          const node = document.querySelector(selector);
+          return node ? node.getBoundingClientRect().top : null;
+        };
+        const tablePanel = document.querySelector("#analysisTableTitle")?.closest(".panel");
+        const domOrder = {
+          cardsTop: topOf("#analysisResultCards"),
+          chartTop: topOf("#oscChartWrapper"),
+          tableTop: tablePanel ? tablePanel.getBoundingClientRect().top : null,
+          technicalTop: topOf("#spectralDetailSummary")
+        };
+        const defaultActiveDetailsTab = document.querySelector(".spectral-analysis-details .spectral-tab.is-active")?.dataset.spectralTab || "";
+        const detailTabs = [...document.querySelectorAll(".spectral-analysis-details [data-spectral-tab]")].map(button => button.textContent.trim());
+        const displayedRegionRows = document.querySelectorAll(".spectral-analysis-details tr[data-spectral-detail-kind='region']").length;
+        let displayedQualityRows = 0;
+        let qualitySummaryText = "";
+        if (type === "spectrogram") {
+          document.querySelector(".spectral-analysis-details [data-spectral-tab='quality']")?.click();
+          displayedQualityRows = document.querySelectorAll(".spectral-analysis-details tr[data-spectral-detail-kind='quality']").length;
+          qualitySummaryText = document.querySelector(".spectral-empty-summary")?.textContent.trim() || "";
+          document.querySelector(".spectral-analysis-details [data-spectral-tab='regions']")?.click();
+        }
         const captured = [];
         const originalDownload = window.downloadBlob;
         window.downloadBlob = (filename, content, mimeType) => captured.push({ filename, content, mimeType });
@@ -129,7 +151,9 @@ try {
             value: card.querySelector(".value")?.textContent.trim() || "",
             text: card.textContent.trim()
           }));
-        const firstRow = document.querySelector("#analysisEventsBody tr.event-row");
+        const firstRow = type === "spectrogram"
+          ? document.querySelector(".spectral-analysis-details tr.event-row")
+          : document.querySelector("#analysisEventsBody tr.event-row");
         if (firstRow) firstRow.click();
         const zoomAfterRowClick = state.oscillationChart.getOption().dataZoom?.some(zoom => zoom.startValue !== undefined || zoom.endValue !== undefined) || false;
         outcomes.push({
@@ -140,6 +164,15 @@ try {
           emptyText,
           tableTitle: document.querySelector("#analysisTableTitle")?.textContent || "",
           tableHeaders: [...document.querySelectorAll("#analysisEventsHead th")].map(th => th.textContent.trim()),
+          domOrder,
+          detailTabs,
+          defaultActiveDetailsTab,
+          displayedRegionRows,
+          displayedQualityRows,
+          qualitySummaryText,
+          infoButtonCount: document.querySelectorAll(".metric-info-button").length,
+          technicalAdvancedSummary: document.querySelector("#spectralDetailSummary summary")?.textContent.trim() || "",
+          technicalMainLabels: [...document.querySelectorAll("#spectralDetailSummary .spectral-primary-metrics .analysis-detail-item .metric-label")].map(node => node.textContent.trim()),
           cards: resultCards.map(card => card.text),
           cardPairs: resultCards,
           spectralDetailText,
@@ -171,6 +204,10 @@ try {
           csvHasDisplaySummary: csv.includes("displaySummaryMode") && csv.includes("calculationResolutionSeconds"),
           csvHasDbReference: csv.includes("dB re 1 Hz²/Hz"),
           csvHasQuality: csv.includes("totalImputedSampleCount"),
+          exportRowCount: state.analysis.lastResult?.exportRows?.length || 0,
+          visibleQualityLimitOk: displayedQualityRows <= 50,
+          visibleRegionLimitOk: displayedRegionRows <= 50,
+          csvPreservesFullQualityRows: type !== "spectrogram" || csv.split("\n").length > displayedQualityRows + 20,
           downloads: captured.map(item => item.filename),
           seriesNames: chart.series?.map(series => series.name || "") || [],
           hasVisualMap: Boolean(chart.visualMap),
@@ -203,6 +240,14 @@ try {
     assert(item.csvHasRequestedSegment && item.csvHasEffectiveSegment && item.csvHasFftLength && item.csvHasFftBinSpacing && item.csvHasEffectiveSpectralResolution && item.csvHasTimezone && item.csvHasDisplaySummary && item.csvHasQuality, `CSV metadata missing: ${JSON.stringify(item)}`);
     assert(item.downloads.includes("analysis-result.json") && item.downloads.includes("analysis-events.csv"));
     assert(item.zoomAfterRowClick, `Table row should zoom chart: ${JSON.stringify(item)}`);
+    assert(item.domOrder.cardsTop !== null && item.domOrder.chartTop !== null && item.domOrder.tableTop !== null && item.domOrder.technicalTop !== null, `Spectral DOM order anchors missing: ${JSON.stringify(item)}`);
+    assert(item.domOrder.chartTop >= item.domOrder.cardsTop, `Chart should be below KPI cards: ${JSON.stringify(item)}`);
+    assert(item.domOrder.tableTop >= item.domOrder.chartTop, `Result tables/details should not appear before the chart: ${JSON.stringify(item)}`);
+    assert(item.domOrder.technicalTop >= item.domOrder.tableTop, `Technical details should appear after chart-bottom results: ${JSON.stringify(item)}`);
+    assert(item.infoButtonCount >= 6, `Spectral terms should expose accessible help buttons: ${JSON.stringify(item)}`);
+    assert(item.technicalAdvancedSummary.includes(item.language === "tr" ? "Tüm teknik" : "technical details"), `Advanced technical details summary missing: ${JSON.stringify(item)}`);
+    assert(item.technicalMainLabels.some(label => /Örnekleme|Sample rate/.test(label)), `Simplified metric card should keep sample rate: ${JSON.stringify(item)}`);
+    assert(!item.technicalMainLabels.some(label => /^Nyquist$|Source time zone|Kaynak zaman dilimi|Window function|Pencere fonksiyonu|Detrend|Segment trend/.test(label)), `Advanced-only metrics should not stay in the primary technical grid: ${JSON.stringify(item)}`);
     if (item.type === "psd") {
       assert(/Welch|PSD/.test(item.title));
       assert(item.emptyText.includes(item.language === "tr" ? "güç spektral yoğunluğu" : "power spectral density"));
@@ -213,7 +258,14 @@ try {
     } else {
       assert(/Spektrogram|Spectrogram/.test(item.title));
       assert(item.emptyText.includes(item.language === "tr" ? "zaman içindeki değişimi" : "changes over time"));
-      assert(item.tableHeaders.some(header => /Geçerli|Valid|Doldur|Imputed/i.test(header)));
+      assert.equal(item.tableTitle, item.language === "tr" ? "Analiz Ayrıntıları" : "Analysis Details", `Spectrogram details title wrong: ${JSON.stringify(item)}`);
+      assert(item.detailTabs.includes(item.language === "tr" ? "Anlamlı Bölgeler" : "Meaningful Regions"), `Meaningful regions tab missing: ${JSON.stringify(item)}`);
+      assert(item.detailTabs.includes(item.language === "tr" ? "Veri Kalitesi" : "Data Quality"), `Data quality tab missing: ${JSON.stringify(item)}`);
+      assert.equal(item.defaultActiveDetailsTab, "regions", `Meaningful regions should be the default tab: ${JSON.stringify(item)}`);
+      assert.equal(item.visibleRegionLimitOk, true, `Visible spectrogram regions should be capped at 50: ${JSON.stringify(item)}`);
+      assert.equal(item.visibleQualityLimitOk, true, `Visible quality rows should be capped at 50: ${JSON.stringify(item)}`);
+      assert(item.exportRowCount > 50, `JSON export should preserve the full quality-row list: ${JSON.stringify(item)}`);
+      assert.equal(item.csvPreservesFullQualityRows, true, `CSV export should preserve more than the visible quality rows: ${JSON.stringify(item)}`);
       assert(item.hasVisualMap, "Spectrogram should show a color scale.");
       assert.equal(item.units, "dB re 1 Hz²/Hz", `Spectrogram unit metadata missing: ${JSON.stringify(item)}`);
       assert.equal(item.csvHasDbReference, true, `Spectrogram CSV dB reference missing: ${JSON.stringify(item)}`);
@@ -251,10 +303,13 @@ try {
     const result = computeAnalysisResult("spectrogram", "tr", state.current, ["2026-01-03"], workerResult, prepared);
     state.analysis.lastResult = result;
     renderAnalysisResult(result);
+    document.querySelector(".spectral-analysis-details [data-spectral-tab='quality']")?.click();
     return {
       invalidWindowCount: workerResult.invalidWindowCount,
       imputedWindowCount: workerResult.imputedWindowCount,
-      seriesNames: state.oscillationChart.getOption().series?.map(series => series.name || "") || []
+      seriesNames: state.oscillationChart.getOption().series?.map(series => series.name || "") || [],
+      qualityTableCount: document.querySelectorAll(".spectral-analysis-details[data-active-tab='quality'] table").length,
+      qualitySummaryText: document.querySelector(".spectral-empty-summary")?.textContent.trim() || ""
     };
   }, {
     tr: Array.from({ length: 4096 }, (_, index) => 50 + 0.02 * Math.sin(2 * Math.PI * 0.12 * index)),
@@ -262,6 +317,8 @@ try {
   });
   assert.equal(cleanSpectrogramSeries.invalidWindowCount, 0);
   assert.equal(cleanSpectrogramSeries.imputedWindowCount, 0);
+  assert.equal(cleanSpectrogramSeries.qualityTableCount, 0, `Clean spectrogram should summarize quality instead of rendering an empty table: ${JSON.stringify(cleanSpectrogramSeries)}`);
+  assert.match(cleanSpectrogramSeries.qualitySummaryText, /All .* windows were used/i);
   assert(!cleanSpectrogramSeries.seriesNames.some(name => /Invalid|Geçersiz|Quality|Kalite|Imputation|Doldur/i.test(name)), `Clean spectrogram should not render mask/quality overlay series: ${JSON.stringify(cleanSpectrogramSeries)}`);
 
   const dateSync = await page.evaluate(() => {
