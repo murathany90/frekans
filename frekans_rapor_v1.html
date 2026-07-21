@@ -13665,8 +13665,8 @@
               symbol: 'none',
               data: [
                 { xAxis: trend.nominalHz || 50, name: t('dailyTrendNominalLine'), label: { formatter: t('dailyTrendNominalLine') }, lineStyle: { color: '#64748b', type: 'dashed' } },
-                { xAxis: histogram.meanHz, name: t('dailyTrendMean'), label: { formatter: t('dailyTrendMean') }, lineStyle: { color: '#176b9c', type: 'solid' } },
-                { xAxis: histogram.medianHz, name: t('dailyTrendMedian'), label: { formatter: t('dailyTrendMedian') }, lineStyle: { color: '#8a6fbd', type: 'dotted' } }
+                { xAxis: histogram.meanHz, name: t('dailyTrendMean'), label: { formatter: t('dailyTrendMean'), position: 'insideEndTop', distance: 6 }, lineStyle: { color: '#176b9c', type: 'solid' } },
+                { xAxis: histogram.medianHz, name: t('dailyTrendMedian'), label: { formatter: t('dailyTrendMedian'), position: 'insideStartBottom', distance: 6 }, lineStyle: { color: '#8a6fbd', type: 'dotted' } }
               ].filter(item => Number.isFinite(item.xAxis))
             },
             markArea: {

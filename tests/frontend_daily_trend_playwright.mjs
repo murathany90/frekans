@@ -107,6 +107,7 @@ try {
         const cardsTop = document.querySelector("#analysisResultCards")?.getBoundingClientRect().top ?? 0;
         const chartTop = document.querySelector("#oscChartWrapper")?.getBoundingClientRect().top ?? 0;
         const tableTop = document.querySelector("#analysisTableTitle")?.closest(".panel")?.getBoundingClientRect().top ?? 0;
+        const histogramSeries = (option.series || []).find(series => /Histogram|Dağılım/.test(series.name || ""));
         out.push({
           language,
           title: result.title,
@@ -118,6 +119,7 @@ try {
           yAxisNames: (Array.isArray(option.yAxis) ? option.yAxis : [option.yAxis]).map(axis => axis?.name || ""),
           series: (option.series || []).map(series => ({ name: series.name || "", yAxisIndex: series.yAxisIndex || 0 })),
           seriesNames: (option.series || []).map(series => series.name || ""),
+          histogramMarkerLabelPositions: (histogramSeries?.markLine?.data || []).map(item => item?.label?.position || ""),
           headers: [...document.querySelectorAll("#analysisEventsHead th")].map(th => th.textContent.trim()),
           rowCount: document.querySelectorAll("#analysisEventsBody tr.event-row").length,
           detailCount: document.querySelectorAll("#analysisEventsBody .analysis-row-detail").length,
@@ -150,6 +152,8 @@ try {
     }
     assert.ok(item.seriesNames.some(name => /Envelope|zarf/i.test(name)), "Min-max envelope series missing");
     assert.ok(item.seriesNames.some(name => /Histogram|Dağılım/.test(name)), "Histogram series missing");
+    assert.ok(item.histogramMarkerLabelPositions.includes("insideEndTop"), "Mean histogram marker label should be separated from median.");
+    assert.ok(item.histogramMarkerLabelPositions.includes("insideStartBottom"), "Median histogram marker label should be separated from mean.");
     const trendSeries = item.series.filter(series => /Mean|Maximum|Minimum|Ortalama|Maksimum/.test(series.name));
     assert.ok(trendSeries.length >= 3, "Mean/min/max trend series are missing");
     assert.ok(trendSeries.every(series => series.yAxisIndex === 0), "Mean/min/max must share the same Hz axis.");
