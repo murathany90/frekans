@@ -138,12 +138,14 @@ try {
           effectiveSegmentSamples: json.metadata?.parameters?.spectral?.effectiveSegmentSamples,
           fftLengthSamples: json.metadata?.parameters?.spectral?.fftLengthSamples,
           frequencyResolutionHz: json.metadata?.parameters?.spectral?.frequencyResolutionHz,
+          units: json.metadata?.parameters?.spectral?.units,
           acceptedSegmentCount: json.metadata?.parameters?.spectral?.acceptedSegmentCount,
           rejectedSegmentCount: json.metadata?.parameters?.spectral?.rejectedSegmentCount,
           totalImputedSampleCount: json.metadata?.parameters?.spectral?.totalImputedSampleCount,
           csvHasRequestedSegment: csv.includes("requestedSegmentSeconds"),
           csvHasEffectiveSegment: csv.includes("effectiveSegmentSamples"),
           csvHasFftLength: csv.includes("fftLengthSamples"),
+          csvHasDbReference: csv.includes("dB re 1 Hz²/Hz"),
           csvHasQuality: csv.includes("totalImputedSampleCount"),
           downloads: captured.map(item => item.filename),
           seriesNames: chart.series?.map(series => series.name || "") || [],
@@ -179,6 +181,8 @@ try {
       assert(item.emptyText.includes(item.language === "tr" ? "zaman içindeki değişimi" : "changes over time"));
       assert(item.tableHeaders.some(header => /Geçerli|Valid|Doldur|Imputed/i.test(header)));
       assert(item.hasVisualMap, "Spectrogram should show a color scale.");
+      assert.equal(item.units, "dB re 1 Hz²/Hz", `Spectrogram unit metadata missing: ${JSON.stringify(item)}`);
+      assert.equal(item.csvHasDbReference, true, `Spectrogram CSV dB reference missing: ${JSON.stringify(item)}`);
       assert(item.seriesNames.some(name => /Ridge|Sırt|Invalid|Geçersiz|Quality|Kalite/i.test(name)));
     }
   }

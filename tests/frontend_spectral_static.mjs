@@ -75,6 +75,8 @@ assert(html.includes("renderWelchAnalysisChart"), "Welch should have a specializ
 assert(html.includes("renderSpectrogramAnalysisChart"), "Spectrogram should have a specialized chart renderer.");
 assert(html.includes("renderSpectralDetailSummary"), "Spectral analyses should render parameter/data-quality summaries.");
 assert(html.includes("spectralParameterMetadata"), "Spectral metadata should be included in export metadata.");
+assert(html.includes("'units'"), "Spectral metadata should preserve result units.");
+assert(html.includes("['powerUnit', meta.units"), "Spectral CSV export should include the PSD power unit.");
 assert(html.includes("analysisSpectralTableTitle"), "Spectral table title should be analysis-specific.");
 
 console.log("frontend_spectral_static ok");
