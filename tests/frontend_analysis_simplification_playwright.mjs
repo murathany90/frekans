@@ -78,6 +78,14 @@ try {
   await page.waitForSelector("#analysisTypeSelect", { state: "attached" });
   await page.waitForSelector("#autoModeBadge", { state: "attached" });
   await page.waitForFunction(() => Boolean(document.querySelector("#dateSelect")?.value));
+  const initialDefault = await page.evaluate(() => ({
+    selected: document.querySelector("#analysisTypeSelect")?.value || "",
+    title: document.querySelector("#oscChartTitle")?.textContent || "",
+    chartText: document.querySelector("#analysisMainChart")?.textContent || ""
+  }));
+  if (initialDefault.selected === "stats" && /Osilasyon|Oscillation|Bant Geçiren|Bandpass/i.test(`${initialDefault.title} ${initialDefault.chartText}`)) {
+    throw new Error(`Default analysis empty state leaked another module: ${JSON.stringify(initialDefault)}`);
+  }
 
   for (const language of ["tr", "en"]) {
     await setLanguage(language);

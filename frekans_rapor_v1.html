@@ -3067,7 +3067,7 @@
       <div class="panel">
         <div class="section-title">
           <div>
-            <h3 id="oscChartTitle" data-i18n="oscChartTitle">Seçilen Kaynağın Bant Geçiren Bileşeni ve Bulgular</h3>
+            <h3 id="oscChartTitle">Temel Frekans İstatistikleri</h3>
           </div>
           <span class="tag" id="oscCountTag" data-i18n="oscCountTag">0 bulgu</span>
         </div>
@@ -8212,7 +8212,7 @@
       renderFrequencyChart(state.current);
       renderQuarterHeatmap(state.current);
       renderHourBlocks(state.current);
-      renderOscillationEmpty();
+      renderAnalysisEmptyState($('analysisTypeSelect')?.value || 'stats');
       $('reportDateTag').textContent = displayDate(date);
       updateUrlState({ date, tab: 'chart' });
 
@@ -8326,7 +8326,7 @@
         state.oscillationChart = echarts.init($('analysisMainChart'));
       }
       renderFrequencyEmpty();
-      renderOscillationEmpty();
+      renderAnalysisEmptyState($('analysisTypeSelect')?.value || 'stats');
     }
 
     function renderFrequencyEmpty() {
