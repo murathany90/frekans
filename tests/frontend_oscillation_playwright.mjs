@@ -156,9 +156,8 @@ try {
     assert.match(item.title, item.language === "tr" ? /Salınım Adayı Tespiti/ : /Oscillation Candidate Detection/);
     assert.match(item.tableTitle, item.language === "tr" ? /Salınım Adayı Tespiti/ : /Oscillation Candidate Detection/);
     assert(item.headers.some(header => /Tepe genliği|Peak amplitude/.test(header)), `Peak-amplitude column missing: ${JSON.stringify(item)}`);
-    assert(item.headers.some(header => /RMS/.test(header)), `RMS column missing: ${JSON.stringify(item)}`);
     assert(item.headers.some(header => /Aday türü|Candidate type/.test(header)), `Candidate-type column missing: ${JSON.stringify(item)}`);
-    assert(item.headers.some(header => /Damping oranı|Damping ratio/.test(header)), `Damping column missing: ${JSON.stringify(item)}`);
+    assert(!item.headers.some(header => /RMS|Damping oranı|Damping ratio/.test(header)), `Secondary oscillation columns should move out of the default table: ${JSON.stringify(item)}`);
     assert(item.candidateTypes.includes("ringdown"), `Ringdown candidate missing: ${JSON.stringify(item)}`);
     assert(item.localizedTypes.every(label => !/^ringdown$|sustained_forced|frequency_drifting|^indeterminate$/i.test(label)), `Raw enum leaked into table: ${JSON.stringify(item)}`);
     assert(item.detailCount >= 1, `Expandable technical row missing: ${JSON.stringify(item)}`);
@@ -217,6 +216,7 @@ try {
     const result = computeAnalysisResult("oscillation", "tr", state.current, ["2026-03-02"], workerResult, prepared);
     state.analysis.lastResult = result;
     renderAnalysisResult(result);
+    document.querySelector("#analysisEventsBody details")?.setAttribute("open", "");
     return {
       type: result.candidates[0]?.candidateType,
       status: result.candidates[0]?.damping?.dampingStatus,

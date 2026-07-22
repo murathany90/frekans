@@ -78,14 +78,14 @@ for (const fragment of [
 }
 
 for (const fragment of [
-  "Detaylı Metrikler ve Örnek Analizi",
-  "Tüm teknik ayrıntıları göster",
+  "Hesap Özeti",
+  "Tüm ayrıntıları göster",
   "Analiz Ayrıntıları",
   "Anlamlı Bölgeler",
   "Veri Kalitesi",
   "Dengeli",
-  "Detailed Metrics and Sample Analysis",
-  "Show all technical details",
+  "Calculation Summary",
+  "Show all details",
   "Analysis Details",
   "Meaningful Regions",
   "Data Quality",
@@ -149,6 +149,6 @@ assert.match(html, /mode === 'spectrogram'[\s\S]{0,240}spectralScaleLabel/, "Spe
 assert.match(html, /function renderSpectrogramDetailsCard/, "Spectrogram tables should be combined into an analysis-details card.");
 assert.match(html, /const SPECTRAL_VISIBLE_ROW_LIMIT\s*=\s*50/, "Spectrogram UI tables should be capped at 50 visible rows.");
 assert.match(html, /calculationResolutionSeconds:\s*1/, "Spectral UI parameters should keep one-second calculation semantics.");
-assert.match(html, /details[\s\S]{0,180}spectralTechnicalAdvancedTitle/, "Advanced spectral metrics should be in a collapsible technical details block.");
+assert.match(html, /details[\s\S]{0,180}spectralTechnicalAdvancedTitle/, "Advanced spectral metrics should be in a collapsible details block.");
 
 console.log("frontend_spectral_static ok");

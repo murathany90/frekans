@@ -16,6 +16,8 @@ on:
       - "tests/frontend_prompt5_static.mjs"
       - "tests/frontend_prompt5_playwright.mjs"
       - "tests/frontend_prompt6_static.mjs"
+      - "tests/frontend_analysis_simplification_static.mjs"
+      - "tests/frontend_analysis_simplification_playwright.mjs"
       - "tests/frontend_hash_routing_static.mjs"
       - "tests/frontend_brand_static.mjs"
       - "tests/frontend_public_sharing_static.mjs"
@@ -52,6 +54,8 @@ on:
       - "tests/frontend_prompt5_static.mjs"
       - "tests/frontend_prompt5_playwright.mjs"
       - "tests/frontend_prompt6_static.mjs"
+      - "tests/frontend_analysis_simplification_static.mjs"
+      - "tests/frontend_analysis_simplification_playwright.mjs"
       - "tests/frontend_hash_routing_static.mjs"
       - "tests/frontend_brand_static.mjs"
       - "tests/frontend_public_sharing_static.mjs"
@@ -104,6 +108,7 @@ jobs:
           node tests/frontend_prompt4_static.mjs
           node tests/frontend_prompt5_static.mjs
           node tests/frontend_prompt6_static.mjs
+          node tests/frontend_analysis_simplification_static.mjs
           node tests/frontend_hash_routing_static.mjs
           node tests/frontend_brand_static.mjs
           node tests/frontend_public_sharing_static.mjs
@@ -143,6 +148,7 @@ jobs:
           node tests/frontend_initial_load_playwright.mjs
           node tests/frontend_prompt5_playwright.mjs
           node tests/frontend_prompt6_playwright.mjs
+          node tests/frontend_analysis_simplification_playwright.mjs
           node tests/frontend_data_sources_modal_playwright.mjs
           node tests/frontend_hash_routing_playwright.mjs
           node tests/frontend_regions_playwright.mjs

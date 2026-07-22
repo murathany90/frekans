@@ -245,15 +245,14 @@ try {
     assert(item.domOrder.tableTop >= item.domOrder.chartTop, `Result tables/details should not appear before the chart: ${JSON.stringify(item)}`);
     assert(item.domOrder.technicalTop >= item.domOrder.tableTop, `Technical details should appear after chart-bottom results: ${JSON.stringify(item)}`);
     assert(item.infoButtonCount >= 6, `Spectral terms should expose accessible help buttons: ${JSON.stringify(item)}`);
-    assert(item.technicalAdvancedSummary.includes(item.language === "tr" ? "Tüm teknik" : "technical details"), `Advanced technical details summary missing: ${JSON.stringify(item)}`);
+    assert(item.technicalAdvancedSummary.includes(item.language === "tr" ? "Tüm ayrıntıları" : "Show all details"), `Advanced technical details summary missing: ${JSON.stringify(item)}`);
     assert(item.technicalMainLabels.some(label => /Örnekleme|Sample rate/.test(label)), `Simplified metric card should keep sample rate: ${JSON.stringify(item)}`);
     assert(!item.technicalMainLabels.some(label => /^Nyquist$|Source time zone|Kaynak zaman dilimi|Window function|Pencere fonksiyonu|Detrend|Segment trend/.test(label)), `Advanced-only metrics should not stay in the primary technical grid: ${JSON.stringify(item)}`);
     if (item.type === "psd") {
       assert(/Welch|PSD/.test(item.title));
       assert(item.emptyText.includes(item.language === "tr" ? "güç spektral yoğunluğu" : "power spectral density"));
       assert(item.tableHeaders.some(header => /SNR|Gürültü|noise/i.test(header)));
-      assert(item.tableHeaders.some(header => /Durum|Status/i.test(header)));
-      assert(item.tableHeaders.some(header => /Güven|Confidence/i.test(header)));
+      assert(!item.tableHeaders.some(header => /Durum|Status|Güven|Confidence/i.test(header)), `Secondary PSD columns should move out of the default table: ${JSON.stringify(item)}`);
       assert(item.seriesNames.some(name => /Peak|Tepe|Noise|Gürültü|95|Nyquist/i.test(name)));
     } else {
       assert(/Spektrogram|Spectrogram/.test(item.title));
@@ -269,7 +268,7 @@ try {
       assert(item.hasVisualMap, "Spectrogram should show a color scale.");
       assert.equal(item.units, "dB re 1 Hz²/Hz", `Spectrogram unit metadata missing: ${JSON.stringify(item)}`);
       assert.equal(item.csvHasDbReference, true, `Spectrogram CSV dB reference missing: ${JSON.stringify(item)}`);
-      const psdCard = item.cardPairs.find(card => /PSD/.test(card.label));
+      const psdCard = item.cardPairs.find(card => /PSD|Tepe güç seviyesi|Peak power level/.test(card.label));
       assert(psdCard && /-?\d/.test(psdCard.value) && /dB re 1 Hz²\/Hz/.test(psdCard.value), `Spectrogram PSD KPI should show a numeric dB level, not only the unit: ${JSON.stringify(item)}`);
       assert(item.seriesNames.some(name => /Ridge|Sırt|Invalid|Geçersiz|Quality|Kalite/i.test(name)));
     }

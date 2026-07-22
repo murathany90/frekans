@@ -103,7 +103,7 @@ try {
   if (qualityState.samplingInterval !== 1 || qualityState.samplingMethod !== "raw-canonical") {
     throw new Error(`Data Coverage must use raw one-second sampling: ${JSON.stringify(qualityState)}`);
   }
-  if (!qualityState.hasQualityClass || !qualityState.seriesTypes.includes("heatmap") || qualityState.tableRows < 12) {
+  if (!qualityState.hasQualityClass || !qualityState.seriesTypes.includes("heatmap") || qualityState.tableRows !== 4) {
     throw new Error(`Data Coverage chart/table did not render the new quality UI: ${JSON.stringify(qualityState)}`);
   }
   if (!qualityState.cardValues.some(value => /%$/.test(value))) {
@@ -284,11 +284,6 @@ try {
     const option = window.echarts?.getInstanceByDom(document.querySelector("#analysisMainChart"))?.getOption?.() || {};
     return document.querySelector("#qualityZoomResetBtn")?.hidden === true && option.xAxis?.[0]?.min === 0 && option.xAxis?.[0]?.max === 86400;
   }, { timeout: 10000 });
-
-  await page.locator("#analysisEventsBody tr.event-row", { hasText: /Yinelenen Ardışık Frekans Süresi|Repeated Consecutive Frequency Duration/ }).click();
-  await page.waitForFunction(() => document.querySelector("#qualityZoomResetBtn")?.hidden === false, { timeout: 10000 });
-  await page.click("#qualityZoomResetBtn");
-  await page.waitForFunction(() => document.querySelector("#qualityZoomResetBtn")?.hidden === true, { timeout: 10000 });
 
   await page.evaluate(() => {
     const chart = window.echarts.getInstanceByDom(document.querySelector("#analysisMainChart"));

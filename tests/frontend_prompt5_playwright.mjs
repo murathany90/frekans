@@ -67,17 +67,21 @@ try {
       role: document.querySelector("#analysisInfoPanel")?.getAttribute("role"),
       modal: document.querySelector("#analysisInfoPanel")?.getAttribute("aria-modal"),
       title: document.querySelector("#analysisHelpTitle")?.textContent || "",
+      sectionTitles: [...document.querySelectorAll("#analysisHelpBody [data-help-section-toggle]")].map(node => node.textContent.trim()),
       openSections: [...document.querySelectorAll("[data-help-section-toggle]")].filter(button => button.getAttribute("aria-expanded") === "true").length,
       glossaryItems: document.querySelectorAll("[data-help-glossary-item]").length,
       parameterCards: document.querySelectorAll("[data-help-parameter-card]").length,
+      forbiddenHits: ["filterTaps", "windowSec", "stepSec", "minValidRatio", "computeMagnitudeSquaredCoherence", "computeCrossPowerSpectralDensity", "Teknik ayrıntı: motor parametresi"].filter(term => (document.querySelector("#analysisInfoPanel")?.innerText || "").includes(term)),
       otherLongPage: document.querySelector("#analysisHelpBody")?.textContent?.match(/Veri Kapsama ve Kalite Özeti|Temel Frekans İstatistikleri|Bant İhlali Özeti|Welch Güç Spektral Yoğunluğu/g)?.length || 0
     }));
     assert.equal(state.role, "dialog", `Help shell must be a dialog for ${value}`);
     assert.equal(state.modal, "true", `Help dialog must be modal for ${value}`);
     assert.match(state.title, trTitle, `Wrong Turkish help title for ${value}`);
-    assert(state.openSections >= 4, `Default help sections should be open for ${value}: ${JSON.stringify(state)}`);
-    assert(state.glossaryItems >= 3, `Glossary is missing for ${value}: ${JSON.stringify(state)}`);
-    assert(state.parameterCards >= 1, `Parameter guidance is missing for ${value}: ${JSON.stringify(state)}`);
+    assert.equal(state.sectionTitles.length, 4, `Help center should use four simplified sections for ${value}: ${JSON.stringify(state)}`);
+    for (const heading of ["Bu analiz neyi gösterir?", "Sonuç nasıl yorumlanır?", "Hangi durumda dikkat edilmeli?", "Uzman ayarlar ne zaman değiştirilmeli?"]) {
+      assert(state.sectionTitles.includes(heading), `Simplified help heading missing for ${value}: ${heading} ${JSON.stringify(state)}`);
+    }
+    assert.deepEqual(state.forbiddenHits, [], `Help modal exposes engine terms for ${value}: ${JSON.stringify(state)}`);
     assert(state.otherLongPage <= 1, `Help content must be scoped to active analysis: ${JSON.stringify(state)}`);
     await closeHelpWithEscape();
     const focusId = await page.evaluate(() => document.activeElement?.id || "");
@@ -91,19 +95,6 @@ try {
     return button?.getAttribute("aria-expanded") || "";
   });
   assert.equal(accordionState, "true", "Accordion section did not open");
-
-  await page.evaluate(() => {
-    const section = document.querySelector('[data-help-section="Glossary"]');
-    const button = section?.querySelector("[data-help-section-toggle]");
-    if (button?.getAttribute("aria-expanded") === "false") button.click();
-  });
-  await page.fill("#analysisHelpGlossarySearch", "FFT");
-  const glossaryFilter = await page.evaluate(() => ({
-    visible: [...document.querySelectorAll("[data-help-glossary-item]")].filter(item => !item.hidden).map(item => item.textContent || ""),
-    hidden: [...document.querySelectorAll("[data-help-glossary-item]")].filter(item => item.hidden).length
-  }));
-  assert(glossaryFilter.visible.some(text => /FFT/.test(text)), `Glossary search should keep FFT visible: ${JSON.stringify(glossaryFilter)}`);
-  assert(glossaryFilter.hidden > 0, `Glossary search should hide unrelated terms: ${JSON.stringify(glossaryFilter)}`);
 
   await page.click("#analysisHelpLangToggle");
   await page.waitForFunction(() => /Welch Power Spectral Density/.test(document.querySelector("#analysisHelpTitle")?.textContent || ""));

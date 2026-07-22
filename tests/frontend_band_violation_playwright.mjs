@@ -127,10 +127,11 @@ try {
   assert.equal(result.events.some(event => event.startSecond === 400), false, "Short events should be filtered by minimum duration.");
   assert.equal(result.events.some(event => event.startSecond === 500), false, "YD/RV bad-quality samples should not enter band events.");
   assert.equal(result.events[0].endSecond <= 120 && result.events[1].startSecond >= 122, true, "Missing data must split consecutive violations.");
-  assert(result.cards.some(text => /Toplam Bant|Total Band/.test(text)));
-  assert(result.cards.some(text => /Bant İçinde|In-band/.test(text)));
-  assert(/Kaynak|Source/.test(result.headers.join("|")));
-  assert(/Aşım|Exceedance/.test(result.headers.join("|")));
+  assert(result.cards.some(text => /Toplam ihlal süresi|Total violation duration/.test(text)));
+  assert(result.cards.some(text => /Olay sayısı|Event count/.test(text)));
+  assert(!/Kaynak|Source/.test(result.headers.join("|")));
+  assert(/İhlal türü|Violation type/.test(result.headers.join("|")));
+  assert(/Uç değer|Extreme value/.test(result.headers.join("|")));
   assert.equal(result.tableRows, 3);
   assert.equal(result.resetHidden, true);
 
@@ -152,7 +153,7 @@ try {
       csv
     };
   });
-  assert(/Toplam Bant|Total Band/.test(reportAndExport.preview), "Report preview should render object-format cards.");
+  assert(/Toplam ihlal süresi|Total violation duration/.test(reportAndExport.preview), "Report preview should render object-format cards.");
   assert(reportAndExport.downloads.some(item => item.filename === "analysis-result.json"));
   assert(reportAndExport.downloads.some(item => item.filename === "analysis-events.csv"));
   assert(/start|Başlangıç|Start/i.test(reportAndExport.csv));
@@ -313,7 +314,7 @@ try {
             cards: document.querySelectorAll("#analysisResultCards .analysis-result-card").length,
             rows: document.querySelectorAll("#analysisEventsBody tr.event-row").length,
             heatmap,
-            reportOk: /Toplam Bant|Total Band/.test(document.querySelector("#reportPreview")?.textContent || "")
+            reportOk: /Toplam ihlal süresi|Total violation duration/.test(document.querySelector("#reportPreview")?.textContent || "")
           });
         }
       }

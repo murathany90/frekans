@@ -133,6 +133,7 @@ try {
       longestBandStart: result.statsMeta.longestBandViolation?.startSecond,
       cards: [...document.querySelectorAll("#analysisResultCards .analysis-result-card .label")].map(node => node.textContent?.trim() || ""),
       tableText: document.querySelector("#analysisEventsBody")?.textContent || "",
+      detailText: document.querySelector("#analysisDetailSummary")?.textContent || "",
       rowCount: document.querySelectorAll("#analysisEventsBody tr").length,
       clickableRows: document.querySelectorAll("#analysisEventsBody tr.event-row").length,
       sampling: state.analysis.sampling,
@@ -142,8 +143,8 @@ try {
       bandSeriesNames: bandSeries.map(series => series.name || ""),
       bandMarkerNames: bandSeries.flatMap(series => (series.markArea?.data || []).map(item => item?.[0]?.name || "")),
       countTag: document.querySelector("#oscCountTag")?.textContent || "",
-      tooltipTargets: document.querySelectorAll("#analysisEventsBody [data-tooltip]").length,
-      metricHelpIcons: document.querySelectorAll("#analysisEventsBody .metric-name .metric-info-icon").length,
+      tooltipTargets: document.querySelectorAll("#analysisEventsBody [data-tooltip], #analysisDetailSummary [data-tooltip]").length,
+      metricHelpIcons: document.querySelectorAll("#analysisEventsBody .metric-name .metric-info-icon, #analysisDetailSummary .metric-info-icon").length,
       metricHelpKinds: [...document.querySelectorAll("#analysisEventsBody .metric-name[data-tooltip-kind]")].map(node => node.dataset.tooltipKind),
       visualMapJson: JSON.stringify(option.visualMap || {}),
       lineTooltip: typeof formatter === "function" && linePoint
@@ -164,7 +165,7 @@ try {
   if (synthetic.rawValidSampleCount !== 3589 || synthetic.goodUsedCount !== 3574) {
     throw new Error(`Basic Stats must separate raw valid and good-quality samples: ${JSON.stringify(synthetic)}`);
   }
-  if (synthetic.cards.length !== 4 || synthetic.cards.some(label => /Medyan|Median|P01|P99|Bant|Band/.test(label))) {
+  if (synthetic.cards.length !== 4 || synthetic.cards.some(label => /Medyan|Median|P01|P99/.test(label))) {
     throw new Error(`Basic Stats top KPI cards must stay compact: ${JSON.stringify(synthetic.cards)}`);
   }
   for (const label of [
@@ -185,16 +186,18 @@ try {
     /Çarpıklık|Skewness/,
     /Fazlalık Basıklık|Excess Kurtosis/,
     /Bant içinde kalma oranı|In-band Ratio/,
-    /Bant dışında kalma süresi|Out-of-band Duration/,
     /Alt bant ihlal süresi|Lower-band Violation Duration/,
     /Üst bant ihlal süresi|Upper-band Violation Duration/,
     /Bant ihlal olay sayısı|Band Violation Event Count/,
     /En uzun bant ihlali|Longest Band Violation/
   ]) {
-    if (!label.test(synthetic.tableText)) throw new Error(`Basic Stats table is missing ${label}: ${synthetic.tableText}`);
+    if (!label.test(synthetic.detailText)) throw new Error(`Basic Stats detail section is missing ${label}: ${synthetic.detailText}`);
   }
-  if (synthetic.rowCount < 24 || synthetic.clickableRows < 3) {
-    throw new Error(`Basic Stats detailed table/drilldowns are incomplete: ${JSON.stringify(synthetic)}`);
+  if (!/Bant dışında kalma süresi|Out-of-band Duration/.test(synthetic.tableText)) {
+    throw new Error(`Basic Stats visible table should keep out-of-band duration: ${synthetic.tableText}`);
+  }
+  if (synthetic.rowCount > 5 || synthetic.clickableRows < 2) {
+    throw new Error(`Basic Stats default table should stay compact while preserving drilldowns: ${JSON.stringify(synthetic)}`);
   }
   if (synthetic.sampling?.intervalSeconds !== 1 || synthetic.sampling?.method !== "good-quality-canonical" || synthetic.chartKind !== "stats") {
     throw new Error(`Basic Stats sampling/chart metadata is wrong: ${JSON.stringify(synthetic)}`);
@@ -228,7 +231,8 @@ try {
     throw new Error(`Basic Stats technical metric tooltips need visible info icons and a distinct tooltip kind: ${JSON.stringify(synthetic)}`);
   }
 
-  const varianceMetric = page.locator("#analysisEventsBody .metric-name", { hasText: /Varyans|Variance/ }).first();
+  await page.locator("#analysisDetailSummary").evaluate(node => { node.open = true; });
+  const varianceMetric = page.locator("#analysisDetailSummary .analysis-detail-item", { hasText: /Varyans|Variance/ }).first();
   await varianceMetric.locator(".metric-info-icon").waitFor({ state: "visible", timeout: 5000 });
   await varianceMetric.scrollIntoViewIfNeeded();
   await varianceMetric.hover({ force: true });
@@ -249,7 +253,7 @@ try {
     throw new Error(`Variance help tooltip is not visibly rendered with the right text/layering: ${JSON.stringify(varianceTooltip)}`);
   }
 
-  const stdDevMetric = page.locator("#analysisEventsBody .metric-name", { hasText: /Standart Sapma|Standard Deviation/ }).first();
+  const stdDevMetric = page.locator("#analysisDetailSummary .analysis-detail-item", { hasText: /Standart Sapma|Standard Deviation/ }).first();
   await stdDevMetric.focus();
   await page.waitForSelector("#appTooltip:not(.hidden)");
   const focusedTooltip = await page.locator("#appTooltip").textContent();

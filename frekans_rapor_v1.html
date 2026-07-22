@@ -708,6 +708,15 @@
       border-top: 1px solid #e1e8ee;
       border-bottom: 1px solid #dce6ed;
     }
+    #tab-oscillation table {
+      table-layout: fixed;
+    }
+    #tab-oscillation th,
+    #tab-oscillation td {
+      white-space: normal;
+      overflow-wrap: anywhere;
+      vertical-align: top;
+    }
 
     .inventory-table td:nth-child(n+3) { text-align: right; }
 
@@ -1595,7 +1604,7 @@
     }
     .result-card-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: 10px;
       margin: 12px 0;
     }
@@ -1627,6 +1636,41 @@
       margin: 0 0 10px;
     }
     .analysis-detail-summary[hidden] { display: none; }
+    .analysis-detail-disclosure {
+      margin: 4px 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfdfe;
+      padding: 0 10px;
+    }
+    .analysis-detail-disclosure[hidden] { display: none; }
+    .analysis-detail-disclosure > summary,
+    .analysis-row-details > summary {
+      cursor: pointer;
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      color: var(--navy);
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+    .analysis-row-details dl {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 8px;
+      margin: 8px 0;
+    }
+    .analysis-row-details dt {
+      color: var(--muted);
+      font-size: .76rem;
+      font-weight: 800;
+    }
+    .analysis-row-details dd {
+      margin: 2px 0 0;
+      color: var(--navy);
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
     .spectral-detail-summary {
       display: block;
       margin-top: 12px;
@@ -3004,10 +3048,10 @@
             <div class="field" data-param-key="dailyTrendAdvanced"><label for="dailyTrendDayType" data-i18n="dailyTrendDayTypeLabel">Gün filtresi</label><select id="dailyTrendDayType"><option value="all" data-i18n="dailyTrendDayTypeAll">Tüm günler</option><option value="weekday" data-i18n="dailyTrendDayTypeWeekday">Hafta içi</option><option value="weekend" data-i18n="dailyTrendDayTypeWeekend">Hafta sonu</option></select></div>
             <div class="field" data-param-key="dailyTrendAdvanced"><label for="dailyTrendTimezone" data-i18n="dailyTrendTimezoneLabel">Zaman dilimi</label><select id="dailyTrendTimezone"><option value="source" data-i18n="spectralDisplayTimezoneSource">Kaynak zaman dilimi</option><option value="Europe/Istanbul" data-i18n="spectralDisplayTimezoneTr">Türkiye saati</option><option value="UTC" data-i18n="spectralDisplayTimezoneUtc">UTC</option></select></div>
             <div class="field" data-param-key="dailyTrendAdvanced"><label for="dailyTrendMaxChartPoints" data-i18n="dailyTrendMaxChartPointsLabel">Maksimum grafik noktası</label><input id="dailyTrendMaxChartPoints" type="number" min="500" max="100000" step="500" value="5000" /></div>
-            <div class="field" data-param-key="filter"><label for="filterTaps" data-i18n="filterTapsLabel">FIR katsayı sayısı</label><input id="filterTaps" type="number" min="31" max="401" step="2" value="101" /></div>
+            <div class="field" data-param-key="filter"><label for="filterTaps" data-i18n="filterTapsLabel">Filtre keskinliği</label><input id="filterTaps" type="number" min="31" max="401" step="2" value="101" /></div>
             <div class="field" data-param-key="duration"><label for="minDuration" data-i18n="minDurationLabel">Minimum olay süresi (sn)</label><input id="minDuration" type="number" min="1" max="1800" step="1" value="5" /></div>
             <div class="field" data-param-key="yd"><label for="repeatedValueSeconds" data-i18n="qualityRepeatedThresholdLabel">Yinelenen değer eşiği (sn)</label><input id="repeatedValueSeconds" type="number" min="1" max="3600" step="1" value="15" /></div>
-            <div class="field" data-param-key="rocofMethod"><label for="rocofMethod" data-i18n="rocofMethodLabel">RoCoF hesaplama yöntemi</label><select id="rocofMethod"><option value="central" data-i18n="rocofMethodCentral">Merkezî fark — çevrimdışı</option><option value="filteredDerivative" data-i18n="rocofMethodFiltered">Hareketli ortalama filtreli merkezî fark</option><option value="movingRegression" data-i18n="rocofMethodRegression">Kayan pencereli doğrusal regresyon</option></select></div>
+            <div class="field" data-param-key="rocofMethod"><label for="rocofMethod" data-i18n="rocofMethodLabel">RoCoF hesaplama yöntemi</label><select id="rocofMethod"><option value="central" data-i18n="rocofMethodCentral">Standart RoCoF hesabı</option><option value="filteredDerivative" data-i18n="rocofMethodFiltered">Yumuşatılmış RoCoF</option><option value="movingRegression" data-i18n="rocofMethodRegression">Regresyon tabanlı RoCoF</option></select></div>
             <div class="field" data-param-key="rocofThreshold"><label for="rocofThreshold" data-i18n="rocofThresholdLabel">RoCoF olay eşiği (mHz/s)</label><input id="rocofThreshold" type="number" min="0.1" max="1000" step="0.1" value="10" /></div>
             <div class="field" data-param-key="rocofPrefilter"><label for="rocofPreFilterSeconds" data-i18n="rocofPreFilterLabel">Hareketli ortalama pencere süresi (sn)</label><input id="rocofPreFilterSeconds" type="number" min="1" max="120" step="1" value="5" /></div>
             <div class="field" data-param-key="rocofRegression"><label for="rocofRegressionWindowSeconds" data-i18n="rocofRegressionWindowLabel">Kayan regresyon pencere süresi (sn)</label><input id="rocofRegressionWindowSeconds" type="number" min="3" max="300" step="1" value="5" /></div>
@@ -4133,6 +4177,79 @@
       }
     };
 
+    const ANALYSIS_UI_PROFILES = {
+      quality: {
+        kpiKeys: ['coverage', 'missingDuration', 'longestGap', 'qualityStatus'],
+        metricRows: ['qualityCoverage', 'qualityMissing', 'qualityLongestGap', 'qualityGood'],
+        tableColumns: ['metric', 'value'],
+        mobileColumns: ['metric', 'value'],
+        detailMetricKeys: ['qualityDuplicate', 'qualityInvalid', 'qualityRepeatedEvents', 'qualityRepeatedTotal', 'qualityRepeatedLongest', 'qualityGapEvents']
+      },
+      stats: {
+        kpiKeys: ['mean', 'minMax', 'rmsDeviation', 'outOfBandDuration'],
+        metricRows: ['statsMean', 'eventMin', 'eventMax', 'rmsDeviation', 'statsOutOfBandDuration'],
+        tableColumns: ['metric', 'value'],
+        mobileColumns: ['metric', 'value'],
+        detailMetricKeys: ['statsVariance', 'statsMedian', 'statsMeanAbsDeviation50', 'statsInBandRatio', 'statsSkewness', 'statsExcessKurtosis']
+      },
+      events: {
+        kpiKeys: ['totalViolationDuration', 'eventCount', 'longestViolation', 'largestDeviation'],
+        tableColumns: ['start', 'end', 'duration', 'type', 'extreme'],
+        mobileColumns: ['start', 'duration', 'type', 'extreme'],
+        detailMetricKeys: ['source', 'exceedance']
+      },
+      rocof: {
+        kpiKeys: ['maxPositive', 'maxNegative', 'eventCount', 'longestEvent'],
+        tableColumns: ['type', 'start', 'end', 'duration', 'peak'],
+        mobileColumns: ['type', 'start', 'duration', 'peak'],
+        detailMetricKeys: ['source', 'startHz', 'extremeHz']
+      },
+      psd: {
+        kpiKeys: ['dominantFrequency', 'dominantPeriod', 'peakPower', 'highlightedBand'],
+        fallbackKpiKeys: ['snrDb', 'segmentUsage'],
+        tableColumns: ['rank', 'frequency', 'period', 'psdLevel', 'snrDb', 'source'],
+        mobileColumns: ['rank', 'frequency', 'period', 'snrDb'],
+        detailMetricKeys: ['psd', 'snrLinear', 'prominence', 'bandwidth', 'qualityFactor', 'status', 'confidence']
+      },
+      spectrogram: {
+        kpiKeys: ['strongestBand', 'densestTimeRange', 'peakPowerLevel', 'dataQuality'],
+        fallbackKpiKeys: ['regionCount'],
+        tableColumns: ['start', 'end', 'duration', 'dominantFrequency', 'snrDb', 'confidence', 'source'],
+        mobileColumns: ['start', 'duration', 'dominantFrequency', 'confidence'],
+        detailMetricKeys: ['frequencyRange', 'peakPsd', 'ridgeContinuity', 'validRatio']
+      },
+      oscillation: {
+        kpiKeys: ['candidateCount', 'strongestCandidate', 'dominantPeriod', 'confidenceLevel'],
+        tableColumns: ['start', 'duration', 'frequency', 'period', 'peak', 'classification'],
+        mobileColumns: ['start', 'duration', 'frequency', 'classification'],
+        detailMetricKeys: ['end', 'rms', 'snrDb', 'confidence', 'dampingRatio', 'quality', 'source']
+      },
+      crossCorrelation: {
+        kpiKeys: ['bestLag', 'correlation', 'commonDataRatio', 'interpretation'],
+        metricRows: ['bestLag', 'kpiCorrelation', 'qualityCoverage', 'classification'],
+        tableColumns: ['metric', 'value'],
+        mobileColumns: ['metric', 'value'],
+        detailMetricKeys: ['negativeCorrelation']
+      },
+      coherence: {
+        kpiKeys: ['highestCoherenceBand', 'phaseDifference', 'commonBehaviorStrength', 'dataCompatibility'],
+        tableColumns: ['frequency', 'coherence', 'phase'],
+        mobileColumns: ['frequency', 'coherence', 'phase'],
+        detailMetricKeys: []
+      },
+      trend: {
+        kpiKeys: ['meanTrend', 'rmsTrend', 'worstDay', 'coverageStatus'],
+        singleDayKpiKeys: ['mean', 'maxFrequency', 'minFrequency', 'rmsDeviation'],
+        tableColumns: ['date', 'maxFrequency', 'maxTime', 'mean', 'median', 'minFrequency', 'minTime', 'stdDev', 'coverage', 'status'],
+        mobileColumns: ['date', 'mean', 'coverage', 'status'],
+        detailMetricKeys: ['maxFrequency', 'maxTime', 'median', 'minFrequency', 'minTime', 'stdDev']
+      }
+    };
+
+    function analysisUiProfile(type = $('analysisTypeSelect')?.value || 'stats') {
+      return ANALYSIS_UI_PROFILES[type] || ANALYSIS_UI_PROFILES.stats;
+    }
+
     const ANALYSIS_HELP_PARAMETER_DEFINITIONS = {
       date: {
         engineParameter: 'dateMode, dateRange, timeWindowSeconds',
@@ -4389,24 +4506,24 @@
       },
       filter: {
         engineParameter: 'filterTaps',
-        unit: 'taps',
+        unit: null,
         controlIds: ['filterTaps'],
         tr: {
-          label: 'Bant geçiren filtre uzunluğu',
-          meaning: 'Salınım adayını çıkarmak için kullanılan FIR filtrenin katsayı sayısını belirler.',
-          increase: 'Bant seçiciliği artabilir, ancak kenar etkisi ve gecikme uzar.',
-          decrease: 'Filtre daha hızlı tepki verir, fakat bant ayrımı zayıflayabilir.',
-          risk: 'Çok kısa filtre gürültüyü geçirir; çok uzun filtre kısa olayları bozabilir.',
-          recommended: '101 tap.',
+          label: 'Filtre keskinliği',
+          meaning: 'Salınım adayını ayıran bant geçiren filtrenin ne kadar seçici davranacağını belirler.',
+          increase: 'Bant seçiciliği artabilir, ancak kenar etkisi ve tepki gecikmesi uzar.',
+          decrease: 'Filtre daha hızlı tepki verir, fakat yakın frekansları ayırma gücü zayıflayabilir.',
+          risk: 'Çok düşük keskinlik gürültüyü geçirir; çok yüksek keskinlik kısa olayları yayabilir.',
+          recommended: 'Varsayılan keskinlik çoğu günlük inceleme için yeterlidir.',
           profile: 'Analiz profilleri bu filtreyi değiştirmez.'
         },
         en: {
-          label: 'Band-pass filter length',
-          meaning: 'Sets the FIR filter tap count used to extract oscillation candidates.',
-          increase: 'Band selectivity can improve, but edge effect and delay increase.',
-          decrease: 'The filter reacts faster, but band separation can weaken.',
-          risk: 'Too short passes noise; too long can distort short events.',
-          recommended: '101 taps.',
+          label: 'Filter sharpness',
+          meaning: 'Sets how selectively the band-pass filter separates oscillation candidates.',
+          increase: 'Band selectivity can improve, but edge effects and response delay increase.',
+          decrease: 'The filter reacts faster, but separation between nearby frequencies can weaken.',
+          risk: 'Too little sharpness passes noise; too much can smear short events.',
+          recommended: 'The default sharpness is sufficient for most daily reviews.',
           profile: 'Analysis profiles do not change this filter.'
         }
       },
@@ -5253,6 +5370,169 @@
           mistakes: ['Do not treat display resolution as a recalculation of daily statistics.', 'Reading a low-coverage day as a complete day can mislead the trend.', 'One extreme day is not proof of a long-term trend.'],
           ai: ['If maximum or minimum is extreme, zoom to that day and inspect data quality details.', 'If the histogram is wide or bimodal, compare the same range with Basic Statistics and Band Violation results.', 'If trend slope is strong, verify that source and time-zone choices stayed consistent.'],
           math: ['Daily base statistics are computed from raw valid one-second samples.', 'Display buckets produce mean/min/max at the selected resolution and do not connect missing gaps.', 'Trend slope is computed from valid daily values in mHz/day using linear or robust regression.']
+        }
+      }
+    };
+
+    const ANALYSIS_SIMPLIFIED_HELP_CONTENT = {
+      quality: {
+        tr: {
+          summary: 'Bu analiz, seçilen veri döneminde analize güvenilip güvenilemeyeceğini gösterir.',
+          what: ['Eksik, geçersiz, yinelenen veya uzun boşluk içeren veriler ileri sonuçların yorumunu zorlaştırır.'],
+          interpretation: ['Kapsama oranı ve en uzun boşluk önce okunur; düşük kapsama varsa diğer analizlere geçmeden tarih aralığını daraltın.'],
+          attention: ['Eksik veri gerçek ölçüm değildir; boşlukların üzerinden olay veya türev sürekliliği varsayılmamalıdır.'],
+          expertSettings: ['Yinelenen değer eşiğini yalnız kaynakta donmuş veri veya aşırı yuvarlama şüphesi varsa değiştirin.']
+        },
+        en: {
+          summary: 'This analysis shows whether the selected data period is reliable enough for analysis.',
+          what: ['Missing, invalid, repeated, or long-gap data makes downstream results harder to interpret.'],
+          interpretation: ['Read coverage and longest gap first; narrow the date range before advanced analysis when coverage is low.'],
+          attention: ['Missing data is not a real measurement; do not assume event or derivative continuity across gaps.'],
+          expertSettings: ['Change the repeated-value threshold only when frozen data or excessive rounding is suspected.']
+        }
+      },
+      stats: {
+        tr: {
+          summary: 'Bu analiz, frekansın 50 Hz çevresinde ne kadar dengeli kaldığını özetler.',
+          what: ['Ortalama ve RMS sapma genel davranışı; min-maks değerleri uç durumları gösterir.'],
+          interpretation: ['Ortalama nominale yakın olsa bile RMS veya bant dışı süre yükseliyorsa gün sakin kabul edilmemelidir.'],
+          attention: ['Tek örneklik minimum veya maksimum değer veri kalitesiyle birlikte kontrol edilmelidir.'],
+          expertSettings: ['Bant sınırlarını yalnız farklı bir işletme bandını bilinçli olarak raporlamak istediğinizde değiştirin.']
+        },
+        en: {
+          summary: 'This analysis summarizes how steadily frequency stayed around 50 Hz.',
+          what: ['Mean and RMS deviation describe general behavior; min-max values show extremes.'],
+          interpretation: ['A mean near nominal is not enough if RMS deviation or out-of-band duration is high.'],
+          attention: ['Single-sample minimum or maximum values should be checked against data quality.'],
+          expertSettings: ['Change band limits only when intentionally reporting against a different operating band.']
+        }
+      },
+      events: {
+        tr: {
+          summary: 'Bu analiz, frekansın seçilen alt ve üst bant dışında kaldığı dönemleri olay olarak listeler.',
+          what: ['Olay süresi ve en büyük sapma, ihlalin ciddiyetini gösterir.'],
+          interpretation: ['Uzun tek olay ile çok sayıda kısa olay farklı işletme sorularına işaret eder.'],
+          attention: ['Eksik veri boşluğu olay sürekliliği olarak birleştirilmez.'],
+          expertSettings: ['Minimum olay süresini kısa gürültü geçişleri tabloyu kalabalıklaştırıyorsa artırın.']
+        },
+        en: {
+          summary: 'This analysis lists periods where frequency is outside the selected lower and upper band.',
+          what: ['Event duration and largest deviation describe the severity of the violation.'],
+          interpretation: ['One long event and many short events point to different operational questions.'],
+          attention: ['Missing-data gaps are not merged as event continuity.'],
+          expertSettings: ['Increase minimum event duration when short noisy transitions clutter the table.']
+        }
+      },
+      rocof: {
+        tr: {
+          summary: 'RoCoF, frekansın saniye başına ne kadar hızlı değiştiğini gösterir.',
+          what: ['Büyük pozitif veya negatif değerler ani sistem hareketlerini işaret edebilir.'],
+          interpretation: ['R+ frekans yükselişini, R− frekans düşüşünü gösterir; eşik tam eşitliği olay sayılmaz.'],
+          attention: ['Bu sonuç çevrimdışı tarihsel tahmindir; koruma rölesi veya gerçek zamanlı ölçüm gibi kullanılmamalıdır.'],
+          expertSettings: ['Yöntem ve pencere ayarlarını yalnız gürültü-yumuşatma veya regresyon duyarlılığı bilinçli incelenecekse değiştirin.']
+        },
+        en: {
+          summary: 'RoCoF shows how quickly frequency changes per second.',
+          what: ['Large positive or negative values can indicate abrupt system movement.'],
+          interpretation: ['R+ means rising frequency and R− means falling frequency; exact equality to the threshold is not an event.'],
+          attention: ['This is an offline historical estimate; do not treat it as protection-relay or real-time measurement.'],
+          expertSettings: ['Change method and window settings only when deliberately studying smoothing or regression sensitivity.']
+        }
+      },
+      psd: {
+        tr: {
+          summary: 'Bu analiz, frekans verisindeki düzenli salınım bileşenlerini bulur.',
+          what: ['Baskın frekans ve periyot, hangi salınımın öne çıktığını gösterir.'],
+          interpretation: ['Yüksek tepe tek başına fiziksel olay kanıtı değildir; süreklilik için spektrogramla karşılaştırın.'],
+          attention: ['Eksik veri veya çok kısa veri segmentleri tepe güvenini düşürür.'],
+          expertSettings: ['Segment ve pencere ayarlarını yalnız frekans ayrımı ile zaman ayrımı arasında bilinçli tercih yaparken değiştirin.']
+        },
+        en: {
+          summary: 'This analysis finds regular oscillatory components in frequency data.',
+          what: ['Dominant frequency and period show which oscillation stands out.'],
+          interpretation: ['A high peak alone is not physical-event proof; compare with the Spectrogram for continuity.'],
+          attention: ['Missing data or very short segments reduce peak confidence.'],
+          expertSettings: ['Change segment and window settings only when deliberately trading frequency separation against time detail.']
+        }
+      },
+      spectrogram: {
+        tr: {
+          summary: 'Spektrogram, salınım yoğunluğunun gün içinde hangi saatlerde ve hangi frekans bandında arttığını gösterir.',
+          what: ['Açık veya yoğun renkler daha güçlü bileşenleri ifade eder.'],
+          interpretation: ['Sürekliliği olan renk sırtları tek pencerelik parçalardan daha anlamlıdır.'],
+          attention: ['Veri kalitesi düşük pencereler varsa renk yoğunluğu temkinli yorumlanmalıdır.'],
+          expertSettings: ['Maksimum hücre, segment ve güç ölçeğini yalnız uzun aralık veya performans sınırı gerektiğinde değiştirin.']
+        },
+        en: {
+          summary: 'The Spectrogram shows when and in which frequency band oscillation intensity increases during the day.',
+          what: ['Brighter or denser colors indicate stronger components.'],
+          interpretation: ['Continuous color ridges are more meaningful than single-window fragments.'],
+          attention: ['Interpret color intensity cautiously when low-quality windows are present.'],
+          expertSettings: ['Change max cells, segment, and power scale only for long ranges or performance constraints.']
+        }
+      },
+      oscillation: {
+        tr: {
+          summary: 'Bu analiz, belirli frekans bantlarında tekrar eden salınım adaylarını bulur.',
+          what: ['Adaylar kesin arıza veya olay değildir; genlik, süre ve güven düzeyiyle birlikte yorumlanmalıdır.'],
+          interpretation: ['En güçlü aday ve baskın periyot önce okunur; damping yalnız uygun adaylarda anlamlıdır.'],
+          attention: ['Güven skoru kalibre edilmiş olasılık değildir; veri kalitesi ve SNR ile birlikte değerlendirin.'],
+          expertSettings: ['Filtre keskinliği ve eşik ayarlarını yalnız belirli bir salınım bandını bilinçli hedeflerken değiştirin.']
+        },
+        en: {
+          summary: 'This analysis finds repeating oscillation candidates in selected frequency bands.',
+          what: ['Candidates are not definite faults or events; interpret them with amplitude, duration, and confidence.'],
+          interpretation: ['Read strongest candidate and dominant period first; damping is meaningful only for suitable candidates.'],
+          attention: ['The confidence score is not a calibrated probability; read it with data quality and SNR.'],
+          expertSettings: ['Change filter sharpness and threshold only when deliberately targeting a specific oscillation band.']
+        }
+      },
+      crossCorrelation: {
+        tr: {
+          summary: 'Çapraz korelasyon, iki frekans serisinin benzer hareket edip etmediğini ve benzerliğin hangi gecikmede en yüksek olduğunu gösterir.',
+          what: ['Bu analiz iki eşleşmiş seri gerektirir; Türkiye + Kıta Avrupası kaynağını seçin.'],
+          interpretation: ['En iyi gecikme ve korelasyon değeri benzerliği özetler, nedensellik kanıtlamaz.'],
+          attention: ['Düşük ortak veri oranı veya yanlış zaman eşleştirme gecikme yorumunu yanıltabilir.'],
+          expertSettings: ['Pencere süresini yalnız olay çevresinde daha dar veya daha geniş benzerlik ararken değiştirin.']
+        },
+        en: {
+          summary: 'Cross-correlation shows whether two frequency series move similarly and at which lag similarity is highest.',
+          what: ['This analysis requires two paired series; choose Türkiye + Continental Europe.'],
+          interpretation: ['Best lag and correlation summarize similarity, not causality.'],
+          attention: ['Low common-data ratio or wrong time alignment can mislead lag interpretation.'],
+          expertSettings: ['Change window duration only when searching for narrower or wider similarity around an event.']
+        }
+      },
+      coherence: {
+        tr: {
+          summary: 'Koherens, iki serinin belirli salınım bantlarında birlikte davranıp davranmadığını gösterir.',
+          what: ['1’e yakın değerler güçlü ortak davranış, 0’a yakın değerler zayıf ilişki anlamına gelir.'],
+          interpretation: ['Faz farkı yalnız yeterli koherens ve güç varken anlamlıdır.'],
+          attention: ['Düşük güçte faz yorumu yanıltıcı olabilir.'],
+          expertSettings: ['Bant ve pencere ayarlarını yalnız belirli ortak salınım frekansı araştırılırken değiştirin.']
+        },
+        en: {
+          summary: 'Coherence shows whether two series behave together in specific oscillation bands.',
+          what: ['Values near 1 mean strong common behavior; values near 0 mean weak relation.'],
+          interpretation: ['Phase difference is meaningful only when coherence and power are sufficient.'],
+          attention: ['Phase interpretation at low power can be misleading.'],
+          expertSettings: ['Change band and window settings only when investigating a specific common oscillation frequency.']
+        }
+      },
+      trend: {
+        tr: {
+          summary: 'Bu analiz, seçilen tarih aralığında frekans davranışının zamanla nasıl değiştiğini gösterir.',
+          what: ['Trend çizgisi, dönemsel iyileşme veya bozulma olup olmadığını anlamaya yardımcı olur.'],
+          interpretation: ['Tek gün modunda günlük değerler; tarih aralığında trend ve kapsama durumu önce okunur.'],
+          attention: ['Görüntü çözünürlüğü grafiği özetler; günlük istatistikleri yeniden hesaplamaz.'],
+          expertSettings: ['Histogram, hareketli ortalama ve trend yöntemini yalnız uzun dönem rapor sunumunu değiştirmek için ayarlayın.']
+        },
+        en: {
+          summary: 'This analysis shows how frequency behavior changes over the selected date range.',
+          what: ['The trend line helps identify period-level improvement or deterioration.'],
+          interpretation: ['In single-day mode read daily values; in range mode read trend and coverage first.'],
+          attention: ['Display resolution summarizes the chart; it does not recalculate daily statistics.'],
+          expertSettings: ['Adjust histogram, moving average, and trend method only to change long-term report presentation.']
         }
       }
     };
@@ -8063,6 +8343,7 @@
       if ($('analysisMainChart')) $('analysisMainChart').style.height = '';
       setQualityZoomResetVisible(false);
       restoreAnalysisTableShell();
+      setAnalysisTablePanelHidden(true);
       setAnalysisTableHeader(analysisDefinition('oscillation').tableColumns);
       if ($('analysisTableTitle')) $('analysisTableTitle').textContent = t(analysisDefinition('oscillation').titleKey);
       if ($('analysisTableDescription')) $('analysisTableDescription').textContent = t(analysisDefinition('oscillation').descriptionKey);
@@ -8099,6 +8380,7 @@
       const rocofNotice = $('rocofResultNotice');
       if (rocofNotice && type !== 'rocof') rocofNotice.remove();
       restoreAnalysisTableShell();
+      setAnalysisTablePanelHidden(true);
       setAnalysisTableHeader(columns);
       if ($('analysisTableTitle')) $('analysisTableTitle').textContent = def.tableTitleKey ? t(def.tableTitleKey) : t(def.titleKey);
       if ($('analysisTableDescription')) $('analysisTableDescription').textContent = t(emptyKey);
@@ -8744,6 +9026,17 @@
       return ANALYSIS_HELP_CONTENT[type] || ANALYSIS_HELP_CONTENT.stats;
     }
 
+    function simplifiedAnalysisHelpContent(type = $('analysisTypeSelect')?.value || 'stats') {
+      const original = analysisHelpContent(type);
+      const simplified = ANALYSIS_SIMPLIFIED_HELP_CONTENT[type]?.[lang] || ANALYSIS_SIMPLIFIED_HELP_CONTENT[type]?.tr || {};
+      return {
+        ...original,
+        ...simplified,
+        title: simplified.title || original.title,
+        summary: simplified.summary || t(analysisDefinition(type).descriptionKey)
+      };
+    }
+
     function selectedOptionText(id) {
       const select = $(id);
       return select?.selectedOptions?.[0]?.textContent?.trim() || select?.value || '';
@@ -8848,7 +9141,6 @@
               <div><dt>${escapeHtml(t('analysisHelpRisk'))}</dt><dd>${escapeHtml(info.risk)}</dd></div>
               <div><dt>${escapeHtml(t('analysisHelpRecommended'))}</dt><dd>${escapeHtml(info.recommended)}</dd></div>
               <div><dt>${escapeHtml(t('analysisHelpProfileBehavior'))}</dt><dd>${escapeHtml(info.profile)}</dd></div>
-              <div><dt>${escapeHtml(t('analysisHelpEngineParameter'))}</dt><dd><code>${escapeHtml(raw.engineParameter)}</code></dd></div>
             </dl>
           </article>
         `;
@@ -9008,7 +9300,7 @@
 
     function renderAnalysisHelpModal() {
       const type = $('analysisTypeSelect')?.value || 'stats';
-      const content = analysisHelpContent(type);
+      const content = simplifiedAnalysisHelpContent(type);
       const def = analysisDefinition(type);
       const title = content.title || t(def.titleKey);
       const titleNode = $('analysisHelpTitle');
@@ -9033,18 +9325,16 @@
       renderAnalysisHelpAccordingToResult(type);
       const body = $('analysisHelpBody');
       if (!body) return;
+      const parameterCards = buildAnalysisHelpParameterCards(type);
       body.innerHTML = `
         <div class="analysis-help-sections">
           ${renderAnalysisHelpSection('What', helpParagraphs(content.what || [content.summary]), { open: true })}
-          ${renderAnalysisHelpSection('When', helpList(content.when), { open: false })}
-          ${renderAnalysisHelpSection('Parameters', `<div class="analysis-help-card-grid">${buildAnalysisHelpParameterCards(type)}</div>`, { open: true })}
-          ${renderAnalysisHelpSection('Results', renderResultInterpretationCards(content), { open: true })}
-          ${renderAnalysisHelpSection('AiSuggestions', helpList(content.ai), { open: true })}
-          ${renderAnalysisHelpSection('Chart', helpList(content.chart), { open: false })}
-          ${renderAnalysisHelpSection('Table', helpList(content.table), { open: false })}
-          ${renderAnalysisHelpSection('Mistakes', helpList(content.mistakes), { open: false })}
-          ${renderAnalysisHelpSection('Glossary', renderGlossary(type), { open: false })}
-          ${renderAnalysisHelpSection('MathEngine', helpList([...(content.math || []), t(def.methodKey), t(def.limitationsKey)]), { open: false })}
+          ${renderAnalysisHelpSection('Interpretation', helpParagraphs(content.interpretation || content.results || []), { open: true })}
+          ${renderAnalysisHelpSection('Attention', helpParagraphs(content.attention || content.mistakes || []), { open: false })}
+          ${renderAnalysisHelpSection('ExpertSettings', `
+            ${helpParagraphs(content.expertSettings || content.ai || [])}
+            ${parameterCards ? `<div class="analysis-help-card-grid">${parameterCards}</div>` : ''}
+          `, { open: false })}
         </div>
       `;
       bindAnalysisHelpControls(body);
@@ -9354,7 +9644,7 @@
       }
       const advancedSummary = document.querySelector('.analysis-advanced-panel > summary');
       if (advancedSummary) {
-        const key = spectral ? 'spectralAdvancedSettings' : 'advanced';
+        const key = 'analysisExpertSettingsTitle';
         advancedSummary.dataset.i18n = key;
         advancedSummary.textContent = t(key);
       }
@@ -12955,10 +13245,157 @@
       return `<span class="metric-label">${escapeHtml(label)}</span>${metricHelpButton(label, helpKeyOrText)}`;
     }
 
+    function simpleAnalysisCard(labelKeyOrText, value, helpKey = '', extra = {}) {
+      const label = i18n[lang]?.[labelKeyOrText] ? t(labelKeyOrText) : String(labelKeyOrText || '');
+      const tooltip = helpKey ? (i18n[lang]?.[helpKey] ? t(helpKey) : String(helpKey)) : '';
+      return {
+        label,
+        value: value ?? '—',
+        tooltip,
+        ...extra
+      };
+    }
+
+    function resultCardByLabel(result, labelKey) {
+      const target = t(labelKey);
+      return (result.cards || [])
+        .map(normalizeAnalysisCard)
+        .find(card => card.label === target);
+    }
+
+    function tableMetricValue(result, metricKey) {
+      const label = t(metricKey);
+      const row = (result.tableRows || []).find(item => item?.metric === label);
+      return row?.value;
+    }
+
+    function sumEventDuration(events = [], predicate = () => true) {
+      return events.reduce((sum, event) => {
+        if (!predicate(event)) return sum;
+        return sum + Math.max(0, Number(event.durationSeconds ?? event.endSecond - event.startSecond ?? event.end - event.start) || 0);
+      }, 0);
+    }
+
+    function longestEvent(events = [], predicate = () => true) {
+      return events
+        .filter(predicate)
+        .reduce((best, event) => {
+          const duration = Number(event.durationSeconds ?? event.endSecond - event.startSecond ?? event.end - event.start) || 0;
+          const bestDuration = Number(best?.durationSeconds ?? best?.endSecond - best?.startSecond ?? best?.end - best?.start) || 0;
+          return duration > bestDuration ? event : best;
+        }, null);
+    }
+
+    function visibleAnalysisCards(result) {
+      const fallback = (result.cards || []).map(normalizeAnalysisCard).filter(card => card.label && card.value !== '');
+      const first = key => resultCardByLabel(result, key);
+      const cards = [];
+      if (result.type === 'quality') {
+        const missingSeconds = sumEventDuration(result.events || [], event => event.type === 'missing');
+        const gap = longestEvent(result.events || [], event => event.type === 'missing');
+        cards.push(
+          simpleAnalysisCard('qualityCoverage', first('qualityCoverage')?.value || tableMetricValue(result, 'qualityCoverage') || '—'),
+          simpleAnalysisCard('qualityMissingDuration', durationText(missingSeconds || 0)),
+          simpleAnalysisCard('qualityLongestGap', durationText(Number(gap?.durationSeconds) || 0), '', { startSecond: gap?.startSecond, endSecond: gap?.endSecond, drilldownType: 'missing' }),
+          simpleAnalysisCard('qualityOverallStatus', first('qualityGood')?.value || tableMetricValue(result, 'qualityGood') || '—')
+        );
+      } else if (result.type === 'stats') {
+        const stats = result.stats || {};
+        cards.push(
+          simpleAnalysisCard('statsMean', statsValueText(stats.mean, 4, ' Hz')),
+          simpleAnalysisCard('statsMinMaxCompact', `${statsValueText(stats.min, 4, ' Hz')} / ${statsValueText(stats.max, 4, ' Hz')}`),
+          simpleAnalysisCard('rmsDeviation', statsValueText(stats.rmsDeviationMhz, 2, ' mHz')),
+          simpleAnalysisCard('statsOutOfBandDuration', durationText(stats.outOfBandSeconds || 0))
+        );
+      } else if (result.type === 'events') {
+        const meta = result.bandViolationMeta || {};
+        const longest = meta.longest || longestEvent(result.events || []);
+        const largest = Math.max(Number(meta.maxLowerExceedanceMhz || 0), Number(meta.maxUpperExceedanceMhz || 0));
+        cards.push(
+          simpleAnalysisCard('bandViolationTotalDuration', durationText(meta.violationSeconds || 0), 'bandViolationTotalDurationHelp'),
+          simpleAnalysisCard('bandViolationEventCount', numberText(result.events?.length || 0)),
+          simpleAnalysisCard('bandViolationLongest', longest ? durationText(longest.durationSeconds || 0) : durationText(0), 'bandViolationLongestHelp', { startSecond: longest?.startSecond, endSecond: longest?.endSecond, drilldownType: 'band' }),
+          simpleAnalysisCard('bandViolationLargestDeviation', statsValueText(largest, 2, ' mHz'), 'bandViolationExceedanceHelp')
+        );
+      } else if (result.type === 'rocof') {
+        const longest = longestEvent(result.events || []);
+        cards.push(
+          first('rocofMaxPositive'),
+          first('rocofMaxNegative'),
+          first('rocofEvents'),
+          simpleAnalysisCard('rocofLongestEvent', longest ? durationText(longest.durationSeconds || 0) : durationText(0), 'rocofDurationHelp', { startSecond: longest?.startSecond, endSecond: longest?.endSecond, drilldownType: 'rocof' })
+        );
+      } else if (result.type === 'psd') {
+        const welch = result.chart?.welch || {};
+        const peak = welch.peaks?.[0] || {};
+        cards.push(
+          simpleAnalysisCard('dominantFrequency', Number.isFinite(peak.frequencyHz) ? `${fmt(peak.frequencyHz, 4)} Hz` : first('dominantFrequency')?.value || '—'),
+          simpleAnalysisCard('dominantPeriod', Number.isFinite(peak.periodSeconds) ? secondsValue(peak.periodSeconds, 2) : '—'),
+          simpleAnalysisCard('spectralPeakPower', Number.isFinite(peak.psd ?? peak.power) ? `${fmt(peak.psd ?? peak.power, 8)} Hz²/Hz` : first('spectralPsdHz2PerHz')?.value || '—'),
+          simpleAnalysisCard('spectralHighlightedBand', Array.isArray(result.chart?.band) ? `${fmt(result.chart.band[0], 3)}–${fmt(result.chart.band[1], 3)} Hz` : first('spectralSnrDb')?.value || first('spectralSegmentUsage')?.value || '—')
+        );
+      } else if (result.type === 'spectrogram') {
+        const spectrogram = result.chart?.spectrogram || {};
+        const region = (result.regionRows || [])[0];
+        cards.push(
+          simpleAnalysisCard('spectrogramStrongestBand', region?.dominantFrequency || spectrogramDominantFrequencyLabel(spectrogram)),
+          region
+            ? simpleAnalysisCard('spectrogramDensestTimeRange', `${region.start} – ${region.end}`)
+            : simpleAnalysisCard('spectrogramRegionCount', numberText((result.regionRows || []).length)),
+          simpleAnalysisCard('spectrogramPeakPowerLevel', spectrogramPeakPsdLabel(spectrogram)),
+          simpleAnalysisCard('spectralDataQuality', percent(spectrogram.meanValidRatio || 0))
+        );
+      } else if (result.type === 'oscillation') {
+        const best = result.candidates?.[0] || {};
+        cards.push(
+          simpleAnalysisCard('eventCount', numberText(result.candidates?.length || 0), 'oscillationEventCountHelp'),
+          simpleAnalysisCard('oscillationStrongestCandidate', Number.isFinite(best.peakAmplitudeMhz) ? `${fmt(best.peakAmplitudeMhz, 2)} mHz` : '—', 'oscillationPeakHelp', { startSecond: best.startSecond, endSecond: best.endSecond, drilldownType: 'oscillation' }),
+          simpleAnalysisCard('dominantPeriod', Number.isFinite(best.periodSeconds) ? secondsValue(best.periodSeconds, 2) : '—', 'oscillationDominantHelp'),
+          simpleAnalysisCard('oscillationConfidenceLevel', Number.isFinite(best.confidenceScore) ? `${fmt(best.confidenceScore, 0)}/100` : t('notApplicable'), 'oscillationConfidenceHelp')
+        );
+      } else if (result.type === 'crossCorrelation') {
+        cards.push(
+          first('bestLag'),
+          first('kpiCorrelation'),
+          first('qualityCoverage'),
+          first('classification') || simpleAnalysisCard('crossCorrelationInterpretation', result.events?.[0]?.classification || '—')
+        );
+      } else if (result.type === 'coherence') {
+        cards.push(
+          simpleAnalysisCard('coherenceHighestBand', first('dominantFrequency')?.value || '—'),
+          first('phaseDifference'),
+          simpleAnalysisCard('coherenceCommonBehaviorStrength', first('coherence')?.value || '—'),
+          first('classification') || simpleAnalysisCard('coherenceDataCompatibility', '—')
+        );
+      } else if (result.type === 'trend') {
+        const dayCount = result.dailyStats?.length || 0;
+        const details = result.trendDetails || {};
+        const advanced = details.advancedRows || [];
+        const findDetail = labelKey => advanced.find(row => row.label === t(labelKey))?.value;
+        if (dayCount <= 1 || $('analysisDateMode')?.value === 'single') {
+          cards.push(
+            first('dailyTrendMean'),
+            first('dailyTrendMaxWithTime'),
+            first('dailyTrendMinWithTime'),
+            simpleAnalysisCard('rmsDeviation', findDetail('rmsDeviation') || '—')
+          );
+        } else {
+          cards.push(
+            simpleAnalysisCard('dailyTrendAverageTrend', findDetail('dailyTrendTrendSlopeMean') || '—', 'dailyTrendSlopeHelp'),
+            simpleAnalysisCard('dailyTrendRmsTrend', findDetail('rmsDeviation') || '—'),
+            simpleAnalysisCard('dailyTrendWorstDay', result.dailyStats?.find(day => day.status !== 'ok')?.date || result.dailyStats?.[0]?.date || '—'),
+            simpleAnalysisCard('qualityCoverage', first('qualityCoverage')?.value || '—')
+          );
+        }
+      }
+      const safeCards = cards.filter(Boolean).map(normalizeAnalysisCard).filter(card => card.label && card.value !== '');
+      return (safeCards.length ? safeCards : fallback).slice(0, 4);
+    }
+
     function renderAnalysisCards(result) {
       const grid = $('analysisResultCards');
       if (!grid) return;
-      grid.innerHTML = (result.cards || []).map(card => {
+      grid.innerHTML = visibleAnalysisCards(result).map(card => {
         const normalized = normalizeAnalysisCard(card);
         const clickable = Number.isFinite(normalized.startSecond);
         const endSecond = Number.isFinite(normalized.endSecond) ? normalized.endSecond : Number(normalized.startSecond) + 1;
@@ -12988,14 +13425,44 @@
       }));
     }
 
+    function renderAnalysisDetailsDisclosure(rows = []) {
+      const rowHtml = rows.map(row => {
+        const attrs = row.tooltip
+          ? `tabindex="0" data-tooltip="${escapeHtml(row.tooltip)}" aria-label="${escapeHtml(`${row.label}: ${row.value}. ${row.tooltip}`)}"`
+          : '';
+        const icon = row.tooltip ? '<span class="metric-info-icon" aria-hidden="true">&#9432;</span>' : '';
+        return `<div class="analysis-detail-item" ${attrs}><span class="metric-label">${escapeHtml(row.label)}</span>${icon}<strong>${escapeHtml(row.value)}</strong></div>`;
+      }).join('');
+      return `
+        <summary>${escapeHtml(t('analysisDetailsToggleTitle'))}</summary>
+        <div class="analysis-detail-summary">
+          ${rowHtml}
+        </div>
+      `;
+    }
+
+    function supplementalAnalysisDetailRows(result = {}) {
+      const profile = analysisUiProfile(result?.type);
+      const visibleMetricLabels = new Set((profile.metricRows || []).map(key => t(key)));
+      return (result.tableRows || [])
+        .filter(row => row && row.metric && row.value && !visibleMetricLabels.has(row.metric))
+        .map(row => ({
+          label: row.metric,
+          value: row.value,
+          tooltip: row.tooltip || ''
+        }));
+    }
+
     function renderAnalysisDetailSummary(result) {
-      const anchor = $('analysisResultCards');
+      const anchor = analysisTablePanel() || $('oscChartWrapper') || $('analysisResultCards');
       if (!anchor) return;
       let summary = $('analysisDetailSummary');
       if (!summary) {
-        summary = document.createElement('div');
+        summary = document.createElement('details');
         summary.id = 'analysisDetailSummary';
-        summary.className = 'analysis-detail-summary';
+        summary.className = 'analysis-detail-disclosure';
+        anchor.insertAdjacentElement('afterend', summary);
+      } else if (summary.previousElementSibling !== anchor) {
         anchor.insertAdjacentElement('afterend', summary);
       }
       if (isSpectralAnalysis(result?.type)) {
@@ -13003,19 +13470,16 @@
         summary.hidden = true;
         return;
       }
-      const rows = result.detailRows || [];
+      const rows = (result.detailRows && result.detailRows.length)
+        ? result.detailRows
+        : supplementalAnalysisDetailRows(result);
       summary.hidden = !rows.length;
       if (!rows.length) {
         summary.innerHTML = '';
         return;
       }
-      summary.innerHTML = rows.map(row => {
-        const attrs = row.tooltip
-          ? `tabindex="0" data-tooltip="${escapeHtml(row.tooltip)}" aria-label="${escapeHtml(`${row.label}: ${row.value}. ${row.tooltip}`)}"`
-          : '';
-        const icon = row.tooltip ? '<span class="metric-info-icon" aria-hidden="true">&#9432;</span>' : '';
-        return `<div class="analysis-detail-item" ${attrs}><span class="metric-label">${escapeHtml(row.label)}</span>${icon}<strong>${escapeHtml(row.value)}</strong></div>`;
-      }).join('');
+      summary.open = false;
+      summary.innerHTML = renderAnalysisDetailsDisclosure(rows);
     }
 
     function renderRocofDetailSummary(result) {
@@ -13062,7 +13526,7 @@
       }
       summary.hidden = false;
       summary.innerHTML = `
-        <summary style="cursor: pointer; font-weight: 600; color: var(--navy);">${t('rocofDetailsSummaryTitle', 'Detaylı Metrikler ve Örnek Analizi')}</summary>
+        <summary style="cursor: pointer; font-weight: 600; color: var(--navy);">${t('analysisDetailsToggleTitle')}</summary>
         <table style="width: 100%; margin-top: 10px; border-collapse: collapse; text-align: left;">
           <tbody>
             <tr>
@@ -15214,6 +15678,15 @@
       return $('analysisTableTitle')?.closest('.panel')?.querySelector('.table-wrap') || null;
     }
 
+    function analysisTablePanel() {
+      return $('analysisTableTitle')?.closest('.panel') || null;
+    }
+
+    function setAnalysisTablePanelHidden(hidden) {
+      const panel = analysisTablePanel();
+      if (panel) panel.hidden = Boolean(hidden);
+    }
+
     function restoreAnalysisTableShell() {
       const wrap = analysisTableWrap();
       if (!wrap) return null;
@@ -15352,6 +15825,7 @@
     }
 
     function renderSpectrogramAnalysisDetails(result) {
+      setAnalysisTablePanelHidden(false);
       const wrap = analysisTableWrap();
       if (!wrap) return;
       wrap.classList.add('spectral-details-card');
@@ -15359,6 +15833,87 @@
       $('analysisTableDescription').textContent = result.description || t('spectrogramEmptyState');
       wrap.innerHTML = renderSpectrogramDetailsCard(result);
       bindSpectrogramDetailsCard(result);
+    }
+
+    function defaultAnalysisColumn(key) {
+      const labelByKey = {
+        source: 'bandViolationSource',
+        type: 'bandViolationType',
+        start: 'oscThStart',
+        end: 'oscThEnd',
+        duration: 'oscThDuration',
+        extreme: 'bandViolationExtremeHz',
+        exceedance: 'bandViolationExceedanceMhz',
+        peak: 'rocofPeak',
+        rms: 'oscThRms',
+        startHz: 'rocofStartHz',
+        extremeHz: 'rocofExtremeHz',
+        rank: 'spectralPeakRank',
+        frequency: 'spectralFrequencyHz',
+        period: 'spectralPeriodSeconds',
+        psd: 'spectralPsdHz2PerHz',
+        psdLevel: 'spectralPsdLevel',
+        snrLinear: 'spectralSnrLinear',
+        snrDb: 'spectralSnrDb',
+        prominence: 'spectralPeakProminence',
+        bandwidth: 'spectralPeakBandwidth',
+        qualityFactor: 'spectralQualityFactor',
+        status: 'spectrogramWindowStatus',
+        confidence: 'spectralPeakConfidence',
+        dominantFrequency: 'oscThDominant',
+        classification: 'oscThClass',
+        quality: 'spectralDataQuality',
+        date: 'reportDateLabelShort',
+        maxFrequency: 'dailyTrendMaxFrequency',
+        maxTime: 'dailyTrendMaxTime',
+        mean: 'dailyTrendMean',
+        median: 'dailyTrendMedian',
+        minFrequency: 'dailyTrendMinFrequency',
+        minTime: 'dailyTrendMinTime',
+        stdDev: 'dailyTrendStdDev',
+        coverage: 'qualityCoverage',
+        metric: 'tableMetric',
+        value: 'tableValue',
+        coherence: 'coherence',
+        phase: 'phaseDifference'
+      };
+      return { key, labelKey: labelByKey[key] || 'tableValue' };
+    }
+
+    function visibleAnalysisTableColumns(result, allColumns = []) {
+      const profile = analysisUiProfile(result?.type);
+      const isMobile = typeof window !== 'undefined' && window.matchMedia?.('(max-width: 720px)').matches;
+      const keys = isMobile && profile.mobileColumns?.length ? profile.mobileColumns : profile.tableColumns;
+      if (!keys?.length) return allColumns;
+      return keys.map(key => allColumns.find(column => column.key === key) || defaultAnalysisColumn(key));
+    }
+
+    function visibleAnalysisTableRows(result, rows = []) {
+      const profile = analysisUiProfile(result?.type);
+      if (!profile.metricRows?.length) return rows;
+      const allowed = new Set(profile.metricRows.map(key => t(key)));
+      const filtered = rows.filter(row => !row.group && allowed.has(row.metric));
+      return filtered.length ? filtered : rows;
+    }
+
+    function hiddenAnalysisTableColumns(allColumns = [], visibleColumns = []) {
+      const visible = new Set(visibleColumns.map(column => column.key));
+      return allColumns.filter(column => !visible.has(column.key));
+    }
+
+    function rowDetailHtmlFromHiddenColumns(row, hiddenColumns = []) {
+      const rows = hiddenColumns.map(column => {
+        const value = formatTableCell(row[column.key]);
+        if (value === '—') return '';
+        const label = column.key === 'mean'
+          ? t('eventSourceMeanHead', { source: sourceShortLabel(getAnalysisSource()) })
+          : column.key === 'range'
+            ? t('eventSourceRangeHead', { source: sourceShortLabel(getAnalysisSource()) })
+            : t(column.labelKey);
+        return `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`;
+      }).filter(Boolean).join('');
+      if (!rows) return '';
+      return `<details class="analysis-row-details"><summary>${escapeHtml(t('analysisDetailsToggleTitle'))}</summary><dl>${rows}</dl></details>`;
     }
 
     function setAnalysisTableHeader(columns) {
@@ -15383,14 +15938,17 @@
         return;
       }
       const def = analysisDefinition(result.type);
-      const columns = result.tableColumns || def.tableColumns || [];
+      const allColumns = result.tableColumns || def.tableColumns || [];
+      const columns = visibleAnalysisTableColumns(result, allColumns);
+      const hiddenColumns = hiddenAnalysisTableColumns(allColumns, columns);
       const body = restoreAnalysisTableShell();
       if (!body) return;
+      setAnalysisTablePanelHidden(false);
       body?.closest('table')?.classList.toggle('stats-table', result.type === 'stats' || result.type === 'events' || result.type === 'rocof');
       $('analysisTableTitle').textContent = result.tableTitle || result.title || t(def.titleKey);
       $('analysisTableDescription').textContent = result.description || t(def.descriptionKey);
       setAnalysisTableHeader(columns);
-      const rows = result.tableRows || analysisEventsToRows(result.events || []);
+      const rows = visibleAnalysisTableRows(result, result.tableRows || analysisEventsToRows(result.events || []));
       if (!rows.length) {
         const noEventsMsg = result.emptyTableMessage || (result.type === 'rocof' ? t('rocofNoEvents') : t('analysisNoTableRows'));
         body.innerHTML = `<tr><td colspan="${Math.max(1, columns.length)}" class="empty-state">${noEventsMsg}</td></tr>`;
@@ -15421,8 +15979,9 @@
           }
           return `<td>${escapeHtml(cell)}</td>`;
         }).join('');
-        const detail = row.detailHtml
-          ? `<tr class="analysis-row-detail"><td colspan="${Math.max(1, columns.length)}">${row.detailHtml}</td></tr>`
+        const detailHtml = [row.detailHtml, rowDetailHtmlFromHiddenColumns(row, hiddenColumns)].filter(Boolean).join('');
+        const detail = detailHtml
+          ? `<tr class="analysis-row-detail"><td colspan="${Math.max(1, columns.length)}">${detailHtml}</td></tr>`
           : '';
         return `<tr class="${clickable ? 'event-row' : ''}" ${attrs}>${cells}</tr>${detail}`;
       }).join('');
@@ -16665,7 +17224,7 @@
         oscThresholdModeAdaptive: 'MAD tabanlı adaptif eşik',
         windowSecLabel: 'RMS değerlendirme penceresi (sn)',
         stepSecLabel: 'Analiz pencere adımı (sn)',
-        filterTapsLabel: 'FIR katsayı sayısı',
+        filterTapsLabel: 'Filtre keskinliği',
         minDurationLabel: 'Minimum olay süresi (sn)',
         oscCalculateBtn: 'Hesaplama Yap',
         oscStatusDefault: 'Tarih ve kaynak seçin.',
@@ -16996,7 +17555,7 @@
         oscThresholdModeAdaptive: 'MAD-based adaptive threshold',
         windowSecLabel: 'RMS evaluation window (s)',
         stepSecLabel: 'Analysis window step (s)',
-        filterTapsLabel: 'FIR tap count',
+        filterTapsLabel: 'Filter sharpness',
         minDurationLabel: 'Minimum event duration (s)',
         oscCalculateBtn: 'Run Analysis',
         oscStatusDefault: 'Select a date and source.',
@@ -17323,9 +17882,9 @@
         resolutionHour: 'Saatlik',
         rocofThresholdLabel: 'RoCoF olay eşiği (mHz/s)',
         rocofMethodLabel: 'RoCoF hesaplama yöntemi',
-        rocofMethodCentral: 'Merkezî fark — çevrimdışı',
-        rocofMethodFiltered: 'Hareketli ortalama filtreli merkezî fark',
-        rocofMethodRegression: 'Kayan pencereli doğrusal regresyon',
+        rocofMethodCentral: 'Standart RoCoF hesabı',
+        rocofMethodFiltered: 'Yumuşatılmış RoCoF',
+        rocofMethodRegression: 'Regresyon tabanlı RoCoF',
         rocofPreFilterLabel: 'Hareketli ortalama pencere süresi (sn)',
         rocofRegressionWindowLabel: 'Kayan regresyon pencere süresi (sn)',
         analysisGroupQuality: 'Veri Kalitesi',
@@ -17386,20 +17945,22 @@
         analysisHelpClose: 'Kapat',
         analysisHelpCurrentValues: 'Güncel seçimler',
         analysisHelpAccordingToResult: 'Bu sonuca göre',
-        analysisHelpTechnicalMeaning: 'Teknik anlam',
+        analysisHelpTechnicalMeaning: 'Ne işe yarar?',
         analysisHelpUnit: 'Birim',
         analysisHelpIncrease: 'Artırıldığında',
         analysisHelpDecrease: 'Azaltıldığında',
         analysisHelpRisk: 'Risk',
         analysisHelpRecommended: 'Önerilen başlangıç',
         analysisHelpProfileBehavior: 'Profil davranışı',
-        analysisHelpEngineParameter: 'Teknik ayrıntı: motor parametresi',
         analysisHelpInterpretationPoint: 'Yorumlama notu',
         analysisHelpGlossarySearchLabel: 'Terim sözlüğünde ara',
         analysisHelpGlossarySearchPlaceholder: 'Terim veya açıklama yazın',
         analysisHelpAlphabetFilter: 'Alfabetik terim filtresi',
         analysisHelpAllTerms: 'Tümü',
         helpSectionWhat: 'Bu analiz neyi gösterir?',
+        helpSectionInterpretation: 'Sonuç nasıl yorumlanır?',
+        helpSectionAttention: 'Hangi durumda dikkat edilmeli?',
+        helpSectionExpertSettings: 'Uzman ayarlar ne zaman değiştirilmeli?',
         helpSectionWhen: 'Ne zaman kullanılmalı?',
         helpSectionParameters: 'Gelişmiş filtreler nasıl kullanılır?',
         helpSectionResults: 'Sonuçlar nasıl yorumlanır?',
@@ -17415,6 +17976,34 @@
         analysisCompatibilityFallback: 'Seçilen kaynak ve analiz için uyumluluk bilgisi burada gösterilir.',
         analysisSamplingFallback: 'Örnekleme bilgisi analiz seçimine göre hesaplanır.',
         analysisNoTableRows: 'Bu analiz için olay tablosu yok; özet metrikler kartlarda ve raporda gösterilir.',
+        analysisDetailsToggleTitle: 'Detayları göster',
+        analysisExpertSettingsTitle: 'Uzman ayarlar',
+        qualityMissingDuration: 'Eksik süre',
+        qualityOverallStatus: 'Genel kalite durumu',
+        statsMinMaxCompact: 'Minimum–maksimum',
+        bandViolationEventCount: 'Olay sayısı',
+        bandViolationLargestDeviation: 'En büyük sapma',
+        rocofLongestEvent: 'En uzun RoCoF olayı',
+        dominantPeriod: 'Baskın periyot',
+        spectralPeakPower: 'Tepe güç',
+        spectralHighlightedBand: 'Öne çıkan bant',
+        spectrogramStrongestBand: 'En güçlü salınım bandı',
+        spectrogramDensestTimeRange: 'En yoğun saat aralığı',
+        spectrogramRegionCount: 'Anlamlı bölge sayısı',
+        spectrogramPeakPowerLevel: 'Tepe güç seviyesi',
+        oscillationStrongestCandidate: 'En güçlü aday',
+        oscillationConfidenceLevel: 'Güven düzeyi',
+        crossCorrelationInterpretation: 'Sonuç yorumu',
+        crossCorrelationPeak: 'En yüksek benzerlik noktası',
+        coherenceHighestBand: 'En yüksek koherens bandı',
+        coherenceCommonBehaviorStrength: 'Ortak davranış gücü',
+        coherenceDataCompatibility: 'Veri uyumluluğu',
+        dailyTrendAverageTrend: 'Ortalama trend',
+        dailyTrendRmsTrend: 'RMS trendi',
+        dailyTrendWorstDay: 'En sorunlu gün',
+        dailyTrendTechnicalSummary: 'Detayları göster',
+        dailyTrendShowAllTechnical: 'Tüm ayrıntıları göster',
+        notApplicable: 'Uygulanamaz',
         analysisQualityTitle: 'Veri Kapsama ve Kalite Özeti',
         analysisQualityDesc: 'Eksik örnekler, kapsama oranı ve zaman sürekliliği ölçülür.',
         analysisStatsTitle: 'Temel Frekans İstatistikleri',
@@ -17507,8 +18096,8 @@
         dailyTrendAggregation: 'Agregasyon',
         dailyTrendAggregationMeanMinMax: 'Ortalama / min / maks',
         dailyTrendDayCount: 'Gün sayısı',
-        dailyTrendTechnicalSummary: 'Teknik özet',
-        dailyTrendShowAllTechnical: 'Tüm teknik ayrıntıları göster',
+        dailyTrendTechnicalSummary: 'Detayları göster',
+        dailyTrendShowAllTechnical: 'Tüm ayrıntıları göster',
         dailyTrendShowDetails: 'Günlük ayrıntıları göster',
         dailyTrendStatusOk: 'Yeterli',
         dailyTrendStatusLowCoverage: 'Düşük kapsama',
@@ -17675,7 +18264,7 @@
         spectrogramDataQualityTab: 'Veri Kalitesi',
         spectralDetailsRowsShowing: '{shown}/{total} kayıt gösteriliyor. Tam liste JSON/CSV dışa aktarımında korunur.',
         spectralShowMore: 'Daha fazla göster',
-        spectralTechnicalAdvancedTitle: 'Tüm teknik ayrıntıları göster',
+        spectralTechnicalAdvancedTitle: 'Tüm ayrıntıları göster',
         spectralSampleRate: 'Örnekleme frekansı',
         spectralNyquist: 'Nyquist',
         spectralRequestedSegment: 'İstenen segment',
@@ -17701,7 +18290,7 @@
         spectralSamplesUnit: 'örnek',
         spectralSegmentUsage: 'Segment kullanımı',
         spectralNoFindingsTag: 'spektral analiz',
-        spectralTechnicalDetailsTitle: 'Detaylı Metrikler ve Örnek Analizi',
+        spectralTechnicalDetailsTitle: 'Hesap Özeti',
         spectralCalculationResolution: 'Hesaplama çözünürlüğü',
         spectralDisplaySummaryLabel: 'Görüntü özeti',
         spectralDisplayDetailed: 'Ayrıntılı',
@@ -17836,7 +18425,7 @@
         statsHelpLongestBandViolation: 'En uzun kesintisiz bant ihlali; tıklayınca ilgili aralığa zoom yapılır.',
         bandViolationTotal: 'Toplam Bant İhlali',
         bandViolationTotalHelp: 'Good Quality saniyelik örneklerde alt veya üst bant dışında kalan kesintisiz olay sayısı.',
-        bandViolationTotalDuration: 'Toplam İhlal Süresi',
+        bandViolationTotalDuration: 'Toplam ihlal süresi',
         bandViolationTotalDurationHelp: 'Good Quality saniyelik örneklerde bant dışında geçen toplam süre.',
         bandViolationLongest: 'En Uzun Bant İhlali',
         bandViolationLongestHelp: 'En uzun kesintisiz bant ihlali; tıklayınca gerçek saniyelik veride ilgili olaya zoom yapılır.',
@@ -17844,10 +18433,10 @@
         bandViolationInBandRatioHelp: 'Good Quality örneklerin tanımlı alt/üst bant içinde kaldığı oran.',
         bandViolationSource: 'Kaynak',
         bandViolationSourceHelp: 'Olayın hesaplandığı ölçüm serisi. Çift seri modunda Türkiye ve CE olayları ayrı tutulur.',
-        bandViolationType: 'Tür',
+        bandViolationType: 'İhlal türü',
         bandViolationTypeHelp: 'Aİ alt bant ihlali, Üİ üst bant ihlalidir.',
         bandViolationDurationHelp: 'Olayın başlangıç ve bitişi arasındaki kesintisiz ihlal süresi.',
-        bandViolationExtremeHz: 'Ekstrem Hz',
+        bandViolationExtremeHz: 'Uç değer',
         bandViolationExtremeHelp: 'Alt bant olayında minimum, üst bant olayında maksimum frekans değeri.',
         bandViolationExceedanceMhz: 'Aşım mHz',
         bandViolationExceedanceHelp: 'İlgili olayda frekansın tanımlı alt veya üst bant limitini maksimum ne kadar aştığı.',
@@ -17896,7 +18485,7 @@
         rocofEvents: 'RoCoF olayı',
         intraEventMin: 'Olay İçi Min',
         intraEventMax: 'Olay İçi Maks',
-        rocofDetailsSummaryTitle: 'Detaylı Metrikler ve Örnek Analizi',
+        rocofDetailsSummaryTitle: 'Detayları göster',
         rocofSampleCountLabel: 'RoCoF hesaplanabilen örnek',
         rocofMethodUnavailable: 'Yöntem/pencere nedeniyle hesaplanamayan',
         rocofEventCountHelp: 'Pozitif veya negatif eşiği aşan kesintisiz RoCoF olay sayısı.',
@@ -18102,9 +18691,9 @@
         resolutionHour: 'Hourly',
         rocofThresholdLabel: 'RoCoF event threshold (mHz/s)',
         rocofMethodLabel: 'RoCoF estimation method',
-        rocofMethodCentral: 'Centered difference — offline',
-        rocofMethodFiltered: 'Moving-average filtered centered difference',
-        rocofMethodRegression: 'Sliding-window linear regression',
+        rocofMethodCentral: 'Standard RoCoF calculation',
+        rocofMethodFiltered: 'Smoothed RoCoF',
+        rocofMethodRegression: 'Regression-based RoCoF',
         rocofPreFilterLabel: 'Moving-average window duration (s)',
         rocofRegressionWindowLabel: 'Sliding regression window duration (s)',
         analysisGroupQuality: 'Data Quality',
@@ -18165,20 +18754,22 @@
         analysisHelpClose: 'Close',
         analysisHelpCurrentValues: 'Current selections',
         analysisHelpAccordingToResult: 'Based on this result',
-        analysisHelpTechnicalMeaning: 'Technical meaning',
+        analysisHelpTechnicalMeaning: 'What does it do?',
         analysisHelpUnit: 'Unit',
         analysisHelpIncrease: 'When increased',
         analysisHelpDecrease: 'When decreased',
         analysisHelpRisk: 'Risk',
         analysisHelpRecommended: 'Recommended starting point',
         analysisHelpProfileBehavior: 'Profile behavior',
-        analysisHelpEngineParameter: 'Technical detail: engine parameter',
         analysisHelpInterpretationPoint: 'Interpretation note',
         analysisHelpGlossarySearchLabel: 'Search the term glossary',
         analysisHelpGlossarySearchPlaceholder: 'Type a term or description',
         analysisHelpAlphabetFilter: 'Alphabetical term filter',
         analysisHelpAllTerms: 'All',
         helpSectionWhat: 'What does this analysis show?',
+        helpSectionInterpretation: 'How should the result be interpreted?',
+        helpSectionAttention: 'When should I be careful?',
+        helpSectionExpertSettings: 'When should expert settings be changed?',
         helpSectionWhen: 'When should it be used?',
         helpSectionParameters: 'How should advanced filters be used?',
         helpSectionResults: 'How should results be interpreted?',
@@ -18194,6 +18785,34 @@
         analysisCompatibilityFallback: 'Compatibility for the selected source and analysis is shown here.',
         analysisSamplingFallback: 'Sampling metadata is calculated from the selected analysis.',
         analysisNoTableRows: 'No event table for this analysis; summary metrics are shown in cards and report.',
+        analysisDetailsToggleTitle: 'Show details',
+        analysisExpertSettingsTitle: 'Expert settings',
+        qualityMissingDuration: 'Missing duration',
+        qualityOverallStatus: 'Overall quality status',
+        statsMinMaxCompact: 'Minimum–maximum',
+        bandViolationEventCount: 'Event count',
+        bandViolationLargestDeviation: 'Largest deviation',
+        rocofLongestEvent: 'Longest RoCoF event',
+        dominantPeriod: 'Dominant period',
+        spectralPeakPower: 'Peak power',
+        spectralHighlightedBand: 'Highlighted band',
+        spectrogramStrongestBand: 'Strongest oscillation band',
+        spectrogramDensestTimeRange: 'Densest time interval',
+        spectrogramRegionCount: 'Meaningful region count',
+        spectrogramPeakPowerLevel: 'Peak power level',
+        oscillationStrongestCandidate: 'Strongest candidate',
+        oscillationConfidenceLevel: 'Confidence level',
+        crossCorrelationInterpretation: 'Result interpretation',
+        crossCorrelationPeak: 'Cross-correlation peak',
+        coherenceHighestBand: 'Highest coherence band',
+        coherenceCommonBehaviorStrength: 'Common behavior strength',
+        coherenceDataCompatibility: 'Data compatibility',
+        dailyTrendAverageTrend: 'Average trend',
+        dailyTrendRmsTrend: 'RMS trend',
+        dailyTrendWorstDay: 'Most problematic day',
+        dailyTrendTechnicalSummary: 'Show details',
+        dailyTrendShowAllTechnical: 'Show all details',
+        notApplicable: 'Not applicable',
         analysisQualityTitle: 'Data Coverage and Quality Summary',
         analysisQualityDesc: 'Missing samples, coverage ratio, and time continuity are measured.',
         analysisStatsTitle: 'Basic Frequency Statistics',
@@ -18286,8 +18905,8 @@
         dailyTrendAggregation: 'Aggregation',
         dailyTrendAggregationMeanMinMax: 'Mean / min / max',
         dailyTrendDayCount: 'Day count',
-        dailyTrendTechnicalSummary: 'Technical summary',
-        dailyTrendShowAllTechnical: 'Show all technical details',
+        dailyTrendTechnicalSummary: 'Show details',
+        dailyTrendShowAllTechnical: 'Show all details',
         dailyTrendShowDetails: 'Show daily details',
         dailyTrendStatusOk: 'Sufficient',
         dailyTrendStatusLowCoverage: 'Low coverage',
@@ -18454,7 +19073,7 @@
         spectrogramDataQualityTab: 'Data Quality',
         spectralDetailsRowsShowing: 'Showing {shown}/{total} records. The full list is preserved in JSON/CSV export.',
         spectralShowMore: 'Show more',
-        spectralTechnicalAdvancedTitle: 'Show all technical details',
+        spectralTechnicalAdvancedTitle: 'Show all details',
         spectralSampleRate: 'Sample rate',
         spectralNyquist: 'Nyquist',
         spectralRequestedSegment: 'Requested segment',
@@ -18480,7 +19099,7 @@
         spectralSamplesUnit: 'samples',
         spectralSegmentUsage: 'Segment usage',
         spectralNoFindingsTag: 'spectral analysis',
-        spectralTechnicalDetailsTitle: 'Detailed Metrics and Sample Analysis',
+        spectralTechnicalDetailsTitle: 'Calculation Summary',
         spectralCalculationResolution: 'Calculation resolution',
         spectralDisplaySummaryLabel: 'Display summary',
         spectralDisplayDetailed: 'Detailed',
@@ -18615,7 +19234,7 @@
         statsHelpLongestBandViolation: 'Longest continuous band violation; click to zoom to the interval.',
         bandViolationTotal: 'Total Band Violations',
         bandViolationTotalHelp: 'Continuous lower or upper band violation event count in Good Quality one-second samples.',
-        bandViolationTotalDuration: 'Total Violation Duration',
+        bandViolationTotalDuration: 'Total violation duration',
         bandViolationTotalDurationHelp: 'Total time spent outside the configured band in Good Quality one-second samples.',
         bandViolationLongest: 'Longest Band Violation',
         bandViolationLongestHelp: 'Longest continuous band violation; click to zoom to the event with real one-second data.',
@@ -18623,10 +19242,10 @@
         bandViolationInBandRatioHelp: 'Share of Good Quality samples that remain inside the configured lower/upper band.',
         bandViolationSource: 'Source',
         bandViolationSourceHelp: 'Measurement series used for the event. In dual-series mode, Türkiye and CE events remain separate.',
-        bandViolationType: 'Type',
+        bandViolationType: 'Violation type',
         bandViolationTypeHelp: 'LBV means Lower Band Violation; UBV means Upper Band Violation.',
         bandViolationDurationHelp: 'Continuous violation duration between event start and end.',
-        bandViolationExtremeHz: 'Extreme Hz',
+        bandViolationExtremeHz: 'Extreme value',
         bandViolationExtremeHelp: 'Minimum frequency for a lower-band event; maximum frequency for an upper-band event.',
         bandViolationExceedanceMhz: 'Exceedance mHz',
         bandViolationExceedanceHelp: 'Maximum amount by which frequency exceeded the configured lower or upper band limit during the event.',
@@ -18675,7 +19294,7 @@
         rocofEvents: 'RoCoF events',
         intraEventMin: 'In-event Min',
         intraEventMax: 'In-event Max',
-        rocofDetailsSummaryTitle: 'Detailed Metrics and Sample Analysis',
+        rocofDetailsSummaryTitle: 'Show details',
         rocofSampleCountLabel: 'RoCoF calculable samples',
         rocofMethodUnavailable: 'Unavailable because of method/window',
         rocofEventCountHelp: 'Count of continuous RoCoF events crossing the positive or negative threshold.',
