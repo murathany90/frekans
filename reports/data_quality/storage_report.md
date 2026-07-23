@@ -1,6 +1,6 @@
 # Storage Report
 
-- Data bytes: 702271939
+- Data bytes: 702271949
 - Data MiB: 669.74
 - Issue count: 0
 - Warning count: 3
@@ -11,6 +11,6 @@ None
 
 ## Warnings
 
-- Invalid day excluded from active manifest: teias 2026-05-08
 - Invalid day excluded from active manifest: teias 2026-05-09
 - Invalid day excluded from active manifest: teias 2026-05-10
+- Invalid day excluded from active manifest: teias 2026-05-08
