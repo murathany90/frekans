@@ -1,5 +1,5 @@
 {
-  "updatedAtUtc": "2026-08-23T15:36:40Z",
+  "updatedAtUtc": "2026-08-23T15:43:41Z",
   "lastWorkflowResult": "success",
   "lastSuccessfulTeiasCheckUtc": "2026-08-23T15:36:40Z",
   "lastSuccessfulTeiasDataDate": "2026-08-18",
@@ -14,7 +14,7 @@
   "qualityWarnings": [],
   "lastErrorMessage": null,
   "lastErrorAtUtc": null,
-  "lastSuccessfulNetztransparenzDataDate": "2026-08-21",
+  "lastSuccessfulNetztransparenzDataDate": "2026-08-22",
   "teiasDataDelayDays": 5,
   "revisionDates": [],
   "lastRunAt": "2026-08-23T15:36:40Z",
@@ -32,17 +32,16 @@
   ],
   "lastError": null,
   "netztransparenz": {
-    "lastRunAt": "2026-08-23T07:53:58Z",
-    "lastSuccessfulRunAt": "2026-08-23T07:53:58Z",
+    "lastRunAt": "2026-08-23T15:43:41Z",
+    "lastSuccessfulRunAt": "2026-08-23T15:43:41Z",
     "lastFailedRunAt": null,
-    "lastSuccessfulDataDate": "2026-08-21",
+    "lastSuccessfulDataDate": "2026-08-22",
     "lastAttemptedDataDate": "2026-08-23",
-    "latestPublishedDate": "2026-08-21",
-    "status": "not_yet_published",
+    "latestPublishedDate": "2026-08-22",
+    "status": "success",
     "sourceMethod": "official_zip",
     "missingDates": [],
     "notYetPublishedDates": [
-      "2026-08-22",
       "2026-08-23"
     ],
     "invalidDates": [],
