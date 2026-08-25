@@ -8,6 +8,7 @@ on:
       - "index.html"
       - "assets/**"
       - "data/**"
+      - "docs/**"
       - "CNAME"
       - "LICENSE"
       - "robots.txt"

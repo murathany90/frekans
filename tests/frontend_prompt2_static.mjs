@@ -14,15 +14,23 @@ const requiredIds = [
   "analysisResultCards",
   "analysisMainChart",
   "analysisEventsBody",
-  "reportLanguageSelect",
-  "reportPreview",
-  "reportExportJsonBtn",
+  "reportsApp",
   "coverageSummary"
 ];
 
 for (const id of requiredIds) {
   if (!html.includes(`id="${id}"`)) {
     throw new Error(`Missing prompt2 frontend id: ${id}`);
+  }
+}
+
+if (!/href="assets\/reports\.css"/.test(html) || !/src="assets\/reports\.js"/.test(html)) {
+  throw new Error("Reports reader assets are not loaded by the production HTML.");
+}
+
+for (const obsoleteId of ["reportLanguageSelect", "reportPreview", "reportExportJsonBtn"]) {
+  if (html.includes(`id="${obsoleteId}"`)) {
+    throw new Error(`Obsolete report-generator UI id is still present: ${obsoleteId}`);
   }
 }
 
