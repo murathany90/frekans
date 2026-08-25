@@ -1,0 +1,34 @@
+{
+  "id": "12",
+  "slug": "kutleden-dijital-hiza",
+  "title": "Kütleden Dijital Hıza: Yeni Nesil Frekans Tepkisi Neden Daha Çevik?",
+  "subtitle": "Atalet, PFR ve hızlı dijital tepki aynı çerçevede nasıl okunmalı?",
+  "category": "Enerji Dönüşümü",
+  "reading_time": "11 dk",
+  "language": "tr",
+  "publication_date": "2026-08-26",
+  "status": "publish-ready",
+  "keywords": [
+    "dijital hız",
+    "PFR",
+    "atalet",
+    "frekans tepkisi"
+  ],
+  "source_files": [
+    "From_Mass_to_Digital_Speed.pptx",
+    "GridFreq_Analytics.pptx"
+  ],
+  "images": [
+    "images/hero_cover.jpg",
+    "images/ppt_inertia_pfr.png",
+    "images/ppt_critical_window.png",
+    "images/ppt_analytics_open.png"
+  ],
+  "pdf": "../../pdf/12_kutleden-dijital-hiza.pdf",
+  "editorial_policy": {
+    "formulas": "minimal; explained in prose",
+    "technical_terms": "English term/acronym followed by Turkish equivalent at first meaningful use",
+    "simulation_claims": "scenario-specific unless independently verified",
+    "regulatory_claims": "verify against current official source before production use"
+  }
+}

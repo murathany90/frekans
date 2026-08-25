@@ -1,0 +1,34 @@
+{
+  "id": "10",
+  "slug": "gridfreq-platform-mimarisi",
+  "title": "GridFreq Platform Mimarisi: Sıfır-Sunucu Yaklaşımıyla Şebeke Analizi",
+  "subtitle": "Statik web, otomatik veri toplama ve tarayıcı içi analiz nasıl birlikte çalışıyor?",
+  "category": "Platform ve Mimari",
+  "reading_time": "10 dk",
+  "language": "tr",
+  "publication_date": "2026-08-26",
+  "status": "publish-ready",
+  "keywords": [
+    "GridFreq",
+    "platform mimarisi",
+    "GitHub Actions",
+    "Cloudflare Worker"
+  ],
+  "source_files": [
+    "GridFreq_Analysis_Platform.pptx",
+    "GridFreq_Analysis_Laboratory.pptx"
+  ],
+  "images": [
+    "images/hero_cover.jpg",
+    "images/ppt_sources.png",
+    "images/ppt_architecture.png",
+    "images/ppt_live.png"
+  ],
+  "pdf": "../../pdf/10_gridfreq-platform-mimarisi.pdf",
+  "editorial_policy": {
+    "formulas": "minimal; explained in prose",
+    "technical_terms": "English term/acronym followed by Turkish equivalent at first meaningful use",
+    "simulation_claims": "scenario-specific unless independently verified",
+    "regulatory_claims": "verify against current official source before production use"
+  }
+}

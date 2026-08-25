@@ -1,0 +1,38 @@
+{
+  "id": "01",
+  "slug": "frekans-olayinin-anatomisi",
+  "title": "Bir Frekans Olayının Anatomisi",
+  "subtitle": "RoCoF, frekans nadiri, toparlanma ve kontrol rezervlerini bir olay eğrisi üzerinden okumak",
+  "category": "Şebeke Dinamikleri",
+  "reading_time": "10 dk",
+  "language": "tr",
+  "publication_date": "2026-08-26",
+  "keywords": [
+    "Şebeke Dinamikleri",
+    "GridFreq",
+    "şebeke frekansı"
+  ],
+  "source_files": [
+    "gridfreq-frequency-event-report.pdf",
+    "gridfreq-technical-manual.pdf",
+    "gridfreq-reports-covers-portfolio (1).pdf",
+    "GridFreq_Analysis_Laboratory.pptx",
+    "GridFreq_Analysis_Platform.pptx",
+    "GridFreq_Analytics.pptx",
+    "The_Digital_Grid_Revolution.pptx",
+    "From_Mass_to_Digital_Speed.pptx"
+  ],
+  "images": [
+    "images/hero_cover.jpg",
+    "images/fig01_frequency_event.png",
+    "images/fig02_rocof.png",
+    "images/ppt_context.png"
+  ],
+  "pdf": "../../pdf/01_frekans-olayinin-anatomisi.pdf",
+  "editorial_policy": {
+    "formulas": "minimal; explained in prose",
+    "technical_terms": "English term/acronym followed by Turkish equivalent at first meaningful use",
+    "simulation_claims": "scenario-specific unless independently verified",
+    "regulatory_claims": "verify against current official source before production use"
+  }
+}

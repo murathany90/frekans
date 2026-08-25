@@ -1,0 +1,38 @@
+{
+  "id": "03",
+  "slug": "teias-pfk-performans-testi",
+  "title": "TEİAŞ PFK Performans Testini Okuma Rehberi",
+  "subtitle": "Rezerv, hassasiyet ve doğrulama testlerinde ölçülen şey aslında nedir?",
+  "category": "Test ve Doğrulama",
+  "reading_time": "12 dk",
+  "language": "tr",
+  "publication_date": "2026-08-26",
+  "keywords": [
+    "Test ve Doğrulama",
+    "GridFreq",
+    "şebeke frekansı"
+  ],
+  "source_files": [
+    "gridfreq-pfk-tests-report.pdf",
+    "gridfreq-technical-manual.pdf",
+    "gridfreq-reports-covers-portfolio (1).pdf",
+    "GridFreq_Analysis_Laboratory.pptx",
+    "GridFreq_Analysis_Platform.pptx",
+    "GridFreq_Analytics.pptx",
+    "The_Digital_Grid_Revolution.pptx",
+    "From_Mass_to_Digital_Speed.pptx"
+  ],
+  "images": [
+    "images/hero_cover.jpg",
+    "images/fig01_pfk_step_response.png",
+    "images/fig02_deadband_droop.png",
+    "images/ppt_context.png"
+  ],
+  "pdf": "../../pdf/03_teias-pfk-performans-testi.pdf",
+  "editorial_policy": {
+    "formulas": "minimal; explained in prose",
+    "technical_terms": "English term/acronym followed by Turkish equivalent at first meaningful use",
+    "simulation_claims": "scenario-specific unless independently verified",
+    "regulatory_claims": "verify against current official source before production use"
+  }
+}

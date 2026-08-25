@@ -1,0 +1,38 @@
+{
+  "id": "02",
+  "slug": "frekans-kontrolunun-uc-savunma-hatti",
+  "title": "Frekans Kontrolünün Üç Savunma Hattı",
+  "subtitle": "PFK/FCR, SFK/aFRR ve mFRR hangi sırayla, hangi amaçla çalışır?",
+  "category": "Yan Hizmetler",
+  "reading_time": "11 dk",
+  "language": "tr",
+  "publication_date": "2026-08-26",
+  "keywords": [
+    "Yan Hizmetler",
+    "GridFreq",
+    "şebeke frekansı"
+  ],
+  "source_files": [
+    "gridfreq-control-layers-report.pdf",
+    "gridfreq-technical-manual.pdf",
+    "gridfreq-reports-covers-portfolio (1).pdf",
+    "GridFreq_Analysis_Laboratory.pptx",
+    "GridFreq_Analysis_Platform.pptx",
+    "GridFreq_Analytics.pptx",
+    "The_Digital_Grid_Revolution.pptx",
+    "From_Mass_to_Digital_Speed.pptx"
+  ],
+  "images": [
+    "images/hero_cover.jpg",
+    "images/fig01_control_layers.png",
+    "images/fig02_layer_purpose.png",
+    "images/ppt_context.png"
+  ],
+  "pdf": "../../pdf/02_frekans-kontrolunun-uc-savunma-hatti.pdf",
+  "editorial_policy": {
+    "formulas": "minimal; explained in prose",
+    "technical_terms": "English term/acronym followed by Turkish equivalent at first meaningful use",
+    "simulation_claims": "scenario-specific unless independently verified",
+    "regulatory_claims": "verify against current official source before production use"
+  }
+}

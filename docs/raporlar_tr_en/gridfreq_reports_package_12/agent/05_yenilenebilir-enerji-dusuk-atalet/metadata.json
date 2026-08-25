@@ -1,0 +1,38 @@
+{
+  "id": "05",
+  "slug": "yenilenebilir-enerji-dusuk-atalet",
+  "title": "Yenilenebilir Enerji Artarken Şebeke Ataleti Neden Gündeme Geliyor?",
+  "subtitle": "Düşük atalet, RoCoF, sönümleme ve esneklik çözümlerini senaryo üzerinden anlamak",
+  "category": "Enerji Dönüşümü",
+  "reading_time": "12 dk",
+  "language": "tr",
+  "publication_date": "2026-08-26",
+  "keywords": [
+    "Enerji Dönüşümü",
+    "GridFreq",
+    "şebeke frekansı"
+  ],
+  "source_files": [
+    "gridfreq-renewable-penetration-report.pdf",
+    "gridfreq-technical-manual.pdf",
+    "gridfreq-reports-covers-portfolio (1).pdf",
+    "GridFreq_Analysis_Laboratory.pptx",
+    "GridFreq_Analysis_Platform.pptx",
+    "GridFreq_Analytics.pptx",
+    "The_Digital_Grid_Revolution.pptx",
+    "From_Mass_to_Digital_Speed.pptx"
+  ],
+  "images": [
+    "images/hero_cover.jpg",
+    "images/fig01_inertia_scenarios.png",
+    "images/fig02_stability_portfolio.png",
+    "images/ppt_context.png"
+  ],
+  "pdf": "../../pdf/05_yenilenebilir-enerji-dusuk-atalet.pdf",
+  "editorial_policy": {
+    "formulas": "minimal; explained in prose",
+    "technical_terms": "English term/acronym followed by Turkish equivalent at first meaningful use",
+    "simulation_claims": "scenario-specific unless independently verified",
+    "regulatory_claims": "verify against current official source before production use"
+  }
+}

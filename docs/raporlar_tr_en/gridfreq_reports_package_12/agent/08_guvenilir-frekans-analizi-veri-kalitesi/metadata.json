@@ -1,0 +1,38 @@
+{
+  "id": "08",
+  "slug": "guvenilir-frekans-analizi-veri-kalitesi",
+  "title": "Güvenilir Frekans Analizinin Temeli: Veri Kalitesi",
+  "subtitle": "Eksik örnek, donmuş değer, zaman damgası ve filtre seçimi sonuçları nasıl değiştirir?",
+  "category": "Veri Mühendisliği",
+  "reading_time": "11 dk",
+  "language": "tr",
+  "publication_date": "2026-08-26",
+  "keywords": [
+    "Veri Mühendisliği",
+    "GridFreq",
+    "şebeke frekansı"
+  ],
+  "source_files": [
+    "gridfreq-technical-manual.pdf",
+    "gridfreq-technical-manual (1).pdf",
+    "gridfreq-reports-covers-portfolio (1).pdf",
+    "GridFreq_Analysis_Laboratory.pptx",
+    "GridFreq_Analysis_Platform.pptx",
+    "GridFreq_Analytics.pptx",
+    "The_Digital_Grid_Revolution.pptx",
+    "From_Mass_to_Digital_Speed.pptx"
+  ],
+  "images": [
+    "images/hero_cover.jpg",
+    "images/fig01_quality_flags.png",
+    "images/fig02_rocof_methods.png",
+    "images/ppt_context.png"
+  ],
+  "pdf": "../../pdf/08_guvenilir-frekans-analizi-veri-kalitesi.pdf",
+  "editorial_policy": {
+    "formulas": "minimal; explained in prose",
+    "technical_terms": "English term/acronym followed by Turkish equivalent at first meaningful use",
+    "simulation_claims": "scenario-specific unless independently verified",
+    "regulatory_claims": "verify against current official source before production use"
+  }
+}

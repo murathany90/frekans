@@ -1,0 +1,38 @@
+{
+  "id": "04",
+  "slug": "welch-psd-spektrogram-osilasyon",
+  "title": "Şebeke Salınımlarını Görünür Kılmak",
+  "subtitle": "Welch PSD ve spektrogram ile frekans verisindeki gizli periyodik davranışları okumak",
+  "category": "Sinyal İşleme",
+  "reading_time": "13 dk",
+  "language": "tr",
+  "publication_date": "2026-08-26",
+  "keywords": [
+    "Sinyal İşleme",
+    "GridFreq",
+    "şebeke frekansı"
+  ],
+  "source_files": [
+    "gridfreq-spectral-analysis-report.pdf",
+    "gridfreq-technical-manual.pdf",
+    "gridfreq-reports-covers-portfolio (1).pdf",
+    "GridFreq_Analysis_Laboratory.pptx",
+    "GridFreq_Analysis_Platform.pptx",
+    "GridFreq_Analytics.pptx",
+    "The_Digital_Grid_Revolution.pptx",
+    "From_Mass_to_Digital_Speed.pptx"
+  ],
+  "images": [
+    "images/hero_cover.jpg",
+    "images/fig01_welch_psd.png",
+    "images/fig02_spectrogram.png",
+    "images/ppt_context.png"
+  ],
+  "pdf": "../../pdf/04_welch-psd-spektrogram-osilasyon.pdf",
+  "editorial_policy": {
+    "formulas": "minimal; explained in prose",
+    "technical_terms": "English term/acronym followed by Turkish equivalent at first meaningful use",
+    "simulation_claims": "scenario-specific unless independently verified",
+    "regulatory_claims": "verify against current official source before production use"
+  }
+}

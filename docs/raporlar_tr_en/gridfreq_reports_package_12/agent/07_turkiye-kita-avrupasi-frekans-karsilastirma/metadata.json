@@ -1,0 +1,37 @@
+{
+  "id": "07",
+  "slug": "turkiye-kita-avrupasi-frekans-karsilastirma",
+  "title": "Türkiye ve Kıta Avrupası Frekansını Birlikte Okumak",
+  "subtitle": "Çapraz korelasyon, koherens ve ortak/diferansiyel mod ile iki seri ne anlatır?",
+  "category": "Karşılaştırmalı Analiz",
+  "reading_time": "12 dk",
+  "language": "tr",
+  "publication_date": "2026-08-26",
+  "keywords": [
+    "Karşılaştırmalı Analiz",
+    "GridFreq",
+    "şebeke frekansı"
+  ],
+  "source_files": [
+    "gridfreq-technical-manual.pdf",
+    "gridfreq-reports-covers-portfolio (1).pdf",
+    "GridFreq_Analysis_Laboratory.pptx",
+    "GridFreq_Analysis_Platform.pptx",
+    "GridFreq_Analytics.pptx",
+    "The_Digital_Grid_Revolution.pptx",
+    "From_Mass_to_Digital_Speed.pptx"
+  ],
+  "images": [
+    "images/hero_cover.jpg",
+    "images/fig01_two_series.png",
+    "images/fig02_coherence.png",
+    "images/ppt_context.png"
+  ],
+  "pdf": "../../pdf/07_turkiye-kita-avrupasi-frekans-karsilastirma.pdf",
+  "editorial_policy": {
+    "formulas": "minimal; explained in prose",
+    "technical_terms": "English term/acronym followed by Turkish equivalent at first meaningful use",
+    "simulation_claims": "scenario-specific unless independently verified",
+    "regulatory_claims": "verify against current official source before production use"
+  }
+}

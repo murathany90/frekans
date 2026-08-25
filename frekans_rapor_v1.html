@@ -24,6 +24,7 @@
   <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
   <link rel="manifest" href="site.webmanifest">
   <link rel="stylesheet" href="assets/live-frequency.css">
+  <link rel="stylesheet" href="assets/reports.css">
   <title>GridFreq – Türkiye ve Kıta Avrupası Şebeke Frekansı Analiz Platformu</title>
 
   <!-- CSV ayrıştırma Web Worker içinde akış tabanlı ve satır satır yapılır. -->
@@ -3102,33 +3103,9 @@
 
     </section>
 
-    <!-- SEKME 3: RAPORLAR -->
-    <section id="tab-reports" class="tab-panel">
-      <div class="panel no-print">
-        <div class="section-title">
-          <div>
-            <h2 data-i18n="reportsTitle">Raporlar</h2>
-          </div>
-          <div class="button-row">
-            <select id="reportLanguageSelect" aria-label="Rapor dili">
-              <option value="tr">Türkçe</option>
-              <option value="en">English</option>
-            </select>
-            <button class="btn btn-secondary" id="reportExportJsonBtn" type="button" data-i18n="reportJsonBtn">JSON</button>
-            <button class="btn btn-secondary" id="reportExportCsvBtn" type="button" data-i18n="reportCsvBtn">CSV</button>
-            <button class="btn btn-primary" id="reportPrintBtn" type="button" data-i18n="reportPrintBtn">PDF</button>
-          </div>
-        </div>
-        <div class="grid-4">
-          <label><input type="checkbox" class="report-part" value="summary" checked /> <span data-i18n="reportPartSummary">Özet</span></label>
-          <label><input type="checkbox" class="report-part" value="quality" checked /> <span data-i18n="reportPartQuality">Veri kalitesi</span></label>
-          <label><input type="checkbox" class="report-part" value="methodology" checked /> <span data-i18n="reportPartMethodology">Yöntem</span></label>
-          <label><input type="checkbox" class="report-part" value="limitations" checked /> <span data-i18n="reportPartLimitations">Sınırlamalar</span></label>
-        </div>
-      </div>
-      <div class="panel">
-        <div id="reportPreview" class="report-preview" aria-live="polite"></div>
-      </div>
+    <!-- SEKME 3: RAPORLAR VE MAKALELER -->
+    <section id="tab-reports" class="tab-panel" aria-label="Raporlar ve Makaleler">
+      <div id="reportsApp" class="reports-app" aria-live="polite"></div>
     </section>
 
     <!-- SEKME 4: VERİ VE AYARLAR -->
@@ -6514,11 +6491,6 @@
       $('saveSettingsBtn').addEventListener('click', saveSettingsFromForm);
       $('resetSettingsBtn').addEventListener('click', resetSettings);
       $('langToggle').addEventListener('click', () => setLanguage(lang === 'tr' ? 'en' : 'tr'));
-      $('reportLanguageSelect').addEventListener('change', renderReportPreview);
-      document.querySelectorAll('.report-part').forEach(input => input.addEventListener('change', renderReportPreview));
-      $('reportExportJsonBtn').addEventListener('click', exportAnalysisJson);
-      $('reportExportCsvBtn').addEventListener('click', exportAnalysisCsv);
-      $('reportPrintBtn').addEventListener('click', printReport);
       $('regionsMobileSelect').addEventListener('change', event => {
         const [regionId, countryCode] = String(event.target.value || '').split('|');
         selectFrequencyRegion(regionId, countryCode, { pushHistory: true });
@@ -16997,6 +16969,8 @@
       const tabPath = patch.tab ? routePathForTab(patch.tab.startsWith?.('tab-') ? patch.tab : `tab-${patch.tab}`) : null;
       const path = patch.path || patch.route || patch.tabPath || tabPath || currentRoutePath();
       const normalizedPath = path === 'chart' ? 'daily' : path === 'oscillation' ? 'analysis' : path;
+      const currentReportSlug = String(window.location.hash || '').split('?')[0].match(/^#\/reports\/([^/?#]+)\/?$/i)?.[1] || null;
+      const reportSlug = patch.reportSlug ?? (normalizedPath === 'reports' ? currentReportSlug : null);
       const analysis = routeAnalysisAlias(patch.analysis ?? $('analysisTypeSelect')?.value) || 'stats';
       const dailyDate = patch.date ?? $('dateSelect')?.value;
       let hashPath = '#/regions';
@@ -17010,7 +16984,7 @@
       }
       if (normalizedPath === 'live-frequency') hashPath = '#/live-frequency';
       else if (normalizedPath === 'analysis') hashPath = `#/analysis/${encodeURIComponent(analysis)}`;
-      else if (normalizedPath === 'reports') hashPath = '#/reports';
+      else if (normalizedPath === 'reports') hashPath = reportSlug ? `#/reports/${encodeURIComponent(reportSlug)}` : '#/reports';
       else if (normalizedPath === 'data') hashPath = '#/data';
       else if (normalizedPath === 'daily' && dailyDate) hashPath = `#/daily/${encodeURIComponent(dailyDate)}`;
 
@@ -19772,5 +19746,6 @@
     }
 
   </script>
+  <script type="module" src="assets/reports.js"></script>
 </body>
 </html>

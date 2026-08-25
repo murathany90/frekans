@@ -1,0 +1,33 @@
+{
+  "id": "11",
+  "slug": "dijital-sebeke-devrimi",
+  "title": "Dijital Şebeke Devrimi: Mekanik Ataletten İnverter Çağına",
+  "subtitle": "Yenilenebilir dönüşüm frekans güvenliğini neden zorlaştırıyor ve aynı anda nasıl yeni çözümler doğuruyor?",
+  "category": "Enerji Dönüşümü",
+  "reading_time": "12 dk",
+  "language": "tr",
+  "publication_date": "2026-08-26",
+  "status": "publish-ready",
+  "keywords": [
+    "atalet",
+    "yenilenebilir",
+    "inverter tabanlı kaynaklar",
+    "UFLS"
+  ],
+  "source_files": [
+    "The_Digital_Grid_Revolution.pptx",
+    "gridfreq-renewable-penetration-report.pdf"
+  ],
+  "images": [
+    "images/hero_cover.jpg",
+    "images/ppt_five_factors.png",
+    "images/ppt_ibr.png"
+  ],
+  "pdf": "../../pdf/11_dijital-sebeke-devrimi.pdf",
+  "editorial_policy": {
+    "formulas": "minimal; explained in prose",
+    "technical_terms": "English term/acronym followed by Turkish equivalent at first meaningful use",
+    "simulation_claims": "scenario-specific unless independently verified",
+    "regulatory_claims": "verify against current official source before production use"
+  }
+}

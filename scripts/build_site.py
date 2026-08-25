@@ -16,6 +16,7 @@ from scripts.validate_frequency import validate_data_root, write_storage_report
 CUSTOM_DOMAIN = "gridfreq.com"
 REQUIRED_DOMAIN_FILES = ("CNAME", "robots.txt", "sitemap.xml", "site.webmanifest")
 OPTIONAL_DOMAIN_FILES = ("404.html", "LICENSE")
+REPORTS_PACKAGE = Path("docs/raporlar_tr_en/gridfreq_reports_package_12")
 
 
 def copy_tree(src: Path, dst: Path) -> None:
@@ -47,6 +48,26 @@ def copy_domain_files(dist_root: Path, require_domain_files: bool = True) -> Non
             shutil.copy2(source, dist_root / name)
 
 
+def copy_reports_package(dist_root: Path) -> None:
+    """Copy only the public runtime assets used by the reports reader."""
+    if not REPORTS_PACKAGE.is_dir():
+        return
+    target_root = dist_root / REPORTS_PACKAGE
+    target_root.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(REPORTS_PACKAGE / "manifest.json", target_root / "manifest.json")
+    for article_dir in (REPORTS_PACKAGE / "agent").glob("*"):
+        if not article_dir.is_dir():
+            continue
+        target_article = target_root / "agent" / article_dir.name
+        target_article.mkdir(parents=True, exist_ok=True)
+        for name in ("article.md", "metadata.json"):
+            source = article_dir / name
+            if source.is_file():
+                shutil.copy2(source, target_article / name)
+        copy_tree(article_dir / "images", target_article / "images")
+    copy_tree(REPORTS_PACKAGE / "pdf", target_root / "pdf")
+
+
 def git_commit_sha() -> str:
     try:
         return subprocess.check_output(["git", "rev-parse", "HEAD"], text=True, stderr=subprocess.DEVNULL).strip()
@@ -75,6 +96,7 @@ def build_site(data_root: Path = Path("data"), dist_root: Path = Path("dist"), r
         shutil.copy2("index.html", dist_root / "source-index.html")
     copy_domain_files(dist_root, require_domain_files=bool(require_domain_files))
     copy_tree(Path("assets"), dist_root / "assets")
+    copy_reports_package(dist_root)
     build_manifest(data_root)
     copy_tree(data_root, dist_root / "data")
     validation = validate_data_root(data_root)

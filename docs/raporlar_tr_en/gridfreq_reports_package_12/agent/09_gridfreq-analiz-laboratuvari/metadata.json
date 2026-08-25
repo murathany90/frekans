@@ -1,0 +1,34 @@
+{
+  "id": "09",
+  "slug": "gridfreq-analiz-laboratuvari",
+  "title": "GridFreq Analiz Laboratuvarı: Zaman Uzayından Frekans Uzayına",
+  "subtitle": "Tek bir frekans eğrisinden olay, kalite ve salınım bilgisini nasıl çıkarıyoruz?",
+  "category": "Platform ve Metodoloji",
+  "reading_time": "11 dk",
+  "language": "tr",
+  "publication_date": "2026-08-26",
+  "status": "publish-ready",
+  "keywords": [
+    "GridFreq",
+    "analiz laboratuvarı",
+    "Welch PSD",
+    "RoCoF"
+  ],
+  "source_files": [
+    "GridFreq_Analysis_Laboratory.pptx",
+    "GridFreq_Analytics.pptx",
+    "gridfreq-technical-manual.pdf"
+  ],
+  "images": [
+    "images/hero_cover.jpg",
+    "images/ppt_algorithm_map.png",
+    "images/ppt_pipeline.png"
+  ],
+  "pdf": "../../pdf/09_gridfreq-analiz-laboratuvari.pdf",
+  "editorial_policy": {
+    "formulas": "minimal; explained in prose",
+    "technical_terms": "English term/acronym followed by Turkish equivalent at first meaningful use",
+    "simulation_claims": "scenario-specific unless independently verified",
+    "regulatory_claims": "verify against current official source before production use"
+  }
+}

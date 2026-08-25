@@ -1,0 +1,89 @@
+{
+  "article_count": 12,
+  "articles": [
+    {
+      "id": "01",
+      "slug": "frekans-olayinin-anatomisi",
+      "title": "Bir Frekans Olayının Anatomisi",
+      "category": "Şebeke Dinamikleri",
+      "reading_time": "10 dk"
+    },
+    {
+      "id": "02",
+      "slug": "frekans-kontrolunun-uc-savunma-hatti",
+      "title": "Frekans Kontrolünün Üç Savunma Hattı",
+      "category": "Yan Hizmetler",
+      "reading_time": "11 dk"
+    },
+    {
+      "id": "03",
+      "slug": "teias-pfk-performans-testi",
+      "title": "TEİAŞ PFK Performans Testini Okuma Rehberi",
+      "category": "Test ve Doğrulama",
+      "reading_time": "12 dk"
+    },
+    {
+      "id": "04",
+      "slug": "welch-psd-spektrogram-osilasyon",
+      "title": "Şebeke Salınımlarını Görünür Kılmak",
+      "category": "Sinyal İşleme",
+      "reading_time": "13 dk"
+    },
+    {
+      "id": "05",
+      "slug": "yenilenebilir-enerji-dusuk-atalet",
+      "title": "Yenilenebilir Enerji Artarken Şebeke Ataleti Neden Gündeme Geliyor?",
+      "category": "Enerji Dönüşümü",
+      "reading_time": "12 dk"
+    },
+    {
+      "id": "06",
+      "slug": "batarya-depolama-frekans-kontrolu",
+      "title": "Batarya Depolama Frekans Kontrolünde Ne Kadar Hızlı, Ne Kadar Uzun?",
+      "category": "Depolama",
+      "reading_time": "13 dk"
+    },
+    {
+      "id": "07",
+      "slug": "turkiye-kita-avrupasi-frekans-karsilastirma",
+      "title": "Türkiye ve Kıta Avrupası Frekansını Birlikte Okumak",
+      "category": "Karşılaştırmalı Analiz",
+      "reading_time": "12 dk"
+    },
+    {
+      "id": "08",
+      "slug": "guvenilir-frekans-analizi-veri-kalitesi",
+      "title": "Güvenilir Frekans Analizinin Temeli: Veri Kalitesi",
+      "category": "Veri Mühendisliği",
+      "reading_time": "11 dk"
+    },
+    {
+      "id": "09",
+      "slug": "gridfreq-analiz-laboratuvari",
+      "title": "GridFreq Analiz Laboratuvarı: Zaman Uzayından Frekans Uzayına",
+      "category": "Platform ve Metodoloji",
+      "reading_time": "11 dk"
+    },
+    {
+      "id": "10",
+      "slug": "gridfreq-platform-mimarisi",
+      "title": "GridFreq Platform Mimarisi: Sıfır-Sunucu Yaklaşımıyla Şebeke Analizi",
+      "category": "Platform ve Mimari",
+      "reading_time": "10 dk"
+    },
+    {
+      "id": "11",
+      "slug": "dijital-sebeke-devrimi",
+      "title": "Dijital Şebeke Devrimi: Mekanik Ataletten İnverter Çağına",
+      "category": "Enerji Dönüşümü",
+      "reading_time": "12 dk"
+    },
+    {
+      "id": "12",
+      "slug": "kutleden-dijital-hiza",
+      "title": "Kütleden Dijital Hıza: Yeni Nesil Frekans Tepkisi Neden Daha Çevik?",
+      "category": "Enerji Dönüşümü",
+      "reading_time": "11 dk"
+    }
+  ]
+}
