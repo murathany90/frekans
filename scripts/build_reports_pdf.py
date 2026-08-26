@@ -18,7 +18,11 @@ from reportlab.platypus import Image, KeepTogether, Paragraph, SimpleDocTemplate
 
 PACKAGE = Path("docs/raporlar_tr_en/gridfreq_reports_package_12")
 IMAGE_PATTERN = re.compile(r"^!\[([^]]*)\]\(([^)]+)\)$")
-HEADING_PATTERN = re.compile(r"^(#{1,3})\s+(.+)$")
+HEADING_PATTERN = re.compile(r"^(#{1,6})\s+(.+)$")
+EDITORIAL_HEADING_PATTERN = re.compile(
+    r"^\s{0,3}#{1,6}\s+(?:kaynaklar(?:\s+ve\s+editoryal\s+not)?|editoryal\s+not|dış\s+doğrulama)\s*#*\s*$",
+    re.IGNORECASE,
+)
 
 
 def find_font(name: str) -> Path:
@@ -51,6 +55,15 @@ def strip_front_matter(markdown: str) -> str:
         return markdown
     _, _, remainder = markdown.partition("\n---\n")
     return remainder if remainder else markdown
+
+
+def filter_editorial_notes(markdown: str) -> str:
+    """Keep the PDF body aligned with the editorially filtered web article."""
+    lines = strip_front_matter(markdown).replace("\r\n", "\n").split("\n")
+    for index, line in enumerate(lines):
+        if EDITORIAL_HEADING_PATTERN.match(line):
+            return "\n".join(lines[:index]).strip()
+    return "\n".join(lines).strip()
 
 
 def inline_markdown(value: str) -> str:
@@ -91,7 +104,7 @@ def image_story(image_path: Path, caption: str, style: ParagraphStyle) -> KeepTo
 
 
 def article_story(article_dir: Path, article: dict, style_map: dict[str, ParagraphStyle]) -> tuple[str, list]:
-    markdown = strip_front_matter((article_dir / "article.md").read_text(encoding="utf-8"))
+    markdown = filter_editorial_notes((article_dir / "article.md").read_text(encoding="utf-8"))
     lines = markdown.splitlines()
     story = []
     title = article.get("title", "")

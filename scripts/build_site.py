@@ -97,7 +97,10 @@ def build_site(data_root: Path = Path("data"), dist_root: Path = Path("dist"), r
         shutil.copy2("index.html", dist_root / "source-index.html")
     copy_domain_files(dist_root, require_domain_files=bool(require_domain_files))
     copy_tree(Path("assets"), dist_root / "assets")
-    generate_reports_pdfs(REPORTS_PACKAGE)
+    # Minimal build/test workspaces do not include the publication package.  The
+    # real Pages build does, and generation remains strict there (12 PDFs).
+    if REPORTS_PACKAGE.is_dir():
+        generate_reports_pdfs(REPORTS_PACKAGE)
     copy_reports_package(dist_root)
     build_manifest(data_root)
     copy_tree(data_root, dist_root / "data")
