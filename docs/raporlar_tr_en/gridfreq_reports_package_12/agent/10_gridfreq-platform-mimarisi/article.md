@@ -1,49 +1,49 @@
+# GridFreq Platform Mimarisi: Statik Ön Yüz ve Serverless Veri Katmanıyla Şebeke Analizi
 
-# GridFreq Platform Mimarisi: Sıfır-Sunucu Yaklaşımıyla Şebeke Analizi
+**Alt başlık:** Tarihsel veri, canlı erişim ve tarayıcı içi analiz aynı platformda nasıl ayrışır?
 
-**Alt başlık:** Statik web, otomatik veri toplama ve tarayıcı içi analiz nasıl birlikte çalışıyor?
-
-GridFreq’in dikkat çekici taraflarından biri, ağır kurumsal veri platformlarına benzemeden yüksek çözünürlüklü frekans analizini web üzerinde sunabilmesidir. Bu başarı, klasik bir veritabanı ağırlıklı arka uç yerine; otomasyon, sıkıştırma ve tarayıcı içi hesaplamaya dayalı bir mimariden gelir.
+GridFreq, frekans verisini tek bir merkezi uygulama sunucusundan yayımlayan klasik bir mimari değildir. Tarihsel analiz için statik ön yüz, önceden üretilmiş veri paketleri ve tarayıcı içi hesaplama kullanılır. Canlı veri erişiminde ise kaynak anahtarlarını ve erişim kurallarını koruyan serverless bir ara katman devreye girer. Bu ayrım, her veri yolunun gecikme, maliyet ve güvenlik gereksinimine göre tasarlanmasını sağlar.
 
 ![Makale başlık görseli](images/hero_cover.jpg)
 
-> **Ana mesaj:** GridFreq’in mimarisi, düşük işletme maliyeti ile yüksek analitik çevikliği aynı anda hedefleyen bir “statik ama akıllı” tasarımdır.
+> **Ana mesaj:** Statik yayın, düşük maliyet ve yeniden üretilebilirlik sağlar; canlı veri ise güvenli bir ara katman ve kontrollü önbellek gerektirir.
 
-## Veri kaynakları nasıl birleştiriliyor?
+## Tarihsel Türkiye verisinin yolu
 
-Platform sunumunda TEİAŞ, Netztransparenz ve canlı telemetri kaynağı olarak GridRadar benzeri kaynakların farklı gecikmeler ve farklı kullanım amaçlarıyla işlendiği gösteriliyor. Bazı veri setleri tarihsel analiz için günlük paketler hâlinde alınırken, bazıları daha kısa gecikmeli özet görünüm sağlamak için tamponlanıyor.
+Tarihsel Türkiye frekans verisinde akış, kaynak verinin alınmasıyla başlar. Toplama adımı, ham kayıtları indirir; tarih, saat, yinelenen kayıt, geçersiz değer ve beklenen örnek sayısı gibi kontrollerden geçirir. Zaman damgaları ortak analiz tabanına göre normalleştirilir, günlük özetler ve istemci için verimli paketler üretilir. Sonuç, GitHub Pages üzerinden yayımlanan statik dosyalar olarak tarayıcıya ulaşır.
 
-Bu ayrım önemlidir; çünkü tek bir veri kaynağı tüm ihtiyaçları karşılamaz. Tarihsel bütünlük, canlı görünürlük ve karşılaştırmalı referans amacı için farklı tedarik stratejileri gerekebilir.
+Bu zincirde veri doğrulama, görselleştirmeden önce gelir. Tarayıcı, seçilen güne ait hazır paketi indirir; çözümleme, grafik çizimi ve bazı analizler istemci tarafında yapılır. Böylece her görüntüleme için merkezi bir veritabanına sorgu atmak yerine, aynı yayınlanmış paket birden çok kullanıcı tarafından yeniden kullanılabilir.
 
-![Kaynak matrisi](images/ppt_sources.png)
+![Tarihsel ve canlı veri kaynaklarının amaçlarına göre ayrımı](images/ppt_sources.png)
 
-## Otomasyon omurgası
+## Tarihsel Kıta Avrupası verisinin yolu
 
-Platformun arka planında GitHub Actions ile çalışan bir otomasyon hattı bulunur. Bu hat, zamanlanmış görevlerle kaynaklara erişir, ham veriyi indirir, zaman damgalarını doğrular, UTC ekseninde hizalar ve istemci için daha verimli formatlara dönüştürür.
+Kıta Avrupası serisinde kaynak yapısı ve arşiv biçimi farklı olabilir; yine de ana ilke aynıdır: kaynak veriyi almak, zaman tabanını doğrulamak, analiz için normalleştirmek ve paketlenmiş sonuçları statik olarak yayımlamak. Kaynağın yerel saat uygulaması, yayın gecikmesi ve dosya biçimi Türkiye serisinden farklı olabileceği için doğrulama kuralları kaynak bazında ele alınmalıdır.
 
-Bu yöntem, büyük bir sürekli sunucu altyapısına gerek bırakmadan günlük veri üretimini sürdürür. Ayrıca veri akışı kodla tarif edildiği için süreç şeffaf ve tekrar üretilebilir kalır.
+Tarihsel iki serinin aynı platformda bulunması, onların aynı zaman çözünürlüğüne veya aynı ölçüm zincirine sahip olduğu anlamına gelmez. İstemci tarafındaki karşılaştırma, bu farkları veri kalitesi ve zaman eşleme bilgisiyle birlikte değerlendirmelidir. Statik veri katmanı, tarihsel tekrar üretilebilirlik için güçlüdür; canlı olay doğrulamasının yerine geçmez.
 
-## Neden ikili sıkıştırma ve istemci tarafı işleme?
+## Canlı veri için neden serverless ara katman gerekir?
 
-Sunumlarda günlük 86.400 saniyelik verinin int16 tabanlı binary (ikili) biçimde sıkıştırılması gösteriliyor. Bu yaklaşım, indirme boyutunu düşürürken anlamlı hassasiyeti korumayı hedefler. Böylece kullanıcı tarayıcıda hızlı çizim, filtreleme ve temel analiz işlemlerini gerçekleştirebilir.
+Canlı API anahtarları veya kaynak erişim ayrıntıları tarayıcıya doğrudan verilmemelidir. Bu nedenle canlı veri yolu, API ile ön yüz arasına güvenli bir serverless ara katman yerleştirir. Cloudflare Worker gibi bir bileşen, erişim kurallarını uygular, yanıtı doğrular ve gerektiğinde tampon/önbellek katmanıyla istemciye kontrollü bir özet sunar. SQLite Durable Object benzeri kalıcı serverless bileşenler, kısa süreli durum ve güvenli paylaşım ihtiyacını destekleyebilir.
 
-İstemci tarafı işleme, ölçeklenebilirlik açısından da avantajlıdır. Her kullanıcı kendi tarayıcısında bazı hesaplamaları yaptığı için merkezi sunucu yükü azalır; buna karşılık arayüzün akıcı kalması için Web Worker gibi teknikler kullanılır.
+Bu tasarım canlı görünümü tarihsel paketlerden ayırır. Canlı veri; gecikme, kaynak erişilebilirliği ve önbellek politikası nedeniyle tarihsel seriden farklı davranabilir. Kullanıcı arayüzünde bu farkın açıkça belirtilmesi, yakın gerçek zamanlı değeri kesin ve gecikmesiz saha ölçümü sanma riskini azaltır.
 
-![Mimari akış](images/ppt_architecture.png)
+![Canlı veri erişiminde güvenli ara katman ve istemci akışı](images/ppt_live.png)
 
-## Canlı telemetri nasıl güvenli sunuluyor?
+## Neden bütün hesaplamaları merkezi sunucuda yapmıyoruz?
 
-Canlı telemetri için en kritik meselelerden biri API anahtarlarının istemciye açık edilmemesidir. Sunumda bunun için Cloudflare Worker ve tampon bellek yaklaşımı anlatılıyor. Ara katman, canlı veriyi güvenli şekilde toplayıp istemciye özetlenmiş ve kontrollü erişim sağlar.
+Önceden hazırlanmış paketlerin GitHub Pages üzerinde yayımlanması, statik barındırma maliyetini ve işletme karmaşıklığını düşürür. İstemci tarafı hesaplama, talebi kullanıcıların cihazlarına dağıtır; aynı veri ve aynı parametrelerle analizin yeniden üretilebilmesini kolaylaştırır. Tarayıcı, küçük ve orta boy zaman aralıklarında grafik, filtreleme ve temel sinyal işleme için yeterli esneklik sağlayabilir.
 
-Bu çözüm, tamamen statik bir sitenin gerektiğinde yarı-canlı veri deneyimi sunabileceğini gösterir. Böylece kullanıcı hem tarihsel hem yakın gerçek zamanlı görünümü aynı platform içinde kullanabilir.
+Bu yaklaşımın sınırları vardır. Tarayıcı CPU’su ve belleği cihazdan cihaza değişir; büyük dosyalar indirme süresini uzatır; önbellek eski içeriğin kısa süre daha görünmesine yol açabilir. Karmaşık ya da çok uzun analizler, kullanıcı deneyimini zorlayabilir. Bu nedenle mimari, her hesabı istemciye taşımak yerine yayınlanmış özetler, uygun veri çözünürlüğü ve arka plan işleme arasında denge kurmalıdır.
 
-![Canlı veri mimarisi](images/ppt_live.png)
+![Veri toplama, paketleme, yayınlama ve tarayıcı içi analiz akışı](images/ppt_architecture.png)
 
-## Sonuç
+## Mimarinin mühendislik sonucu
 
-GridFreq’in platform mimarisi, enerji analitiğinde “büyük sistem gerekir” varsayımına pratik bir alternatif sunuyor. Otomasyon, sıkıştırma, tarayıcı içi işleme ve güvenli aracı katman yaklaşımı birlikte kullanıldığında, bağımsız ama güçlü bir frekans izleme ortamı kurulabiliyor.
+GridFreq’in gücü, tek bir teknoloji etiketinde değil; veri yoluna uygun görev dağılımındadır. Tarihsel katman, otomasyon ve statik yayınla denetlenebilir veri paketleri üretir. Tarayıcı, bunları etkileşimli olarak inceler. Canlı katman ise güvenlik ve erişim sınırları için serverless bileşenlerden yararlanır. Bu yapı, sonuçların kaynak gecikmesi, önbellek durumu ve cihaz sınırlarıyla birlikte okunmasını gerektirir; doğru kullanıldığında düşük işletme maliyeti ile teknik şeffaflığı bir araya getirir.
 
-## Kaynaklar ve editoryal not
+## Operasyonel gözlemler ve sınırlar
 
-- Kaynak: `GridFreq_Analysis_Platform.pptx`
-- Kaynak: `GridFreq_Analysis_Laboratory.pptx`
+Statik yayın modelinde her veri güncellemesi belirli bir üretim ve dağıtım anına bağlıdır. Bu, yayınlanmış tarihsel paketin hangi kurallarla üretildiğini izlemeyi kolaylaştırır; ancak kaynak gecikmesi veya başarısız toplama adımı varsa en yeni günün görünmemesine neden olabilir. Canlı katmanda ise önbellek, hız ve kaynak koruması için yararlıdır; buna karşılık kullanıcıya görünen değerle kaynağın son ölçümü arasında kontrollü bir gecikme yaratabilir.
+
+Mimari kararların analitik sonuçla ilişkisi burada ortaya çıkar. Tarihsel eğri ile canlı ekran aynı başlık altında görünse bile güncellik, çözünürlük ve işleme zinciri farklı olabilir. Sağlam yorum, kullanılan veri yolunu, zaman damgasını ve erişim durumunu sonuçla birlikte değerlendirir.

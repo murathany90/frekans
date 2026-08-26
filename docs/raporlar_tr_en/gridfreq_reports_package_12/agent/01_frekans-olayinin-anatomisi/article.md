@@ -50,36 +50,38 @@ Basit ilişki şöyledir: RoCoF yaklaşık olarak güç dengesizliği ile doğru
 
 Başlangıç frekansı, nadir, nadire ulaşma süresi, maksimum RoCoF, geçici denge frekansı ve toparlanma süresi birlikte değerlendirilmelidir. Yalnızca minimum frekansın raporlanması, kontrolün neden başarılı veya yetersiz olduğuna dair çok az bilgi verir.
 
-Ekli GridFreq raporunda 1059 MW büyüklüğünde bir olay profili kullanılmıştır. Kamuya açık Fingrid 2024 raporu yıl içinde 300 mHz’den büyük 11 frekans bozuntusu bulunduğunu ve çoğunun nükleer santral arızalarıyla ilişkili olduğunu doğrular. Buna karşın ekli rapordaki tüm tekil zaman/değer ayrıntıları kamuya açık kayıtlarda aynı biçimde doğrulanamadığından bu makalede eğri “örnek olay profili” olarak ele alınmıştır.
+Bir olay eğrisi, belirli bir sistemin ve belirli bir işletme anının fotoğrafıdır. Bu nedenle örnek bir eğriyi, aynı büyüklükteki her üretim kaybında tekrarlanacak evrensel bir şablon olarak değil; metrikler arasındaki fiziksel ilişkiyi açıklayan bir çalışma örneği olarak okumak gerekir.
 
+## İlk saniyelerin dinamiği: atalet, RoCoF ve aktif güç tepkisi
 
+Güç dengesizliği oluştuğu anda senkron makinelerde depolanan kinetik enerji frekans değişim hızını sınırlar. Bu doğal yanıt, üretim açığını kapatan yeni bir aktif güç kaynağı değildir. **Atalet frekansı 50 Hz’e geri getirmez; esas olarak ilk RoCoF’u sınırlar ve denetim katmanlarının çalışması için zaman yaratır.**
 
-## PowerPoint içeriğiyle genişletilmiş okuma: 5 saniyelik kritik pencere
+Aktif güç tepkisinin başlangıcı ve rampası ise sabit zaman dilimlerine ayrılmaz. Governor dinamiği, türbin tipi, ölçüm filtresi, inverter denetimi, hizmet yükümlülüğü ve kullanılabilir rezerv her tesiste farklıdır. PFK/FCR, frekans sapmasına karşı aktif güç değiştirerek düşüşün büyümesini durdurmaya yardım eder. Daha sonraki restorasyon katmanları ise frekansı ve kontrol alanı dengesini nominal koşullara taşır. Bu nedenle birkaç saniyelik bir pencere önemlidir; ancak “ilk iki saniye yalnızca atalet, sonraki sekiz saniye yalnızca kontrol” biçiminde yorumlanmamalıdır.
 
-Sunum materyallerinde özellikle vurgulanan nokta, büyük bir arızadan sonraki ilk birkaç saniyenin sistem güvenliği açısından belirleyici olduğudur. **0–2 saniye** aralığında görülen ilk düşüş, büyük ölçüde atalet (inertia) etkisiyle yavaşlatılır. **2–10 saniye** aralığında ise Primary Frequency Response - PFR (birincil frekans tepkisi) veya PFK daha görünür hâle gelir ve frekans eğrisi “uçuruma” doğru değil, yeniden dengeye doğru yönelmeye başlar.
+![Frekans olayında ilk tepki ve kontrol katmanlarının zaman sıralaması](images/ppt_context.png)
 
-Bu bakış, olay analizini yalnızca “en düşük frekans kaç oldu?” sorusundan çıkarıp “ilk savunma hattı yeterli miydi, kontrol yeterince hızlı mı devreye girdi, UFLS (Under Frequency Load Shedding / düşük frekansta yük atma) sınırına ne kadar yaklaşıldı?” gibi daha anlamlı sorulara taşır. Dolayısıyla bir olay raporunda nadir kadar nadire ulaşma süresi ve ilk 5 saniyedeki eğim de mühendislik açısından çok değerlidir.
+## Olay öncesinden restorasyona kadar hangi büyüklükler izlenir?
 
-![Sunumdan kritik pencere görseli](images/ppt_context.png)
+Sağlıklı bir olay değerlendirmesi, arıza anından önceki işletme noktasını da kapsar. Başlangıç frekansı nominalden zaten uzaksa, aynı güç kaybı daha dar bir güvenlik marjında başlar. Devredeki rezervin miktarı kadar, bu rezervin hangi yönde ve ne hızda kullanılabildiği de belirleyicidir. Bir ünitenin ayrılmasıyla oluşan net aktif güç açığı; eşzamanlı yük değişimleri, enterkonneksiyon akışları ve frekansa duyarlı yüklerin davranışıyla birlikte değerlendirilmelidir.
 
-## Olay eğrisini okurken kullanılan sade zihinsel model
+İlk RoCoF, olayın başlangıçtaki şiddetini gösterir. Değer hesaplanırken kullanılan zaman penceresi, örnekleme aralığı ve filtreleme açıkça belirtilmelidir; aksi hâlde farklı hesaplar karşılaştırılamaz. Frekans nadiri, kontrol ve doğal sönümleme toplamının açığı ne zaman dengelediğini gösterir. Nadire ulaşma süresi, kontrolün olayın hangi aşamasında etkili olmaya başladığına ilişkin ek bağlam sağlar; tek başına bir performans puanı değildir.
 
-Sunumlarda kullanılan anlatım, atalet ile PFK’yı iki aşamalı bir kurtarma operasyonu gibi ele alır. Atalet bize **zaman kazandırır**; PFK ise bu kazanılan zamanı kullanarak sisteme **aktif güç tepkisi** pompalar. Bu sade model, şebeke dinamiklerini uzman olmayan okuyucu için de anlaşılır kılar.
+Nadirden sonra eğri sıklıkla **quasi-steady-state frequency (geçici kararlı durum frekansı)** olarak adlandırılan yeni bir platoya yaklaşır. Bu plato nominal frekanstan farklı olabilir. Primer kontrolün görevi bu noktada sistemi kararlı tutmaktır; nominale dönüş, frekans restorasyon rezervi ve AGC ile ilişkili daha yavaş kapalı çevrim denetiminin işidir. Restorasyon tamamlandığında ilk rezerv katmanının yeniden boşaltılması ve olayda kullanılan enerji ya da üretim marjının yenilenmesi gerekir. Aksi durumda sistem aynı gün içindeki ikinci bir bozuntuya daha kırılgan girer.
 
-Pratikte bu yaklaşım, GridFreq üzerindeki olay analiz ekranında RoCoF, nadir, toparlanma ve kararlı durum etiketlerinin neden birlikte gösterilmesi gerektiğini de açıklar. Çünkü gerçek karar desteği, tekil metrikte değil, olayın zamansal anatomisindedir.
+## Aynı MW kayıp neden her gün aynı frekans olayını oluşturmaz?
 
+Bir üretim kaybının MW değeri tek başına sonuç tahmini için yeterli değildir. Öncelikle toplam senkron kinetik enerji değişir: çevrim içi makinelerin sayısı, gücü ve çalışma noktası aynı değildir. Üretim kompozisyonu, senkron kompansatörlerin devrede olup olmaması ve inverter tabanlı kaynakların seçilmiş denetim işlevleri ilk eğimi etkileyebilir. Yük sönümlemesi de önemlidir; frekans düştükçe bazı yüklerin doğal olarak daha az güç çekmesi, net açığın bir bölümünü azaltabilir.
 
-## Kaynaklar ve editoryal not
+Başlangıç frekansı, kullanılabilir yukarı yönlü rezerv, rezervin aktivasyon hızı ve denetim sistemlerinin doygunlukları nadiri değiştirir. İletim topolojisi ile ada oluşumu riski de yerel güç dengesizliklerinin hangi bölgelerde yoğunlaşacağını belirler. Bu etkenler, aynı büyüklükte iki kaybın farklı RoCoF, farklı nadir ve farklı toparlanma süresi üretmesini açıklar. Olay analizi, MW kaybını tek başına neden olarak sunmak yerine bu işletme bağlamını görünür kılmalıdır.
 
-Bu metin, kullanıcı tarafından sağlanan GridFreq teknik dokümanları temel alınarak hazırlanmıştır. Simülasyon sonuçları model/senaryo bağımlı olarak ifade edilmiştir; mevzuatla ilgili kritik noktalar güncel TEİAŞ/ENTSO-E kaynaklarıyla karşılaştırılmıştır.
+## GridFreq ile olay eğrisini ihtiyatla okumak
 
-- Ekli kaynak: `gridfreq-frequency-event-report.pdf`
+GridFreq; başlangıç seviyesi, RoCoF adayı, minimum/maksimum değer, nadir ve toparlanma biçimini aynı zaman ekseninde incelemeye yardımcı olur. Bu görünüm aday olayları ayırmak, farklı günleri karşılaştırmak ve ayrıntılı işletme kaydı istenecek zaman aralıklarını belirlemek için yararlıdır. Ancak yalnızca frekans serisinden arızanın yeri, açılan ekipman ya da kesin kök neden çıkarılamaz. Bu değerlendirme için üretim, kesici, güç akışı ve koruma kayıtları gerekir.
 
-- Ekli kaynak: `gridfreq-technical-manual.pdf`
+Mühendislik açısından en değerli sonuç, tek bir minimum frekans sayısı değil; güç dengesizliği, ilk eğim, nadir, geçici kararlı durum ve rezerv yenileme arasındaki tutarlı hikâyedir. Bu hikâye, hem koruma marjlarını hem de sonraki olay için hazır bulundurulması gereken kontrol kapasitesini birlikte gösterir.
 
-- Dış doğrulama: TEİAŞ 03.07.2026 depolama teknik kriterleri ve test prosedürleri.
+## Olay metriklerini aynı bağlamda tutmak
 
-- Dış doğrulama: ENTSO-E/Fingrid sistem işletme ve frekans kalite yayınları.
+RoCoF, nadir ve toparlanma birbirinin yerine geçecek göstergeler değildir. Yüksek RoCoF her zaman en düşük nadiri, derin nadir de her zaman en yavaş restorasyonu üretmez. İlk metrik atalet ve ilk açık hakkında; nadir, kontrol ile yük sönümlemesinin zamanında toplam etkisi hakkında; toparlanma ise rezerv koordinasyonu hakkında bilgi taşır. Bu ayrımı korumak, bir olayın tek bir grafiğe ya da tek bir performans eşiğine indirgenmesini önler.
 
-
-> GridFreq bağımsız bir analiz platformudur; metin resmî sistem işletmecisi görüşü değildir.
+Koruma eşiklerine yakın olaylarda zaman çözünürlüğü ayrıca önem kazanır. Saniyelik kayıt, olayın makro biçimini karşılaştırmak için yararlı olabilir; çok hızlı koruma veya elektromekanik geçişlerin kesin zamanlaması için daha yüksek çözünürlüklü saha kaydı gerekir. Analiz sonucu bu veri sınırıyla birlikte raporlandığında, olay eğrisi hem karar desteği hem de daha ayrıntılı inceleme için güvenilir bir başlangıç olur.

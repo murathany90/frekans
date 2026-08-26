@@ -16,7 +16,7 @@ Bataryanın “çok hızlı” olmasının tek başına yeterli olmadığını; 
 
 ![Makale başlık görseli](images/hero_cover.jpg)
 
-> **Ana mesaj:** Bataryada “hız” MW ile, “dayanma süresi” MWh ile, hizmetin devamlılığı ise SOC yönetimi ile belirlenir.
+> **Ana mesaj:** Tepkinin büyüklüğünü MW, sürdürülebilirliğini MWh ve SOC; ne kadar hızlı gerçekleşeceğini ise ölçüm–kontrol–inverter zincirinin gecikmesi ve rampa kabiliyeti belirler.
 
 
 ## Güç ile enerji aynı şey değildir
@@ -61,28 +61,34 @@ Optimum kontrol yalnızca en yüksek yan hizmet gelirini değil; hücre sıcakl�
 
 
 
-## PowerPoint içeriğiyle genişletilmiş okuma: atalet ve PFR uyumu
+## Bataryanın hızı nereden gelir?
 
-Sunumlar, atalet ile birincil frekans tepkisini iki ayrı ama uyumlu mekanizma olarak açıklıyor. Bu perspektif bataryalar için özellikle önemlidir; çünkü bataryalar klasik senkron atalet üretmese de çok hızlı aktif güç tepkisi vererek ilk saniyelerdeki boşluğu azaltabilir.
+MW, bataryanın anlık aktif güç kapasitesini tanımlar; tepkinin başlangıç hızını tanımlamaz. Hız; frekans ölçümü, filtreleme, denetleyici kararı, gerekli ise haberleşme ve inverterin akım/rampa kabiliyeti boyunca oluşan gecikmelerin toplamıdır. Çok kısa yanıt süreleri mümkün olabilir, ancak bunlar teknoloji, denetim tasarımı, ölçüm kalitesi ve bağlı olduğu şebekenin koşullarına bağlıdır.
 
-Ancak batarya hizmetinin başarılı olması için yalnızca hızlı güç elektroniği yetmez. Güç sınırı, enerji bütçesi, SOC (state of charge / şarj durumu) hedefi ve olay sonrası yeniden dengeleme stratejisi de birlikte tasarlanmalıdır. Aksi hâlde batarya ilk saniyelerde etkileyici görünse bile 15 dakikalık sürdürülebilirlik hedeflerinde zorlanabilir.
+MWh ise enerji bütçesidir. Aynı 100 MW güç, farklı MWh kapasitelerinde çok farklı sürelerde sürdürülebilir. SOC, bu bütçenin olay anında hangi yönde erişilebilir olduğunu gösterir. Frekans düştüğünde güç verme yönünde, frekans yükseldiğinde şarj/güç çekme yönünde ayrı baş boşlukları gerekir. Bu üç kavramı birbirine karıştırmak, özellikle iki yönlü rezervin gerçekte ne kadar kullanılabilir olduğunu gizler.
 
-![Atalet ve PFR uyumu görseli](images/ppt_context.png)
+![Batarya frekans hizmetinde güç, enerji ve denetim zaman ölçeğinin birlikte değerlendirilmesi](images/ppt_context.png)
 
-## Dijital hızın değeri
+## Pozitif ve negatif rezerv neden aynı SOC problemini yaratmaz?
 
-Sunumların “fiziksel kütleden dijital hıza” yaklaşımı, depolamanın neden bu kadar kritik olduğunu gösterir. Batarya, yavaş mekanik valflerin aksine milisaniyeler-seviyesinde kontrol üretebilir; fakat bu hızın sisteme yararlı olabilmesi için iyi filtrelenmiş ölçüm ve doğru enerji yönetimi gerekir.
+Düşük SOC, bataryanın şebekeye ek güç verme kabiliyetini sınırlar; hücrelerde kullanılabilir enerji kalmamış olabilir. Yüksek SOC ise güç çekme veya şarj etme yönünde alanı sınırlar. Bu nedenle orta SOC hedefi, çift yönlü hizmet için yararlı bir başlangıç noktasıdır; ancak tek bir sabit yüzde bütün batarya kimyaları, sıcaklık koşulları ve rezerv sözleşmeleri için optimum değildir.
 
+Denetleyici, gün içi planlanan hizmet, beklenen olay olasılığı, verim kayıpları ve hücre sınırlarına göre pozitif ve negatif marjları ayrı izlemelidir. İnverterin MW limiti yüksek olsa bile SOC veya sıcaklık limiti nedeniyle bu limitin tamamı her an kullanılamayabilir. Kullanılabilir rezerv, isim levhası değerinden değil bu anlık sınırların kesişiminden doğar.
 
-## Kaynaklar ve editoryal not
+## Olay bittikten sonra ne olur?
 
-Bu metin, kullanıcı tarafından sağlanan GridFreq teknik dokümanları temel alınarak hazırlanmıştır. Simülasyon sonuçları model/senaryo bağımlı olarak ifade edilmiştir; mevzuatla ilgili kritik noktalar güncel TEİAŞ/ENTSO-E kaynaklarıyla karşılaştırılmıştır.
+Frekans olayı sonrasında bataryanın hedef SOC’ye veya baz güç düzeyine dönmesi gerekir. Bu **SOC toparlama** işlemi, olay sırasında sağlanan gücün tersini uygularsa yeni bir güç dengesizliği ve rebound etkisi oluşturabilir. Bu nedenle geri dönüş, yeterli rampa sınırı ve sistemdeki diğer rezervlerle koordine edilmelidir. İlk olaya hızlı ve doğru yanıt veren bir batarya, kontrolsüz toparlanma nedeniyle sonraki dakikalarda yeni bir sorun yaratabilir.
 
-- Ekli kaynak: `gridfreq-technical-manual.pdf`
+Sürdürülebilirlik değerlendirmesi bu yüzden yalnızca ilk saniyelerdeki güç eğrisini değil, olay sonu enerji durumunu ve yeniden hazır olma süresini de içerir. Sık çağrılan bir hizmette çevrim derinliği, sıcaklık, verim ve yardımcı tüketimler kullanılabilir kapasiteyi zamanla değiştirebilir.
 
-- Ekli kaynak: `gridfreq-renewable-penetration-report.pdf`
+## Güç elektroniği ile enerji yönetimini birlikte tasarlamak
 
-- Dış doğrulama: TEİAŞ 03.07.2026 depolama teknik kriterleri ve test prosedürleri.
+İnverter güç limiti, akım sınırı ve rampa kabiliyeti ilk tepkide belirleyicidir. Enerji limiti ve SOC ise desteğin ne kadar süre devam edeceğini belirler. Yüksek sıcaklık, soğutma gereksinimi, verim kaybı, cycle aging (döngüsel yaşlanma) ve calendar aging (takvim yaşlanması) uzun vadeli işletme zarfını daraltabilir. Bu sınırlar, çok hızlı bir kısa süreli desteğin her zaman yüksek değerli ve güvenli olduğu anlamına gelmediğini gösterir.
 
+Bataryalar klasik senkron atalet üretmez; ancak uygun tasarlanmış hızlı aktif güç desteğiyle frekans nadirini iyileştirmeye katkı sağlayabilir. Hizmetin performansı, yalnızca etkileyici başlangıç rampasıyla değil, ölçüm gürültüsüne dayanıklılık, MW limiti, enerji yeterliliği, iki yönlü SOC marjı ve kontrollü toparlanma ile ölçülmelidir. GridFreq, frekans eğrisinin bu hizmetlerle uyumlu aday davranışlarını görünür kılar; bir batarya tesisinin uygunluk kararı ise tesis telemetrisi ve geçerli teknik prosedürle yapılır.
 
-> GridFreq bağımsız bir analiz platformudur; metin resmî sistem işletmecisi görüşü değildir.
+## Hizmet tasarımında gerçekçi performans zarfı
+
+Frekans hizmeti için ilan edilen kapasite, bataryanın her sıcaklıkta ve her SOC’de sağlayabildiği azami anlık güç değildir. Kullanılabilir zarf; hücre sıcaklığı, dönüştürücü limiti, yardımcı tüketimler, verim, eşzamanlı piyasa yükümlülükleri ve koruma ayarlarıyla daralabilir. Bu nedenle güç, enerji ve süre taahhüdü aynı işletme senaryosunda birlikte doğrulanmalıdır.
+
+İyi bir tasarım, bataryayı yalnızca en büyük olaya göre boyutlamaz. Küçük fakat sık çağrılarda yaşlanma ve SOC sürüklenmesini, büyük olaylarda ise enerji ve rampa sınırını hesaba katar. Böylece hızlı dijital destek, kısa süreli etkileyici bir tepki olmaktan çıkar ve tekrar çağrılabilir bir sistem hizmetine dönüşür.

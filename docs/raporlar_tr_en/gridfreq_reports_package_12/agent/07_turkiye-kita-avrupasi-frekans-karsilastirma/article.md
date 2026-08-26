@@ -61,26 +61,32 @@ Bu sıra, ileri analizleri veri kalitesi problemi üzerinde çalıştırma riski
 
 
 
-## PowerPoint içeriğiyle genişletilmiş okuma: zaman dilimi ve veri hizalama
+## Aynı fiziksel an ile aynı yerel saat aynı şey değildir
 
-Sunumlarda en dikkat çekici konulardan biri, Türkiye ile Kıta Avrupası verisinin farklı zaman dilimlerinden gelip ortak bir UTC ekseninde hizalanmasıdır. Bu teknik ayrıntı küçük görünse de karşılaştırmalı frekans analizinin güvenilirliği doğrudan buna bağlıdır.
+Karşılaştırmanın ilk kararı zaman eşleme amacıdır. UTC hizalaması, iki seride aynı fiziksel anda gerçekleşen elektriksel davranışı karşılaştırır. Bir üretim kaybının veya geniş alanlı bozuntunun iki ölçümde nasıl göründüğünü incelemek için doğru başlangıç budur. Yerel saat hizalaması ise benzer günlük tüketim, üretim veya piyasa davranışlarını karşılaştırmaya yardımcı olabilir; aynı fiziksel anı temsil etmeyebilir.
 
-Aynı fiziksel anı mı kıyaslıyoruz, yoksa aynı yerel saati mi? Bu iki yaklaşım farklı soruları yanıtlar. UTC eşleştirmesi elektriksel olayların aynı anda nasıl hissedildiğini göstermek için uygundur. Aynı yerel saat karşılaştırması ise tüketim alışkanlığı ve piyasa geçişleri gibi günlük davranışları kıyaslamada yararlıdır.
+Bu ayrım yaz-kış saati geçişlerinde özellikle önemlidir. Yerel tarih ve saat aynı görünse bile UTC karşılığı farklı olabilir. Örnekleme aralığı, zaman damgası kaynağı, yayın gecikmesi ve yeniden örnekleme adımları kayıt altına alınmadan yapılan bir karşılaştırma, gerçek şebeke farkını veri boru hattı farkıyla karıştırabilir.
 
-![Veri hizalama görseli](images/ppt_context.png)
+![Türkiye ve Kıta Avrupası serilerinde zaman eşleme ve karşılaştırma mantığı](images/ppt_context.png)
 
-## İki seri neden birebir aynı görünmez?
+## Çapraz korelasyonun söylediği ve söylemediği
 
-Sunumlar, senkronizasyonun “özdeş eğri” anlamına gelmediğini de dolaylı olarak anlatıyor. Ölçüm filtresi, yayın gecikmesi, yerel olaylar ve zaman damgası farkları küçük ayrışmalar üretebilir. Bu nedenle makaledeki çapraz korelasyon ve koherens araçları, yalnızca görsel kıyasın ötesine geçmek için gereklidir.
+Çapraz korelasyon, iki serinin benzerliğini farklı lag (gecikme) değerlerinde ölçer. En yüksek değerin bulunduğu kaydırma, seçilen pencere ve ön işlem altında ortak yapıların en iyi nasıl hizalandığını anlatır. Bu sonuç; ölçüm filtresi, saat ofseti, örnekleme çözünürlüğü, eksik değer işleme ve günlük periyodiklikten etkilenir.
 
+GridFreq’in 1 saniye örneklemeli verisinde bulunan gecikme, milisaniyelik elektromekanik yayılım süresi olarak yorumlanamaz. Böyle bir fiziksel değerlendirme; iyi senkronize edilmiş yüksek çözünürlüklü ölçümler, ölçüm zinciri gecikmelerinin bilinmesi ve birden fazla coğrafi nokta gerektirir. Çapraz korelasyon daha uygun biçimde, hangi zaman aralıklarının ayrıntılı araştırma gerektirdiğini gösteren bir ön tanı aracıdır.
 
-## Kaynaklar ve editoryal not
+## Koherens ve fazı birlikte okumak
 
-Bu metin, kullanıcı tarafından sağlanan GridFreq teknik dokümanları temel alınarak hazırlanmıştır. Simülasyon sonuçları model/senaryo bağımlı olarak ifade edilmiştir; mevzuatla ilgili kritik noktalar güncel TEİAŞ/ENTSO-E kaynaklarıyla karşılaştırılmıştır.
+Koherens, iki sinyalin belirli bir frekans bileşenini ne ölçüde birlikte taşıdığını gösterir. Yüksek koherens, o bantta ortak davranış olabileceğine işaret eder; tek başına nedensellik, olay kaynağı veya elektriksel bağlantının yönü anlamına gelmez. Ortak bir dış etken, eşzamanlı denetim davranışı veya benzer veri işleme adımı da koherens üretebilir.
 
-- Ekli kaynak: `gridfreq-technical-manual.pdf`
+Faz yorumu ancak ilgili bantta koherens yeterince yüksek ve kestirim kararlıysa anlam kazanır. Koherensin zayıf olduğu yerde faz açısı, gürültünün veya kestirim belirsizliğinin sonucu olabilir. Bu nedenle fazı tek başına gecikmeye dönüştürmek, özellikle geniş ve düşük güvenli bantlarda yanıltıcıdır.
 
-- Dış doğrulama: ENTSO-E/Fingrid sistem işletme ve frekans kalite yayınları.
+## Ortak mod ve diferansiyel mod neyi ayırmaya çalışır?
 
+Ortak mod, iki serinin birlikte hareket eden bileşenini vurgular; geniş senkron alana yayılan yavaş değişimleri incelemek için yararlı olabilir. Diferansiyel mod ise serilerin göreli farkını büyütür ve ölçüm, yerel güç dengesi veya bölgesel davranış farklarını görünür kılar. Bu ayrım, iki eğrinin neden aynı anda hem benzer hem de farklı görünebildiğini anlamaya yardım eder.
 
-> GridFreq bağımsız bir analiz platformudur; metin resmî sistem işletmecisi görüşü değildir.
+İki seriden olayın kesin kaynağını belirlemek çoğu durumda mümkün değildir. Bunun için üretim, hat akışı, gerilim, koruma olayları ve mümkünse daha yüksek çözünürlüklü çok noktalı ölçümler gerekir. GridFreq; ortak ve fark serilerini, korelasyon ve koherens sonuçlarını aynı araştırma akışına koyarak doğru soruların sorulmasına yardımcı olur.
+
+## Sağlam bir karşılaştırma sırası
+
+Önce her iki kaynakta eksik örnek, yinelenen zaman damgası ve örnekleme farkı denetlenmelidir. Sonra seçilen UTC veya yerel saat yaklaşımı açıkça belirtilmeli; ham seriler, fark serisi ve basit korelasyon birlikte görülmelidir. Periyodik bir aday varsa kaynakların spektrumları ve uygun bantta koherens incelenir. Bu sıra, görsel benzerliği fiziksel sonuç sanmadan önce zaman tabanını ve veri kalitesini sınamayı sağlar.

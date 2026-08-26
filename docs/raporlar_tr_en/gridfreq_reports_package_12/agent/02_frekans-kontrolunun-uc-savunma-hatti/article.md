@@ -61,30 +61,38 @@ TEİAŞ’ın Temmuz 2026 tarihli depolama teknik kriterleri ayrıca “hızlı 
 
 
 
-## PowerPoint içeriğiyle genişletilmiş okuma: 50 Hz nominal bant ve müdahale katmanları
+## Kontrol katmanlarını işlev ve zaman ölçeğiyle okumak
 
-Sunumlar, frekans kontrol katmanlarını 50 Hz nominal referansı etrafında görsel olarak ayırıyor: PFK/FCR saniyeler içinde çalışan ilk savunma, SFK/aFRR dakikalar içinde devreye giren restorasyon katmanı ve tersiyer/mFRR daha uzun ölçekte sistemi yeniden düzenleyen işletme katmanı. Bu görsel ayrım, farklı rezervlerin aynı işi yapmadığını açık biçimde gösterir.
+Rezerv mimarisinin amacı üç ayrı soruya cevap vermektir: frekans sapmasının büyümesi nasıl durdurulacak, nominal frekans ve kontrol alanı dengesi nasıl geri kazanılacak, kullanılan kapasite nasıl yenilenecek? PFK/FCR ilk soruya odaklanır. Yerel frekans ölçümüyle otomatik çalışan denetleyici, frekans düştüğünde aktif gücü artırır veya frekans yükseldiğinde azaltır. Bu denetim, sistemi ilk aşamada stabilize eder; nominal frekansa tek başına ve her koşulda tam dönüş sağlamak zorunda değildir.
 
-Türkiye ve Kıta Avrupası örnekleri yan yana konduğunda terminolojinin farklı, işlevin ise büyük ölçüde benzer olduğu görülür. Bu nedenle sistemleri karşılaştırırken kısaltmalara değil, **tepki süresi**, **kontrol amacı** ve **rezervin serbest bırakma işlevine** bakmak en doğru yöntemdir.
+SFK/aFRR ikinci görevi üstlenir. AGC, kontrol alanının frekans ve enterkonneksiyon program sapmasını izler; katılımcı kaynaklara güncellenmiş güç hedefleri gönderir. Böylece frekans restorasyonu yapılırken primer rezervin sürekli kullanımda kalması önlenir. Aynı kısa devre eğimi, aynı kontrol kazancı veya aynı aktivasyon süresi bütün sistemlerde geçerli değildir. Hizmet tasarımı ve şebeke kodu, bu işlevin hangi kaynakla ve hangi performans gerekliliğiyle sağlanacağını belirler.
 
-![Kontrol katmanları görseli](images/ppt_context.png)
+![Frekans kontrol katmanlarının amaç ve zaman ölçeği ilişkisi](images/ppt_context.png)
 
-## Okuyucu için pratik ayrım
+## Yerel kontrol ile merkezi kontrol arasındaki fark
 
-Birincil katman “frekansı tutar”, ikincil katman “frekansı nominale geri yaklaştırır”, üçüncül katman ise “rezervleri yeniler ve sistemi bir sonraki olaya hazırlar”. Sunumdaki görsel akış bu mantığı yalınlaştırdığı için, makalenin eğitim değeri de artmaktadır.
+Governor ya da inverter denetleyicisi, ölçtüğü yerel frekans sapmasına doğrudan yanıt verir. Bu davranış haberleşme veya merkezi optimizasyon beklemeden çalışabilir; bu yüzden ilk stabilizasyon için değerlidir. Ancak yerel denetleyici, kontrol alanındaki tüm üretim-tüketim dengesini, sınır ötesi program sapmasını veya rezerv tahsisini tek başına göremez.
 
+AGC ise daha geniş bir resmi kullanır. Ölçümleri, planlı enterkonneksiyon değişimlerini ve katılımcı birimlerin kullanılabilirliğini birlikte değerlendirerek hedef dağıtır. Merkezi denetim daha yavaş olabilir; buna karşılık frekansı nominale yaklaştırma, alan kontrol hatasını azaltma ve rezervleri koordine etme işlevi taşır. Yerel ve merkezi denetim rakip değildir: biri bozuntunun ilk etkisini sınırlar, diğeri sistemi sürdürülebilir işletme noktasına götürür.
 
-## Kaynaklar ve editoryal not
+## mFRR, RR ve rezerv yenilemesi
 
-Bu metin, kullanıcı tarafından sağlanan GridFreq teknik dokümanları temel alınarak hazırlanmıştır. Simülasyon sonuçları model/senaryo bağımlı olarak ifade edilmiştir; mevzuatla ilgili kritik noktalar güncel TEİAŞ/ENTSO-E kaynaklarıyla karşılaştırılmıştır.
+mFRR, daha uzun zaman ölçeğinde operatör kararı veya tanımlı aktivasyon süreçleriyle devreye alınır. Otomatik rezervlerin yerini almak, uzun süren dengesizlikleri yönetmek ve yeniden sevk kararlarına zaman kazandırmak için kullanılır. Replacement Reserve - RR ise uygulanabildiği mimarilerde daha uzun süreli kapasite yenilemesine katkı sağlar. Bu adların ülkeler arasında aynı iş akışını zorunlu olarak temsil etmediği unutulmamalıdır; PFK/FCR, SFK/aFRR ve mFRR etiketlerini birebir eş anlamlı kabul etmek yerine ilgili prosedürdeki amaç, aktivasyon biçimi ve süreklilik şartı incelenmelidir.
 
-- Ekli kaynak: `gridfreq-control-layers-report.pdf`
+## Hızlı frekans tepkisi klasik primer kontrolden neden farklı olabilir?
 
-- Ekli kaynak: `gridfreq-technical-manual.pdf`
+Fast Frequency Response - FFR (hızlı frekans tepkisi), çoğunlukla batarya, HVDC veya inverter tabanlı kaynakların çok kısa zamanda güç değiştirebilmesinden yararlanır. Klasik governor tepkisi ile aynı sistem yararına hizmet edebilir; yine de fiziksel mekanizması ve işletme sınırları farklıdır. FFR’nin ulaştığı güç, inverterin akım ve MW limitiyle; sürdürülebileceği süre ise kullanılabilir enerji, şarj durumu ve hizmet kuralıyla sınırlıdır.
 
-- Dış doğrulama: TEİAŞ 03.07.2026 depolama teknik kriterleri ve test prosedürleri.
+Çok hızlı olmak tek başına yeterli değildir. Ölçüm filtresi yanlış ayarlanırsa gürültü tetikleme yaratabilir; haberleşmeli şemalarda gecikme eklenebilir; güç geri çekilirken oluşan rebound etkisi yeni bir dengesizlik doğurabilir. Bu nedenle FFR, klasik primer kontrolün otomatik ikamesi olarak değil, uygun koordinasyon ve enerji yönetimi gerektiren tamamlayıcı bir hizmet olarak değerlendirilmelidir.
 
-- Dış doğrulama: ENTSO-E/Fingrid sistem işletme ve frekans kalite yayınları.
+## GridFreq üzerinde ne aranmalı?
 
+Frekans serisi, farklı katmanların etkisini doğrudan etiketlemez; fakat ilk eğim, nadir, plato ve restorasyon bölgesi hakkında ipuçları verir. GridFreq’te bu biçimi karşılaştırmak, rezervlerin zaman ölçeğiyle uyumlu görünüp görünmediği konusunda ön tanı sağlar. Kesin performans değerlendirmesi için güç komutları, birim telemetrisi, AGC kayıtları ve yürürlükteki hizmet ölçütleri aynı zaman ekseninde incelenmelidir.
 
-> GridFreq bağımsız bir analiz platformudur; metin resmî sistem işletmecisi görüşü değildir.
+İyi tasarlanmış bir kontrol hiyerarşisi, yalnızca en hızlı kaynağı seçmez. Her katmanın neyi koruduğunu, ne zaman devreye girdiğini, ne kadar süre enerji sağlayabildiğini ve ayrıldıktan sonra hangi rezervin yerini dolduracağını açıkça tanımlar.
+
+## Rezerv yeterliliği neden sadece MW toplamı değildir?
+
+Rezerv portföyü değerlendirilirken toplam sözleşme MW’ı başlangıç noktasıdır; kullanılabilirlik ise daha geniş bir sorudur. Kaynağın mevcut çalışma noktası, yukarı ve aşağı yön baş boşluğu, rampa kabiliyeti, enerji süresi, iletim kısıtı ve aynı anda yaşanabilecek başka bir olay bu toplamı değiştirebilir. Birden çok kaynak aynı büyüklükte güce sahip olsa da etkinleşme sıraları ve sürdürülebilirlikleri farklı olabilir.
+
+Bu nedenle işletme planında yeterlilik, olay büyüklüğü ile eşleşen güç kadar rezervin yerini kimin, hangi sürede ve hangi ağ koşulunda dolduracağını da içerir. Frekans kontrol hiyerarşisi, bu ardışıklığı görünür kıldığı için yalnızca yan hizmet sınıflandırması değil, sistem güvenliği tasarımıdır.

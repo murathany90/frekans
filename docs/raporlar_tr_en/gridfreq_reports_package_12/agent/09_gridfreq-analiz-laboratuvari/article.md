@@ -1,48 +1,47 @@
-
 # GridFreq Analiz Laboratuvarı: Zaman Uzayından Frekans Uzayına
 
-**Alt başlık:** Tek bir frekans eğrisinden olay, kalite ve salınım bilgisini nasıl çıkarıyoruz?
+**Alt başlık:** Tek bir frekans eğrisinden olay, kalite ve salınım adaylarını nasıl incelemeli?
 
-GridFreq Analiz Laboratuvarı, 1 saniyelik frekans verisini yalnızca çizmek için değil; aynı veri üzerinden olay tespiti, RoCoF (frekans değişim hızı), zaman sapması, salınım adayı tespiti ve iki şebekenin karşılaştırmalı analizi için kullanmak üzere tasarlanmıştır.
+GridFreq Analiz Laboratuvarı, frekans serisini yalnızca çizilecek bir zaman dizisi olarak değil; olay davranışı, veri güvenilirliği ve düşük frekanslı periyodik yapı hakkında sorular sorulabilecek bir mühendislik sinyali olarak ele alır. Amaç, tek bir düğmeyle kesin hüküm vermek değil; farklı yöntemlerin hangi soruya cevap verdiğini aynı araştırma akışında görünür kılmaktır.
 
 ![Makale başlık görseli](images/hero_cover.jpg)
 
-> **Ana mesaj:** İyi bir frekans laboratuvarı tek bir grafik değil; zaman alanı, frekans alanı ve veri kalitesi katmanlarını birlikte çalıştıran bir analiz düzenidir.
+> **Ana mesaj:** Güvenilir analiz, doğru yöntemi seçmekten önce doğru soruyu, doğru zaman penceresini ve verinin sınırlarını tanımlamayı gerektirir.
 
-## Zaman alanı araçları neyi gösterir?
+## Hangi mühendislik sorusuna hangi analiz yöntemi cevap verir?
 
-Zaman alanı (time domain / zaman uzayı) araçları, ham frekans serisinin olay bazlı davranışını görünür kılar. Ortalama sapma, bant ihlali, minimum–maksimum değerler ve RoCoF gibi göstergeler, operatör veya araştırmacının “az önce ne oldu?” sorusuna hızlı yanıt vermesini sağlar.
+Ani bir üretim kaybı veya yük değişimi adayında ilk araç zaman serisidir. Başlangıç frekansı, minimum/maksimum değer, frekans nadiri, toparlanma biçimi ve Rate of Change of Frequency - RoCoF (frekans değişim hızı) birlikte incelenir. Bu görünüm, olayın ne zaman başladığını ve hangi zaman penceresinin ayrıntılı işletme kaydıyla karşılaştırılması gerektiğini gösterir.
 
-Bu katmanda amaç mümkün olduğunca doğrudan okumadır. Örneğin bir olay anında frekansın ne kadar hızlı düştüğü, kaç saniyede toparlanmaya başladığı ve 50 Hz’e göre ne kadar kalıcı sapma taşıdığı kolayca görülebilir. Fakat bu görünürlük, veri kalitesi zayıfsa yanıltıcı olabilir; bu nedenle zaman alanı analizi kalite denetimiyle birlikte ele alınmalıdır.
+Tekrarlayan davranış için Welch Power Spectral Density - PSD (güç spektral yoğunluğu) kullanılır. PSD, seçilen zaman aralığında hangi düşük frekans bileşenlerinin belirgin olduğunu araştırır. Zamanla değişen periyodiklikte spektrogram, enerji yoğunluğunun ne zaman ortaya çıktığını gösterir. İki seri arasındaki ilişki için çapraz korelasyon farklı gecikmelerdeki benzerliği; koherens ise belirli frekanslarda birlikte davranışı inceler. Faz, ancak koherens yeterince yüksek olduğunda anlamlı bir tamamlayıcı ölçüttür.
 
-## Frekans alanına neden geçiyoruz?
+![Zaman alanı, frekans alanı ve karşılaştırmalı analiz araçlarının ilişkisi](images/ppt_algorithm_map.png)
 
-Bazı olaylar tekil değildir; daha çok tekrarlı salınım kalıpları olarak ortaya çıkar. İşte burada frekans alanı (frequency domain / frekans uzayı) araçları devreye girer. Welch PSD (Welch güç spektral yoğunluğu) belirli frekans bantlarında gücün yoğunlaştığı noktaları gösterir; spektrogram ise bu yoğunlaşmanın günün hangi anlarında öne çıktığını anlamamıza yardım eder.
+## Veri güvenilirliği analizden ayrı değildir
 
-Böylece “şebeke bugün gürültülü müydü?” veya “0.2 Hz civarındaki bir mod hangi saatlerde güçlendi?” gibi sorular yanıtlanabilir. Bu tür araçlar, olay raporlarından farklı olarak sürekli izleme ve kök neden analizi için son derece değerlidir.
+Completeness (tamlık), eksik kayıt, yinelenen zaman damgası, frozen/spike adayları ve örnekleme düzeni her yöntemin güvenilirliğini etkiler. Özellikle RoCoF türev tabanlı olduğu için tek bir zaman kayması veya spike fiziksel olmayan büyük bir tepe üretebilir. PSD ve koherens için de örnekleme hızı, boşlukların nasıl ele alındığı ve analiz bandı sonucu belirler.
 
-![Algoritma haritası](images/ppt_algorithm_map.png)
+Bu nedenle laboratuvarın doğru çalışma sırası; önce veri kaynağını ve zaman aralığını tanımlamak, sonra kalite bayraklarını incelemek, ardından zaman veya frekans alanı yöntemini seçmektir. 1 saniye örneklemeli tarihsel veri için Nyquist sınırı yaklaşık 0,5 Hz’tir; bunun üzerindeki fiziksel bileşenlerin güvenilir analizi daha yüksek hızlı ölçüm gerektirir.
 
-## Analiz laboratuvarının algoritma haritası
+## GridFreq neyi yapar, neyi tek başına yapamaz?
 
-PowerPoint sunumunda gösterilen algoritma haritası, GridFreq’in farklı yöntemleri tek çatı altında nasıl birleştirdiğini güzel özetler. Zaman alanında temel istatistikler, bant ihlali tespiti ve RoCoF bulunurken; frekans alanında Welch PSD, spektrogram, koherens ve çapraz korelasyon yer alır.
+GridFreq; aday olayları, anomali örüntülerini ve düşük frekanslı salınım yapılarını görünür kılar; tarihsel aralıkları karşılaştırmaya ve ön tanı oluşturmaya yardım eder. Bu, inceleme süresini doğru aralığa yöneltmek açısından değerlidir. Buna karşılık platform, yalnızca frekans serisinden kesici işleminin hangi noktada gerçekleştiğini, üretim kaybının kesin kaynağını veya olayın kök nedenini tek başına belirleyemez.
 
-Bu harita, kullanıcının sorun tipine göre doğru analizi seçmesini kolaylaştırır. Ani bir bozulma için RoCoF ve olay eğrisi yeterliyken, uzun dönemli etkileşimleri incelemek için koherens ve salınım aday analizine geçmek gerekir.
+Gerçek root cause analysis (kök neden analizi) için üretim kayıtları, hat akışları, gerilim ölçümleri, kesici ve koruma kayıtları, PMU, SCADA, disturbance recorder ve işletme olay kayıtları gerekebilir. Frekans eğrisinde aynı biçimi yaratan farklı fiziksel nedenler bulunabilir. Bu sınırlamayı açık tutmak, platformun bilimsel güvenilirliğinin temelidir.
 
-## Veri üretim bandı neden önemli?
+## Yeniden üretilebilir araştırma akışı
 
-Analiz laboratuvarı yalnızca bir arayüz değildir; arka planda çalışan otomatik bir veri üretim bandına dayanır. Sunumda gösterildiği gibi GitHub Actions ile tetiklenen toplama adımları, veri doğrulama, UTC normalizasyonu ve sıkıştırma aşamalarından geçer. Bu sayede kullanıcı tarayıcıda hazır, hızlı ve tutarlı bir veri paketiyle karşılaşır.
+Her analizde kaynak, zaman dilimi, örnekleme çözünürlüğü, seçilen yöntem, parametreler ve kalite durumu birlikte kaydedilmelidir. Bir PSD tepesinin segment uzunluğu ve penceresi belirtilmeden, bir RoCoF değerinin filtre ve zaman aralığı belirtilmeden karşılaştırılması zayıf kanıt üretir. Aynı veri ve aynı parametrelerle aynı sonuca ulaşılabilmesi; karşılaştırma, hata ayıklama ve metodolojik eleştiri için gereklidir.
 
-Bu veri üretim disiplini, araştırma sonuçlarının yeniden üretilebilir olmasını sağlar. Aynı ham veri, aynı iş kurallarıyla işlendiğinde benzer analitik sonuçlara ulaşmak mümkün olur; bu da GridFreq’in bağımsız araştırma aracı karakterini güçlendirir.
+![Veri toplama, doğrulama, normalizasyon ve istemci analizi arasındaki akış](images/ppt_pipeline.png)
 
-![Veri üretim bandı](images/ppt_pipeline.png)
+Tarihsel verinin otomatik toplama, doğrulama, UTC normalizasyonu ve uygun biçimde paketlenme aşamalarından geçmesi; tarayıcıdaki analizin daha hızlı ve izlenebilir olmasına katkı sağlar. Bununla birlikte veri paketinin güncelliği, kaynak gecikmesi ve cihaz performansı sonuç yorumunun parçasıdır. Büyük zaman aralıklarında hesaplama süresi, tarayıcı belleği ve görselleştirme çözünürlüğü sınır oluşturabilir.
 
-## Sonuç
+## Mühendislik sonucu
 
-GridFreq Analiz Laboratuvarı, frekans verisini yalnızca izlemek için değil, açıklamak için kurgulanmıştır. Zaman alanı, frekans alanı ve veri kalitesini bir arada değerlendirmek; şebeke frekansını rastgele dalgalanan bir çizgi olmaktan çıkarıp yorumlanabilir bir mühendislik sinyaline dönüştürür.
+Analiz Laboratuvarı en iyi, yöntem seçimini otomatikleştiren bir kara kutu olarak değil; mühendislik muhakemesini yapılandıran bir çalışma ortamı olarak kullanılır. Ani olayda zaman alanı, periyodik davranışta PSD ve spektrogram, iki seri ilişkisinde korelasyon ile koherens ve her aşamada veri kalitesi birlikte ele alındığında frekans eğrisi daha anlamlı hâle gelir. Sonuç, kesin kök neden değil; daha ayrıntılı işletme verisiyle sınanabilecek şeffaf bir ön tanıdır.
 
-## Kaynaklar ve editoryal not
+## Örnek bir inceleme akışı
 
-- Kaynak: `GridFreq_Analysis_Laboratory.pptx`
-- Kaynak: `GridFreq_Analytics.pptx`
-- Kaynak: `gridfreq-technical-manual.pdf`
+Bir günün frekans eğrisinde ani bir düşüş görüldüğünde önce zaman damgaları ve eksik örnekler denetlenir. Ardından başlangıç frekansı, ilk eğim, minimum değer ve toparlanma bölgesi aynı pencerede ölçülür. Benzer bir biçim farklı günlerde tekrar ediyorsa, olay büyüklüğü ve işletme koşulları erişilebildiği ölçüde karşılaştırılır. Bu aşama, adayın fiziksel olay mı yoksa veri sorunu mu olabileceğini ayırmaya yardım eder.
+
+Uzun süreli tekrar aranıyorsa analiz penceresi, örnekleme hızı ve Nyquist sınırı belirtildikten sonra PSD’ye geçilir. Belirgin bir düşük frekanslı yapı bulunursa spektrogram, bunun kalıcı mı yoksa belirli bir zamana bağlı mı olduğunu sınar. İki kaynak aynı araştırmaya katılıyorsa UTC hizalaması, çapraz korelasyon ve yalnızca güvenilir bantta koherens eklenir. Her adımda sonuçtan çok kanıt zinciri önemlidir: veri kalitesi zayıfsa sonraki hesap daha karmaşık olsa bile daha güvenilir olmaz.

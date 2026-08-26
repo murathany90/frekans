@@ -61,26 +61,34 @@ Zaman içinde aynı büyüklükteki olayların daha yüksek RoCoF üretmeye baş
 
 
 
-## PowerPoint içeriğiyle genişletilmiş okuma: ağır şebekeden hafif şebekeye
+## Yenilenebilir enerji oranı ile sistem ataleti aynı şey değildir
 
-Sunumlarda “ağır şebeke” ve “hafif şebeke” ayrımı çok öğretici bir dille anlatılıyor. Yüksek tüketim saatlerinde çok sayıda senkron makinenin devrede olduğu ağır şebeke, aynı arıza karşısında frekansı daha yavaş kaybeder. Gece saatlerinde veya yüksek rüzgâr/güneş üretiminde senkron makine sayısı azalırsa daha hafif bir şebeke oluşur ve aynı bozuntu daha hızlı bir frekans düşüşü yaratabilir.
+Atalet seviyesi, yalnızca talep, günün saati veya yenilenebilir üretimin yüzdesiyle belirlenmez. Asıl büyüklük, o anda şebekeye senkron bağlı makinelerin döner kütlelerinde depolanan toplam kinetik enerji ve sistemin dinamik bileşimidir. Aynı yenilenebilir üretim payında bile çevrim içi senkron jeneratör sayısı, hangi makinelerin yüklendiği, enterkonneksiyon akışları ve senkron kompansatörlerin durumu farklı olabilir.
 
-Bu yaklaşım, yenilenebilir oranına tek başına değil, o anda sistemde bulunan **senkron enerji**, **rezerv hızı** ve **kontrol teknolojisi** ile birlikte bakmak gerektiğini hatırlatır. Dolayısıyla düşük atalet, yalnızca “yenilenebilir arttı” cümlesiyle açıklanabilecek bir durum değildir.
+Batarya ile inverter denetimleri, rezerv miktarı ve sistem topolojisi de frekans performansını değiştirir. Bu kaynaklar doğal mekanik ataletin doğrudan karşılığı değildir; fakat uygun denetim, baş boşluğu ve enerji bütçesiyle ilk frekans davranışını destekleyebilir. Bu nedenle “yüksek yenilenebilir oranı = düşük atalet” yalnızca belirli işletme koşullarında geçerli olabilecek eksik bir kısaltmadır.
 
-![Ağır ve hafif şebeke karşılaştırması](images/ppt_context.png)
+![Farklı dinamik bileşimlerde frekans dayanıklılığını etkileyen etkenler](images/ppt_context.png)
 
-## Kütleye karşı hız: yanlış ikilem
+## Senaryo sonuçlarını doğru sınırda tutmak
 
-Sunumlardaki önemli mesajlardan biri de “mekanik atalet mi, dijital hız mı?” sorusunun çoğu durumda yanlış kurulduğudur. Doğru yaklaşım, yeterli fiziksel/dijital tamponu ve yeterince hızlı kontrolü birlikte tasarlamaktır. Bu yüzden makaledeki çözüm portföyü, tek teknolojiye değil hibrit yaklaşıma dayandırılmıştır.
+Yenilenebilir payı değiştirilen bir dinamik benzetim, seçilmiş model ve olay için değerli bir hassasiyet çalışmasıdır. Ancak yüzde 15, 20 veya 30 gibi örnekler Türkiye sistemi için evrensel güvenli ya da kararsız sınırlar üretmez. Sonuç; devreden çıkarılan senkron makineler, olayın büyüklüğü ve yeri, yük seviyesi, ağ topolojisi, AVR/PSS ayarları, inverter modelinin ayrıntısı ve koruma varsayımlarına bağlıdır.
 
+Mühendislikte doğru soru “hangi yenilenebilir oranı güvenlidir?” değil, “bu işletme anında bu bozuntu için yeterli kinetik enerji, hızlı rezerv, kısa devre gücü ve denetim marjı var mı?” sorusudur. Bu yaklaşım, planlama çalışmalarını bir yüzdelik hedefe indirgemek yerine koşula bağlı güvenlik değerlendirmesine taşır.
 
-## Kaynaklar ve editoryal not
+## Düşük atalet yalnızca frekans problemi midir?
 
-Bu metin, kullanıcı tarafından sağlanan GridFreq teknik dokümanları temel alınarak hazırlanmıştır. Simülasyon sonuçları model/senaryo bağımlı olarak ifade edilmiştir; mevzuatla ilgili kritik noktalar güncel TEİAŞ/ENTSO-E kaynaklarıyla karşılaştırılmıştır.
+Düşük atalet, ilk olarak daha yüksek RoCoF ve daha dar frekans nadiri marjı şeklinde görünür. Bununla birlikte aynı işletme koşulları kısa devre gücü, gerilim toparlanması, dönüştürücü etkileşimleri ve denetim kararlılığı için de önem taşıyabilir. Zayıf şebekede çalışan inverterler; akım limiti, PLL davranışı, gerilim desteği ve diğer denetleyicilerle etkileşim nedeniyle frekans grafiğinde görünmeyen ek riskler yaratabilir.
 
-- Ekli kaynak: `gridfreq-renewable-penetration-report.pdf`
+Bu yüzden frekans performansı ile gerilim/fault dayanımı aynı çalışma başlığı altında fakat farklı teknik araçlarla incelenmelidir. Hızlı aktif güç tepkisi nadiri iyileştirebilir; ancak tek başına yeterli kısa devre gücü, gerilim desteği veya koordineli koruma sağlamaz. Çözüm seti, senkron kapasite, depolama, şebeke oluşturan denetim, iletim güçlendirmesi ve işletme rezervlerini birlikte içeren bir portföy olmalıdır.
 
-- Ekli kaynak: `gridfreq-technical-manual.pdf`
+## GridFreq ile ne gözlemlenebilir?
 
+GridFreq, olaylar arasındaki RoCoF, nadir, toparlanma süresi ve düşük frekanslı davranış farklarını karşılaştırmaya imkân verir. Benzer boyuttaki aday olaylarda ilk eğimin zaman içinde değişmesi, daha ayrıntılı işletme analizi için işaret olabilir. Fakat olay büyüklüğü, başlangıç frekansı ve rezerv koşulları bilinmeden bu farklılık doğrudan atalet değişimi olarak etiketlenemez.
 
-> GridFreq bağımsız bir analiz platformudur; metin resmî sistem işletmecisi görüşü değildir.
+En sağlam çıkarım, tek bir teknolojinin üstünlüğünü ilan etmek değil; fiziksel tampon, hızlı denetim, enerji sürdürülebilirliği ve işletme koordinasyonunun birlikte tasarlanması gerektiğidir. Enerji dönüşümü frekans güvenliğini basitleştirmez; değerlendirilmesi gereken dinamik değişkenlerin sayısını artırır.
+
+## Planlama ile gerçek zamanlı işletme arasındaki köprü
+
+Planlama çalışmaları, olası üretim bileşimleri ve arıza senaryoları altında hangi güvenlik marjının gerekli olabileceğini gösterir. Gerçek zamanlı işletme ise bu varsayımların o anki karşılığını izler: çevrim içi senkron kapasite, yük seviyesi, enterkonneksiyon programı, batarya SOC’si ve kullanılabilir rezerv değişkendir. Aynı modelin iki farklı işletme anında farklı sonuç vermesi bu nedenle tutarsızlık değil, sistemin dinamik doğasıdır.
+
+Dinamik güvenlik kısıtları, bu bağı planlama ve işletme arasında kurabilir. Amaç yenilenebilir üretimi tek bir sabit yüzdeye kadar sınırlamak değil; yeterli atalet, baş boşluğu, gerilim dayanımı ve denetim koordinasyonu bulunduğunda esnek işletmeye izin vermektir. Bu çerçeve, enerji dönüşümünü frekans güvenliğinin karşıtı değil, daha ayrıntılı mühendislik gerektiren bir tasarım problemi olarak ele alır.

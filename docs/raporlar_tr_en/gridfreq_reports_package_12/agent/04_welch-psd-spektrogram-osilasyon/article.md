@@ -53,34 +53,38 @@ Welch PSD tüm analiz aralığının ortalama spektral imzasını verir; ancak s
 Grafikte yatay eksen zaman, dikey eksen salınım frekansı, renk/yoğunluk ise spektral güçtür. Böylece bir modun günün hangi saatinde başladığı, güçlendiği ve söndüğü görülebilir.
 
 
-## “Tepe gördüm, arıza var” demeden önce
+## Örnekleme hızı hangi salınımları görmemize izin verir?
 
-Spektral tepe tek başına kararsızlık kanıtı değildir. Yük döngüleri, AGC davranışı, saatlik piyasa geçişleri veya veri işleme artefaktları da tepe üretebilir. Bir adayın önemini değerlendirmek için süreklilik, genlik, damping (sönümleme), farklı ölçüm noktalarındaki koherens ve olayla zaman ilişkisi birlikte incelenmelidir.
+Spektral yorumun ilk sınırı veri çözünürlüğüdür. GridFreq’in temel tarihsel frekans serileri 1 saniye örnekleme frekansıyla işlenir; bu durumda örnekleme frekansı 1 Hz, Nyquist sınırı 0,5 Hz’tir. Dolayısıyla yaklaşık 0,5 Hz üzerindeki gerçek sinyal bileşenleri bu seriyle güvenilir biçimde incelenemez. Nyquist sınırına çok yaklaşan sonuçlar da filtre, yeniden örnekleme ve sınırlı veri uzunluğuna karşı hassastır.
 
-GridFreq kaynakları 0.1-0.8 Hz civarını bölgeler arası (inter-area) ve yaklaşık 0.8-2 Hz aralığını yerel (local) salınımlar için tipik mühendislik aralıkları olarak ele alır. Bunlar katı sınırlar değil, başlangıç sınıflandırmasıdır.
+Bu sınır, 0,8–2 Hz gibi daha yüksek frekanslı yerel elektromekanik modların 1 saniyelik veriden teşhis edilebileceği anlamına gelmez. Bu tür çalışmalar için PMU, disturbance recorder veya daha yüksek hızlı SCADA/ölçüm kaynakları gerekir. Düşük örneklemeli seride görünen bir tepe, daha yüksek frekanslı fiziksel davranışın aliasing etkisiyle farklı bir banda taşınmış görünümü de olabilir. Bu nedenle analiz bandı, kaynak verinin örnekleme hızına göre açıkça sınırlandırılmalıdır.
 
+## Welch PSD’nin arkasındaki mühendislik mantığı
 
+Welch yöntemi, kayıt uzunluğunu üst üste binebilen segmentlere ayırır. Her segmentte ortalamadan arındırma ve bir pencere uygulanır; ardından güç spektrumu hesaplanır ve segment sonuçları ortalanır. Segmentleme, tek bir kısa zaman aralığının rastlantısal davranışına aşırı bağımlılığı azaltır. Örtüşme, aynı veri boyunca daha çok gözlem kullanarak kestirimin kararlılığını artırabilir; ancak birbirinden bağımsız yeni bilgi üretmez.
 
-## PowerPoint içeriğiyle genişletilmiş okuma: algoritma haritası
+Pencereleme, sonlu bir kayıt parçasının başı ve sonu arasındaki süreksizliği azaltır. Spektral sızıntı, fiziksel olarak yeni bir mod değil, sonlu gözlem penceresinin enerjiyi komşu frekans kutularına dağıtmasıdır. Ortalama alma varyansı düşürür ve tekrar eden bileşenleri daha görünür kılar; bunun karşılığında segment uzunluğu kısaldıkça frekans çözünürlüğü azalır. Bu nedenle segment boyu, örtüşme ve pencere seçimi raporlanmadan iki PSD eğrisinin doğrudan karşılaştırılması doğru değildir.
 
-Analiz Laboratuvarı sunumunda zaman uzayı (time domain / zaman alanı) ile frekans uzayı (frequency domain / frekans alanı) araçları aynı harita üzerinde gösteriliyor. Temel istatistikler, bant ihlali tespiti ve RoCoF aynı tarafta yer alırken; Welch PSD, spektrogram, koherens ve salınım adayı tespiti diğer tarafta konumlandırılıyor. Bu şema, yöntemler arasındaki ilişkiyi çok daha net hâle getirir.
+![Zaman alanı, spektral analiz ve karşılaştırmalı inceleme arasındaki ilişki](images/ppt_context.png)
 
-Böylece okuyucu hangi soruda hangi araca gitmesi gerektiğini daha iyi anlar: “ani olay var mı?” için RoCoF, “tekrarlı periyodik davranış var mı?” için PSD, “zaman içinde mod ne zaman güçleniyor?” için spektrogram, “iki nokta aynı modu paylaşıyor mu?” için koherens kullanılmalıdır.
+## Spektrogramın eklediği zaman bağlamı
 
-![Algoritma haritası](images/ppt_context.png)
+PSD, analiz aralığı boyunca **hangi frekanslarda enerji bulunduğu** sorusuna cevap verir. Spektrogram ise aynı hesabı kayan pencerelerde yaparak **bu enerji ne zaman ortaya çıktı** sorusuna yaklaşır. Bir tepenin sadece belirli bir olaydan sonra görünmesi, düzenli olarak günün aynı saatinde yinelenmesi veya tüm gün boyunca kalması farklı mühendislik yorumları gerektirir.
 
-## Ağır hesaplamaların arka planda çalıştırılması neden önemlidir?
+Pencere süresi burada da ödünleşim yaratır. Uzun pencere frekans çözünürlüğünü artırırken kısa süreli değişimlerin zamanını bulanıklaştırır; kısa pencere ise değişimin zamanını daha iyi gösterir fakat frekansları daha kaba ayırır. Renk ölçeği ve normalizasyon seçimi de zayıf yapıların görünürlüğünü etkilediği için sonuçla birlikte saklanmalıdır.
 
-Sunumlarda Web Worker (tarayıcı içi arka plan iş parçacığı) vurgusu da bulunuyor. Bunun mühendislik karşılığı şudur: PSD veya koherens gibi nispeten ağır işlemler arayüzü kilitlemeden çalıştırılabilir. Bu da GridFreq’i sadece bir rapor ekranı değil, etkileşimli bir laboratuvar hâline getirir.
+## Bir PSD tepesini hemen “salınım modu” kabul etmemek
 
+Spektral tepe tek başına kararsızlık veya fiziksel mod kanıtı değildir. Veri boşlukları, örnek tutarsızlığı, yeniden örnekleme, filtre artefaktı ve ölçüm sistemindeki periyodik davranışlar tepe üretebilir. Saatlik ya da dakikalık piyasa, yük ve denetim döngüleri de frekans serisinde tekrar eden bileşenler oluşturabilir. Aday davranışın sürekliliği, farklı kaynaklarda tutarlılığı, olayla zaman ilişkisi ve mümkünse daha yüksek çözünürlüklü ölçümlerle uyumu birlikte aranmalıdır.
 
-## Kaynaklar ve editoryal not
+GridFreq, zaman alanındaki olay adaylarıyla PSD ve spektrogram bulgularını yan yana getirmeyi destekler. Bu yaklaşım, hangi zaman aralıklarının ayrıntılı ölçüm kaydıyla incelenmesi gerektiğini görünür kılar. Platformtaki 1 saniyelik tarihsel seriden yüksek frekanslı yerel mod, milisaniyelik etkileşim veya kesin kök neden çıkarıldığı iddia edilmemelidir.
 
-Bu metin, kullanıcı tarafından sağlanan GridFreq teknik dokümanları temel alınarak hazırlanmıştır. Simülasyon sonuçları model/senaryo bağımlı olarak ifade edilmiştir; mevzuatla ilgili kritik noktalar güncel TEİAŞ/ENTSO-E kaynaklarıyla karşılaştırılmıştır.
+## Analizi doğru soruyla başlatmak
 
-- Ekli kaynak: `gridfreq-spectral-analysis-report.pdf`
+Ani bir değişim için zaman serisi, minimum/maksimum ve RoCoF; tekrarlayan düşük frekanslı davranış için PSD; zamanla değişen periyodiklik için spektrogram; iki seri arasındaki ortaklık için koherens uygundur. Araçlar aynı olguyu farklı açılardan gösterir. Güvenilir bir sonuç, tek bir parlak tepeye değil, veri kalitesi ve fiziksel bağlamla uyumlu birden çok göstergeye dayanır.
 
-- Ekli kaynak: `gridfreq-technical-manual.pdf`
+## Parametreleri değiştirmek sonucu neden değiştirir?
 
+Analiz penceresinin başlangıç ve bitişi, ortalamadan arındırma yöntemi, segment uzunluğu, örtüşme, pencere fonksiyonu ve güç ölçeği PSD’nin görünümünü değiştirebilir. Bu değişim tek başına hataya işaret etmez; kestirimin hangi soruya göre ayarlandığını gösterir. Kısa süreli aday davranış aranıyorsa zaman yerelleştirmesi, uzun dönemli istatistik aranıyorsa frekans çözünürlüğü daha ağır basabilir.
 
-> GridFreq bağımsız bir analiz platformudur; metin resmî sistem işletmecisi görüşü değildir.
+Karşılaştırmalı incelemede aynı parametrelerin iki seri için korunması önemlidir. Aksi hâlde iki tepe arasındaki farkın şebeke davranışından mı yoksa hesap ayarından mı doğduğu belirsizleşir. Özellikle 1 saniyelik serilerde analiz bandı Nyquist sınırının güvenli alt bölgesiyle sınırlanmalı; daha yüksek modlar için sonuç üretmek yerine uygun ölçüm kaynağı istenmelidir.

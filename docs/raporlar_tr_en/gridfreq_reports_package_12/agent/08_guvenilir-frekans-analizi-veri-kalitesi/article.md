@@ -60,34 +60,28 @@ Central difference (merkezî fark) en basit RoCoF yöntemidir fakat gürültüye
 Bu yüzden raporda yalnızca “maksimum RoCoF” değil; kullanılan örnekleme aralığı, filtre/pencere uzunluğu ve hesaplama yöntemi de verilmelidir. Aynı veri farklı filtrelerle farklı tepe değerleri üretebilir.
 
 
-## Tekrar üretilebilir analiz
+## Veri kalitesi bayrakları nasıl düşünülmeli?
 
-Agent veya RAG (bilgi geri çağırma) sistemi için en değerli çıktı, yalnızca sonuç paragrafı değil; veri kaynağı, zaman aralığı, parametreler, kullanılan görsel dosyaları ve varsa düzeltme notlarını içeren yapılandırılmış metadata (üst veri) paketidir.
+Kalite bayrağı, veriyi otomatik olarak yok sayan bir hüküm değil, analitik kararın girdisidir. **VALID**, zaman ve değer kontrollerini geçen örneği; **MISSING**, beklenen anda hiç kayıt bulunmadığını belirtir. **DUPLICATE**, aynı zaman damgasının birden çok kez gelmesi veya açıkça yinelenen kayıt yapısıdır. **FROZEN**, ölçümün olağandışı süre boyunca değişmeden kalması şüphesini taşır. **SPIKE**, komşu örneklerle uyumsuz ani sıçramayı; **OPERATIONAL OUTLIER**, normal işletme bandının dışındaki fakat fiziksel olarak mümkün olabilecek değeri; **PHYSICAL INVALID** ise ölçüm sisteminin güvenilir aralığıyla bağdaşmayan değeri temsil eder.
 
-Bu nedenle bu GridFreq içerik paketinde her makale için Markdown metin, metadata.json, ayrı yüksek çözünürlüklü görseller ve kaynak haritası birlikte verilmiştir.
+Bu sınıflar birbirine karıştırılmamalıdır. Bir örnek operasyon bandının dışındaysa, ciddi bir olayın ilk işareti olabilir; fiziksel olarak geçersiz olduğu kanıtlanmış değildir. Buna karşılık zaman damgası bozuk bir kayıt, frekans değeri makul görünse bile türev ve eşleme hesaplarını bozabilir.
 
+## 49–51 Hz bandını analitik bağlamında okumak
 
+49–51 Hz gibi bir bandın operasyonel kalite kontrolünde ve aykırı değer işaretlemede kullanılması pratiktir. Ancak ağır frekans olaylarının ham veriden otomatik silinmesi, tam da incelenmesi gereken fiziksel davranışın kaybolmasına yol açabilir. Analitik olarak daha güvenli yaklaşım, ham ölçümü korumak; normal çalışma bandı dışındaki kaydı bayraklamak; değerlendirme ve görselleştirmede bu bayrağı görünür kılmaktır.
 
-## PowerPoint içeriğiyle genişletilmiş okuma: interpolasyonsuz veri ilkesi
+Mevcut uygulama davranışı, belirli değer aralıklarını kalite hesabında geçersiz olarak işaretleyebilir. Bu metindeki önerilen analitik yaklaşım ise bu işaretin, olay araştırmasında ham kaydın geri döndürülemez biçimde silinmesi anlamına gelmemesidir. Hangi değerlerin fiziksel olarak imkânsız sayılacağı; ölçüm cihazının aralığı, kalibrasyonu ve bağımsız kayıtlarla değerlendirilmelidir.
 
-Analiz Laboratuvarı sunumu, veri kalitesine yaklaşımın en kritik ilkesini çok açık biçimde özetliyor: eksik örnekler “uydurulmaz”, boşluklar gizlenmez ve kalite sorunu olan veri analitik katmanda ayrı biçimde taşınır. Bu ilke özellikle RoCoF ve zaman sapması gibi metriklerde yapay sonuçları önler.
+![Eksik, yinelenen ve aykırı kayıtların analiz güvenilirliğine etkisi](images/ppt_context.png)
 
-Ayrıca yinelenen zaman damgaları, 49–51 Hz dışındaki aykırı değerler ve beklenmeyen zaman boşlukları kalite skorunu etkileyen olaylar olarak ele alınır. Bu yaklaşım sayesinde kullanıcı, yalnızca analizin sonucunu değil, sonucun ne kadar güvenilir olduğunu da görebilir.
+## Donmuş değer kararlı şebeke kanıtı değildir
 
-![Veri kalitesi görseli](images/ppt_context.png)
+Tam olarak 50.000 Hz gibi tekrar eden kayıtlar, tek başına donmuş sensörü kanıtlamaz. Kaynağın çözünürlüğü, kayıt süresi, çevredeki örneklerin davranışı, başka bir ölçüm noktası ve olay bağlamı birlikte incelenmelidir. Kısa bir tekrar dizisi kuantizasyonun doğal sonucu olabilir; uzun ve kusursuz tekrar ise telemetri veya veri işleme sorununa işaret edebilir. Bu nedenle FROZEN bayrağı bir araştırma çağrısıdır, kesin tanı değildir.
 
-## Neden ikili (binary) optimizasyon da bir kalite meselesidir?
+## RoCoF neden kalite hatalarına çok hassastır?
 
-Sunumlarda anlatılan int16 tabanlı sıkıştırma ve -32768 ile eksik veri işaretleme yaklaşımı yalnızca performans için değildir. Aynı zamanda eksik veriyi “ortalama ile doldurma” gibi analizi bozabilecek müdahalelerden kaçınmanın bir yoludur. Kısacası veri mühendisliği kararı, sonuçların teknik güvenilirliğinin bir parçasıdır.
+RoCoF türev tabanlıdır; zaman aralığındaki küçük hata bile eğimi değiştirir. Zaman damgası kayması, eksik örneğin yanlış doldurulması, tekil spike, ölçüm gürültüsü ve filtre seçimi maksimum RoCoF’u önemli ölçüde etkileyebilir. Merkezî fark, hareketli ortalama veya kayan regresyon kullanılması yalnızca algoritma tercihi değildir; her biri gürültü bastırma ile hızlı değişimi koruma arasında farklı bir denge kurar.
 
+Bu nedenle bir RoCoF sonucu; örnekleme aralığı, kullanılan pencere, filtre, eksik veri politikası ve bayraklanan kayıt sayısından bağımsız raporlanmamalıdır. GridFreq bu bağlamı görünür kılmaya ve aday sorunlu aralıkları ayırmaya yardımcı olur; ölçüm zincirindeki kesin arıza tanısı için kaynağın ham telemetrisi ve cihaz bilgisi gerekir.
 
-## Kaynaklar ve editoryal not
-
-Bu metin, kullanıcı tarafından sağlanan GridFreq teknik dokümanları temel alınarak hazırlanmıştır. Simülasyon sonuçları model/senaryo bağımlı olarak ifade edilmiştir; mevzuatla ilgili kritik noktalar güncel TEİAŞ/ENTSO-E kaynaklarıyla karşılaştırılmıştır.
-
-- Ekli kaynak: `gridfreq-technical-manual.pdf`
-
-- Ekli kaynak: `gridfreq-technical-manual (1).pdf`
-
-
-> GridFreq bağımsız bir analiz platformudur; metin resmî sistem işletmecisi görüşü değildir.
+Veri kalitesine yapılan yatırım, daha karmaşık bir algoritmadan önce gelir. Güvenilir analiz, olağandışı kaydı saklayan, neden şüpheli olduğunu açıkça belirten ve sonucu bu belirsizlikle birlikte yorumlayan analizdir.
