@@ -1,32 +1,33 @@
 {
-  "updatedAtUtc": "2026-08-25T16:06:20Z",
-  "lastWorkflowResult": "success",
-  "lastSuccessfulTeiasCheckUtc": "2026-08-25T16:00:40Z",
-  "lastSuccessfulTeiasDataDate": "2026-08-22",
+  "updatedAtUtc": "2026-08-26T08:00:54Z",
+  "lastWorkflowResult": "failed",
+  "lastSuccessfulTeiasCheckUtc": "2026-08-26T08:00:05Z",
+  "lastSuccessfulTeiasDataDate": "2026-08-23",
   "lastTeiasLookback": [
-    "2026-08-23",
-    "2026-08-24",
-    "2026-08-25"
+    "2026-08-26"
   ],
-  "missingDayCount": 3,
+  "missingDayCount": 1,
   "qualityWarnings": [],
-  "lastErrorMessage": null,
-  "lastErrorAtUtc": null,
+  "lastErrorMessage": "Run tests failed. See workflow run.",
+  "lastErrorAtUtc": "2026-08-26T08:00:54Z",
   "lastSuccessfulNetztransparenzDataDate": "2026-08-24",
   "teiasDataDelayDays": 3,
   "revisionDates": [],
-  "lastRunAt": "2026-08-25T16:00:40Z",
-  "lastSuccessfulRunAt": "2026-08-25T16:00:40Z",
-  "lastFailedRunAt": "2026-08-24T08:05:08Z",
-  "lastSuccessfulDataDate": "2026-08-22",
-  "lastAttemptedDataDate": "2026-08-25",
-  "status": "success",
+  "lastRunAt": "2026-08-26T08:00:54Z",
+  "lastSuccessfulRunAt": "2026-08-26T08:00:05Z",
+  "lastFailedRunAt": "2026-08-26T08:00:54Z",
+  "lastSuccessfulDataDate": "2026-08-23",
+  "lastAttemptedDataDate": "2026-08-26",
+  "status": "failed",
   "missingDates": [
-    "2026-08-23",
-    "2026-08-24",
-    "2026-08-25"
+    "2026-08-26"
   ],
-  "lastError": null,
+  "lastError": {
+    "step": "Run tests",
+    "message": "Run tests failed. See workflow run.",
+    "httpStatus": null,
+    "retryCount": 3
+  },
   "netztransparenz": {
     "lastRunAt": "2026-08-25T16:06:20Z",
     "lastSuccessfulRunAt": "2026-08-25T16:06:20Z",
