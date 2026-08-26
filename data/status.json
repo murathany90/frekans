@@ -1,33 +1,32 @@
 {
-  "updatedAtUtc": "2026-08-26T08:00:54Z",
-  "lastWorkflowResult": "failed",
-  "lastSuccessfulTeiasCheckUtc": "2026-08-26T08:00:05Z",
+  "updatedAtUtc": "2026-08-26T09:57:12Z",
+  "lastWorkflowResult": "success",
+  "lastSuccessfulTeiasCheckUtc": "2026-08-26T09:57:12Z",
   "lastSuccessfulTeiasDataDate": "2026-08-23",
   "lastTeiasLookback": [
+    "2026-08-24",
+    "2026-08-25",
     "2026-08-26"
   ],
-  "missingDayCount": 1,
+  "missingDayCount": 3,
   "qualityWarnings": [],
-  "lastErrorMessage": "Run tests failed. See workflow run.",
-  "lastErrorAtUtc": "2026-08-26T08:00:54Z",
+  "lastErrorMessage": null,
+  "lastErrorAtUtc": null,
   "lastSuccessfulNetztransparenzDataDate": "2026-08-24",
   "teiasDataDelayDays": 3,
   "revisionDates": [],
-  "lastRunAt": "2026-08-26T08:00:54Z",
-  "lastSuccessfulRunAt": "2026-08-26T08:00:05Z",
+  "lastRunAt": "2026-08-26T09:57:12Z",
+  "lastSuccessfulRunAt": "2026-08-26T09:57:12Z",
   "lastFailedRunAt": "2026-08-26T08:00:54Z",
   "lastSuccessfulDataDate": "2026-08-23",
   "lastAttemptedDataDate": "2026-08-26",
-  "status": "failed",
+  "status": "success",
   "missingDates": [
+    "2026-08-24",
+    "2026-08-25",
     "2026-08-26"
   ],
-  "lastError": {
-    "step": "Run tests",
-    "message": "Run tests failed. See workflow run.",
-    "httpStatus": null,
-    "retryCount": 3
-  },
+  "lastError": null,
   "netztransparenz": {
     "lastRunAt": "2026-08-25T16:06:20Z",
     "lastSuccessfulRunAt": "2026-08-25T16:06:20Z",
