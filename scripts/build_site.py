@@ -11,6 +11,7 @@ if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from scripts.normalize_frequency import build_manifest
+from scripts.build_reports_pdf import generate_reports_pdfs
 from scripts.validate_frequency import validate_data_root, write_storage_report
 
 CUSTOM_DOMAIN = "gridfreq.com"
@@ -96,6 +97,7 @@ def build_site(data_root: Path = Path("data"), dist_root: Path = Path("dist"), r
         shutil.copy2("index.html", dist_root / "source-index.html")
     copy_domain_files(dist_root, require_domain_files=bool(require_domain_files))
     copy_tree(Path("assets"), dist_root / "assets")
+    generate_reports_pdfs(REPORTS_PACKAGE)
     copy_reports_package(dist_root)
     build_manifest(data_root)
     copy_tree(data_root, dist_root / "data")

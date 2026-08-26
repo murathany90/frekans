@@ -31,7 +31,7 @@ Bu yüzden yenilenebilir üretim arttığında aynı anda çok sayıda senkron �
 
 ## Yenilenebilir yüzdesi tek başına kararlılık sınırı değildir
 
-Ekli DIgSILENT PowerFactory senaryosu %15, %20 ve %30 yenilenebilir penetrasyonlarını karşılaştırıyor ve daha yüksek penetrasyonda daha ağır salınımlar gösteriyor. Bu sonuç, kullanılan model, hangi senkron jeneratörlerin devreden çıkarıldığı, yük seviyesi, ağ topolojisi, AVR/PSS ayarları ve yenilenebilir kontrol modelleri için geçerlidir.
+İncelenen DIgSILENT PowerFactory senaryolarında %15, %20 ve %30 yenilenebilir üretim payları karşılaştırılmıştır. Bu sonuçlar modele ve işletme varsayımlarına özgüdür; Türkiye sistemi için evrensel penetrasyon sınırları olarak yorumlanmamalıdır. Hangi senkron jeneratörlerin devreden çıkarıldığı, yük seviyesi, ağ topolojisi, AVR/PSS ayarları ve yenilenebilir kontrol modelleri sonuçları doğrudan etkiler.
 
 Bu nedenle “Türkiye %20’nin üzerinde kararsız olur” gibi bir genelleme teknik olarak doğru değildir. Gerçek işletme sınırı anlık inertia (atalet), short-circuit strength (kısa devre gücü), reserve availability (rezerv mevcudiyeti), transfer seviyeleri ve inverter kontrol özelliklerinin birleşimidir.
 

@@ -48,7 +48,7 @@ Ancak sabit bir 15 saniye eşiğini her cihaz ve veri kaynağı için evrensel k
 
 ## Frekans aralığı kontrolü: “imkânsız” ile “acil durum” aynı şey değildir
 
-Kaynak teknik rehberde 49-51 Hz dışındaki değerlerin geçersiz olarak işaretlenmesi önerisi bulunur. Bu, normal gün veri temizliği için pratik olabilir ancak fiziksel olarak 49 Hz altı veya 51 Hz üstü değerler ağır sistem olaylarında mümkündür.
+Operasyonel kalite kontrolünde 49-51 Hz dışındaki değerler geçersiz olarak işaretlenebilir. Bu, normal gün veri temizliği için pratik olabilir ancak fiziksel olarak 49 Hz altı veya 51 Hz üstü değerler ağır sistem olaylarında mümkündür.
 
 Daha güvenli yaklaşım hard reject (kesin silme) yerine iki kademeli kontroldür: cihazın fiziksel ölçüm aralığının dışındaki değerleri geçersiz saymak; 49-51 Hz gibi operasyonel bandın dışındakileri ise “olağandışı / olay adayı” olarak işaretleyip ham veriyi korumak.
 

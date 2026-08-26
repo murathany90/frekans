@@ -57,7 +57,7 @@ Bu hizmetlerin kontrol tasarımı klasik droop (hız eğimi) denetiminden farkl�
 
 Batarya frekans hizmeti verirken çok sayıda küçük şarj-deşarj döngüsü yaşar. Bu döngüler cycle aging (döngüsel yaşlanma), yüksek SOC’de uzun bekleme ise calendar aging (takvim yaşlanması) üzerinde etkili olabilir.
 
-Optimum kontrol yalnızca en yüksek yan hizmet gelirini değil; hücre sıcaklığını, SOC aralığını, derin deşarjı, verimi ve uzun vadeli kapasite kaybını da hesaba katmalıdır. Kaynak teknik rehber, deadband (ölü bant), depth of discharge - DOD (deşarj derinliği) ve SOC hedefinin çok kriterli optimizasyonla birlikte seçilmesini önerir.
+Optimum kontrol yalnızca en yüksek yan hizmet gelirini değil; hücre sıcaklığını, SOC aralığını, derin deşarjı, verimi ve uzun vadeli kapasite kaybını da hesaba katmalıdır. Deadband (ölü bant), deşarj derinliği (DOD) ve SOC hedefi; kullanılabilir rezerv, hizmet gereklilikleri ve batarya yaşlanması birlikte değerlendirilerek belirlenmelidir.
 
 
 
