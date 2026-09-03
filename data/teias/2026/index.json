@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "source": "teias",
   "year": 2026,
-  "updatedAtUtc": "2026-09-02T18:52:47Z",
+  "updatedAtUtc": "2026-09-03T12:07:30Z",
   "availableDates": [
     "2026-01-01",
     "2026-01-02",
@@ -242,7 +242,8 @@
     "2026-08-27",
     "2026-08-28",
     "2026-08-29",
-    "2026-08-30"
+    "2026-08-30",
+    "2026-08-31"
   ],
   "excludedDates": [
     "2026-05-08",
@@ -3833,6 +3834,21 @@
         "minute": "teias/2026/08/20260830.minute.json",
         "hourly": "teias/2026/08/20260830.hourly.json",
         "meta": "teias/2026/08/20260830.meta.json"
+      }
+    },
+    "2026-08-31": {
+      "date": "2026-08-31",
+      "timezone": "Europe/Istanbul",
+      "status": "complete",
+      "qualityScore": 100,
+      "sha256": "6d269fdcc53aba010eb5382683e7efd72e26ff66a80abb8c8ccf9e4c0af995b2",
+      "expectedSamples": 86400,
+      "validSamples": 86400,
+      "files": {
+        "frequency": "teias/2026/08/20260831.frequency.i16",
+        "minute": "teias/2026/08/20260831.minute.json",
+        "hourly": "teias/2026/08/20260831.hourly.json",
+        "meta": "teias/2026/08/20260831.meta.json"
       }
     }
   },
