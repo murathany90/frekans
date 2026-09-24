@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAtUtc": "2026-09-23T19:09:41Z",
+  "updatedAtUtc": "2026-09-24T12:45:22Z",
   "storage": {
     "type": "github-pages",
     "baseUrl": "./data"
@@ -22782,7 +22782,7 @@
       "label": "TEİAŞ",
       "timezone": "Europe/Istanbul",
       "firstDate": "2024-01-01",
-      "latestDate": "2026-09-20",
+      "latestDate": "2026-09-21",
       "availableDates": [
         "2024-01-01",
         "2024-01-02",
@@ -23774,7 +23774,8 @@
         "2026-09-17",
         "2026-09-18",
         "2026-09-19",
-        "2026-09-20"
+        "2026-09-20",
+        "2026-09-21"
       ],
       "excludedDates": [
         "2026-05-08",
@@ -38646,6 +38647,21 @@
             "hourly": "teias/2026/09/20260920.hourly.json",
             "meta": "teias/2026/09/20260920.meta.json"
           }
+        },
+        "2026-09-21": {
+          "date": "2026-09-21",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "e1afd6b2ced5999e64e5d4210f1497acce570e5b26148c18a6692d38a701d8e6",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/09/20260921.frequency.i16",
+            "minute": "teias/2026/09/20260921.minute.json",
+            "hourly": "teias/2026/09/20260921.hourly.json",
+            "meta": "teias/2026/09/20260921.meta.json"
+          }
         }
       },
       "status": "active",
@@ -44595,6 +44611,12 @@
           "minute": "teias/2026/09/20260920.minute.json",
           "hourly": "teias/2026/09/20260920.hourly.json",
           "meta": "teias/2026/09/20260920.meta.json"
+        },
+        "2026-09-21": {
+          "frequency": "teias/2026/09/20260921.frequency.i16",
+          "minute": "teias/2026/09/20260921.minute.json",
+          "hourly": "teias/2026/09/20260921.hourly.json",
+          "meta": "teias/2026/09/20260921.meta.json"
         }
       }
     }
