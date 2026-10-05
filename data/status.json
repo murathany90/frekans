@@ -1,34 +1,30 @@
 {
-  "updatedAtUtc": "2026-10-04T18:41:56Z",
+  "updatedAtUtc": "2026-10-05T16:00:56Z",
   "lastWorkflowResult": "success",
-  "lastSuccessfulTeiasCheckUtc": "2026-10-04T18:38:44Z",
-  "lastSuccessfulTeiasDataDate": "2026-09-29",
+  "lastSuccessfulTeiasCheckUtc": "2026-10-05T16:00:56Z",
+  "lastSuccessfulTeiasDataDate": "2026-10-02",
   "lastTeiasLookback": [
-    "2026-09-30",
-    "2026-10-01",
-    "2026-10-02",
     "2026-10-03",
-    "2026-10-04"
+    "2026-10-04",
+    "2026-10-05"
   ],
-  "missingDayCount": 5,
+  "missingDayCount": 3,
   "qualityWarnings": [],
   "lastErrorMessage": null,
   "lastErrorAtUtc": null,
   "lastSuccessfulNetztransparenzDataDate": "2026-10-03",
-  "teiasDataDelayDays": 5,
+  "teiasDataDelayDays": 3,
   "revisionDates": [],
-  "lastRunAt": "2026-10-04T18:38:44Z",
-  "lastSuccessfulRunAt": "2026-10-04T18:38:44Z",
+  "lastRunAt": "2026-10-05T16:00:56Z",
+  "lastSuccessfulRunAt": "2026-10-05T16:00:56Z",
   "lastFailedRunAt": "2026-08-26T08:00:54Z",
-  "lastSuccessfulDataDate": "2026-09-29",
-  "lastAttemptedDataDate": "2026-10-04",
+  "lastSuccessfulDataDate": "2026-10-02",
+  "lastAttemptedDataDate": "2026-10-05",
   "status": "success",
   "missingDates": [
-    "2026-09-30",
-    "2026-10-01",
-    "2026-10-02",
     "2026-10-03",
-    "2026-10-04"
+    "2026-10-04",
+    "2026-10-05"
   ],
   "lastError": null,
   "netztransparenz": {
