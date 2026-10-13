@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAtUtc": "2026-10-13T15:05:12Z",
+  "updatedAtUtc": "2026-10-13T15:12:32Z",
   "storage": {
     "type": "github-pages",
     "baseUrl": "./data"
@@ -10,7 +10,7 @@
       "label": "Netztransparenz",
       "timezone": "Europe/Berlin",
       "firstDate": "2024-01-01",
-      "latestDate": "2026-10-11",
+      "latestDate": "2026-10-12",
       "availableDates": [
         "2024-01-01",
         "2024-01-02",
@@ -1026,7 +1026,8 @@
         "2026-10-08",
         "2026-10-09",
         "2026-10-10",
-        "2026-10-11"
+        "2026-10-11",
+        "2026-10-12"
       ],
       "excludedDates": [],
       "days": {
@@ -17119,6 +17120,22 @@
             "meta": "netztransparenz/2026/10/20261011.meta.json"
           },
           "sourceMethod": "official_zip"
+        },
+        "2026-10-12": {
+          "date": "2026-10-12",
+          "timezone": "Europe/Berlin",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "a10144fc789d06fe5436fd1fa031474461111bf768c851c2cb2206700efb6a7d",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "netztransparenz/2026/10/20261012.frequency.i16",
+            "minute": "netztransparenz/2026/10/20261012.minute.json",
+            "hourly": "netztransparenz/2026/10/20261012.hourly.json",
+            "meta": "netztransparenz/2026/10/20261012.meta.json"
+          },
+          "sourceMethod": "official_zip"
         }
       },
       "status": "automatic_update",
@@ -23212,6 +23229,12 @@
           "minute": "netztransparenz/2026/10/20261011.minute.json",
           "hourly": "netztransparenz/2026/10/20261011.hourly.json",
           "meta": "netztransparenz/2026/10/20261011.meta.json"
+        },
+        "2026-10-12": {
+          "frequency": "netztransparenz/2026/10/20261012.frequency.i16",
+          "minute": "netztransparenz/2026/10/20261012.minute.json",
+          "hourly": "netztransparenz/2026/10/20261012.hourly.json",
+          "meta": "netztransparenz/2026/10/20261012.meta.json"
         }
       }
     },
