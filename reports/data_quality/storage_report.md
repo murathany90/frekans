@@ -1,6 +1,6 @@
 # Storage Report
 
-- Data bytes: 767040790
+- Data bytes: 767040800
 - Data MiB: 731.51
 - Issue count: 0
 - Warning count: 3
