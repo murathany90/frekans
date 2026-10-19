@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "source": "teias",
   "year": 2026,
-  "updatedAtUtc": "2026-10-18T18:16:46Z",
+  "updatedAtUtc": "2026-10-19T14:41:55Z",
   "availableDates": [
     "2026-01-01",
     "2026-01-02",
@@ -286,7 +286,10 @@
     "2026-10-10",
     "2026-10-11",
     "2026-10-12",
-    "2026-10-13"
+    "2026-10-13",
+    "2026-10-14",
+    "2026-10-15",
+    "2026-10-16"
   ],
   "excludedDates": [
     "2026-05-08",
@@ -4537,6 +4540,51 @@
         "minute": "teias/2026/10/20261013.minute.json",
         "hourly": "teias/2026/10/20261013.hourly.json",
         "meta": "teias/2026/10/20261013.meta.json"
+      }
+    },
+    "2026-10-14": {
+      "date": "2026-10-14",
+      "timezone": "Europe/Istanbul",
+      "status": "partial",
+      "qualityScore": 96,
+      "sha256": "5f79969cdee7930d4777ae48f31c60afe9ee8d1f8b935e7357807794f36e2bd7",
+      "expectedSamples": 86400,
+      "validSamples": 82800,
+      "files": {
+        "frequency": "teias/2026/10/20261014.frequency.i16",
+        "minute": "teias/2026/10/20261014.minute.json",
+        "hourly": "teias/2026/10/20261014.hourly.json",
+        "meta": "teias/2026/10/20261014.meta.json"
+      }
+    },
+    "2026-10-15": {
+      "date": "2026-10-15",
+      "timezone": "Europe/Istanbul",
+      "status": "complete",
+      "qualityScore": 100,
+      "sha256": "dc8e54093a7abbadc09c442135cf3653901dd1a376b976307b7f9bc515ccb1d2",
+      "expectedSamples": 86400,
+      "validSamples": 86400,
+      "files": {
+        "frequency": "teias/2026/10/20261015.frequency.i16",
+        "minute": "teias/2026/10/20261015.minute.json",
+        "hourly": "teias/2026/10/20261015.hourly.json",
+        "meta": "teias/2026/10/20261015.meta.json"
+      }
+    },
+    "2026-10-16": {
+      "date": "2026-10-16",
+      "timezone": "Europe/Istanbul",
+      "status": "complete",
+      "qualityScore": 100,
+      "sha256": "a44bb9cc0b6df54429597d5de04da41c1597efb6f19d1b606fda3852292837cd",
+      "expectedSamples": 86400,
+      "validSamples": 86400,
+      "files": {
+        "frequency": "teias/2026/10/20261016.frequency.i16",
+        "minute": "teias/2026/10/20261016.minute.json",
+        "hourly": "teias/2026/10/20261016.hourly.json",
+        "meta": "teias/2026/10/20261016.meta.json"
       }
     }
   },
