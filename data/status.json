@@ -1,32 +1,34 @@
 {
-  "updatedAtUtc": "2026-10-24T18:15:29Z",
+  "updatedAtUtc": "2026-10-25T12:34:21Z",
   "lastWorkflowResult": "success",
-  "lastSuccessfulTeiasCheckUtc": "2026-10-24T15:57:28Z",
+  "lastSuccessfulTeiasCheckUtc": "2026-10-25T12:34:21Z",
   "lastSuccessfulTeiasDataDate": "2026-10-20",
   "lastTeiasLookback": [
     "2026-10-21",
     "2026-10-22",
     "2026-10-23",
-    "2026-10-24"
+    "2026-10-24",
+    "2026-10-25"
   ],
-  "missingDayCount": 4,
+  "missingDayCount": 5,
   "qualityWarnings": [],
   "lastErrorMessage": null,
   "lastErrorAtUtc": null,
   "lastSuccessfulNetztransparenzDataDate": "2026-10-23",
-  "teiasDataDelayDays": 4,
+  "teiasDataDelayDays": 5,
   "revisionDates": [],
-  "lastRunAt": "2026-10-24T15:57:28Z",
-  "lastSuccessfulRunAt": "2026-10-24T15:57:28Z",
+  "lastRunAt": "2026-10-25T12:34:21Z",
+  "lastSuccessfulRunAt": "2026-10-25T12:34:21Z",
   "lastFailedRunAt": "2026-08-26T08:00:54Z",
   "lastSuccessfulDataDate": "2026-10-20",
-  "lastAttemptedDataDate": "2026-10-24",
+  "lastAttemptedDataDate": "2026-10-25",
   "status": "success",
   "missingDates": [
     "2026-10-21",
     "2026-10-22",
     "2026-10-23",
-    "2026-10-24"
+    "2026-10-24",
+    "2026-10-25"
   ],
   "lastError": null,
   "netztransparenz": {
