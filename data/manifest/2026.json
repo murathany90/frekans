@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAtUtc": "2026-10-25T18:33:04Z",
+  "updatedAtUtc": "2026-10-26T14:17:31Z",
   "storage": {
     "type": "github-pages",
     "baseUrl": "./data"
@@ -6706,7 +6706,7 @@
       "label": "TEİAŞ",
       "timezone": "Europe/Istanbul",
       "firstDate": "2026-01-01",
-      "latestDate": "2026-10-20",
+      "latestDate": "2026-10-23",
       "availableDates": [
         "2026-01-01",
         "2026-01-02",
@@ -6997,7 +6997,10 @@
         "2026-10-17",
         "2026-10-18",
         "2026-10-19",
-        "2026-10-20"
+        "2026-10-20",
+        "2026-10-21",
+        "2026-10-22",
+        "2026-10-23"
       ],
       "excludedDates": [
         "2026-05-08",
@@ -11354,6 +11357,51 @@
             "hourly": "teias/2026/10/20261020.hourly.json",
             "meta": "teias/2026/10/20261020.meta.json"
           }
+        },
+        "2026-10-21": {
+          "date": "2026-10-21",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "98c27bc46b510d359b7ea67faf4f46f6e04024ff56fd64ef233b841a42c5db71",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/10/20261021.frequency.i16",
+            "minute": "teias/2026/10/20261021.minute.json",
+            "hourly": "teias/2026/10/20261021.hourly.json",
+            "meta": "teias/2026/10/20261021.meta.json"
+          }
+        },
+        "2026-10-22": {
+          "date": "2026-10-22",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "46da4f23cf6c84e873d47d40a7f44befe0afb3e6fe1f1450b4fb8529fc5156f8",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/10/20261022.frequency.i16",
+            "minute": "teias/2026/10/20261022.minute.json",
+            "hourly": "teias/2026/10/20261022.hourly.json",
+            "meta": "teias/2026/10/20261022.meta.json"
+          }
+        },
+        "2026-10-23": {
+          "date": "2026-10-23",
+          "timezone": "Europe/Istanbul",
+          "status": "complete",
+          "qualityScore": 100,
+          "sha256": "84164b664d05841caaee279a50ed895c61bf36ce5bbef0cbacb9fbcd4541cabd",
+          "expectedSamples": 86400,
+          "validSamples": 86400,
+          "files": {
+            "frequency": "teias/2026/10/20261023.frequency.i16",
+            "minute": "teias/2026/10/20261023.minute.json",
+            "hourly": "teias/2026/10/20261023.hourly.json",
+            "meta": "teias/2026/10/20261023.meta.json"
+          }
         }
       },
       "status": "active",
@@ -13097,6 +13145,24 @@
           "minute": "teias/2026/10/20261020.minute.json",
           "hourly": "teias/2026/10/20261020.hourly.json",
           "meta": "teias/2026/10/20261020.meta.json"
+        },
+        "2026-10-21": {
+          "frequency": "teias/2026/10/20261021.frequency.i16",
+          "minute": "teias/2026/10/20261021.minute.json",
+          "hourly": "teias/2026/10/20261021.hourly.json",
+          "meta": "teias/2026/10/20261021.meta.json"
+        },
+        "2026-10-22": {
+          "frequency": "teias/2026/10/20261022.frequency.i16",
+          "minute": "teias/2026/10/20261022.minute.json",
+          "hourly": "teias/2026/10/20261022.hourly.json",
+          "meta": "teias/2026/10/20261022.meta.json"
+        },
+        "2026-10-23": {
+          "frequency": "teias/2026/10/20261023.frequency.i16",
+          "minute": "teias/2026/10/20261023.minute.json",
+          "hourly": "teias/2026/10/20261023.hourly.json",
+          "meta": "teias/2026/10/20261023.meta.json"
         }
       }
     }
