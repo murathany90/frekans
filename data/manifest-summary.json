@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAtUtc": "2026-10-27T13:13:25Z",
+  "updatedAtUtc": "2026-10-27T13:27:42Z",
   "storage": {
     "type": "github-pages",
     "baseUrl": "./data"
@@ -15,7 +15,7 @@
       "label": "Netztransparenz",
       "timezone": "Europe/Berlin",
       "firstDate": "2024-01-01",
-      "latestDate": "2026-10-25",
+      "latestDate": "2026-10-26",
       "availableDates": [
         "2024-01-01",
         "2024-01-02",
@@ -1045,7 +1045,8 @@
         "2026-10-22",
         "2026-10-23",
         "2026-10-24",
-        "2026-10-25"
+        "2026-10-25",
+        "2026-10-26"
       ],
       "excludedDates": [],
       "status": "automatic_update"
