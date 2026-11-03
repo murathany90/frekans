@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAtUtc": "2026-11-02T17:19:38Z",
+  "updatedAtUtc": "2026-11-03T15:09:04Z",
   "storage": {
     "type": "github-pages",
     "baseUrl": "./data"
@@ -1061,7 +1061,7 @@
       "label": "TEİAŞ",
       "timezone": "Europe/Istanbul",
       "firstDate": "2024-01-01",
-      "latestDate": "2026-10-30",
+      "latestDate": "2026-10-31",
       "availableDates": [
         "2024-01-01",
         "2024-01-02",
@@ -2093,7 +2093,8 @@
         "2026-10-27",
         "2026-10-28",
         "2026-10-29",
-        "2026-10-30"
+        "2026-10-30",
+        "2026-10-31"
       ],
       "excludedDates": [
         "2026-05-08",
