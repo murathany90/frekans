@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "source": "netztransparenz",
   "year": 2026,
-  "updatedAtUtc": "2026-11-05T15:28:55Z",
+  "updatedAtUtc": "2026-11-05T15:43:11Z",
   "availableDates": [
     "2026-01-01",
     "2026-01-02",
@@ -310,7 +310,8 @@
     "2026-10-31",
     "2026-11-01",
     "2026-11-02",
-    "2026-11-03"
+    "2026-11-03",
+    "2026-11-04"
   ],
   "excludedDates": [],
   "days": {
@@ -5073,6 +5074,22 @@
         "minute": "netztransparenz/2026/11/20261103.minute.json",
         "hourly": "netztransparenz/2026/11/20261103.hourly.json",
         "meta": "netztransparenz/2026/11/20261103.meta.json"
+      },
+      "sourceMethod": "official_zip"
+    },
+    "2026-11-04": {
+      "date": "2026-11-04",
+      "timezone": "Europe/Berlin",
+      "status": "complete",
+      "qualityScore": 100,
+      "sha256": "bc96c79d11586df75a3be3293dfb4f08728011ee7a785a2db519769fdacf073c",
+      "expectedSamples": 86400,
+      "validSamples": 86400,
+      "files": {
+        "frequency": "netztransparenz/2026/11/20261104.frequency.i16",
+        "minute": "netztransparenz/2026/11/20261104.minute.json",
+        "hourly": "netztransparenz/2026/11/20261104.hourly.json",
+        "meta": "netztransparenz/2026/11/20261104.meta.json"
       },
       "sourceMethod": "official_zip"
     }
